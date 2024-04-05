@@ -26,7 +26,12 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def calculate_winners
+  #  @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
+  if @budget.stv
+    @budget.headings.each { |heading| Budget::Stvresult.new(@budget, heading).delay.calculate_stv_winners }
+  else
     @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
+  end
     redirect_to admin_budget_budget_investments_path(
                   budget_id: @budget.id,
                   advanced_filters: ["winners"]
