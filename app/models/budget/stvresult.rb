@@ -334,9 +334,6 @@ end
       @current_investment.update!(winner: true)
     end
     
-    def eliminate
-      @current_investment.update!(eliminated: true)
-    end
 
     def winners
       investments.where(winner: true)
