@@ -1,0 +1,27 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV["DB_HOST"].presence || "localhost" %>
+  pool: 5
+  schema_search_path: "public,shared_extensions"
+  username: <%= ENV["PGUSER"].presence %>
+  password: <%= ENV["PGPASSWORD"].presence || ENV["POSTGRES_PASSWORD"].presence %>
+
+development: &development
+  <<: *default
+  database: coslaconsul_dev
+
+# The staging, preproduction and production dbs are only needed
+# for running rake assets:precompile locally before deploying
+staging:
+  <<: *development
+
+preproduction:
+  <<: *development
+
+production:
+  <<: *development
+
+test:
+  <<: *default
+  database: consul_test

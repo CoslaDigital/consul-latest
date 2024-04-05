@@ -5,7 +5,6 @@ class Budget
     def initialize(budget, heading)
       @budget = budget
       @heading = heading
-      @candidates = candidates
       @elected_investments = []
       @eliminated_investments = []
       log_file_name = "stv_budget_#{budget.id}_heading_#{heading.id}.log"
@@ -294,9 +293,9 @@ end
       heading.investments.selected.sort_by_votes
     end
 
-def candidates_ids
-  heading.investments.selected.pluck(:id)
-end
+    def candidates_ids
+     heading.investments.selected.pluck(:id)
+    end
     
     def investments
       heading.investments.selected.sort_by_ballots
