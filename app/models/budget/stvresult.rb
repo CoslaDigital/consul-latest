@@ -23,7 +23,6 @@ class Budget
     
     def calculate_stv_winners
       reset_winners
-      reset_eliminateds
       seats = budget.stv_winners
       votes = budget.ballots.count
       quota = droop_quota(votes, seats) # Calculate the Droop quota once
@@ -329,9 +328,6 @@ end
       candidates.update_all(votes: 0)
     end
 
-    def reset_eliminateds
-      candidates.update_all(eliminated: false)
-    end
 
     def set_winner
       @money_spent += @current_investment.price
