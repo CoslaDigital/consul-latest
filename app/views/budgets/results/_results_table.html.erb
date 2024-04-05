@@ -50,6 +50,7 @@
               <%= link_to investment.title, budget_investment_path(@budget, investment) %>
             </td>
             <td class="text-center">
+              <%=investment.ballots.joins(:ballot_lines).distinct.count(:ballot_lines) %>
               <%= investment.ballot_lines_count %>
             </td>
             <% if @budget.show_money? %>
