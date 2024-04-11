@@ -11,6 +11,7 @@ class Budget
   
      # Configure the STV logger with the constructed file name
       @stv_logger = ActiveSupport::Logger.new(Rails.root.join('log', log_file_name))
+      @stv_logger.level = Logger::INFO
     end
     
     def droop_quota(votes, seats)
@@ -92,32 +93,37 @@ class Budget
      break
     end
     # Output sorted investments to Rails logger
-    @stv_logger.info("Remaining andidates in order of votes:")
+    @stv_logger.info("Remaining Candidates in order of votes:")
        sorted_investments.each do |investment_id, count|
        @stv_logger.info("Investment ID: #{investment_id}, Vote Count: #{count}")
        investments.find_by(id: investment_id)&.update(votes: count)
     end
     # Check if there are any investments with enough votes to meet the quota
-    elected_investment = sorted_investments.find { |investment_id, count| count >= quota }
-    @stv_logger.info "elected investment #{elected_investment}"
-    if elected_investment
+    elected = sorted_investments.select { |investment_id, count| count >= quota }
+    # Log information about elected investments
+    elected.each do |investment_id, count|
+     @stv_logger.info "Elected: Investment #{investment_id} (votes count: #{count})"
+    end
+    if elected.present?
+    elected.each do |investment_id, count|
       # Add the elected investment to the list of elected investments
-      @elected_investments << elected_investment[0]
-      @stv_logger.info "Elected: Investment #{elected_investment[0]} (exceeds quota)"
+      @elected_investments << investment_id
+      @stv_logger.info "Elected: Investment #{investment_id} (exceeds quota)"
 
       # Calculate surplus votes and transfer them to next preferences
-      surplus = elected_investment[1] - quota
+      surplus = count - quota
       @stv_logger.info "surplus is #{surplus}"
-      transfer_surplus_votes(votes_data, elected_investment[0], surplus)
+      transfer_surplus_votes(votes_data, investment_id, surplus)
 
       # Reduce the number of seats left to fill
 
       empty_seats -= 1
       @stv_logger.info "Remaining empty seats #{empty_seats}"
       # Remove the elected investment from consideration
-      initial_vote_counts.delete(elected_investment[0])
+      initial_vote_counts.delete(investment_id)
       # Break if no more seats left to fill
       break if empty_seats <= 0
+      end
     else
       @stv_logger.info " No investments meet the quota, so eliminate the lowest-ranking investment"
       eliminated_investment = sorted_investments.last
@@ -190,27 +196,6 @@ def transfer_eliminated_votes(votes_data, eliminated_investment_id)
   reallocated_votes
 end
 
-
-
-def transfer_eliminated_votes_nearly(votes_data, eliminated_investment_id)
-  reallocated_votes = []
-  votes_data.each do |vote|
-    if vote[:rankings].first == eliminated_investment_id
-      @stv_logger.info "Reallocating votes for #{eliminated_investment_id}"
-      next_preference = vote[:rankings][1]
-      if next_preference && next_preference != eliminated_investment_id && !elected_or_eliminated?(next_preference)
-        reallocated_votes << next_preference
-      else
-        Rails.logger.warn "Next preference for vote #{vote} is already elected or eliminated. Using next available preference."
-        reallocated_votes << vote[:rankings].find { |id| !elected_or_eliminated?(id) }
-      end      
-      vote[:rankings].shift  # Remove the eliminated investment from the first preference
-    end
-  end
-  @stv_logger.info "Rallocate votes #{reallocated_votes.flatten}"
-  reallocated_votes.flatten
-  
-end
   
 def elected_or_eliminated?(investment_id)
   if @elected_investments.include?(investment_id)
@@ -230,12 +215,12 @@ def transfer_surplus_votes(votes_data, elected_investment_id, surplus)
   votes_data.each do |vote|
     if vote[:rankings].first == elected_investment_id
       transfer_ratio = surplus.to_f / surplus_contributing_votes
-    #  @stv_logger.info " transfer ratio #{transfer_ratio}"
+      @stv_logger.info "transfer ratio is #{transfer_ratio}"
       vote[:rankings].shift  # Remove the elected investment from the first preference
 
       vote[:rankings].each_with_index do |investment_id, index|
   # Increase each next preference vote count by the transfer_ratio
-      vote[:rankings][index] = investment_id if index == 0  # Keep the first preference unchanged
+  #    vote[:rankings][index] = investment_id if index == 0  # Keep the first preference unchanged
       vote[:rankings][index] += transfer_ratio if index > 0  # Increase next preference votes by transfer_ratio
     end
 
