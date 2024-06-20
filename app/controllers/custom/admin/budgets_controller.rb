@@ -26,7 +26,6 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def calculate_winners
-  #  @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
   if @budget.stv
     @budget.headings.each { |heading| Budget::Stvresult.new(@budget, heading).delay.calculate_stv_winners }
   else

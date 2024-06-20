@@ -41,4 +41,9 @@ class Admin::Budgets::FormComponent
     def hide_money_style
       "hide" if budget.voting_style == "knapsack"
     end
+
+    def hide_stv_style
+      "hide" unless budget.voting_style == "stv"
+    end
+
 end

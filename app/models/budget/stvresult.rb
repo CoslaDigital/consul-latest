@@ -7,7 +7,7 @@ class Budget
       @heading = heading
       @elected_investments = []
       @eliminated_investments = []
-      @log_file_name = "stv_budget_#{budget.id}_heading_#{heading.id}.log"
+      @log_file_name = "stv_voting_#{budget.name}_#{heading.name}.log"
       log_path = Rails.root.join('log', @log_file_name)
       File.open(log_path, 'w') {}
       #@stv_logger = ActiveSupport::Logger.new(log_path)
@@ -27,14 +27,14 @@ class Budget
       write_to_output( "<p><h3>the quota is #{quota}</h3></p>")
       ballots = get_ballots
       ballot_data = get_votes_data
-      write_to_output( "<p>About to count votes</p>")
+     # write_to_output( "<p>About to count votes</p>")
       winners = calculate_results(ballot_data, seats, quota)
       write_to_output( "<br><p>Election Complete</p>")
       write_to_output( "<p>Results are #{winners}</p>")
       update_winning_investments(winners)
-      Rails.logger.info("startingto create custom page")
+      #Rails.logger.info("startingto create custom page")
       update_custom_page(@log_file_name)
-      Rails.logger.info("finished creating custom page")
+      #Rails.logger.info("finished creating custom page")
       winners 
     end
     
@@ -81,7 +81,7 @@ class Budget
        write_to_output( "<br><h2>Round #{iteration}:</h2><br>")
        write_to_output( "<p>----------------</p><br>")
 #    write_to_output( "Quota is #{quota}<br>")
-
+       write_to_output( "<table><thead><tr> <th>Candidate</th><th>Votes</th></tr></thead><tbody>")  
     # Sort investments by their initial vote counts
     sorted_investments = initial_vote_counts.sort_by { |investment_id, count| -count }
     if sorted_investments.empty?
@@ -91,7 +91,8 @@ class Budget
     # Output sorted investments to Rails logger
     write_to_output("<p>Remaining Candidates in order of votes:</p>")
        sorted_investments.each do |investment_id, count|
-       write_to_output("<p>Investment ID: #{investment_id}, Vote Count: #{count}</p><br>")
+       write_to_output("<td>#{investment_id}</td><td>#{count}</td></tr><tr>")
+#       write_to_output("<p>Investment ID: #{investment_id}, Vote Count: #{count}</p><br>")
        investments.find_by(id: investment_id)&.update(votes: count)
     end
     # Check if there are any investments with enough votes to meet the quota
@@ -136,7 +137,7 @@ class Budget
     else
       write_to_output( "<p> No investments meet the quota, so eliminate the lowest-ranking investment</p>")
       eliminated_investment = sorted_investments.last
-      write_to_output( "<p>Candidate to be eliminated<strong> #{eliminated_investment}</strong><p><br>")
+      write_to_output( "<p>Candidate to be eliminated<strong> #{eliminated_investment[0]}</strong><p><br>")
       @eliminated_investments << eliminated_investment[0]
       write_to_output( "<strong>Eliminated: Investment #{eliminated_investment[0]} (lowest vote count)</strong><br>")
 
@@ -151,7 +152,7 @@ class Budget
       if initial_vote_counts.key?(id)
          # Increment the vote count for the investment ID
            initial_vote_counts[id] += 1
-           write_to_output( "<p>Reallocated vote to investment #{id}</p><br>")
+         #  write_to_output( "<p>Reallocated vote to investment #{id}</p><br>")
       else
          # Optionally, handle the case where the investment ID is not found in the hash
           Rails.logger.warn "Investment ID #{id} not found in initial vote counts"
@@ -165,8 +166,8 @@ class Budget
 
     # Output elected and eliminated investments for this iteration
     write_to_output( "<p><strong>End of round #{iteration} summary</strong></p><br>")
-    write_to_output( "<p><strong>Elected Investments: #{@elected_investments.join(', ')}</strong></p><br>") unless @elected_investments.empty?
-    write_to_output( "<p>Eliminated Investments: #{@eliminated_investments.join(', ')}</p>") unless @eliminated_investments.empty?
+    write_to_output( "<p><strong>Elected Candidatess: #{@elected_investments.join(', ')}</strong></p><br>") unless @elected_investments.empty?
+    write_to_output( "<p>Eliminated Candidatess: #{@eliminated_investments.join(', ')}</p>") unless @eliminated_investments.empty?
     write_to_output( "<p>-------------\n</p><br>")
     write_to_output( "<p>Remaining empty seats: #{empty_seats}</p><br><br>")
 
@@ -201,7 +202,7 @@ def transfer_eliminated_votes(votes_data, eliminated_investment_id)
     end
   end
 
-  write_to_output( "Reallocated votes: #{reallocated_votes}")
+#  write_to_output( "Reallocated votes: #{reallocated_votes}")
   reallocated_votes
 end
 
