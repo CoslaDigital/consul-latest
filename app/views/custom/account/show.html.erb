@@ -28,12 +28,14 @@
 
             <% else %>
               <%= f.text_field :username, maxlength: User.username_max_length %>
+              <% if feature?(:demographics) %>
               <h3>About Me (Optional information)</h3>
               <%= f.date_field :date_of_birth, include_blank: true %>
               <%= f.select :gender, [['Select Gender', nil], ['Male', 'male'], ['Female', 'female'], ['Other', 'other']], {}, { class: 'gender-select' } %>
  
               <%= f.label :geozone_id, 'Choose Area (or leave blank for none)' %>
               <%= f.collection_select :geozone_id, Geozone.all, :id, :name, { include_blank: 'Select Geozone' }, { class: 'geozone-select' } %>    
+            <% end %>
             <% end %>
           </div>
 
