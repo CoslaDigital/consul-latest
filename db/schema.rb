@@ -314,6 +314,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.string "video_url"
     t.bigint "estimated_price"
     t.text "summary"
+    t.integer "implementation_performer", default: 0
+    t.text "implementation_contribution"
+    t.string "user_cost_estimate"
+    t.string "on_behalf_of"
+    t.integer "qualified_votes_count", default: 0
     t.index ["administrator_id"], name: "index_budget_investments_on_administrator_id"
     t.index ["author_id"], name: "index_budget_investments_on_author_id"
     t.index ["budget_id"], name: "index_budget_investments_on_budget_id"
@@ -432,6 +437,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.boolean "published"
     t.boolean "hide_money", default: false
     t.boolean "part_fund"
+    t.bigint "projekt_id"
+    t.index ["projekt_id"], name: "index_budgets_on_projekt_id"
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
@@ -575,6 +582,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.integer "geozone_id"
     t.tsvector "tsv"
     t.datetime "featured_at", precision: nil
+    t.bigint "projekt_id"
+    t.string "on_behalf_of"
     t.index ["author_id", "hidden_at"], name: "index_debates_on_author_id_and_hidden_at"
     t.index ["author_id"], name: "index_debates_on_author_id"
     t.index ["cached_votes_down"], name: "index_debates_on_cached_votes_down"
@@ -585,7 +594,97 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.index ["geozone_id"], name: "index_debates_on_geozone_id"
     t.index ["hidden_at"], name: "index_debates_on_hidden_at"
     t.index ["hot_score"], name: "index_debates_on_hot_score"
+    t.index ["projekt_id"], name: "index_debates_on_projekt_id"
     t.index ["tsv"], name: "index_debates_on_tsv", using: :gin
+  end
+
+  create_table "deficiency_report_categories", force: :cascade do |t|
+    t.string "color"
+    t.string "icon"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+  end
+
+  create_table "deficiency_report_category_translations", force: :cascade do |t|
+    t.bigint "deficiency_report_category_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.index ["deficiency_report_category_id"], name: "index_d61b31ba5bbffdea13be0cd92b8cb671cb6d18b5"
+    t.index ["locale"], name: "index_deficiency_report_category_translations_on_locale"
+  end
+
+  create_table "deficiency_report_officers", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.index ["user_id"], name: "index_deficiency_report_officers_on_user_id"
+  end
+
+  create_table "deficiency_report_status_translations", force: :cascade do |t|
+    t.bigint "deficiency_report_status_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "title"
+    t.text "description"
+    t.index ["deficiency_report_status_id"], name: "index_9003f0b89e1dd7ed97cbb6fd7a245a79809763a3"
+    t.index ["locale"], name: "index_deficiency_report_status_translations_on_locale"
+  end
+
+  create_table "deficiency_report_statuses", force: :cascade do |t|
+    t.string "color"
+    t.string "icon"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.integer "given_order"
+  end
+
+  create_table "deficiency_report_translations", force: :cascade do |t|
+    t.bigint "deficiency_report_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "title"
+    t.text "description"
+    t.text "summary"
+    t.text "official_answer"
+    t.index ["deficiency_report_id"], name: "index_deficiency_report_translations_on_deficiency_report_id"
+    t.index ["locale"], name: "index_deficiency_report_translations_on_locale"
+  end
+
+  create_table "deficiency_reports", force: :cascade do |t|
+    t.integer "author_id"
+    t.integer "comments_count", default: 0
+    t.string "video_url"
+    t.boolean "official_answer_approved", default: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.bigint "deficiency_report_category_id"
+    t.bigint "deficiency_report_status_id"
+    t.bigint "deficiency_report_officer_id"
+    t.integer "cached_votes_total", default: 0
+    t.integer "cached_votes_up", default: 0
+    t.integer "cached_votes_down", default: 0
+    t.integer "cached_votes_score", default: 0
+    t.integer "cached_anonymous_votes_total", default: 0
+    t.datetime "hidden_at", precision: nil
+    t.tsvector "tsv"
+    t.bigint "hot_score", default: 0
+    t.string "on_behalf_of"
+    t.datetime "assigned_at", precision: nil
+    t.index ["cached_anonymous_votes_total"], name: "index_deficiency_reports_on_cached_anonymous_votes_total"
+    t.index ["cached_votes_down"], name: "index_deficiency_reports_on_cached_votes_down"
+    t.index ["cached_votes_score"], name: "index_deficiency_reports_on_cached_votes_score"
+    t.index ["cached_votes_total"], name: "index_deficiency_reports_on_cached_votes_total"
+    t.index ["cached_votes_up"], name: "index_deficiency_reports_on_cached_votes_up"
+    t.index ["deficiency_report_category_id"], name: "index_deficiency_reports_on_deficiency_report_category_id"
+    t.index ["deficiency_report_officer_id"], name: "index_deficiency_reports_on_deficiency_report_officer_id"
+    t.index ["deficiency_report_status_id"], name: "index_deficiency_reports_on_deficiency_report_status_id"
+    t.index ["hidden_at"], name: "index_deficiency_reports_on_hidden_at"
+    t.index ["hot_score"], name: "index_deficiency_reports_on_hot_score"
+    t.index ["tsv"], name: "index_deficiency_reports_on_tsv", using: :gin
   end
 
   create_table "delayed_jobs", id: :serial, force: :cascade do |t|
@@ -700,6 +799,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.string "census_code"
     t.text "geojson"
     t.string "color"
+    t.string "postal_codes"
   end
 
   create_table "geozones_polls", id: :serial, force: :cascade do |t|
@@ -1087,6 +1187,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.bigint "option_id"
+    t.string "open_answer_text"
     t.index ["author_id"], name: "index_poll_answers_on_author_id"
     t.index ["option_id", "author_id"], name: "index_poll_answers_on_option_id_and_author_id", unique: true
     t.index ["option_id"], name: "index_poll_answers_on_option_id"
@@ -1188,6 +1289,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.integer "question_id"
     t.integer "given_order", default: 1
     t.boolean "most_voted", default: false
+    t.boolean "open_answer", default: false
+    t.integer "rating_scale_weight"
     t.index ["question_id"], name: "index_poll_question_answers_on_question_id"
   end
 
@@ -1198,6 +1301,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "title"
     t.datetime "hidden_at", precision: nil
+    t.text "description"
     t.index ["hidden_at"], name: "index_poll_question_translations_on_hidden_at"
     t.index ["locale"], name: "index_poll_question_translations_on_locale"
     t.index ["poll_question_id"], name: "index_poll_question_translations_on_poll_question_id"
@@ -1213,6 +1317,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.tsvector "tsv"
+    t.boolean "show_images", default: false
+    t.boolean "multiple", default: false
+    t.integer "given_order"
     t.index ["author_id"], name: "index_poll_questions_on_author_id"
     t.index ["poll_id"], name: "index_poll_questions_on_poll_id"
     t.index ["proposal_id"], name: "index_poll_questions_on_proposal_id"
@@ -1560,7 +1667,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.index ["name", "locale"], name: "index_site_customization_content_blocks_on_name_and_locale", unique: true
+    t.string "key"
+    t.index ["key", "name", "locale"], name: "locale_key_name_index", unique: true
   end
 
   create_table "site_customization_images", id: :serial, force: :cascade do |t|
@@ -1717,6 +1825,22 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at", precision: nil
     t.string "unlock_token"
+    t.string "street_number"
+    t.string "document_last_digits"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "street_name"
+    t.integer "plz"
+    t.string "city_name"
+    t.string "unique_stamp"
+    t.boolean "adm_email_on_new_comment", default: false
+    t.boolean "adm_email_on_new_proposal", default: false
+    t.boolean "adm_email_on_new_debate", default: false
+    t.boolean "adm_email_on_new_deficiency_report", default: false
+    t.string "otp_secret"
+    t.integer "consumed_timestep"
+    t.boolean "otp_required_for_login"
+    t.text "otp_backup_codes"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -1843,6 +1967,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.integer "columns", default: 4
     t.string "cardable_type", default: "SiteCustomization::Page"
     t.integer "order", default: 1, null: false
+    t.string "card_category", default: ""
     t.index ["cardable_id"], name: "index_widget_cards_on_cardable_id"
   end
 
@@ -1862,6 +1987,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
   add_foreign_key "budget_investments", "communities"
   add_foreign_key "budget_valuators", "budgets"
   add_foreign_key "budget_valuators", "valuators"
+  add_foreign_key "budgets", "projekts"
   add_foreign_key "dashboard_administrator_tasks", "users"
   add_foreign_key "dashboard_executed_actions", "dashboard_actions", column: "action_id"
   add_foreign_key "dashboard_executed_actions", "proposals"
