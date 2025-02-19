@@ -25,4 +25,5 @@
 #
 # Add your custom gem dependencies here
 gem 'ruby-openai', '~> 3.7'
-
+gem "omniauth-saml", "~> 2.1.0"
+gem 'notifications-ruby-client', '~> 6.2'
