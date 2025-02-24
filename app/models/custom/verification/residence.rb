@@ -1,3 +1,5 @@
+load Rails.root.join("app", "models", "verification", "residence.rb")
+
 class Verification::Residence
   include ActiveModel::Model
   include ActiveModel::Dates
@@ -14,7 +16,7 @@ class Verification::Residence
   validate :allowed_age, if: -> { Setting["min_age_to_participate"].present? }
  # validate :document_number_uniqueness
 
-  validate :local_postal_code
+  #validate :local_postal_code
   #validate :local_residence
 
   def initialize(attrs = {})
@@ -25,10 +27,11 @@ class Verification::Residence
   end
 
   def save
+    puts "ABOUT TO TRY TO SAVE"
     return false unless valid?
-
+    
   #  user.take_votes_if_erased_document(document_number, document_type)
-
+    puts "ABOUT TO TRY TO UPDATE USER"
     user.update(#document_number: document_number,
                 #document_type: document_type,
                 geozone_id: my_geozone,
@@ -36,7 +39,8 @@ class Verification::Residence
 #               date_of_birth: date_of_birth.in_time_zone.to_datetime,
  #              gender: gender,
                 residence_verified_at: Time.current,
-                verified_at: Time.current)             
+#                verified_at: Time.current
+                )             
   end
 
   def save!

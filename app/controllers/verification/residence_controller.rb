@@ -15,6 +15,9 @@ class Verification::ResidenceController < ApplicationController
     else
       render :new
     end
+    rescue => e
+    Rails.logger.debug( "Error: #{e.message}")
+    Rails.logger.error e.backtrace.join("\n")
   end
 
   private

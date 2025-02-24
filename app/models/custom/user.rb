@@ -16,6 +16,23 @@ def send_devise_notification(notification, *)
      devise_mailer.send(notification, self, *).deliver_later
 end
 
+def remove_verification
+  update!(
+      level_two_verified_at: nil,
+      residence_verified_at: nil,
+      verified_at: nil,
+      phone_number: nil,
+      confirmation_token: nil,
+      sms_confirmation_code: nil,
+      reset_password_token: nil,
+      email_verification_token: nil,
+      letter_verification_code:nil,
+      letter_requested_at: nil,
+      confirmed_phone: nil,
+      unconfirmed_phone: nil
+    )
+  end
+
 
 def erase(erase_reason = nil)
     update!(
