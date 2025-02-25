@@ -1,3 +1,4 @@
+Rails.root.join("app","controllers","comments_controller.rb")
 class CommentsController < ApplicationController
   include SettingsHelper
   
@@ -55,6 +56,7 @@ class CommentsController < ApplicationController
     set_comment_flags(@comment.subtree)
   end
 
+
 def openaimoderate(text_string)
   thresh = Rails.application.secrets.openai_thresh || 1.5
   openai_key = Rails.application.secrets.openai_key
@@ -63,29 +65,39 @@ def openaimoderate(text_string)
   flag_score = 0
   flag_cat = ""
   puts "openaikey is #{openai_key}"
-  
+
   if openai_key.nil? || openai_key.strip.empty?
     return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: "missing api key" }
   end
-  
-  client = OpenAI::Client.new(access_token: openai_key)
-  body = text_string
-  response = client.moderations(parameters: { input: body })
+
+  client = OpenAI::Client.new(access_token: openai_key) rescue nil
+  if client.nil?
+    return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: "client initialization error" }
+  end
+
+  response = client.moderations(parameters: {  model: "omni-moderation-latest", input: text_string }) rescue nil
+  if response.nil? || response.to_s.include?("error")
+    error_message = response["error"]["message"] rescue "Unknown error"
+    error_code = response["error"]["code"] rescue "unknown_error"
+    return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: "API error: #{error_code}", message: error_message }
+  end
+
   is_hidden = response["results"][0]["flagged"] == true ? true : false
   scores = response["results"][0]["category_scores"]
   puts scores
-  total_score = 0 
-  
+  total_score = 0
+
   scores.each do |cat, score|
     total_score += score
     if score > thresh
-      flag_score += 2       
+      flag_score += 2
       flag_cat += cat
     end
   end
   if flag_score > thresh
-     is_flagged = true
+    is_flagged = true
   end
+
   return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: flag_cat }
 end
 

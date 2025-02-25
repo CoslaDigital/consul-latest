@@ -24,6 +24,7 @@
 ###### Other gems ######
 #
 # Add your custom gem dependencies here
-gem 'ruby-openai', '~> 3.7'
+gem 'ruby-openai'
 gem "omniauth-saml", "~> 2.1.0"
 gem 'notifications-ruby-client', '~> 6.2'
+gem 'google_perspective', '~> 0.1.3'
