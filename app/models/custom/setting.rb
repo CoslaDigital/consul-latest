@@ -36,5 +36,26 @@ class Setting
         })
       end
     end
+    
+    def moderate_comments?
+      Setting["moderation.comments"].present?
+    end
+
+     def moderate_proposals?
+      Setting["moderation.proposals"].present?
+    end
+
+    def get_vendor_name
+      vendor_key = Setting["moderation.vendor"]
+      vendor = Llm::Vendor.find_by(id: vendor_key)
+      vendor.name if vendor
+    end
+
+    def get_vendor_api
+      vendor_key = Setting["moderation.vendor"]
+      vendor = Llm::Vendor.find_by(id: vendor_key)
+      vendor.api_key if vendor
+    end
+
   end
 end

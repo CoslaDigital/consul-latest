@@ -1843,23 +1843,24 @@ en:
       vendors:
         empty: No vendors found
         third_party_cookies: Third party cookies
-        create_button: Create cookie vendor
+        create_button: Create LLM vendor
         create:
-          notice: Cookie vendor created successfully
+          notice: LLM vendor created successfully
         new:
-          title: New cookie vendor
+          title: New LLM vendor
         edit:
-          title: Edit cookie vendor
+          title: Edit LLM vendor
         update:
-          notice: Cookie vendor updated successfully
+          notice: LLM vendor updated successfully
         destroy:
-          notice: Cookie vendor deleted successfully
+          notice: LLM vendor deleted successfully
         form:
           name:
-            help_text: This information will be publicly visible.
-          cookie:
-            help_text: This information will be used internally. The cookie name must be unique, and it can only contain letters, digits and underscores.
+            help_text: "Select a LLM provider from the suppported list."
+          api_key:
+            help_text: "Enter your api key"
           description:
-            help_text: This information will be publicly visible.
+            help_text: Enter any additional information about this vendor
           script:
-            help_text: This is the script to run when this cookie is accepted by the user. You can enter vanilla Javascript code here and introduce references to other application javascript.
+            help_text: NOT IMPLEMENTED YET
+            
