@@ -33,10 +33,13 @@ class Setting
           "moderation.threshold_low": 0.8,
           "moderation.threshold_high": 2.0,
           "moderation.threshold": 1.5
+          "feature.hide_local_login": false
+
         })
       end
     end
     
+
     def moderate_comments?
       Setting["moderation.comments"].present?
     end
@@ -55,6 +58,10 @@ class Setting
       vendor_key = Setting["moderation.vendor"]
       vendor = Llm::Vendor.find_by(id: vendor_key)
       vendor.api_key if vendor
+    end
+
+    def hide_local_login?
+      Setting["feature.hide_local_login"] == "active"
     end
 
   end

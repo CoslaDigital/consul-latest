@@ -89,6 +89,8 @@ en:
       facebook_login_description: "Allow users to sign up with their Facebook account"
       google_login: "Google login"
       google_login_description: "Allow users to sign up with their Google Account"
+      hide_local_login: "Hide local login"
+      hide_local_login_description: "Obfuscate local login form fields"
       wordpress_login: "Wordpress login"
       wordpress_login_description: "Allow users to sign up with their Wordpress Account"
       saml_login: "Saml login"
