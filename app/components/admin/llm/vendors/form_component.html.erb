@@ -1,0 +1,10 @@
+<%= form_for [:admin, vendor], html: { class: "vendor-form" } do |f| %>
+  <%= render "shared/errors", resource: vendor %>
+
+  <%= f.text_field :name, hint: t("admin.llm.vendors.form.name.help_text") %>
+  <%= f.text_area :description, hint: t("admin.llm.vendors.form.description.help_text"), rows: 4 %>
+  <%= f.text_field :api_key, hint: t("admin.llm.vendors.form.cookie.help_text") %>
+  <%= f.text_area :script, hint: t("admin.llm.vendors.form.script.help_text"), rows: 10 %>
+
+  <%= f.submit %>
+<% end %>

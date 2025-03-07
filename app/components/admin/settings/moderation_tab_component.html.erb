@@ -1,0 +1,13 @@
+<h2><%= t("admin.settings.index.moderation.title") %></h2>
+<%= render Admin::Settings::TableComponent.new(setting_name: "feature") do %>
+  <%= render Admin::Settings::RowComponent.new("moderation.vendor", type: :dropdown, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.comments", type: :feature, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.proposals", type: :feature, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.images", type: :feature, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.threshold", type: :text, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.threshold_low", type: :text, tab: tab) %>
+  <%= render Admin::Settings::RowComponent.new("moderation.threshold_high", type: :text, tab: tab) %>
+
+<% end %>
+
+<%= render Admin::Llm::Vendors::TableComponent.new %>

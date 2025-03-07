@@ -25,7 +25,14 @@ class Setting
         consul_defaults.merge({
           # Overwrite default CONSUL DEMOCRACY settings or add new settings here
           "feature.saml_login": true,
-          "feature.valid_geozone": true
+          "feature.valid_geozone": true,
+          "moderation.vendor": true,
+          "moderation.comments": "",
+          "moderation.images": true,
+          "moderation.proposals": true,
+          "moderation.threshold_low": 0.8,
+          "moderation.threshold_high": 2.0,
+          "moderation.threshold": 1.5
         })
       end
     end

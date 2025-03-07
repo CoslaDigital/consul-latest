@@ -19,4 +19,9 @@ class Admin::Settings::RowComponent < ApplicationComponent
   def featured_setting?
     type == :feature
   end
+
+  def dropdown_setting?
+    type == :dropdown
+  end
+
 end
