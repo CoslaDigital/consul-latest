@@ -1,6 +1,8 @@
+Rails.root.join("app","controllers","comments_controller.rb")
 class CommentsController < ApplicationController
   include SettingsHelper
-  
+  include ModerationHelper
+    
   before_action :authenticate_user!, only: [:create, :hide, :vote]
   before_action :load_commentable, only: :create
   before_action :verify_resident_for_commentable!, only: :create
@@ -10,14 +12,16 @@ class CommentsController < ApplicationController
   respond_to :html, :js 
 
   def create
+    
     if @comment.save
       CommentNotifier.new(comment: @comment).process
       add_notification @comment
       EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?  
-      results=moderate
-      if results[:flagged] || results[:hidden]
-         flash[:error] = "Your comment is being moderated. Please come back later."
-         redirect_back(fallback_location: root_path)
+      if Setting.moderate_comments?
+        moderation_result = moderate_text(@comment.body)
+        handle_moderation(@comment, moderation_result)
+        flash[:error] = "Your comment is being moderated. Please come back later. Categories: #{moderation_result[:category].keys.join(', ')}"
+        redirect_back(fallback_location: root_path) if moderation_result[:flagged] || moderation_result[:hidden]
       end
     else
      render :new 
@@ -54,83 +58,6 @@ class CommentsController < ApplicationController
     @comment.hide
     set_comment_flags(@comment.subtree)
   end
-
-def openaimoderate(text_string)
-  thresh = Rails.application.secrets.openai_thresh || 1.5
-  openai_key = Rails.application.secrets.openai_key
-  is_hidden = false
-  is_flagged = false
-  flag_score = 0
-  flag_cat = ""
-  puts "openaikey is #{openai_key}"
-  
-  if openai_key.nil? || openai_key.strip.empty?
-    return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: "missing api key" }
-  end
-  
-  client = OpenAI::Client.new(access_token: openai_key)
-  body = text_string
-  response = client.moderations(parameters: { input: body })
-  is_hidden = response["results"][0]["flagged"] == true ? true : false
-  scores = response["results"][0]["category_scores"]
-  puts scores
-  total_score = 0 
-  
-  scores.each do |cat, score|
-    total_score += score
-    if score > thresh
-      flag_score += 2       
-      flag_cat += cat
-    end
-  end
-  if flag_score > thresh
-     is_flagged = true
-  end
-  return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: flag_cat }
-end
-
- def moderate
-    # setup       
-    is_flagged = false
-    is_hidden = false
-    flag_score = 0
-    flag_cat = ""
-
-    if feature?(:cosla)
-      puts "going to do it"
-    end
-
-    thresh = Rails.application.secrets.openai_thresh || 1.5
-    openai_key = Rails.application.secrets.openai_key
-
-    body = @comment.body
-
-    #test code to avoid using openai
-    if body == "Bad Bad Bad Comment"
-      is_flagged = "true" 
-      total_score = 300
-      flag_score = 300
-    elsif openai_key && !openai_key.strip.empty? 
-       response = openaimoderate(body)
-       is_hidden = response[:hidden]
-       is_flagged = response[:flagged]
-       flag_score = response[:flags] || 0    
-    end
-    
-
-    if is_flagged
-         @comment.flags_count = flag_score
-         @comment.save
-    end
-    if is_hidden || (flag_score > thresh)
-        @comment.hidden_at = Time.current
-        @comment.save
-     end
- return { hidden: is_hidden, flagged: is_flagged }
-
- end
-
-
 
 
   private

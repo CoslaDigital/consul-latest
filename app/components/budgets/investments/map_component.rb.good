@@ -1,0 +1,5 @@
+class Budgets::Investments::MapComponent < Shared::MapComponent
+  def initialize(investments, heading:)
+    super(investments, heading: heading)
+  end
+end

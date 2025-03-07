@@ -1,0 +1,25 @@
+<% if @process.description.present? %>
+  <!-- Foundation Accordion for Description -->
+  <div class="accordion" data-accordion>
+    <div class="accordion-item" data-accordion-item>
+      <a href="#" class="accordion-title"><%= t("legislation.processes.header.description") %></a>
+      <div class="accordion-content" data-tab-content>
+        <%= markdown @process.description %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= render SDG::TagListComponent.new(@process, linkable: false) %>
+
+<% if @process.additional_info.present? %>
+  <!-- Foundation Accordion for Additional Info -->
+  <div class="accordion" data-accordion>
+    <div class="accordion-item" data-accordion-item>
+      <a href="#" class="accordion-title"><%= t("legislation.processes.header.additional_info") %></a>
+      <div class="accordion-content" data-tab-content>
+        <%= markdown @process.additional_info %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -26,13 +26,43 @@ class Setting
           # Overwrite default CONSUL DEMOCRACY settings or add new settings here
           "feature.saml_login": true,
           "feature.valid_geozone": true,
+          "moderation.vendor": true,
+          "moderation.comments": "",
+          "moderation.images": true,
+          "moderation.proposals": true,
+          "moderation.threshold_low": 0.8,
+          "moderation.threshold_high": 2.0,
+          "moderation.threshold": 1.5
           "feature.hide_local_login": false
+
         })
       end
     end
     
+
+    def moderate_comments?
+      Setting["moderation.comments"].present?
+    end
+
+     def moderate_proposals?
+      Setting["moderation.proposals"].present?
+    end
+
+    def get_vendor_name
+      vendor_key = Setting["moderation.vendor"]
+      vendor = Llm::Vendor.find_by(id: vendor_key)
+      vendor.name if vendor
+    end
+
+    def get_vendor_api
+      vendor_key = Setting["moderation.vendor"]
+      vendor = Llm::Vendor.find_by(id: vendor_key)
+      vendor.api_key if vendor
+    end
+
     def hide_local_login?
       Setting["feature.hide_local_login"] == "active"
     end
+
   end
 end

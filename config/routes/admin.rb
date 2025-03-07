@@ -316,8 +316,14 @@ namespace :admin do
     namespace :cookies do
       resources :vendors, except: [:index, :show]
     end
+
   end
+    namespace :llm do
+    resources :vendors, except: [:index, :show]
+  end
+
 end
+
 
 resolve "Milestone" do |milestone|
   [*resource_hierarchy_for(milestone.milestoneable), milestone]

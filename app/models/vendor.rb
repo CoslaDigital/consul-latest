@@ -1,0 +1,1 @@
+Vendor = Struct.new(:id, :name)

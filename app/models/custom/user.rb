@@ -16,6 +16,23 @@ def send_devise_notification(notification, *)
      devise_mailer.send(notification, self, *).deliver_later
 end
 
+def remove_verification
+  update!(
+      level_two_verified_at: nil,
+      residence_verified_at: nil,
+      verified_at: nil,
+      phone_number: nil,
+      confirmation_token: nil,
+      sms_confirmation_code: nil,
+      reset_password_token: nil,
+      email_verification_token: nil,
+      letter_verification_code:nil,
+      letter_requested_at: nil,
+      confirmed_phone: nil,
+      unconfirmed_phone: nil
+    )
+  end
+
 
 def erase(erase_reason = nil)
     update!(
@@ -54,8 +71,8 @@ def erase(erase_reason = nil)
       password: Devise.friendly_token[0, 20],
       terms_of_service: "1",
       confirmed_at: oauth_email_confirmed ? DateTime.current : nil,
-      verified_at: DateTime.current ,
-      residence_verified_at:  DateTime.current
+      level_two_verified_at: DateTime.current ,
+    #  residence_verified_at:  DateTime.current
     )
   end
   
@@ -169,8 +186,8 @@ def erase(erase_reason = nil)
       password: Devise.friendly_token[0, 20],
       terms_of_service: "1",
       confirmed_at: DateTime.current,
-      verified_at: DateTime.current ,
-      residence_verified_at:  DateTime.current,
+#      verified_at: DateTime.current ,
+#      residence_verified_at:  DateTime.current,
       geozone_id: saml_geozone_id
     )
   end

@@ -11,6 +11,8 @@
       <%= render Admin::Settings::ContentTypesFormComponent.new(setting, tab: tab) %>
     <% elsif featured_setting? %>
       <%= render Admin::Settings::FeaturedSettingsFormComponent.new(setting, tab: tab) %>
+    <% elsif dropdown_setting? %>
+      <%= render Admin::Settings::DropdownFormComponent.new(setting, collection: Llm::Vendor.all, value_method: :id, text_method: :name, tab: tab) %>
     <% else %>
       <%= render Admin::Settings::TextFormComponent.new(setting, tab: tab) %>
     <% end %>

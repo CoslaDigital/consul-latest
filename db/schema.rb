@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_10_26_112901) do
+ActiveRecord::Schema[7.0].define(version: 2025_03_07_110160) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -395,7 +396,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_26_112901) do
     t.string "voting_style", default: "knapsack"
     t.boolean "published"
     t.boolean "hide_money", default: false
+    t.boolean "stv"
+    t.integer "stv_winners"
     t.boolean "part_fund"
+  end
+
+  create_table "campaigns", id: :serial, force: :cascade do |t|
+    t.string "name"
+    t.string "track_id"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.boolean "part_fund"
+
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
@@ -888,6 +900,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_26_112901) do
     t.index ["linkable_type", "linkable_id"], name: "index_links_on_linkable_type_and_linkable_id"
   end
 
+  create_table "llm_vendors", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "api_key"
+    t.text "script"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["api_key"], name: "index_llm_vendors_on_api_key"
+  end
+
   create_table "local_census_records", id: :serial, force: :cascade do |t|
     t.string "document_number", null: false
     t.string "document_type", null: false
@@ -1318,6 +1340,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_26_112901) do
     t.integer "community_id"
     t.datetime "published_at", precision: nil
     t.boolean "selected", default: false
+    t.bigint "price"
     t.index ["author_id", "hidden_at"], name: "index_proposals_on_author_id_and_hidden_at"
     t.index ["author_id"], name: "index_proposals_on_author_id"
     t.index ["cached_votes_up"], name: "index_proposals_on_cached_votes_up"
@@ -1643,6 +1666,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_26_112901) do
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at", precision: nil
     t.string "unlock_token"
+    t.boolean "guest", default: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true

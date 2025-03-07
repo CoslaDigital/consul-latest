@@ -145,6 +145,9 @@ module Abilities
       can :manage, LocalCensusRecord
       can [:create, :read], LocalCensusRecords::Import
 
+
+       can :manage, Llm::Vendor
+
       can :manage, Cookies::Vendor
 
       if Rails.application.config.multitenancy && Tenant.default?

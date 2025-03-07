@@ -1,10 +1,15 @@
-<% if @residence.errors[:local_residence].present? %>
+<% if @residence.errors.present? %>
 
   <div id="error_explanation" data-alert class="callout alert" data-closable>
     <button class="close-button" aria-label="<%= t("application.close") %>" type="button" data-close>
       <span aria-hidden="true">&times;</span>
     </button>
     <%= t("verification.residence.new.error_verifying_census") %>
+    <ul>
+      <% @residence.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %> 
+    </ul>
   </div>
 
 <% else %>
