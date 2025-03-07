@@ -13,21 +13,16 @@ class CommentsController < ApplicationController
 
   def create
     
-   # results = moderate_text(@comment.body)
-    #if results[:flagged] || results[:hidden]
-    #   flash[:error] = "Your comment is being moderated. Please come back later. #{results[:category]}"
-    #   redirect_back(fallback_location: root_path)
-    #end
-    
     if @comment.save
       CommentNotifier.new(comment: @comment).process
       add_notification @comment
       EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?  
-      moderation_result = moderate_text(@comment.body)
-      handle_moderation(@comment, moderation_result)
-      flash[:error] = "Your comment is being moderated. Please come back later. Categories: #{moderation_result[:category].keys.join(', ')}"
-      redirect_back(fallback_location: root_path) if moderation_result[:flagged] || moderation_result[:hidden]
-
+      if Setting.moderate_comments?
+        moderation_result = moderate_text(@comment.body)
+        handle_moderation(@comment, moderation_result)
+        flash[:error] = "Your comment is being moderated. Please come back later. Categories: #{moderation_result[:category].keys.join(', ')}"
+        redirect_back(fallback_location: root_path) if moderation_result[:flagged] || moderation_result[:hidden]
+      end
     else
      render :new 
     end
