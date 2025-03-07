@@ -1,6 +1,6 @@
 module Budgets
   class BallotsController < ApplicationController
-    include GuestUsers
+  #  include GuestUsers
 #    before_action :authenticate_user!
     before_action :load_budget
     authorize_resource :budget
