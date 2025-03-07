@@ -846,7 +846,7 @@ DEPENDENCIES
   rubocop-rails (~> 2.26.2)
   rubocop-rspec (~> 3.1.0)
   rubocop-rspec_rails (~> 2.30.0)
-  ruby-openai
+  ruby-openai (~> 3.7)
   rvm1-capistrano3 (~> 1.4.0)
   sassc-embedded (~> 1.80.1)
   sassc-rails (~> 2.1.2)
