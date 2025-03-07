@@ -32,7 +32,7 @@ class Setting
           "moderation.proposals": true,
           "moderation.threshold_low": 0.8,
           "moderation.threshold_high": 2.0,
-          "moderation.threshold": 1.5
+          "moderation.threshold": 1.5,
           "feature.hide_local_login": false
 
         })
