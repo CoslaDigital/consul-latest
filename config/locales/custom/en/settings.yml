@@ -193,42 +193,18 @@ en:
       budgets_description: "With participatory budgets, citizens decide which projects presented by their neighbours will receive a part of the budget"
       legislation: "Collaborative Legislation"
       legislation_description: "In participatory processes, citizens are offered the opportunity to participate in the drafting and modification of regulations that affect the society and to give their opinion on certain actions that are planned to be carried out"
-    html:
-      per_page_code_head: "Code to be included on every page (<head>)"
-      per_page_code_head_description: "This code will appear inside the <head> label. Useful for entering custom scripts, analytics..."
-      per_page_code_body: "Code to be included on every page (<body>)"
-      per_page_code_body_description: "This code will appear inside the <body> label. Useful for entering custom scripts, analytics..."
-    uploads:
-      images:
-        min_width: "Image minimum width"
-        min_width_description: "Minimum width allowed for an uploaded image (in pixels)"
-        min_height: "Image minimum height"
-        min_height_description: "Minimum height allowed for an uploaded image (in pixels)"
-        max_size: "Image maximum size"
-        max_size_description: "Maximum size allowed for an uploaded image (in Megabytes/MB)"
-        content_types: "Accepted content types for images"
-        content_types_description: "Select all the content types allowed for uploaded images"
-        title:
-          min_length: "Image title minimum length"
-          min_length_description: "Title provided by the user when uploading an image (used as alt HTML attribute)"
-          max_length: "Image title maximum length"
-          max_length_description: "Title provided by the user when uploading an image (used as alt HTML attribute)"
-      documents:
-        max_amount: "Maximum number of documents"
-        max_amount_description: "Maximum number of documents that can be attached to a proposal, investment..."
-        max_size: "Document maximum size"
-        max_size_description: "Maximum size allowed for an uploaded document (in Megabytes/MB)"
-        content_types: "Accepted content types for documents"
-        content_types_description: "Select all the content types allowed for uploaded documents"
-    sdg:
-      process:
-        debates: Related SDG in debates
-        debates_description: Allow debates to be linked to Sustainable Development Goals
-        proposals: Related SDG in proposals
-        proposals_description: Allow proposals to be linked to Sustainable Development Goals
-        polls: Related SDG in polls
-        polls_description: Allow polls to be linked to Sustainable Development Goals
-        budgets: Related SDG in partipatory budgets
-        budgets_description: Allow participatory budgets to be linked to Sustainable Development Goals
-        legislation: Related SDG in collaborative legislation
-        legislation_description: Allow collaborative legislation to be linked to Sustainable Development Goals
+    moderation:
+      vendor: "LLM Model"
+      vendor_description: "Select the LLM Model to be used for moderation"
+      comments: "Moderate Comments"
+      comments_description: "Moderate comments in all processes"
+      proposals: "Moderate Proposals"
+      proposals_description: "Moderate proposals in all processes"
+      images: "Moderate Images"
+      images_description: "Moderate uploaded images"
+      threshold: "Threshold"
+      threshold_description: "default value. LLMs returning higher than this score will be flagged"
+      threshold_low: "Threshold Strict score"
+      threshold_low_description: "when strict moderation is applied any content which scores more than this value will be moderated"
+      threshold_high: "Threshold relaxed score"
+      threshold_high_description: "Threshold relaxed score"

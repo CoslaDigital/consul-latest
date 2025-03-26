@@ -1862,5 +1862,5 @@ en:
           description:
             help_text: Enter any additional information about this vendor
           script:
-            help_text: NOT IMPLEMENTED YET
+            help_text: "enter the chat prompt for this model if applicable"
             
