@@ -4,8 +4,8 @@ class Llm::Vendor < ApplicationRecord
   def self.supported_vendors
     [
       Vendor.new(1, "OpenAI"),
-      Vendor.new(2, "Vendor2"),
-      Vendor.new(3, "Vendor3")
+      Vendor.new(2, "Moderation API"),
+      Vendor.new(3, "Deepseek-WIP")
       # Add more vendors as needed
     ]
   end
