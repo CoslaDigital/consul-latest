@@ -1,12 +1,13 @@
 module ModerationHelper
   
   def handle_moderation(moderatable, moderation_result)
+      thresh = Setting["moderation.threshold"].to_f || 1.5
       if moderation_result[:flagged]
         moderatable.update(flags_count: moderation_result[:flags])
       end
-
-      if moderation_result[:hidden] || moderation_result[:flags] > thresh
-        moderatable.update(hidden_at: Time.current)
+      puts "Moderation result is  #{moderation_result[:flags]}"
+      if moderation_result[:hidden] || (moderation_result[:flags].to_i > thresh)
+        moderatable.update(hidden_at: Time.current, moderated_at: Time.current, moderation_reason: moderation_result[:category])
       end
     end
 
@@ -18,16 +19,11 @@ module ModerationHelper
     flag_cat = ""
     
     vendor = Setting.get_vendor_name
-    if vendor == "Moderation API"
-  puts "WTD"
-else
-  puts "NO NO NO"
-end
     api_key = Setting.get_vendor_api
     puts "THE VENDOR IS #{vendor.inspect}"
-    thresh = Rails.application.secrets.openai_thresh || 1.5
-    #openai_key = Rails.application.secrets.openai_key
-
+    #thresh = Rails.application.secrets.openai_thresh || 1.5
+    thresh = Setting["moderation.threshold"] || 1.5
+    puts "THE THRESH IS #{thresh}"
     # Test code to avoid using OpenAI
     if text == "Bad Bad Bad Comment"
       is_flagged = true
@@ -59,7 +55,6 @@ end
   def openaimoderate(text_string, api_key)
     thresh = Rails.application.secrets.openai_thresh || 1.5
     puts "insideopenaimoderate #{api_key}"
-    # openai_key = Rails.application.secrets.openai_key
     is_hidden = false
     is_flagged = false
     flag_score = 0
