@@ -56,6 +56,8 @@ class Comment < ApplicationRecord
 
   scope :not_valuations, -> { where(valuation: false) }
 
+  scope :moderated, -> { where.not(moderated_at: nil) }
+
   after_create :call_after_commented
 
   def self.build(commentable, user, body, p_id = nil, valuation = false)
@@ -144,6 +146,10 @@ class Comment < ApplicationRecord
 
   def self.search(terms)
     pg_search(terms)
+  end
+
+  def awaiting_moderation?
+    hidden_at.present? && moderated_at.present? && confirmed_hide_at.nil?
   end
 
   private
