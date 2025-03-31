@@ -1,5 +1,6 @@
 <tr id="<%= dom_id(vendor) %>" class="vendor">
   <td><%= vendor.name %></td>
-  <td><%= vendor.api_key %></td>
+  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= vendor.api_key %></td>
+  <td><%= vendor.model_endpoint %></td>
   <td><%= render Admin::TableActionsComponent.new(vendor) %></td>
 </tr>

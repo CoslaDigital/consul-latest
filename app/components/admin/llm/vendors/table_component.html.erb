@@ -1,11 +1,12 @@
 <h3><%= t("admin.llm.vendors.third_party_llm") %></h3>
-
 <% if vendors.any? %>
+
   <table>
     <thead>
       <tr>
         <th><%= attribute_name(:name) %></th>
         <th><%= attribute_name(:api_key) %></th>
+        <th><%= attribute_name(:model_endpoint) %></th>
         <th><%= t("admin.shared.actions") %></th>
       </tr>
     </thead>
