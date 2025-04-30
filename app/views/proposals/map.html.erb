@@ -29,7 +29,6 @@
 
     <%= form_for(@proposal, url: new_proposal_path, method: :get) do |f| %>
       <div class="small-12 medium-4">
-        <%= f.label :geozone_id, t("attributes.geozone_id") %>
         <%= f.select :geozone_id, geozone_select_options,
             label: t("proposals.form.geozone"),
              hint: t("proposals.form.geozone_help"),
