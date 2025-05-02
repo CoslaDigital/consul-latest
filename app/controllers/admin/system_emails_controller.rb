@@ -4,6 +4,7 @@ class Admin::SystemEmailsController < Admin::BaseController
   def index
     @system_emails = {
       proposal_notification_digest: %w[view preview_pending],
+      proposal_published: %w[view edit_info],
       budget_investment_created: %w[view edit_info],
       budget_investment_selected: %w[view edit_info],
       budget_investment_unfeasible: %w[view edit_info],
@@ -22,6 +23,8 @@ class Admin::SystemEmailsController < Admin::BaseController
     case @system_email
     when "proposal_notification_digest"
       load_sample_proposal_notifications
+    when "proposal_published"
+      load_sample_proposal
     when /\Abudget_investment/
       load_sample_investment
     when /\Adirect_message/
@@ -65,6 +68,15 @@ class Admin::SystemEmailsController < Admin::BaseController
 
     def load_system_email
       @system_email = params[:system_email_id]
+    end
+    
+    def load_sample_proposal
+      if Proposal.any?
+        @proposal = Proposal.last
+        @subject = t("mailers.#{@system_email}.subject", code: @proposal.code)
+      else
+        redirect_to admin_system_emails_path, alert: t("admin.system_emails.alert.no_investments")
+      end
     end
 
     def load_sample_proposal_notifications
