@@ -228,6 +228,49 @@ def erase(erase_reason = nil)
   end
 
 
+# send the notification using your AdminNotification system
+  def send_new_organization_admin_notification!
+    # Ensure the user and their organization are actually created and persisted
+    unless self.persisted? && self.organization.present? && self.organization.persisted?
+      Rails.logger.warn "[User##{self.id}] Skipping AdminNotification: User or Organization not fully persisted."
+      return
+    end
+
+    # Construct the title and body for the notification
+    alert_title = "New Organization Registered: #{self.organization.name}"
+    alert_body = "Organization '#{self.organization.name}' (Responsible: #{self.organization.responsible_name || 'N/A'}) " \
+                 "was registered by user #{self.email} (Phone: #{self.phone_number || 'N/A'})."
+
+    begin
+      admin_link = Rails.application.routes.url_helpers.admin_organizations_path(host: ENV['APPLICATION_HOST'])
+    rescue NoMethodError, ActionController::UrlGenerationError => e
+      Rails.logger.warn "[User##{self.id}] Could not generate admin_organization_path for Org ID #{self.organization.id}: #{e.message}. Using a fallback link."
+      # Fallback link to a general admin area or the organization's ID
+      admin_link = "/admin/organizations" # Basic fallback
+    end
+
+
+    # Create and deliver the AdminNotification
+    admin_notification = AdminNotification.new(
+      title: alert_title,
+      body: alert_body,
+      segment_recipient: "administrators", 
+      link: admin_link
+    )
+
+    if admin_notification.save
+      admin_notification.deliver
+      Rails.logger.info "[User##{self.id}] AdminNotification for new organization #{self.organization.id} created and delivery initiated."
+    else
+      Rails.logger.error "[User##{self.id}] Failed to save AdminNotification for new organization: #{admin_notification.errors.full_messages.join(', ')}"
+    end
+
+  rescue StandardError => e
+    # Catch potential errors during the process
+    Rails.logger.error "[User##{self.id}] Error in send_new_organization_admin_notification! for Org ID #{self.organization&.id}: #{e.class.name} - #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+  end
+
  private
   
   def self.log_in_or_create_ys_user(username)
