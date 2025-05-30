@@ -6,9 +6,46 @@ attr_reader :consul_version
 
   def initialize
     @consul_version = extract_latest_version_from_changelog
+    @revision = read_production_revisions_log
   end
 
   private
+
+def read_production_revisions_log
+  # 1. Rails.root points to something like /path/to/consul/releases/YYYYMMDDHHMMSS/
+  #    (because 'current' is a symlink to a release directory)
+  current_release_path = Rails.root
+
+  # 2. current_release_path.parent will be /path/to/consul/releases/
+  releases_directory_path = current_release_path.parent
+
+  # 3. releases_directory_path.parent will be /path/to/consul/
+  consul_base_path = releases_directory_path.parent # This is your 'consul' directory
+
+  # 4. Construct the full path to the revisions.log file within the 'consul' directory
+  revisions_log_path = consul_base_path.join('revisions.log')
+
+  # 5. Check if the file exists and read it
+  if File.exist?(revisions_log_path)
+    begin
+    last_line = File.readlines(revisions_log_path).last&.strip
+
+      if last_line.nil? || last_line.empty?
+        Rails.logger.info "[RevisionsLogReader] revisions.log at #{revisions_log_path} is empty or the last line is blank."
+        return "Revisions log is empty or last line is blank."
+      else
+        return last_line
+      end
+    rescue StandardError => e
+      Rails.logger.error "[RevisionsLogReader] Error reading production revisions.log at #{revisions_log_path}: #{e.message}"
+      Rails.logger.error "[RevisionsLogReader] Backtrace:\n#{e.backtrace.join("\n")}"
+      return "Error reading revisions.log."
+    end
+  else
+    Rails.logger.warn "[RevisionsLogReader] Production revisions.log not found at: #{revisions_log_path}"
+    return "revisions.log not found."
+  end
+end
 
 def extract_latest_version_from_changelog
   changelog_path = Rails.root.join('CHANGELOG.md')
