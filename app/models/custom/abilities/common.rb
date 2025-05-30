@@ -86,7 +86,12 @@ module Abilities
       end
 
       can :create, Legislation::Answer if  user.organization&.verified?
-
+      if  user.organization&.verified?
+        can :create, Budget::Investment,  budget: { phase: "accepting" }
+        can :update, Budget::Investment,  budget: { phase: "accepting" }, author_id: user.id
+        can :suggest, Budget::Investment, budget: { phase: "accepting" }
+        can :destroy, Budget::Investment, budget: { phase: ["accepting", "reviewing"] }, author_id: user.id
+      end
       if user.level_two_or_three_verified?
         can :vote, Proposal, &:published?
 
