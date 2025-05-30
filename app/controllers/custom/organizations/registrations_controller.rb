@@ -10,7 +10,7 @@ class Organizations::RegistrationsController < Devise::RegistrationsController
         user.errors.delete(:organization)
         
         if user.persisted?
-        user.send_new_organization_admin_notification!
+          user.send_new_organization_admin_notification!
         end
       end
     else

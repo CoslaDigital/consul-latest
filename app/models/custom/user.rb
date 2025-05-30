@@ -228,7 +228,7 @@ def erase(erase_reason = nil)
   end
 
 
-#  Instance method to send the notification using your AdminNotification system
+# send the notification using your AdminNotification system
   def send_new_organization_admin_notification!
     # Ensure the user and their organization are actually created and persisted
     unless self.persisted? && self.organization.present? && self.organization.persisted?
