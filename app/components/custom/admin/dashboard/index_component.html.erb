@@ -1,0 +1,28 @@
+<% provide :main_class, "admin-dashboard-index" %>
+<%= header(skip_section_title: true) %>
+
+<p><%= t("admin.dashboard.index.description", org: setting["org_name"]) %></p>
+
+<%= info %>
+
+<address>
+  <%= email_link %>
+  <%= website_link %>
+</address>
+<h2>About</h2>
+<p> Consul Democracy is provided in Scotland by COSLA<p>
+<% if @consul_version && !@consul_version.start_with?("Error", "Changelog not found", "Latest version information not found") %>
+   <p>Current Release: <strong><%= @consul_version %></strong></p>
+ <% elsif @consul_version %>
+   <p class="warning"><%= @consul_version %></p>
+ <% else %>
+   <p class="warning">Version information is currently unavailable.</p>
+ <% end %> 
+<h2>Read the documentation </h2>
+<address>
+  <%= documentation_link %>
+</address>
+<h2> Get help </h2>
+<address>
+  <%= support_link %>
+</address>
