@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - **Feature:** Version information now displayed on Admin dashboard
 - **Feature:** Send notification to Admin when an organisation registers
 - **Feature:** Added Process manager role which cn create/manage processes
+- **Feature** Added local change log
 
 ### Changed
 
