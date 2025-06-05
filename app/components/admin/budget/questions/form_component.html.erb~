@@ -1,0 +1,61 @@
+<%# app/components/admin/budget/questions/form_component.html.erb %>
+
+<%# Render locale tabs if your TranslatableFormHelper/GlobalizeHelper provides this %>
+<%= render "shared/globalize_locales", resource: @budget_question if defined?(render) && @budget_question.respond_to?(:translations) %>
+
+<%= translatable_form_for(@budget_question, url: @form_url, html: { class: "budget-question-actual-form-class" }) do |f| %>
+
+  <%= render "shared/errors", resource: @budget_question if defined?(render) && @budget_question.errors.any? %>
+
+  <%= f.translatable_fields do |translations_form| %>
+    <div>
+      <%#= translations_form.label :text %>
+      <%= translations_form.text_area :text,
+            label: t("admin.budget_questions.form.question", default: "Question"),
+            hint: t("admin.budget_questions.form.hint_instructions", default: "Optional hint text to guide the user."),
+            rows: 3,
+            maxlength: 500 %> <%# Example maxlength, adjust as needed or define in model %>
+    </div>
+  <% end %>
+
+  <%# --- Non-translatable fields --- %>
+  <fieldset>
+    <legend><%= t('admin.budget_questions.form.main_settings_legend', default: "Main Settings") %></legend>
+
+    <div>
+    </div>
+
+    <div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><%= t('admin.budget_questions.form.additional_details_legend', default: "Additional Details") %></legend>
+
+    <div>
+      <%= f.label :hint %>
+      <%= f.text_area :hint,
+            rows: 2,
+            hint: t("admin.budget_questions.form.hint_instructions", default: "Optional hint text to guide the user.") %>
+      <%# If your form builder doesn't render the 'hint' option for text_area, add it manually. %>
+    </div>
+
+    <%# Checkboxes might be better with their standard structure for styling %>
+    <div class="form-check mt-3 mb-2">
+      <%= f.label :enabled, Budget::Question.human_attribute_name(:enabled), class: "form-check-label" %>
+      <%= f.check_box :enabled, class: "form-check-input" %>
+
+    </div>
+
+    <div class="form-check mb-3">
+      <%= f.label :is_mandatory, Budget::Question.human_attribute_name(:is_mandatory), class: "form-check-label" %>
+      <%= f.check_box :is_mandatory, class: "form-check-input" %>
+    </div>
+  </fieldset>
+
+  <div class="actions mt-4">
+    <% submit_text_key = @budget_question.new_record? ? "common.create_resource" : "common.update_resource" %>
+    <%# Using similar classes and I18n structure as your example for the submit button %>
+    <%= f.submit class: "button success expanded", value: t(submit_text_key, resource_name: Budget::Question.model_name.human) %>
+  </div>
+<% end %>
