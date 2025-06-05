@@ -1,0 +1,68 @@
+<%# app/views/admin/budget_questions/index.html.erb %>
+
+<h1><%= t(".title", budget_name: @budget.name) %></h1>
+
+<%# Link to create a new budget question for the current budget %>
+<div class="mb-4">
+  <%= link_to t(".add_new_question"), new_admin_budget_budget_question_path(@budget), class: "button button-primary" %>
+</div>
+
+<% if @budget_questions.any? %>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <%# Using BudgetQuestion.human_attribute_name for translatable column headers %>
+          <th><%= Budget::Question.human_attribute_name(:text) %></th>
+          <th><%= Budget::Question.human_attribute_name(:enabled) %></th>
+          <th class="actions-column"><%= t(".actions_header") %></th>
+        </tr>
+      </thead>
+      <tbody>
+  <% @budget_questions.each do |budget_question| %>
+    <tr>
+      <td>
+        <%= link_to budget_question.text.truncate(60), edit_admin_budget_budget_question_path(@budget, budget_question) %>
+      </td>
+      <td>
+        <span class="badge <%= budget_question.enabled? ? 'badge-success' : 'badge-secondary' %>">
+          <%= budget_question.enabled? ? t("common.yes") : t("common.no") %>
+        </span>
+      </td>
+      <td class="actions-cell"> <%# Added a class for potential styling of the cell itself %>
+          <%= render Admin::TableActionsComponent.new(
+        budget_question,
+        actions: [:edit, :destroy], 
+        edit_text: t("common.edit"),
+        edit_path: edit_admin_budget_budget_question_path(@budget, budget_question),
+        # edit_options: { class: "your-edit-button-class" }, # Optional: if Admin::ActionComponent accepts these
+
+        destroy_text: t("common.delete"),
+        destroy_path: admin_budget_budget_question_path(@budget, budget_question),
+        # destroy_options will automatically add method: :delete and confirm,
+        # assuming Admin::TableActionsComponent's template and Admin::ActionComponent handle it.
+        # The `confirm` key within destroy_options will be used.
+        destroy_confirmation: t("common.confirm_delete_item", item: Budget::Question.model_name.human)
+        # destroy_options: { class: "your-delete-button-class" } # Optional
+      ) %>
+      </td>
+    </tr>
+  <% end %>
+</tbody>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <%# Message to display if no budget questions exist for this budget %>
+  <div class="alert alert-info" role="alert">
+    <p><%= t(".no_questions_yet") %></p>
+    <p><%= t(".get_started_by_adding") %></p>
+  </div>
+<% end %>
+
+<%# Optional: Link to go back to the budget's main page or budgets list %>
+<div class="mt-4">
+  <%= link_to t("common.back_to_resource", resource_name: @budget.name), edit_admin_budget_path(@budget), class: "button button-secondary" %>
+  <%# Or if you want a generic back to all budgets: %>
+  <%#= link_to t("common.back_to_budgets_list"), admin_budgets_path, class: "button button-secondary" %>
+</div>

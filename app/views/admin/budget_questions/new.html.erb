@@ -1,0 +1,23 @@
+%# app/views/admin/budget_questions/new.html.erb %>
+
+<%# Use your existing back_link_to helper, pointing to the questions index for this budget %>
+<%= back_link_to admin_budget_budget_questions_path(@budget) %>
+
+<h2 class="margin-top"><%= t("admin.budget_questions.new.title") %></h2>
+
+<%#
+  Optional: If you want to render error messages for a default/blank object,
+  though typically errors are shown after a failed submission which re-renders 'new'.
+  If @budget_question is just Budget::Question.new, it won't have errors yet.
+%>
+<%# <%= render "admin/shared/error_messages", resource: @budget_question if @budget_question.errors.any? %>
+
+<div class="budget-question-form"> <%# Or your preferred generic form wrapper class %>
+  <%#
+    Render the form partial.
+    It will receive @budget_question (a new instance) and @budget (the parent).
+    The _form.html.erb partial will then determine the correct form URL (for create)
+    and render your Admin::Budget::Questions::FormComponent.
+  %>
+  <%= render "form", budget_question: @budget_question, budget: @budget %>
+</div>
