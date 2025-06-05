@@ -43,6 +43,14 @@
 <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
 </div>
 <hr>
+<% @budget.questions.order(:id).each do |question| %>
+  <h4><%= question.text.html_safe %></h4>
+  <p>
+    <% investment.answers.where(budget_question_id: question.id).each do |answer| %>
+      <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
+    <% end %>
+  </p>
+<% end %>
 
 <%= render Shared::EmbeddedVideoComponent.new(@investment) %>
 
