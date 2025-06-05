@@ -73,6 +73,8 @@ namespace :admin do
     end
 
     resources :budgets, except: [:create, :new] do
+      resources :budget_questions
+      
       member do
         patch :publish
         put :calculate_winners

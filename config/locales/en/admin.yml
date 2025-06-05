@@ -81,9 +81,11 @@ en:
           ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
+          questions: "Create form fields ro be displayed on budget investments" 
         edit: "Edit budget"
         preview: "Preview"
         preview_results: "Preview results"
+        questions: "Manage Questions"
       index:
         title: Participatory budgets
         new_link: Create new budget

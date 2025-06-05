@@ -9,7 +9,11 @@ class Budget
       validates_translation :text, presence: true
     
       scope :enabled, -> { where(enabled: true) }
-
+      
+      
+      def title
+        text
+      end
       private
   
     end
