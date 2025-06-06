@@ -1,4 +1,4 @@
-class Admin::BudgetQuestions::QuestionsComponent < ApplicationComponent
+class Admin::Budget::Questions::QuestionsComponent < ApplicationComponent
     include Header
     attr_reader :budget
   
