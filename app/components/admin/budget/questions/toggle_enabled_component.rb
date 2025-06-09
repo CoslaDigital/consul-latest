@@ -1,4 +1,4 @@
-class Admin::Budget::Questionss::ToggleEnabledComponent < ApplicationComponent
+class Admin::Budget::Questions::ToggleEnabledComponent < ApplicationComponent
   attr_reader :phase
   delegate :enabled?, to: :phase
 
