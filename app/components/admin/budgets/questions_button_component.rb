@@ -9,7 +9,7 @@ class Admin::Budgets::QuestionsButtonComponent < ApplicationComponent
   end
 
   def render?
- #   path.present? #&& can?(:manage_questions, @budget) # Define :manage_questions ability in your Ability file
+    path.present? #&& can?(:manage_questions, @budget) # Define :manage_questions ability in your Ability file
   end
 
   private
@@ -32,6 +32,6 @@ class Admin::Budgets::QuestionsButtonComponent < ApplicationComponent
   # Provides any specific CSS classes for the button/link.
   # You can customize this as needed.
   def html_class
-    "button hollow float-right clear" 
+    "button_to hollow float-right" 
   end
 end

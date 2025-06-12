@@ -41,6 +41,7 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
     end
     
     def questions_action
+      puts "TRYING TO DO QUESTONS"
       render Admin::Budgets::QuestionsButtonComponent.new(budget)
     end
 
