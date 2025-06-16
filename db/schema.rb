@@ -398,7 +398,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.boolean "part_fund"
     t.boolean "stv"
     t.integer "stv_winners"
-    t.boolean "part_fund"
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
