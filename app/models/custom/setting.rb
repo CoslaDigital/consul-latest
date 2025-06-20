@@ -47,8 +47,8 @@ class Setting
       Setting["feature.hide_comments"] == "active"
     end
     
-     def hide_dash_votes?
-      Setting["feature.hide_votes"] == "active"
+     def hide_dash_progress?
+      Setting["feature.hide_dash_progress"] == "active"
     end
 
     
