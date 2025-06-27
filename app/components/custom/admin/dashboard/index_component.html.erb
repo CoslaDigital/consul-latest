@@ -11,13 +11,23 @@
 </address>
 <h2>About</h2>
 <p> Consul Democracy is provided in Scotland by COSLA<p>
-<% if @consul_version && !@consul_version.start_with?("Error", "Changelog not found", "Latest version information not found") %>
-   <p>Current Release: <strong><%= @consul_version %></strong></p>
- <% elsif @consul_version %>
-   <p class="warning"><%= @consul_version %></p>
- <% else %>
-   <p class="warning">Version information is currently unavailable.</p>
- <% end %> 
+<%# --- Consul Version Block (Using the new info hash) --- %>
+<% if !@consul_version_info[:error] %>
+  <p>
+    Current Release: <strong><%= link_to @consul_version_info[:text], @consul_version_info[:url], target: "_blank" %></strong>
+  </p>
+<% else %>
+  <p class="warning"><%= @consul_version_info[:text] %></p>
+<% end %>
+
+<%# --- Local Version Block (Using the new info hash) --- %>
+<% if !@local_version_info[:error] %>
+  <p>
+    Local Release: <strong><%= link_to @local_version_info[:text], @local_version_info[:url], target: "_blank" %></strong>
+  </p>
+<% else %>
+  <p class="warning"><%= @local_version_info[:text] %></p>
+<% end %>
 <h2>Read the documentation </h2>
 <address>
   <%= documentation_link %>
