@@ -18,6 +18,13 @@
  <% else %>
    <p class="warning">Version information is currently unavailable.</p>
  <% end %> 
+<% if @local_version && !@local_version.start_with?("Error", "Changelog", "Latest version") %>
+  <p>Local Release: <strong><%= @local_version %></strong></p>
+<% elsif @local_version %>
+  <p class="warning"><%= @local_version %></p>
+<% else %>
+  <p class="warning">Local version information is currently unavailable.</p>
+<% end %>
 <h2>Read the documentation </h2>
 <address>
   <%= documentation_link %>

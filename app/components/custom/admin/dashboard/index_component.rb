@@ -5,13 +5,16 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
 attr_reader :consul_version
 
   def initialize
-    @consul_version = extract_latest_version_from_changelog
+    # Call the extractor method for each changelog file
+    @consul_version = extract_latest_version_from_changelog('CHANGELOG.md')
+    # Assuming your local changelog is named 'CHANGELOG-local.md'. Change if necessary.
+    @local_version  = extract_latest_version_from_changelog('CHANGELOG-LOCAL.md')
   end
-
+  
   private
 
-def extract_latest_version_from_changelog
-  changelog_path = Rails.root.join('CHANGELOG.md')
+def extract_latest_version_from_changelog(filename)
+  changelog_path = Rails.root.join(filename)
 
   unless File.exist?(changelog_path)
     Rails.logger.warn "[ChangelogExtractor] Changelog file not found at: #{changelog_path}"
