@@ -5,9 +5,30 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
   attr_reader :consul_version
 
   def initialize
-    @consul_version = extract_latest_version_from_changelog("CHANGELOG.md")
-    # Assuming your local changelog is named 'CHANGELOG-local.md'. Change if necessary.
-    @local_version  = extract_latest_version_from_changelog("CHANGELOG-LOCAL.md")
+    consul_match = extract_latest_version_from_changelog("CHANGELOG.md")
+    if consul_match.is_a?(MatchData)
+      # On success, build a hash with the text, the URL, and no error
+      @consul_version_info = {
+        text: "Version #{consul_match[:version]} (#{consul_match[:date]})",
+        url: consul_match[:url].sub('/tree/', '/releases/tag/'),
+        error: false
+      }
+    else
+      # On failure, build a hash with the error message
+      @consul_version_info = { text: consul_match, url: nil, error: true }
+    end
+ 
+    local_match = extract_latest_version_from_changelog("CHANGELOG-LOCAL.md")
+    if local_match.is_a?(MatchData)
+      @local_version_info = {
+        text: "Version #{local_match[:version]} (#{local_match[:date]})",
+        url: local_match[:url].sub('/tree/', '/releases/tag/v'),
+        error: false
+      }
+    else
+      @local_version_info = { text: local_match, url: nil, error: true }
+    end
+ 
   end
   
   private
@@ -27,19 +48,10 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
 
           cleaned_line = line.sub(/^\xEF\xBB\xBF/, '').strip
 
-          # The Regex:
-          # ^##\s+                  => Starts with "##" and one or more spaces
-          # \[(?<version>[^\]]+)\]  => Captures version inside "[...]" (e.g., "2.3.1")
-          # \([^)]+\)               => Matches the URL part "(...)" (we don't capture this)
-          # \s+                     => One or more spaces
-          # \((?<date>\d{4}-\d{2}-\d{2})\) => Captures date inside "(YYYY-MM-DD)"
-          regex = /^##\s+\[(?<version>[^\]]+)\]\([^)]+\)\s+\((?<date>\d{4}-\d{2}-\d{2})\)/
+          regex = /^##\s+\[(?<version>[^\]]+)\]\((?<url>[^)]+)\)\s+\((?<date>\d{4}-\d{2}-\d{2})\)/
           match = cleaned_line.match(regex)
 
-          if match
-          # Successfully found and parsed the line
-            return "Version #{match[:version]} (#{match[:date]})"
-          end
+          return match if match
         end
       end
 
