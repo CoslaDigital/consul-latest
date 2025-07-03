@@ -81,7 +81,7 @@ en:
           ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
-          questions: "Create form fields to be displayed on budget investments" 
+          questions: "Create form fields to be displayed on budget investments"
         edit: "Edit budget"
         preview: "Preview"
         preview_results: "Preview results"
@@ -312,8 +312,8 @@ en:
         sent: Sent
         group: Group
         heading: Heading
-        dossier: Dossier
-        edit_dossier: Edit dossier
+        dossier: Project Evaluation
+        edit_dossier: Edit Project Evaluation
         tags: Tags
         undefined: Undefined
         compatibility:
@@ -351,7 +351,7 @@ en:
       new:
         options_heading: "Options"
         enabled: "Enabled"
-        enabled_instructions: "tick this box to enable this question on this budget" 
+        enabled_instructions: "tick this box to enable this question on this budget"
         is_private: "This is a private question"
         is_private_instructions: "tick this box to make the answer to this question only visible to administrators"
         is_mandatory: "This is a mandatory question"
@@ -635,7 +635,7 @@ en:
           summary_phase_description: This phase will show a summary of proposals which have been selected and the best comments from the most recent draft.
           draft_publication: Draft Publication
           draft_publication_description: In draft state, registered users can comment on your document
-          final_publication_description: This publishes your final version of the legislation or outcome of this process. Users cannot comment on this version. 
+          final_publication_description: This publishes your final version of the legislation or outcome of this process. Users cannot comment on this version.
           final_publication: Final Result Publication
           use_markdown: Use Markdown to format the text
           homepage_description: Here you can explain the content of the process
