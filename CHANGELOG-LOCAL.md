@@ -18,10 +18,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 * Display correct currency symbol for budget in dossier ([16331d2](https://github.com/CoslaDigital/consul-latest/commit/16331d2))
 * display formatted price for proposals ([353be3b](https://github.com/CoslaDigital/consul-latest/commit/353be3b))
-* Fix error in _dossier_form.html.erb ([565f341](https://github.com/CoslaDigital/consul-latest/commit/565f341))
 * Update CHANGELOG-LOCAL.md ([b53b1ca](https://github.com/CoslaDigital/consul-latest/commit/b53b1ca))
 * update schema to reflect migrations ([76706e4](https://github.com/CoslaDigital/consul-latest/commit/76706e4))
 * Update schema.rb ([83a254c](https://github.com/CoslaDigital/consul-latest/commit/83a254c))
+* fix: typo in dossier form causing 500 error ([6bc0918](https://github.com/CoslaDigital/consul-latest/commit/6bc0918))
 
 ## [2.3.1-local.2](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.2) (2025-06-13)
 
