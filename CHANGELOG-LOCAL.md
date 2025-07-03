@@ -2,6 +2,27 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.3.1-local.3](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.3) (2025-07-03)
+
+[Base Changelog](https://github.com/consuldemocracy/consuldemocracy/compare/2.3.1...2.3.2)
+
+### Added
+* add feature switch to hide dashboard progress graph ([2b89adb](https://github.com/CoslaDigital/consul-latest/commit/2b89adb))
+* display version information from CHANGELOG-LOCAL.md ([5669339](https://github.com/CoslaDigital/consul-latest/commit/5669339))
+* hide graph if setting and fixed custom method ([b617b41](https://github.com/CoslaDigital/consul-latest/commit/b617b41))
+
+### Changed
+* Refactor to add url to release ([78d27d0](https://github.com/CoslaDigital/consul-latest/commit/78d27d0))
+* Update CHANGELOG-LOCAL.md ([b53b1ca](https://github.com/CoslaDigital/consul-latest/commit/b53b1ca))
+
+### Fixed
+* Display correct currency symbol for budget in dossier ([16331d2](https://github.com/CoslaDigital/consul-latest/commit/16331d2))
+* display formatted price for proposals ([353be3b](https://github.com/CoslaDigital/consul-latest/commit/353be3b))
+* Fix error in _dossier_form.html.erb ([565f341](https://github.com/CoslaDigital/consul-latest/commit/565f341))
+* Update CHANGELOG-LOCAL.md ([b53b1ca](https://github.com/CoslaDigital/consul-latest/commit/b53b1ca))
+* update schema to reflect migrations ([76706e4](https://github.com/CoslaDigital/consul-latest/commit/76706e4))
+* Update schema.rb ([83a254c](https://github.com/CoslaDigital/consul-latest/commit/83a254c))
+
 ## [2.3.1-local.2](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.2) (2025-06-13)
 
 ### Added
