@@ -104,18 +104,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_02_103604) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "ahoy_events", force: :cascade do |t|
-    t.bigint "visit_id"
-    t.bigint "user_id"
-    t.string "name"
-    t.jsonb "properties"
-    t.datetime "time", precision: nil
-    t.index ["name", "time"], name: "index_ahoy_events_on_name_and_time"
-    t.index ["properties"], name: "index_ahoy_events_on_properties_jsonb_path_ops", opclass: :jsonb_path_ops, using: :gin
-    t.index ["user_id"], name: "index_ahoy_events_on_user_id"
-    t.index ["visit_id"], name: "index_ahoy_events_on_visit_id"
-  end
-
   create_table "ahoy_events_old", id: :uuid, default: nil, force: :cascade do |t|
     t.uuid "visit_id"
     t.integer "user_id"
@@ -1381,7 +1369,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_02_103604) do
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.tsvector "tsv"
-    t.string "video_url"
     t.boolean "show_images", default: false
     t.boolean "multiple", default: false
     t.integer "given_order"
