@@ -1,6 +1,8 @@
 class Budget
   class Investment < ApplicationRecord
-    SORTING_OPTIONS = { id: "id", supports: "cached_votes_up" }.freeze
+    SORTING_OPTIONS = { id: "id",
+                        supports: "cached_votes_up",
+                        ballot_lines_count: "ballot_lines_count" }.freeze
 
     include Measurable
     include Sanitizable
@@ -10,9 +12,11 @@ class Budget
     include Followable
     include Communitable
     include Imageable
+    include Videoable
     include Mappable
     include Documentable
     include SDG::Relatable
+    include Videoable
     include HasPublicAuthor
 
     acts_as_taggable_on :valuation_tags
@@ -66,6 +70,8 @@ class Budget
     validates :price, presence: { if: :price_required? }
     validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
 
+     validate :valid_video_url?
+
     scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc, id: :desc) }
     scope :sort_by_ballots,          -> { reorder(ballot_lines_count: :desc, id: :desc) }
     scope :sort_by_price,            -> { reorder(price: :desc, confidence_score: :desc, id: :desc) }
@@ -91,11 +97,14 @@ class Budget
     scope :not_unfeasible,              -> { excluding(unfeasible) }
     scope :undecided,                   -> { where(feasibility: "undecided") }
 
-    scope :with_supports,      -> { where(cached_votes_up: 1..) }
+
+    scope :everything,         -> { all }
+    scope :with_supports,      -> { where("cached_votes_up > 0") }
     scope :selected,           -> { feasible.where(selected: true) }
     scope :compatible,         -> { where(incompatible: false) }
     scope :incompatible,       -> { where(incompatible: true) }
     scope :winners,            -> { selected.compatible.where(winner: true) }
+    scope :unsuccessful,          -> { selected.compatible.where(winner: false) }
     scope :unselected,         -> { not_unfeasible.where(selected: false) }
     scope :last_week,          -> { where(created_at: 7.days.ago..) }
     scope :sort_by_flags,      -> { order(flags_count: :desc, updated_at: :desc) }
@@ -290,10 +299,27 @@ class Budget
       return :not_logged_in unless user
       return :organization  if user.organization?
       return :not_verified  unless user.level_two_or_three_verified?
-
+      return :invalid_geozone unless valid_geozone?(user)
       nil
     end
+    
+    def goodvalid_geozone?(user)
+      heading.geozone_id.nil? || (heading.geozone_id == user.geozone_id)
+    end
+    
+    def valid_geozone?(user)
+  Rails.logger.info "Heading geozone_restricted: #{heading.geozone_restricted}"
+  Rails.logger.info "Heading geozone_id: #{heading.geozone_id}"
+  Rails.logger.info "Heading geozone_ids: #{heading.geozone_ids.inspect}"
+  Rails.logger.info "User geozone_id: #{user.geozone_id}"
 
+  valid = !heading.geozone_restricted || heading.geozone_ids.include?(user.geozone_id)
+  Rails.logger.info "Is valid geozone? #{valid}"
+
+  valid
+end
+
+    
     def permission_problem?(user)
       permission_problem(user).present?
     end
@@ -355,6 +381,10 @@ class Budget
     def should_show_price_explanation?
       should_show_price? && price_explanation.present?
     end
+    
+    def should_show_estimated_price?
+      estimated_price.present? && budget.show_money?
+    end
 
     def should_show_unfeasibility_explanation?
       unfeasible? && valuation_finished? && unfeasibility_explanation.present?
@@ -363,6 +393,11 @@ class Budget
     def formatted_price
       budget.formatted_amount(price)
     end
+
+    def formatted_estimated_price
+      budget.formatted_amount(estimated_price)
+    end
+
 
     def self.apply_filters_and_search(_budget, params, current_filter = nil)
       investments = all

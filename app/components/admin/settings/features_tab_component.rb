@@ -6,12 +6,14 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.google_login
       feature.twitter_login
       feature.wordpress_login
+      feature.public_stats
       feature.signature_sheets
       feature.user.recommendations
       feature.user.recommendations_on_debates
       feature.user.recommendations_on_proposals
       feature.user.skip_verification
       feature.community
+      feature.resources
       feature.map
       feature.allow_attached_documents
       feature.allow_images

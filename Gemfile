@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby file: ".ruby-version"
+#ruby file: ".ruby-version"
 
 gem "rails", "7.1.5.1"
 
@@ -62,6 +62,12 @@ gem "view_component", "~> 3.23.2"
 gem "whenever", "~> 1.0.0", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
+gem  "ed25519" 
+gem  "bcrypt_pbkdf"
+gem "faker", "~> 3.5.1"
+source "https://rails-assets.org" do
+  gem "rails-assets-markdown-it", "~> 9.0.1"
+end
 
 group :development, :test do
   gem "debug", "~> 1.9.2"

@@ -16,6 +16,7 @@ class Layout::CommonHtmlAttributesComponent < ApplicationComponent
     end
 
     def html_class
+#        "class=\"tenant-#{Tenant.current_schema}\"" if Rails.application.config.multitenancy
       "tenant-#{Tenant.current_schema}" if Rails.application.config.multitenancy
     end
 end

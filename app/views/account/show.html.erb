@@ -30,7 +30,18 @@
 
             <% else %>
               <%= f.text_field :username, maxlength: User.username_max_length %>
-            <% end %>
+              <h3>About Me (Optional information)</h3>
+               <% enabled = feature?(:demographics) %>
+              <%= f.date_field :date_of_birth, include_blank: true, readonly: !enabled %>
+
+              <%= f.select :gender, [["Select Gender", nil], ["Male", "male"], ["Female", "female"], ["Other", "other"]], {}, { class: "gender-select", disabled: !enabled } %>
+
+              <%#= f.label :geozone_id, t("proposals.form.geozone") %>
+              <%= f.collection_select :geozone_id, Geozone.all, :id, :name, { include_blank: "Select Geozone",
+                  label: t("proposals.form.geozone"), hint: t("proposals.form.geozone_help") },
+                 { class: "geozone-select", disabled: !enabled } %>
+
+          <% end %>
           </div>
 
           <div>

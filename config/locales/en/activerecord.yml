@@ -180,9 +180,9 @@ en:
         description: "Description"
         external_url: "Link to additional documentation"
         administrator_id: "Administrator"
-        location: "Location additional info"
-        organization_name: "If you are proposing in the name of a collective/organization, or on behalf of more people, write its name"
-        image: "Proposal descriptive image"
+        location: "Tell us more about the location"
+        organization_name: "If you are proposing on behalf of a group or organization write its name"
+        image: "Project image"
         image_title: "Image title"
         duration: "Time scope"
         feasibility_feasible: "Feasible"
@@ -461,13 +461,13 @@ en:
       image:
         title: Title
         attachment: "Choose image"
-      poll/question/option:
+      poll/question/answer:
         title: Answer
         description: Description
-      poll/question/option/translation:
+      poll/question/answer/translation:
         title: Answer
         description: "Description (optional)"
-      poll/question/option/video:
+      poll/question/answer/video:
         title: Title
         url: External video
       newsletter:

@@ -91,6 +91,8 @@ en:
       google_login_description: "Allow users to sign up with their Google Account"
       wordpress_login: "Wordpress login"
       wordpress_login_description: "Allow users to sign up with their Wordpress Account"
+      saml_login: "Saml login"
+      saml_login_description: "Allow users to sign up with their Saml Account"
       featured_proposals: "Featured proposals"
       featured_proposals_description: "Shows featured proposals on index proposals page"
       signature_sheets: "Signature sheets"
@@ -106,6 +108,8 @@ en:
         recommendations_on_proposals_description: "Displays recommendations to users on the proposals page based on the tags of the items followed"
       community: "Community on proposals and investments"
       community_description: "Enables the community section in the proposals and investment projects of the Participatory Budgets"
+      resources: "Resources on proposals dashboard"
+      resources_description: "Enables the resources section in the proposals dashboard"
       machine_learning: "AI / Machine learning"
       machine_learning_description: "Enable the AI / Machine Learning section to run python scripts and enrich content automatically."
       map: "Proposals and budget investments geolocation"
@@ -136,8 +140,16 @@ en:
       remove_investments_supports_description: "Allow users to remove supports on participatory budgets investments during the selecting projects phase."
       sdg: SDG
       sdg_description: Enable Sustainable Development Goals sections in the administration menu and in the Global Settings.
+      demographics: "Demographics"
+      demographics_description: "Enable users to manage gender DOB and Geozone"
       cookies_consent: Cookies consent banner
       cookies_consent_description: Enable the cookies consent banner to inform users about the cookies the application uses.
+      hide_comments: "Hide Comments"
+      hide_comments_description: "Disable commenting on proposals"
+      hide_votes: "Hide Proposal votes"
+      hide_votes_description: "Disable supporting proposals"
+      hide_dash_progress: "Hide dashboard graph"
+      hide_dash_progress_description: "Hide dashboard progress graph"
     remote_census:
       general:
         endpoint: "Endpoint"
