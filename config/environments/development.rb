@@ -35,7 +35,7 @@ Rails.application.configure do
   end
 
   # Allow accessing the application through a domain so subdomains can be used
-  config.hosts << "consuldev.communitychoices.scot:3000"
+  config.hosts << "consuldev.communitychoices.scot"
   config.hosts << /.*\.lvh\.me/
 
   # Don't care if the mailer can't send.
@@ -72,7 +72,6 @@ Rails.application.configure do
 
   config.eager_load_paths << "#{Rails.root}/spec/mailers/previews"
   config.action_mailer.preview_path = "#{Rails.root}/spec/mailers/previews"
-
   # Limit size of local logs
   # TODO: replace with config.log_file_size after upgrading to Rails 7.1
   logger = ActiveSupport::Logger.new(config.default_log_file, 1, 100.megabytes)

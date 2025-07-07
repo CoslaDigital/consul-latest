@@ -784,6 +784,8 @@ DEPENDENCIES
   devise (~> 4.9.4)
   devise-security (~> 0.18.0)
   ed25519
+  devise-two-factor (~> 6.1)
+  dotenv-rails
   email_spec (~> 2.3.0)
   erb_lint (~> 0.9.0)
   exiftool_vendored (~> 12.97.0)
