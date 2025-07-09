@@ -16,7 +16,6 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
   end
 
   private
-  
   def get_branch_info
     revisions_log_path = Rails.root.join("..", "..", "revisions.log")
 
@@ -47,19 +46,18 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
 
       # If no matching line is found
       Rails.logger.info "[BranchInfo] No valid deployment line found in revisions.log."
-      return { text: "Could not determine deployment branch.", error: true }
+      { text: "Could not determine deployment branch.", error: true }
 
     rescue StandardError => e
       Rails.logger.error "[BranchInfo] Error reading revisions.log: #{e.class.name} - #{e.message}"
-      return { text: "Error reading deployment info.", error: true }
+      { text: "Error reading deployment info.", error: true }
     end
   end
 
-  
   def get_version_info(filename, is_local: false)
     match = extract_latest_version_from_changelog(filename)
     if match.is_a?(MatchData)
-      url = is_local ? match[:url].sub('/tree/', '/releases/tag/v') : match[:url].sub('/tree/', '/releases/tag/')
+      url = is_local ? match[:url].sub("/tree/", "/releases/tag/v") : match[:url].sub("/tree/", "/releases/tag/")
       {
         text: "Version #{match[:version]} (#{match[:date]})",
         url: url,
@@ -104,10 +102,10 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
 
     begin
       File.foreach(changelog_path) do |line|
-        cleaned_line = line.sub(/^\xEF\xBB\xBF/, '').strip
+        cleaned_line = line.sub(/^\xEF\xBB\xBF/, "").strip
 
         # A version header marks the start/end of a section of changes
-        if cleaned_line.start_with?('## [')
+        if cleaned_line.start_with?("## [")
           break if capturing # We found the *next* version, so we stop.
           capturing = true   # This is the first version, so we start.
           next
@@ -116,27 +114,27 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
         next unless capturing
 
         # Check for a section change (### Added, etc.)
-        if cleaned_line.start_with?('### ')
+        if cleaned_line.start_with?("### ")
           section_match = cleaned_line.match(/^###\s+(Added|Changed|Fixed)/)
           current_section = section_match ? section_match[1] : nil
           next
         end
 
         # Capture list items under the current section
-        if current_section && cleaned_line.start_with?('-', '*')
+        if current_section && cleaned_line.start_with?("-", "*")
           # More robustly strip prefixes like "- **Fix:** ", "- ", or "* "
-          item_text = cleaned_line.sub(/^[-*]\s*(\*\*.*?\*\*[:\s]*)?/, '').strip
+          item_text = cleaned_line.sub(/^[-*]\s*(\*\*.*?\*\*[:\s]*)?/, "").strip
           changes[current_section] << item_text unless item_text.empty?
         end
       end
 
       final_changes = changes.reject { |_, v| v.empty? }
       Rails.logger.info "[ChangelogExtractor] Extracted changes: #{final_changes.inspect}"
-      return final_changes
+      final_changes
 
     rescue StandardError => e
       Rails.logger.error "[ChangelogExtractor] Error extracting latest changes: #{e.class.name} - #{e.message}"
-      return {} # Return empty hash on error
+      {} # Return empty hash on error
     end
   end
 
