@@ -18,7 +18,7 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
   private
   
   def get_branch_info
-    revisions_log_path = Rails.root.join("..", "revisions.log")
+    revisions_log_path = Rails.root.join("..", "..", "revisions.log")
 
     unless File.exist?(revisions_log_path)
       Rails.logger.warn "[BranchInfo] revisions.log not found at #{revisions_log_path}"

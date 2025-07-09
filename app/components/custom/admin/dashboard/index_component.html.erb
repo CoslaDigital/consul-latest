@@ -66,7 +66,7 @@
        <%# --- Local Version Block --- %>
       <% if !@branch[:error] %>
         <p>
-          Branch: <strong><%= @branch[:text] %></strong>
+          Branch: <strong><%= @branch[:branch] %></strong>
         </p>
       <% else %>
         <p class="warning">Branch: <%= @branch[:text] %></p>
