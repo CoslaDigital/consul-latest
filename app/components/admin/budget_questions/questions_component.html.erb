@@ -1,0 +1,28 @@
+<div class="questions-actions">
+  <%# action(:new,
+            budget,
+            text: t("admin.budgets.show.add_heading"),
+            path: new_admin_question_path(budget),
+            "aria-label": true) #%>
+</div>
+<% if budget.questions.any? %>
+  <h3><%= t("admin.budget_questions.amount", count: @budget.questions.count) %></h3>
+  <table>
+    <thead>
+      <tr id="<%= dom_id(budget) %>">
+        <th><%= Budget::Question.human_attribute_name(:text) %></th>
+          <th><%= Budget::Question.human_attribute_name(:enabled) %></th>
+          <th class="actions-column"><%= t(".actions_header") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <%budget.questions.each do |question| %>
+        <%= render Admin::BudgetQuestions::RowComponent.new(question) %>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="callout primary clear">
+    <%= t("admin.budget_questions.no_questions") %>
+  </div>
+<% end %>

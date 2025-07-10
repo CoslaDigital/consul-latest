@@ -3,12 +3,12 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
  include Translatable
   include ReportAttributes
   before_action :set_budget
-  before_action :set_budget_question, only: [:show, :edit, :update, :destroy]
+  before_action :set_budget_question, only: [:show, :edit, :update, :destroy, :mark_as_enabled, :unmark_as_enabled]
 
   # GET /admin/budgets/:budget_id/budget_questions
   def index
     @budget.inspect
-    @budget_questions = @budget.questions
+    @budget_questions = @budget.questions.compact
   end
 
   # GET /admin/budgets/:budget_id/budget_questions/:id
@@ -66,7 +66,25 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
     @budget_question.destroy
     redirect_to admin_budget_budget_questions_path(@budget), notice: t(".success", name: @budget_question.text.truncate(30)), status: :see_other
   end
+  
+  def mark_as_enabled
+    @budget_question.update!(enabled: true)
 
+    respond_to do |format|
+      format.html { redirect_to request.referer, notice: t("flash.actions.update.budget_investment") }
+      format.js { render :toggle_enabled }
+    end
+  end
+
+  def unmark_as_enabled
+    @budget_question.update!(enabled: false)
+
+    respond_to do |format|
+      format.html { redirect_to request.referer, notice: t("flash.actions.update.budget_investment") }
+      format.js { render :toggle_enabled }
+    end
+  end
+  
   private
 
   def set_budget
