@@ -1,4 +1,25 @@
 <%# app/views/admin/budget_questions/index.html.erb %>
+<h1><%= t(".title", budget_name: @budget.name) %></h1>
+<%# Link to create a new budget question for the current budget %>
+
+<div class="mb-4">
+  <%= link_to t(".add_new_question"), new_admin_budget_budget_question_path(@budget), class: "button button-primary" %>
+</div>
+
+
 <% if @budget_questions.any? %> 
 <%= render Admin::BudgetQuestions::QuestionsComponent.new(@budget, @budget_questions) %>
+<% else %>
+  <%# Message to display if no budget questions exist for this budget %>
+  <div class="alert alert-info" role="alert">
+    <p><%= t(".no_questions_yet") %></p>
+    <p><%= t(".get_started_by_adding") %></p>
+  </div>
 <% end %>
+
+<%# Optional: Link to go back to the budget's main page or budgets list %>
+<div class="mt-4">
+  <%= link_to t("common.back_to_resource", resource_name: @budget.name), edit_admin_budget_path(@budget), class: "button button-secondary" %>
+  <%# Or if you want a generic back to all budgets: %>
+  <%#= link_to t("common.back_to_budgets_list"), admin_budgets_path, class: "button button-secondary" %>
+</div>
