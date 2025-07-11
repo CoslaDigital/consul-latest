@@ -7,14 +7,12 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
 
   # GET /admin/budgets/:budget_id/budget_questions
   def index
-    @budget.inspect
-    @budget_questions = @budget.questions.compact
+#    @budget.inspect
+    @budget_questions = @budget.questions#.compact
   end
 
   # GET /admin/budgets/:budget_id/budget_questions/:id
   def show
-    # Typically, for admin CRUD, 'edit' might be sufficient,
-    # but 'show' can be useful for a read-only view.
   end
 
   # GET /admin/budgets/:budget_id/budget_questions/new
@@ -39,21 +37,9 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
 
   # PATCH/PUT /admin/budgets/:budget_id/budget_questions/:id
   def update
-     Rails.logger.debug "RAW PARAMS received: #{params.inspect}" # Log raw params
+    permitted_params = budget_question_params
 
-  permitted_params = budget_question_params
-  Rails.logger.debug "PERMITTED PARAMS (budget_question_params): #{permitted_params.inspect}" # Log permitted params
-
-  # Temporarily log the state of @budget_question.text BEFORE update
-  Rails.logger.debug "TEXT BEFORE update: #{@budget_question.text.inspect}"
-  Rails.logger.debug "LOCALE BEFORE update: #{I18n.locale}"
     if @budget_question.update(budget_question_params)
-       # Temporarily log the state of @budget_question.text AFTER successful update attempt
-    Rails.logger.debug "TEXT AFTER update attempt (in if block): #{@budget_question.text.inspect}"
-    # You might want to reload to be absolutely sure what's in the DB if caching is a concern
-    # @budget_question.reload
-    # Rails.logger.debug "TEXT AFTER reload (in if block): #{@budget_question.text.inspect}"
-
       redirect_to admin_budget_budget_questions_path(@budget), notice: t(".success", name: @budget_question.text.truncate(30))
     else
       flash.now[:alert] = t(".failure")
@@ -63,8 +49,9 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
 
   # DELETE /admin/budgets/:budget_id/budget_questions/:id
   def destroy
+    question_text = @budget_question.text.truncate(30)
     @budget_question.destroy
-    redirect_to admin_budget_budget_questions_path(@budget), notice: t(".success", name: @budget_question.text.truncate(30)), status: :see_other
+    redirect_to admin_budget_budget_questions_path(@budget), notice: t(".success", name: question_text), status: :see_other
   end
   
   def mark_as_enabled
