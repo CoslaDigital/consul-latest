@@ -157,6 +157,7 @@ en:
         title_single: New single heading budget
       help:
         budgets: "Participatory budgets allow citizens to propose and decide directly how to spend part of the budget, with monitoring and rigorous evaluation of proposals by the institution."
+        budget_questions: "Here you can create, edit, and manage the questions that will be presented as part of the application form for this budget."
         groups:
           multiple: "Groups are meant to organize headings. After a group is created and it contains headings, it's possible to determine in how many headings a user can vote per group."
           single: "Groups are meant to organize headings, since this budget will only contain one heading, the same name can be used because it will not appear anywhere. You can just continue with the next step."
