@@ -7,8 +7,8 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
 
   # GET /admin/budgets/:budget_id/budget_questions
   def index
-#    @budget.inspect
-    @budget_questions = @budget.questions#.compact
+    @budget_questions = @budget.questions.order(:id)
+   # @budget_questions = @budget.questions
   end
 
   # GET /admin/budgets/:budget_id/budget_questions/:id
