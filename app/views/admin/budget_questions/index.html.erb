@@ -1,3 +1,5 @@
+ <%= back_link_to admin_budget_path(@budget) %>
+<%= render Admin::Budgets::HelpComponent.new("budget_questions") %>
 <%# app/views/admin/budget_questions/index.html.erb %>
 <h1><%= t(".title", budget_name: @budget.name) %></h1>
 <%# Link to create a new budget question for the current budget %>
@@ -17,9 +19,3 @@
   </div>
 <% end %>
 
-<%# Optional: Link to go back to the budget's main page or budgets list %>
-<div class="mt-4">
-  <%= link_to t("common.back_to_resource", resource_name: @budget.name), edit_admin_budget_path(@budget), class: "button button-secondary" %>
-  <%# Or if you want a generic back to all budgets: %>
-  <%#= link_to t("common.back_to_budgets_list"), admin_budgets_path, class: "button button-secondary" %>
-</div>
