@@ -1,14 +1,12 @@
 module Abilities
-  class ProcessManager
+  class Administrator
     include CanCan::Ability
 
     def initialize(user)
+      merge Abilities::ProcessManager.new(user)
+      merge Abilities::Moderation.new(user)
+      merge Abilities::SDG::Manager.new(user)
 
-      can :read, Budget::Investment::Answer
-      
-      cannot :edit, Administrator
-       can :index, Administrator
-      
       can :restore, Comment
       cannot :restore, Comment, hidden_at: nil
 
@@ -57,11 +55,10 @@ module Abilities
                                       Budget::Investment, Legislation::Question,
                                       Legislation::Proposal, Legislation::Annotation, Topic]
 
-      cannot [:search, :create, :index, :destroy, :update], ::Administrator
-      cannot [:search, :create, :index, :destroy], ::Moderator
-      cannot [:search, :show, :update, :create, :index, :destroy, :summary], ::Valuator
-      cannot [:search, :create, :index, :destroy], ::Manager
-      can [:search, :create, :read, :destroy], ::ProcessManager
+      can [:search, :create, :index, :destroy, :update], ::Administrator
+      can [:search, :create, :index, :destroy], ::Moderator
+      can [:search, :show, :update, :create, :index, :destroy, :summary], ::Valuator
+      can [:search, :create, :index, :destroy], ::Manager
       can [:create, :read, :destroy], ::SDG::Manager
       can [:search, :index], ::User
 
@@ -82,6 +79,9 @@ module Abilities
              Budget::Investment, budget: { phase: "finished" }
       can [:select, :deselect], Budget::Investment do |investment|
         investment.feasible? && investment.valuation_finished? && !investment.budget.finished?
+      end
+      can [:mark_as_winner, :unmark_as_winner], Budget::Investment do |investment|
+        investment.feasible? && investment.valuation_finished? && investment.budget.reviewing_ballots?
       end
 
       can :create, Budget::ValuatorAssignment
@@ -149,7 +149,7 @@ module Abilities
       can :manage, LocalCensusRecord
       can [:create, :read], LocalCensusRecords::Import
 
-      cannot :manage, Cookies::Vendor
+      can :manage, Cookies::Vendor
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant

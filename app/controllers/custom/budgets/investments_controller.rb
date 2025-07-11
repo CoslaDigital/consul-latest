@@ -42,7 +42,6 @@ module Budgets
     def create
       @investment.author = current_user
       @investment.heading = @budget.headings.first if @budget.single_heading?
-
       if @investment.save
         Mailer.budget_investment_created(@investment).deliver_later
         redirect_to budget_investment_path(@budget, @investment),
