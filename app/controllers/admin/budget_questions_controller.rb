@@ -98,7 +98,8 @@ class Admin::BudgetQuestionsController < Admin::BaseController # Or ApplicationC
       :text,
       :enabled,
       :hint, # Optional hint/description for the question
-      :mandatory
+      :is_mandatory,
+      :is_private
     ]
     [*valid_attributes, translation_params(Budget::Question)]
   end
