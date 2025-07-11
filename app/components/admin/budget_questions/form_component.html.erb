@@ -1,0 +1,53 @@
+<%# app/views/admin/budgets/budget_questions/_form.html.erb %>
+
+<%= render "shared/globalize_locales", resource: @budget_question if @budget_question.respond_to?(:translations) %>
+
+<%= translatable_form_for [:admin, @budget, @budget_question] do |f| %>
+  <%= render "shared/errors", resource: @budget_question if @budget_question.errors.any? %>
+
+  <div class="row">
+    <div class="small-12 medium-4 column">
+      <h3><%= t("admin.budget_questions.form.options", default: "Options") %></h3>
+
+      <%= f.check_box :enabled %>
+      <%= f.label :enabled %>
+      <br>
+
+      <%= f.check_box :is_private %>
+      <%= f.label :is_private %>
+      <br>
+
+      <%= f.check_box :is_mandatory %>
+      <%= f.label :is_mandatory %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 column">
+      <hr>
+      <%= f.translatable_fields do |translations_form| %>
+        <div class="small-12 column">
+          <%# Question (translatable) %>
+          <%= translations_form.text_area :text,
+                rows: 4,
+                label: t("admin.budget_questions.form.question", default: "Question"),
+                maxlength: 500 %>
+        </div>
+
+        <div class="small-12 column">
+          <%# Hint (not translatable, but visually grouped with the question) %>
+          <%= f.text_area :hint,
+                rows: 3,
+                label: t("admin.budget_questions.form.hint", default: "Hint (optional)"),
+                hint: t("admin.budget_questions.form.hint_instructions", default: "Optional hint text to guide the user.") %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 medium-6 large-3 margin-top column">
+      <%= f.submit class: "button success expanded" %>
+    </div>
+  </div>
+<% end %>
