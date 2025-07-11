@@ -11,23 +11,25 @@ class Budget
     validate :all_answers
 
     def all_answers
-      errors.add(:answers, I18n.t('activerecord.errors.models.user.attributes.document_number.invalid')) unless has_all_answers?
+      errors.add(:answers, :missing_mandatory) unless has_all_answers?
     end
-
+    
     def has_all_answers?
-      filtered_answers = answers.select { |answer| answer.text.strip != "" }
-      filtered_answers.length == self.budget.questions.count
-    end
+  # 1. Get the count of all mandatory questions for this budget.
+  # This is one efficient database query.
+  mandatory_question_count = budget.questions.where(is_mandatory: true).count
 
-    # this is quite possibly useless and/or redundant
-    def self.description
-      unless self.budget.questions.any? do
-        self.description
-      end
+  # 2. Count how many of this investment's answers are for mandatory questions
+  #    and have non-blank text. This is a second efficient query using a JOIN.
+  answered_mandatory_count = answers
+                               .joins(:budget_question)
+                               .where(budget_questions: { is_mandatory: true, enabled: true })
+                               .where.not(text: [nil, ""])
+                               .count
 
-      return 'OPIS MANJKA UPS'
-    end
+  # 3. The validation passes if the counts are equal.
+  answered_mandatory_count == mandatory_question_count
+end
 
   end
-end
 end
