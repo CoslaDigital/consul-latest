@@ -2,6 +2,12 @@
      <td data-field="title">
         <%= link_to question.text.truncate(60), edit_admin_budget_budget_question_path(@budget, question) %>
       </td>
+      <td data-field="mandatory">
+        <%= question.is_mandatory ? "✓" : "✗" %>
+      </td>
+      <td data-field="private">
+        <%= question.is_private  ? "✓" : "✗"  %>
+      </td>
       <td data-field="enabled">
          <%= render Admin::BudgetQuestions::ToggleEnabledComponent.new(question) %>
       </td>
@@ -15,11 +21,7 @@
 
         destroy_text: t("common.delete"),
         destroy_path: admin_budget_budget_question_path(@budget, question),
-        # destroy_options will automatically add method: :delete and confirm,
-        # assuming Admin::TableActionsComponent's template and Admin::ActionComponent handle it.
-        # The `confirm` key within destroy_options will be used.
         destroy_confirmation: t("common.confirm_delete_item", item: Budget::Question.model_name.human)
-        # destroy_options: { class: "your-delete-button-class" } # Optional
       ) %>
       </td>
 

@@ -6,13 +6,14 @@
             "aria-label": true) #%>
 </div>
 <% if budget.questions.any? %>
-  <h3><%= t("admin.budget_questions.amount", count: @budget.questions.count) %></h3>
   <table>
     <thead>
       <tr id="<%= dom_id(budget) %>">
         <th><%= Budget::Question.human_attribute_name(:text) %></th>
-          <th><%= Budget::Question.human_attribute_name(:enabled) %></th>
-          <th class="actions-column"><%= t(".actions_header") %></th>
+        <th><%= Budget::Question.human_attribute_name(:mandatory) %></th>
+        <th><%= Budget::Question.human_attribute_name(:private) %></th>
+        <th><%= Budget::Question.human_attribute_name(:enabled) %></th>
+        <th class="actions-column"><%= t(".actions_header") %></th>
       </tr>
     </thead>
     <tbody>
