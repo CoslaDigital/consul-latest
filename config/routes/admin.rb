@@ -79,7 +79,6 @@ namespace :admin do
           patch :unmark_as_enabled
         end
       end
-            
       member do
         patch :publish
         put :calculate_winners
