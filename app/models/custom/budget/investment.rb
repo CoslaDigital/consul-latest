@@ -15,21 +15,36 @@ class Budget
     end
     
     def has_all_answers?
-  # 1. Get the count of all mandatory questions for this budget.
-  # This is one efficient database query.
-  mandatory_question_count = budget.questions.where(is_mandatory: true).count
+  # 1. Get the IDs of all mandatory and enabled questions for this budget.
+  # This remains an efficient database query.
+  mandatory_question_ids = budget.questions
+                                 .where(is_mandatory: true, enabled: true)
+                                 .pluck(:id)
 
-  # 2. Count how many of this investment's answers are for mandatory questions
-  #    and have non-blank text. This is a second efficient query using a JOIN.
-  answered_mandatory_count = answers
-                               .joins(:budget_question)
-                               .where(budget_questions: { is_mandatory: true, enabled: true })
-                               .where.not(text: [nil, ""])
-                               .count
+  # --- BEGIN DEBUG ---
+  Rails.logger.debug "--- Validating all_answers for Investment ID: #{id || 'new'} ---"
+  Rails.logger.debug "Mandatory Question IDs for Budget ID #{budget.id}: #{mandatory_question_ids}"
+  # --- END DEBUG ---
+
+  # 2. Count the answers currently in memory that are for a mandatory question
+  #    and have non-blank text. This avoids querying the database for unsaved records.
+  answered_mandatory_count = self.answers.count do |answer|
+    # Skip answers that are blank or marked for deletion
+    next if answer.marked_for_destruction? || answer.text.blank?
+
+    # Check if the answer's question_id is in our mandatory list
+    mandatory_question_ids.include?(answer.budget_question_id)
+  end
+
+  # --- BEGIN DEBUG ---
+  Rails.logger.debug "In-memory answers being considered: #{self.answers.map { |a| a.attributes.slice('budget_question_id', 'text') }}"
+  Rails.logger.debug "Count of valid in-memory answers for mandatory questions: #{answered_mandatory_count}"
+  result = (answered_mandatory_count == mandatory_question_ids.count)
+  Rails.logger.debug "Comparison Result: #{answered_mandatory_count} == #{mandatory_question_ids.count} is #{result}"
+  # --- END DEBUG ---
 
   # 3. The validation passes if the counts are equal.
-  answered_mandatory_count == mandatory_question_count
+  result
 end
-
   end
 end

@@ -81,7 +81,7 @@ en:
           ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
-          questions: "Create form fields ro be displayed on budget investments" 
+          questions: "Create form fields to be displayed on budget investments" 
         edit: "Edit budget"
         preview: "Preview"
         preview_results: "Preview results"
@@ -230,7 +230,7 @@ en:
         description_help_text: This text will appear in the header when the phase is active
         duration: "Phase's duration"
         duration_description: "These fields are used for information purposes only and <strong>do not trigger an automatic update of the active phase.</strong> In order to update it, edit the budget and select the active phase."
-        enabled_help_text: This phase will be public in the budget's phases timeline.
+        enabled_help_text: "This phase will be public in the budget's phases timeline"
         image_description: "If an image is uploaded it will be displayed next to the description of this phase."
         main_call_to_action: "Main call to action (optional)"
         main_call_to_action_description: "This link will appear on main banner of this participatory budget when this phase is enabled and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
@@ -337,6 +337,24 @@ en:
         tags_placeholder: "Write the tags you want separated by commas (,)"
         undefined: Undefined
       search_unfeasible: Search unfeasible
+    budget_questions:
+      add_new_question: "Create a question"
+      add_new_question_description: "Add a question to be added to the budget investment form"
+      no_questions: "There are no questions to display"
+      title: "Manage questions for this budget"
+      create:
+        success: "Question created successfully"
+      update:
+        success: "Question updated successfully"
+      new:
+        options_heading: "Options"
+        enabled: "Enabled"
+        enabled_instructions: "tick this box to enable this question on this budget" 
+        is_private: "This is a private question"
+        is_private_instructions: "tick this box to make the answer to this question only visible to administrators"
+        is_mandatory: "This is a mandatory question"
+        is_mandatory_instructions: "Make this a mandatory question"
+        title: "Create a budget question"
     budgets_wizard:
       creation_timeline:
         budget: Budget

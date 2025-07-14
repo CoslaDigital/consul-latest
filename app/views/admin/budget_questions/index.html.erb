@@ -1,11 +1,11 @@
  <%= back_link_to admin_budget_path(@budget) %>
 <%= render Admin::Budgets::HelpComponent.new("budget_questions") %>
 <%# app/views/admin/budget_questions/index.html.erb %>
-<h1><%= t(".title", budget_name: @budget.name) %></h1>
+<h1><%= t("admin.budget_questions.title", budget_name: @budget.name) %></h1>
 <%# Link to create a new budget question for the current budget %>
 
 <div class="mb-4">
-  <%= link_to t(".add_new_question"), new_admin_budget_budget_question_path(@budget), class: "button button-primary" %>
+  <%= link_to t("admin.budget_questions.add_new_question"), new_admin_budget_budget_question_path(@budget), class: "button button-primary" %>
 </div>
 
 
@@ -14,8 +14,8 @@
 <% else %>
   <%# Message to display if no budget questions exist for this budget %>
   <div class="alert alert-info" role="alert">
-    <p><%= t(".no_questions_yet") %></p>
-    <p><%= t(".get_started_by_adding") %></p>
+    <p><%= t("admin.budget_questions.no_questions") %></p>
+    <p><%= t("admin.budget_questions.add_new_question_description") %></p>
   </div>
 <% end %>
 
