@@ -11,5 +11,4 @@ class Admin::BudgetQuestions::QuestionsComponent < ApplicationComponent
     def cookie
       "budget_questions-columns-#{budget.current_phase.kind}"
     end
-
 end
