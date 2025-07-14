@@ -1,6 +1,6 @@
 class Budget
     class Question < ApplicationRecord
-      translates :text, touch: true
+      translates :text, :hint,  touch: true
       include Globalizable
   
       belongs_to :budget, touch: true
