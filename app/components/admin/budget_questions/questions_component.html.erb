@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <%budget_questions.each do |question| %>
+      <% budget_questions.each do |question| %>
         <%= render Admin::BudgetQuestions::RowComponent.new(question) %>
       <% end %>
     </tbody>

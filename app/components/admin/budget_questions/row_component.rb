@@ -2,7 +2,6 @@ class Admin::BudgetQuestions::RowComponent < ApplicationComponent
   attr_reader :question
 
   def initialize(question)
-    
     @question = question
     @budget = budget
   end
@@ -15,8 +14,8 @@ class Admin::BudgetQuestions::RowComponent < ApplicationComponent
 
     def question_path
       admin_budget_budget_question_path(budget_id: budget.id,
-                                          id: question.id,
-                                          params: Budget::Investment.filter_params(params).to_h)
+                                        id: question.id,
+                                        params: Budget::Investment.filter_params(params).to_h)
     end
 
     def administrator_info
