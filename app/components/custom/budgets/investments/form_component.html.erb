@@ -8,7 +8,7 @@
 
     <% unless budget.single_heading? %>
       <div>
-          <%= f.select :heading_id, budget_heading_select_options(budget),  { include_blank: true, hint: t("budgets.investments.form.heading_note"),class: "html-area" } %>
+          <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: t("budgets.investments.form.heading_note"), class: "html-area" } %>
       </div>
     <% end %>
 
@@ -19,30 +19,29 @@
     <%= f.translatable_fields do |translations_form| %>
       <div>
         <%= translations_form.text_field :title,
-              hint: t("budgets.investments.form.subtitle_note"),
-              maxlength: Budget::Investment.title_max_length,
-              data: suggest_data(investment) %>
+                                         hint: t("budgets.investments.form.subtitle_note"),
+                                         maxlength: Budget::Investment.title_max_length,
+                                         data: suggest_data(investment) %>
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
       <div>
       <%= f.text_area :summary,
-        label: t("budgets.investments.form.summary"),
-        rows: 4, maxlength: 500,
-        hint: t("budgets.investments.form.summary_note") %>
+                      label: t("budgets.investments.form.summary"),
+                      rows: 4, maxlength: 500,
+                      hint: t("budgets.investments.form.summary_note") %>
       </div>
-    
+
       <div>
         <%= translations_form.text_area :description,
-              hint: t("budgets.investments.form.description_note"),
-              maxlength: Budget::Investment.description_max_length,
-              class: "html-area" %>
+                                        hint: t("budgets.investments.form.description_note"),
+                                        maxlength: Budget::Investment.description_max_length,
+                                        class: "html-area" %>
       </div>
       <div>
           <h2> Estimated Cost of Project </h2>
-          <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note")%>
+          <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
        </div>
 
-  
   <% end %>
   <%= f.fields_for :answers do |builder| %>
   <%# Get the corresponding question for this answer %>
@@ -56,9 +55,9 @@
 
   <p>
     <%= builder.text_area :text,
-          label: label_text,
-          rows: 5,
-          hint: budget_question.hint %>
+                          label: label_text,
+                          rows: 5,
+                          hint: budget_question.hint %>
 
     <%= builder.hidden_field :budget_id %>
     <%= builder.hidden_field :budget_question_id %>
@@ -77,10 +76,9 @@
     <legend><%= t("shared.optional") %></legend>
     <p class="help-text"><%= t("shared.optional_note") %></p>
     <br>
-    <div  id="video_url">   
+    <div id="video_url">
       <%= f.text_field :video_url, hint: t("proposals.form.proposal_video_url_note") %>
     </div>
-
 
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) %>
@@ -101,11 +99,11 @@
       </div>
     <% end %>
 
-    <div  id="location">
+    <div id="location">
       <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
 
-    <div  id="org_name">
+    <div id="org_name">
       <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
     </div>
 
