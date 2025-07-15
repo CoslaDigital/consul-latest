@@ -30,9 +30,12 @@ set :log_level, :info
 set :pty, true
 set :use_sudo, false
 
-set :linked_files, %w[config/database.yml config/secrets.yml config/credentials/production.key config/credentials/production.yml.enc]
+#set :linked_files, %w[config/database.yml config/secrets.yml config/credentials/production.key config/credentials/production.yml.enc]
 set :linked_dirs, %w[.bundle log tmp public/system public/assets
                      public/ckeditor_assets public/machine_learning/data storage]
+# Required and optional linked files
+required_files = %w[config/database.yml config/secrets.yml]
+optional_files = %w[config/credentials/production.key config/credentials/production.yml.enc]
 
 set :keep_releases, 5
 
@@ -77,6 +80,18 @@ namespace :deploy do
     invoke "deploy"
   end
 
+  task :set_linked_files do
+    on roles(:app) do
+      existing_optional_files = optional_files.select do |file|
+        test "[ -f #{shared_path}/#{file} ]"
+      end
+
+      set :linked_files, required_files + existing_optional_files
+    end
+  end
+
+  before "deploy:check:linked_files", "deploy:set_linked_files"
+  
   before "deploy:restart", "puma:smart_restart"
   before "deploy:restart", "delayed_job:restart"
 end
