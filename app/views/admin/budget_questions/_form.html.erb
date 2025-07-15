@@ -1,12 +1,10 @@
 <%# app/views/admin/budget_questions/_form.html.erb %>
 
-# Determine the correct URL for the form based on whether it's a new or existing record.
-  if budget_question.new_record?
-    form_url_to_pass = admin_budget_budget_questions_path(budget) # POST to create
-  else
-                       form_url_to_pass = admin_budget_budget_question_path(budget, budget_question) # PATCH to update
-  end
-%>
+<% if budget_question.new_record? %>
+  <% form_url_to_pass = admin_budget_budget_questions_path(budget) %> <%# POST to create %>
+<% else %>
+  <% form_url_to_pass = admin_budget_budget_question_path(budget, budget_question) %> <%# PATCH to update %>
+<% end %>
 
 <%# Render your new Form Component, passing the necessary arguments %>
 <%= render Admin::BudgetQuestions::FormComponent.new(
