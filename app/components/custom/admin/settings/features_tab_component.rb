@@ -10,7 +10,6 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_local_login
                           feature.hide_comments
                           feature.hide_votes
-                          feature.hide_dash_progress
                         ]
     original_settings + custom_settings
   end

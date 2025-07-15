@@ -144,10 +144,6 @@ en:
       cookies_consent_description: Enable the cookies consent banner to inform users about the cookies the application uses.
       hide_comments: "Hide Comments"
       hide_comments_description: "Disable commenting on proposals"
-      hide_votes: "Hide Proposal votes"
-      hide_votes_description: "Disable supporting proposals"
-      hide_dash_progress: "Hide dashboard graph"
-      hide_dash_progress_description: "Hide dashboard progress graph"
     remote_census:
       general:
         endpoint: "Endpoint"
