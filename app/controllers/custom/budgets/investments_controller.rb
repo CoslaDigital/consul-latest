@@ -1,52 +1,12 @@
+load Rails.root.join("app", "controllers", "budgets", "investments_controller.rb")
 module Budgets
   class InvestmentsController < ApplicationController 
-    include FeatureFlags
-    include CommentableActions
-    include FlagActions
-    include RandomSeed
-    include ImageAttributes
-    include DocumentAttributes
-    include MapLocationAttributes
-    include Translatable
-
-    PER_PAGE = 10
-
-    before_action :authenticate_user!, except: [:index, :show]
-    before_action :load_budget
-
-    authorize_resource :budget
-    load_and_authorize_resource :investment, through: :budget, class: "Budget::Investment"
-
-    before_action :load_ballot, only: [:index, :show]
-    before_action :load_heading, only: [:index, :show]
-    before_action :set_random_seed, only: :index
-    before_action :load_categories, only: :index
-    before_action :set_default_investment_filter, only: :index
-    before_action :set_view, only: :index
-
-    feature_flag :budgets
-
-    has_orders %w[most_voted newest oldest], only: :show
-    has_orders ->(c) { c.instance_variable_get(:@budget).investments_orders }, only: :index
-    has_filters ->(c) { c.instance_variable_get(:@budget).investments_filters },
-                only: [:index, :show, :suggest]
-
-    invisible_captcha only: [:create, :update], honeypot: :subtitle, scope: :budget_investment
-
-    helper_method :resource_model, :resource_name
-    respond_to :html, :js
-
-    def index
-      @investments = investments.page(params[:page]).per(PER_PAGE).for_render
-      @investment_ids = @investments.ids
-
-      @investments_in_map = investments
-      @tag_cloud = tag_cloud
-      @remote_translations = detect_remote_translations(@investments)
-    end
 
     def new
       puts "Starting new method"
+      @investment.budget.questions.order(:id).each do |question|
+        answer = @investment.answers.build({budget_id: @investment.budget.id, budget_question_id: question.id})
+      end
     @budget = Budget.find(params[:budget_id])
     puts "Found Budget ID: #{@budget.id}"
     # Check for proposal ID before proceeding
@@ -82,7 +42,6 @@ module Budgets
     def create
       @investment.author = current_user
       @investment.heading = @budget.headings.first if @budget.single_heading?
-
       if @investment.save
         Mailer.budget_investment_created(@investment).deliver_later
         redirect_to budget_investment_path(@budget, @investment),
@@ -117,7 +76,7 @@ module Budgets
       super
     end
 
-    private
+  private
 
       def map_proposal_to_investment(proposal)
     {
@@ -202,10 +161,7 @@ module Budgets
                    puts "Completed copy_documents method"
   end
      
-     def copy_sdg_relations(proposal, investment)
-  puts "Starting copy_sdgs method"
-  puts "Proposal ID: #{proposal.id}"
-  puts "Investment ID: #{investment.id}"
+  def copy_sdg_relations(proposal, investment)
 
   # Find SDG::Relation records associated with the proposal
   sdg_relations = proposal.sdg_relations
@@ -223,8 +179,8 @@ module Budgets
     puts "Successfully copied SDGs from Proposal ID: #{proposal.id} to Investment ID: #{investment.id}"
   else
     puts "Failed to copy SDGs: #{investment.errors.full_messages.join(', ')}"
-  end
-end  
+    end
+  end  
 
       def resource_model
         Budget::Investment
@@ -241,6 +197,7 @@ end
       def allowed_params
         attributes = [:video_url, :estimated_price, :summary,  :heading_id, :tag_list, :organization_name, :location,
                       :terms_of_service, :related_sdg_list,
+                      answers_attributes: [:id, :text, :budget_id, :investment_id, :budget_question_id],
                       image_attributes: image_attributes,
                       documents_attributes: document_attributes,
                       map_location_attributes: map_location_attributes]
