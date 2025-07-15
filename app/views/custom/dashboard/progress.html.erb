@@ -1,4 +1,5 @@
 <% if proposal.published? %>
+  <% if !Setting.hide_dash_progress? %>
   <% content_for :action_title, t("dashboard.progress.title") %>
 
   <div class="row expanded">
@@ -30,6 +31,7 @@
   </div>
 
   <%= javascript_include_tag "dashboard_graphs", "data-turbolinks-track" => "reload" %>
+<% end %>
 <% end %>
 
 <%= render "next_goal" %>
