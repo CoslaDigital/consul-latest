@@ -19,17 +19,20 @@ class CommentsController < ApplicationController
       EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?  
       if Setting.moderate_comments?
         moderation_result = moderate_text(@comment.body)
-
         # Display the returned value of moderation_result
-      puts "Moderation Result: #{moderation_result.inspect}"
-      puts "Hidden: #{moderation_result[:hidden]}"
-      puts "Flagged: #{moderation_result[:flagged]}"
-      puts "Flags: #{moderation_result[:flags]}"
-      puts "Category: #{moderation_result[:category]}"
-
+        puts "Moderation Result: #{moderation_result.inspect}"
+        puts "Hidden: #{moderation_result[:hidden]}"
+        puts "Flagged: #{moderation_result[:flagged]}"
+        puts "Flags: #{moderation_result[:flags]}"
+        puts "Category: #{moderation_result[:category]}"
         handle_moderation(@comment, moderation_result)
-        flash[:error] = "Your comment is being moderated. Please come back later. Categories: #{moderation_result[:category].keys.join(', ')}"
-        redirect_back(fallback_location: root_path) if moderation_result[:flagged] || moderation_result[:hidden]
+        message = "Your comment is being moderated. Please come back later. Categories: #{moderation_result[:category].keys.join(', ')}"
+        if moderation_result[:flagged] || moderation_result[:hidden]
+          flash[:error] = message
+          redirect_back(fallback_location: root_path)
+        else
+          flash.now[:error] = message
+        end
       end
     else
      render :new 
