@@ -8,7 +8,7 @@
   <% end %>
 
   <% if investments.any? %>
-    <h3 class="inline-block"><%= page_entries_info investments %>FFS</h3>
+    <h3 class="inline-block"><%= page_entries_info investments %></h3>
     <%= render "admin/shared/columns_selector",
                cookie: cookie,
                default: default_columns %>
@@ -22,6 +22,7 @@
         <tr>
           <th data-field="id"><%= link_to_investments_sorted_by :id %></th>
           <th data-field="title"><%= link_to_investments_sorted_by :title %></th>
+          <th data-field="summary"><%= link_to_investments_sorted_by :summary %></th>
           <th data-field="supports"><%= link_to_investments_sorted_by :supports %></th>
           <th data-field="admin"><%= t("admin.budget_investments.index.list.admin") %></th>
           <th data-field="author">
