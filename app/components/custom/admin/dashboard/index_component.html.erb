@@ -1,28 +1,90 @@
+<%# app/components/custom/admin/dashboard/index_component.html.erb %>
 <% provide :main_class, "admin-dashboard-index" %>
-<%= header(skip_section_title: true) %>
 
-<p><%= t("admin.dashboard.index.description", org: setting["org_name"]) %></p>
+<div class="jumbo">
+  <div class="row">
+    <div class="columns">
+       <%= header(skip_section_title: true) %>
+       <p><%= t("admin.dashboard.index.description", org: setting["org_name"]) %></p>
+       <%= info %>
+       <address>
+         <%= email_link %>
+         <%= website_link %>
+       </address>
+    </div>
+  </div>
+</div>
 
-<%= info %>
+<div class="row">
+<h2>Consul Democracy is provided in Scotland by COSLA</h2>
+  <%# --- Main Content Column (Latest Changes) --- %>
+  <div class="columns medium-6 more-info-content">
+    <% if @latest_changes.any? %>
+      <div class="section-content">
+        <h2>Latest Local Changes</h2>
+        <% @latest_changes.each do |section, items| %>
+          <% if items.any? %>
+            <h3><%= section %></h3>
+            <ul class="features">
+              <% items.each do |item| %>
+                <li><%= item %></li>
+              <% end %>
+            </ul>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="section-content">
+        <p>No recent changes found in the local changelog.</p>
+      </div>
+    <% end %>
+  </div>
 
-<address>
-  <%= email_link %>
-  <%= website_link %>
-</address>
-<h2>About</h2>
-<p> Consul Democracy is provided in Scotland by COSLA<p>
-<% if @consul_version && !@consul_version.start_with?("Error", "Changelog not found", "Latest version information not found") %>
-   <p>Current Release: <strong><%= @consul_version %></strong></p>
- <% elsif @consul_version %>
-   <p class="warning"><%= @consul_version %></p>
- <% else %>
-   <p class="warning">Version information is currently unavailable.</p>
- <% end %> 
-<h2>Read the documentation </h2>
-<address>
-  <%= documentation_link %>
-</address>
-<h2> Get help </h2>
-<address>
-  <%= support_link %>
-</address>
+  <%# --- Sidebar Column (About) --- %>
+  <div class="columns medium-6 more-info-sidebar">
+    <div class="sidebar-card">
+      <h2>About</h2>
+
+      <%# --- Consul Version Block --- %>
+      <% if !@consul_version_info[:error] %>
+        <p>
+          Current Release: <strong><%= link_to @consul_version_info[:text], @consul_version_info[:url], target: "_blank" %></strong>
+        </p>
+      <% else %>
+        <p class="warning"><%= @consul_version_info[:text] %></p>
+      <% end %>
+
+      <%# --- Local Version Block --- %>
+      <% if !@local_version_info[:error] %>
+        <p>
+          Local Release: <strong><%= link_to @local_version_info[:text], @local_version_info[:url], target: "_blank" %></strong>
+        </p>
+      <% else %>
+        <p class="warning"><%= @local_version_info[:text] %></p>
+      <% end %>
+      
+       <%# --- Local Version Block --- %>
+      <% if !@branch[:error] %>
+        <p>
+          Branch: <strong><%= @branch[:branch] %></strong>
+        </p>
+      <% else %>
+        <p class="warning">Branch: <%= @branch[:text] %></p>
+      <% end %>
+
+      <hr>
+
+      <h4>Read the documentation</h4>
+      <address>
+        <%= documentation_link %>
+      </address>
+
+      <h4>Get help</h4>
+      <address>
+        <%= support_link %>
+      </address>
+    </div>
+  </div>
+
+</div>
+
