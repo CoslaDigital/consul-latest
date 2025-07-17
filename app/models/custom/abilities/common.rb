@@ -11,7 +11,9 @@ module Abilities
       can :update, Debate do |debate|
         debate.editable_by?(user)
       end
-
+      
+      
+      
       can :read, Proposal
       can :update, Proposal do |proposal|
         proposal.editable_by?(user)
@@ -86,7 +88,19 @@ module Abilities
       end
 
       can :create, Legislation::Answer if  user.organization&.verified?
+  
 
+        can :read, Budget::Investment::Answer, budget_question: { is_private: false }
+ 
+        can :read, Budget::Investment::Answer, budget_question: { is_private: true }, investment: { author_id: user.id }
+  
+  
+      if  user.organization&.verified?
+        can :create, Budget::Investment,  budget: { phase: "accepting" }
+        can :update, Budget::Investment,  budget: { phase: "accepting" }, author_id: user.id
+        can :suggest, Budget::Investment, budget: { phase: "accepting" }
+        can :destroy, Budget::Investment, budget: { phase: ["accepting", "reviewing"] }, author_id: user.id
+      end
       if user.level_two_or_three_verified?
         can :vote, Proposal, &:published?
 

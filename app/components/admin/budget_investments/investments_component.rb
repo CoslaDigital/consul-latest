@@ -33,7 +33,7 @@ class Admin::BudgetInvestments::InvestmentsComponent < ApplicationComponent
     end
 
     def default_columns
-      base_columns = ["id", "title", "geozone", "price", "selected", "incompatible"]
+      base_columns = ["id", "title", "summary","geozone", "price", "selected", "incompatible"]
       if budget.selecting? || budget.valuating? || budget.publishing_prices?
         base_columns += ["supports"]
       end
