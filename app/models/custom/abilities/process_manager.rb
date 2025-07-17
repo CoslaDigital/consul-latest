@@ -4,6 +4,8 @@ module Abilities
 
     def initialize(user)
 
+      can :read, Budget::Investment::Answer
+      
       cannot :edit, Administrator
        can :index, Administrator
       

@@ -1,0 +1,4 @@
+<%= render "admin/shared/toggle_switch",
+           record: @budget_question,
+           form_class: "toggle-enabled",
+           new_content: render(Admin::BudgetQuestions::ToggleEnabledComponent.new(@budget_question)) %>

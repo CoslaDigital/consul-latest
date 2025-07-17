@@ -269,11 +269,6 @@ class Proposal < ApplicationRecord
     end
   end
 
-  def formatted_price
-    ActionController::Base.helpers.number_to_currency(price)
-  end
-
-
   protected
 
     def set_responsible_name

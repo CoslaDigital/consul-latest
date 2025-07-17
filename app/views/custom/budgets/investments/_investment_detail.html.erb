@@ -35,7 +35,6 @@
 </div>
 <div>
 
-
 <h3><%= t("budgets.investments.show.summary") %></h3>
 <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
 <hr>
@@ -43,6 +42,25 @@
 <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
 </div>
 <hr>
+
+<%# 1. First, fetch ONLY questions where `enabled` is true. %>
+<% @budget.questions.where(enabled: true).order(:id).each do |question| %>
+
+  <h4><%= question.text.html_safe %></h4>
+  <p>
+    <% investment.answers.where(budget_question_id: question.id).find_each do |answer| %>
+
+      <%# 2. Then, use CanCanCan to check if the user can read this specific answer. %>
+      <% if can? :read, answer %>
+        <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
+      <% else %>
+        <%# Optional: Show a placeholder if the user is not authorized. %>
+        <em><small><%= t("custom.answers.private_answer_placeholder", default: "The answer to this question is private.") %></small></em>
+      <% end %>
+
+    <% end %>
+  </p>
+<% end %>
 
 <%= render Shared::EmbeddedVideoComponent.new(@investment) %>
 
@@ -55,8 +73,6 @@
     <%= sanitize_and_auto_link @investment.video_url %>
   </div>
 <% end %>
-
-
 
 <% if feature?(:map) && map_location_available?(@investment.map_location) %>
   <div class="margin">
