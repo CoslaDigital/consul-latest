@@ -280,6 +280,8 @@ en:
         list:
           id: ID
           title: Title
+          summary: Summary
+          description: Description
           supports: Supports
           admin: Administrator
           valuator: Valuator
