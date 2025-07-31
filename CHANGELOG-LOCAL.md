@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [2.3.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.1) ##(2025-06-03)
+## [2.3.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.1) (2025-06-03)
 
 [Base Changelog](https://github.com/consuldemocracy/consuldemocracy/compare/2.3.0...2.3.1)
 
