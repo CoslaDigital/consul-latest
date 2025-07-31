@@ -28,9 +28,7 @@ class Setting
           "feature.valid_geozone": true,
           "feature.hide_comments": false,
           "feature.hide_votes": false,
-          "feature.hide_dash_progress": false,
           "feature.hide_local_login": false
-          
         })
       end
     end
@@ -46,11 +44,6 @@ class Setting
     def hide_comments?
       Setting["feature.hide_comments"] == "active"
     end
-    
-     def hide_dash_progress?
-      Setting["feature.hide_dash_progress"] == "active"
-    end
-
     
     def hide_local_login?
       Setting["feature.hide_local_login"] == "active"

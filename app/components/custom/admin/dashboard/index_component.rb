@@ -3,6 +3,7 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent; end
 
 load Rails.root.join("app", "components", "admin", "dashboard", "index_component.rb")
 class Admin::Dashboard::IndexComponent < ApplicationComponent
+
   attr_reader :consul_version_info, :local_version_info, :latest_changes
 
   def initialize
@@ -127,6 +128,7 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
           changes[current_section] << item_text unless item_text.empty?
         end
       end
+
 
       final_changes = changes.reject { |_, v| v.empty? }
       Rails.logger.info "[ChangelogExtractor] Extracted changes: #{final_changes.inspect}"
