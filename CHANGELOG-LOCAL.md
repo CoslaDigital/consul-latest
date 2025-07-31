@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [2.3.1-local.3](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.3) (2025-06-13)
+## [2.3.1-local.3](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.3) (2025-07-03)
 
 ### Added
 - add feature switch to hide dashboard progress graph 
