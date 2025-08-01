@@ -2,6 +2,17 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.3.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.4) (2025-08-01)
+
+### Added
+- add ability to create and manage optional custom questions in budgets
+
+### Changed
+- add summary and description fields to budget investments exporter
+
+### Fixed
+
+
 ## [2.3.1-local.3](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.3) (2025-07-03)
 
 ### Added
