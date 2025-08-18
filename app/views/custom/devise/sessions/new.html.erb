@@ -1,8 +1,6 @@
 <% provide :title do %><%= t("devise_views.sessions.new.title") %><% end %>
 <h2><%= t("devise_views.sessions.new.title") %></h2>
 
-<p>Registration and sign-in for your online account is powered by the Scottish Government's 'myaccount' service.  It checks who you are and allows you to use a single account to access a range of Scottish public services online.</p>
-
 <%= render "devise/omniauth_form", action: "sign_in" %>
 
 <p>
