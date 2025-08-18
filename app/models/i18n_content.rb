@@ -84,6 +84,7 @@ class I18nContent < ApplicationRecord
       debates.new.recommendations_title
       devise.sessions.local_sign_in_title
       devise.sessions.local_sign_in_description
+      devise.sessions.ys_sign_in_description
       geozones.none
       map.title
       map.proposal_for_district
