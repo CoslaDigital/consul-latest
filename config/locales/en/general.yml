@@ -272,7 +272,7 @@ en:
       sign_up: Sign up with Wordpress
       name: Wordpress
     saml:
-      sign_in: Sign in with Saml
+      sign_in: Sign in with mygovscot myaccount
       sign_up: Sign up with Saml
       name: Saml
     twitter:
@@ -280,7 +280,8 @@ en:
       sign_up: Sign up with Twitter
       name: Twitter
     info:
-      sign_in: "Sign in with:"
+      sign_in: "You can sign in with any of the methods on this page"
+      sign_in_help: ""
       sign_up: "Sign up with:"
     or_fill: "Or fill the following form:"
   proposals:
