@@ -89,6 +89,7 @@ class I18nContent < ApplicationRecord
       map.proposal_for_district
       map.start_proposal
       omniauth.info.sign_in
+      omniauth.info.sign_in_help
       shared.optional
       shared.optional_note
       shared.tags_cloud.districts
