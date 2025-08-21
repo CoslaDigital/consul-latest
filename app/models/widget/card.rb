@@ -2,6 +2,9 @@ class Widget::Card < ApplicationRecord
   include Imageable
   belongs_to :cardable, polymorphic: true
 
+   attr_accessor :new_cardable_id
+
+
   translates :label,       touch: true
   translates :title,       touch: true
   translates :description, touch: true
