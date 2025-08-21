@@ -1335,6 +1335,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "responsible_name", limit: 60
     t.string "video_url"
+    t.bigint "price"
     t.tsvector "tsv"
     t.integer "geozone_id"
     t.datetime "retired_at", precision: nil
