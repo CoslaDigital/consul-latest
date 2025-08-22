@@ -286,6 +286,7 @@ namespace :admin do
     end
 
     namespace :site_customization do
+      get "all_cards", to: "cards#index_all", as: :all_widget_cards
       resources :pages, except: [:show] do
         resources :cards, except: [:show], as: :widget_cards
       end
