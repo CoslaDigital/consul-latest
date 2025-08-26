@@ -122,6 +122,7 @@ module Abilities
       can :manage, SiteCustomization::Image
       can :manage, SiteCustomization::ContentBlock
       can :manage, Widget::Card
+      can :index_all, Widget::Card
 
       can :access, :ckeditor
       can :manage, Ckeditor::Picture

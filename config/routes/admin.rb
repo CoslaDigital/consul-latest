@@ -284,10 +284,12 @@ namespace :admin do
         get :ncsv_review
       end
     end
-
+    resources :cards, controller: "widget/cards", path: "widget/cards"
+    
     namespace :site_customization do
-      get "all_cards", to: "cards#index_all", as: :all_widget_cards
+      resources :cards, only: [:index]
       resources :pages, except: [:show] do
+      
         resources :cards, except: [:show], as: :widget_cards
       end
       resources :images, only: [:index, :update, :destroy]
