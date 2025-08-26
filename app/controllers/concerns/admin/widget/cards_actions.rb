@@ -21,19 +21,28 @@ module Admin::Widget::CardsActions
   def edit
     @pages = SiteCustomization::Page.all
   end
-
+  
   def update
-    # Store the card's original parent page before the update happens
-    original_parent = @card.cardable
+  # Note: @card is already loaded by CanCanCan for this controller
+  authorize! :update, @card
 
-    if @card.update(card_params)
-      # Pass the original parent to the redirect helper to check for changes
-      redirect_after_save(@card, original_parent)
+  if @card.update(card_params)
+    notice = t("admin.site_customization.pages.cards.update.notice")
+
+    # --- This is the new, robust redirect logic ---
+    if @card.cardable.present?
+      # If the card has a parent, redirect to that parent's card list.
+      redirect_to admin_site_customization_page_widget_cards_path(@card.cardable), notice: notice
     else
-      @pages = SiteCustomization::Page.all
-      render :edit
+      # If the card has NO parent (it's a homepage card), redirect to the admin homepage.
+      redirect_to admin_homepage_path, notice: notice
     end
+  else
+    @pages = SiteCustomization::Page.all
+    render :edit
   end
+  end
+  
 
   def destroy
     @card.destroy!
