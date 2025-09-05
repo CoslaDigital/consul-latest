@@ -41,6 +41,12 @@
         </div>
       </div>
     <% end %>
-
+     <div class="milestone-actions margin-top">
+      <% if can? :update, milestone %>
+        <%= link_to "Edit Milestone",
+                    edit_budget_investment_milestone_path(@budget, @investment, milestone),
+                    class: "button tiny" %>
+      <% end %>
+    </div>
   </div>
 </li>

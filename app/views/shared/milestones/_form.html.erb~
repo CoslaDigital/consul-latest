@@ -1,0 +1,58 @@
+<%# app/views/shared/milestones/_form.html.erb %>
+
+<%# This partial can now be used by both admin and user-facing views %>
+<%
+url = if controller.class.module_parent_name == "Admin"
+  # For admins, build the admin-namespaced URL
+  # Note: The exact helper name depends on your routes file
+  admin_polymorphic_path([milestone.milestoneable, milestone])
+else
+  # For users, build the nested budget/investment URL directly
+  budget_investment_milestone_path(@budget, @investment, milestone)
+end
+%>
+<%= render "shared/globalize_locales", resource: milestone %>
+
+<%= translatable_form_for milestone, url: url do |f| %>
+
+  <div class="row">
+    <div class="small-12 medium-6 margin-bottom column">
+      <%= f.select :status_id,
+                   @statuses.map { |s| [s.name, s.id] },
+                   { include_blank: @statuses.any? ? "" : t("admin.milestones.form.no_statuses_defined") },
+                   { disabled: @statuses.blank? } %>
+
+      <%# 2. Only show the "Administer Statuses" link in the admin section %>
+      <% if controller.class.module_parent_name == "Admin" %>
+        <%= link_to t("admin.milestones.form.admin_statuses"),
+                    admin_milestone_statuses_path,
+                    class: "float-right" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <%= f.translatable_fields do |translations_form| %>
+      <div class="column">
+        <%# 3. This hidden field sets the title to the current time.
+            This seems specific to status updates. You might want to
+            make this conditional if users should be setting their own titles. %>
+        <%= translations_form.hidden_field :title, value: l(Time.current, format: :datetime),
+                                                   maxlength: Milestone.title_max_length %>
+
+        <%= translations_form.text_area :description, rows: 5 %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <%= f.date_field :publication_date %>
+
+      <%= render Images::NestedComponent.new(f) %>
+      <%= render Documents::NestedComponent.new(f) %>
+
+      <%= f.submit nil, class: "button success" %>
+    </div>
+  </div>
+<% end %>

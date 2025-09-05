@@ -1,3 +1,9 @@
 <div class="tabs-panel tab-milestones" id="tab-milestones">
+
+<% if can? :create, Milestone.new(milestoneable: @investment) %>
+  <%= link_to t("investments.show.new_milestone"), 
+              new_budget_investment_milestone_path(@budget, @investment), 
+              class: "button success" %>
+<% end %>
   <%= render "milestones/milestones_content", milestoneable: milestoneable %>
 </div>

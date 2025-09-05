@@ -1,0 +1,6 @@
+<h1>Edit Milestone</h1>
+
+<%# Render the same form from the new shared path %>
+<%= render "shared/milestones/form", 
+           milestone: @milestone, 
+           url: budget_investment_milestone_path(@budget, @investment, @milestone) %>
