@@ -2,6 +2,113 @@
 
 @mixin shared-styles {
 
+@media (max-width: 768px) {
+  .hero-header .row {
+    width: 95%;        // Use more of the screen on mobile
+    margin-left: 2.5%;
+  }
+
+  .hero-header h1 {
+    font-size: 2.25rem; // Make the title smaller to prevent awkward wrapping
+  }
+
+  .hero-header .homepage-lead {
+    font-size: 1rem;
+  }
+}
+
+  .hero-header {
+  @include full-width-background;
+  margin-top: -$line-height;
+
+  position: relative;
+  padding: 6rem 2rem;
+  background-color: var(--brand-secondary);
+  text-align: center;
+  color: #fff;
+}
+
+.hero-header.with-background-image {
+  height: auto;
+  aspect-ratio: 16 / 4;  // Sets a widescreen aspect ratio
+  display: flex;         // These help center content within the new aspect ratio
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  z-index: 0;
+}
+
+.hero-header .homepage-title {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #ffffffcc;
+}
+
+.hero-header h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.hero-header .homepage-lead {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: #ffffffcc;
+}
+
+.hero-header .homepage-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #0078d4;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.hero-header .homepage-link:hover {
+  background-color: #005fa3;
+}
+
+.hero-header .row {
+  padding: 1rem;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  border-radius: 20px;
+  margin-right: unset;
+  margin-left: 10%;
+  position: relative; // This is required for z-index to work
+
+  z-index: 1; // This creates a new stacking context
+}
+
+.hero-header .row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%);
+  opacity: 0.7;
+  border-radius: inherit;
+  z-index: -1; // This is correct
+}
+
+
+.hero-header .row .medium-6 {
+  width: unset;
+  }
+
+
   .admin-sidebar {
     background: linear-gradient(to bottom, var(--brand) 0%,var(--brand-secondary) 100%);
   }
@@ -34,6 +141,7 @@
   width: unset;
   }
 
+.hero-header .homepage-lead,
 .budget-header .homepage-lead {
   max-width: 80%;
   font-size: 1.4rem;
@@ -301,4 +409,11 @@ padding-bottom: 5rem;
         background-image: image-url("leaflet/layers-2x.png");
         background-size: 26px 26px;
   }
+}
+
+/* For debugging the hero-header background issue */
+body .site-dev .hero-header.hero-header .row::before {
+  background: linear-gradient(to top, red, blue) !important;
+  opacity: 0.7 !important;
+  display: block !important; /* Ensures it's not hidden */
 }
