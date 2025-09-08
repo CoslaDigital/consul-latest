@@ -4,6 +4,7 @@ class Image < ApplicationRecord
 
   def self.styles
     {
+      hero:   { gravity: "center", resize: "2816x", crop: "2816x704+0+0" },
       larger: { resize: "1920x" },
       large: { resize: "x#{Setting["uploads.images.min_height"]}" },
       medium: { gravity: "center", resize: "300x300^", crop: "300x300+0+0" },
