@@ -2,15 +2,15 @@
 <% if header.present? %>
 
 <% if header.image.present? %>
-        <div class="budget-header with-background-image"
-	style="background-image: url(<%= polymorphic_path(header.image.variant(:larger)) %>);">
+        <div class="hero-header with-background-image"
+	style="background-image: url(<%= polymorphic_path(header.image.variant(:hero)) %>);">
 <% else %>
-  <div class="budget-header">
+  <div class="hero-header">
 <!--  <div class="header-card jumbo highlight">  -->
 <% end %>
-    <div class="row">
-      <div class="small-12 medium-6 column text-center">
-        <span class="homepage-title"><%= header.label %></span>
+ <div class="row">
+    <div class="small-12 medium-6 column text-center">
+      <span class="homepage-title"><%= header.label %></span>
         <h1><%= header.title %></h1>
 
         <p class="homepage-lead"><%= header.description %></p>
