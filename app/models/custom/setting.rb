@@ -28,7 +28,8 @@ class Setting
           "feature.valid_geozone": true,
           "feature.hide_comments": false,
           "feature.hide_votes": false,
-          "feature.hide_local_login": false
+          "feature.hide_local_login": false,
+          "feature.demographics": false
         })
       end
     end
