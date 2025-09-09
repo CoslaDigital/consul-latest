@@ -2,23 +2,9 @@
 
 @mixin shared-styles {
 
-@media (max-width: 768px) {
-  .hero-header .row {
-    width: 95%;        // Use more of the screen on mobile
-    margin-left: 2.5%;
-  }
-
-  .hero-header h1 {
-    font-size: 2.25rem; // Make the title smaller to prevent awkward wrapping
-  }
-
-  .hero-header .homepage-lead {
-    font-size: 1rem;
-  }
-}
-
   .hero-header {
   @include full-width-background;
+  @extend %budget-header; 
   margin-top: -$line-height;
 
   position: relative;
@@ -30,7 +16,9 @@
 
 .hero-header.with-background-image {
   height: auto;
-  aspect-ratio: 16 / 4;  // Sets a widescreen aspect ratio
+  min-height: 300px; // fallback
+  padding-bottom: 5rem;
+//  aspect-ratio: 16 / 4;  // Sets a widescreen aspect ratio
   display: flex;         // These help center content within the new aspect ratio
   align-items: center;
   justify-content: center;
