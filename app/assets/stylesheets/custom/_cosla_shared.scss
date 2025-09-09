@@ -7,7 +7,7 @@
     @extend %budget-header;
     margin-top: -$line-height;
     width: 100vw;
-    position: relative; // You only need this once
+    position: relative;
     left: 50%;
     transform: translateX(-50%);
     padding: 4rem 2rem;
@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding-top: clamp(2rem, 8vh, 6rem);
   padding-bottom: clamp(2rem, 8vh, 6rem);
   
@@ -85,19 +86,18 @@
 
 .hero-header .row {
   padding: clamp(1.0rem, 4vw, 1.5rem);
-//  width: 80%;
   display: flex;
   justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 30px;
-//  margin-right: unset;
-//  margin-left: 10%;
   // Set a maximum width for readability on large screens
   max-width: 900px; 
   // Allow the box to fill the available space up to its max-width
   width: 100%;
-  position: relative; // This is required for z-index to work
+  position: relative; 
 
-  z-index: 1; // This creates a new stacking context
+  z-index: 1; 
 }
 
 .hero-header .row::before {
