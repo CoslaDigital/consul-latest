@@ -18,15 +18,26 @@
 
 
 .hero-header.with-background-image {
+  
+  --hero-aspect-ratio-height: 4;
   position: relative;
   overflow: hidden;
   padding: 0; // Padding is often removed when using aspect-ratio
-  //aspect-ratio: 16 / 9;
+  aspect-ratio: 16 /  var(--hero-aspect-ratio-height);
   min-height: 400px;
   max-height: 900px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: clamp(2rem, 8vh, 6rem);
+  padding-bottom: clamp(2rem, 8vh, 6rem);
+  
+  padding-left: clamp(1rem, 5vw, 3rem);
+  padding-right: clamp(1rem, 5vw, 3rem);
+ 
+  // This ensures the padding is calculated inside the element's height.
+  // Most modern setups have this globally, but it's good to be explicit.
+  box-sizing: border-box;
 }
 
 .hero-image {
@@ -37,21 +48,22 @@
 
 .hero-header .homepage-title {
   display: block;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2.5vw, 1.75rem);
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   color: #ffffffcc;
 }
 
 .hero-header h1 {
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
   font-weight: bold;
-  margin-bottom: 1rem;
   color: #fff;
+  margin-top: 1.25rem;
+//  margin-bottom: 0.5rem;
 }
 
 .hero-header .homepage-lead {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
   margin-bottom: 2rem;
   color: #ffffffcc;
 }
@@ -72,13 +84,17 @@
 }
 
 .hero-header .row {
-  padding: 1rem;
-  width: 80%;
+  padding: clamp(1.0rem, 4vw, 1.5rem);
+//  width: 80%;
   display: flex;
   justify-content: center;
-  border-radius: 20px;
-  margin-right: unset;
-  margin-left: 10%;
+  border-radius: 30px;
+//  margin-right: unset;
+//  margin-left: 10%;
+  // Set a maximum width for readability on large screens
+  max-width: 900px; 
+  // Allow the box to fill the available space up to its max-width
+  width: 100%;
   position: relative; // This is required for z-index to work
 
   z-index: 1; // This creates a new stacking context
