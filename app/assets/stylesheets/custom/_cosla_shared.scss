@@ -2,31 +2,37 @@
 
 @mixin shared-styles {
 
-  .hero-header {
-  @include full-width-background;
-  @extend %budget-header; 
-  margin-top: -$line-height;
+.hero-header {
+    @include full-width-background;
+    @extend %budget-header;
+    margin-top: -$line-height;
+    width: 100vw;
+    position: relative; // You only need this once
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4rem 2rem;
+    background-color: var(--brand-secondary);
+    text-align: center;
+    color: #fff;
+  }
 
-  position: relative;
-  padding: 6rem 2rem;
-  background-color: var(--brand-secondary);
-  text-align: center;
-  color: #fff;
-}
 
 .hero-header.with-background-image {
-  height: auto;
-  min-height: 300px; // fallback
-  padding-bottom: 5rem;
-//  aspect-ratio: 16 / 4;  // Sets a widescreen aspect ratio
-  display: flex;         // These help center content within the new aspect ratio
+  position: relative;
+  overflow: hidden;
+  padding: 0; // Padding is often removed when using aspect-ratio
+  //aspect-ratio: 16 / 9;
+  min-height: 400px;
+  max-height: 900px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: transparent;
-  z-index: 0;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This remains very important */
 }
 
 .hero-header .homepage-title {
@@ -96,6 +102,16 @@
   width: unset;
   }
 
+
+
+.full-width-media-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Puts it behind the text content */
+}
 
   .admin-sidebar {
     background: linear-gradient(to bottom, var(--brand) 0%,var(--brand-secondary) 100%);
