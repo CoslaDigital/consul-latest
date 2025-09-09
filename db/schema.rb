@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -241,6 +241,24 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.index ["group_id"], name: "index_budget_headings_on_group_id"
   end
 
+  create_table "budget_investment_answer_translations", force: :cascade do |t|
+    t.integer "budget_investment_answer_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.text "text"
+  end
+
+  create_table "budget_investment_answers", force: :cascade do |t|
+    t.bigint "budget_id"
+    t.bigint "investment_id"
+    t.bigint "budget_question_id"
+    t.string "text", null: false
+    t.index ["budget_id"], name: "index_budget_investment_answers_on_budget_id"
+    t.index ["budget_question_id"], name: "index_budget_investment_answers_on_budget_question_id"
+    t.index ["investment_id"], name: "index_budget_investment_answers_on_investment_id"
+  end
+
   create_table "budget_investment_translations", id: :serial, force: :cascade do |t|
     t.integer "budget_investment_id", null: false
     t.string "locale", null: false
@@ -332,6 +350,24 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.index ["kind"], name: "index_budget_phases_on_kind"
     t.index ["next_phase_id"], name: "index_budget_phases_on_next_phase_id"
     t.index ["starts_at"], name: "index_budget_phases_on_starts_at"
+  end
+
+  create_table "budget_question_translations", force: :cascade do |t|
+    t.integer "budget_question_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.text "text"
+    t.text "hint"
+  end
+
+  create_table "budget_questions", force: :cascade do |t|
+    t.bigint "budget_id"
+    t.boolean "enabled", default: true
+    t.boolean "is_mandatory"
+    t.text "hint"
+    t.boolean "is_private", default: false
+    t.index ["budget_id"], name: "index_budget_questions_on_budget_id"
   end
 
   create_table "budget_reclassified_votes", id: :serial, force: :cascade do |t|
@@ -443,6 +479,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.integer "confidence_score", default: 0, null: false
     t.boolean "valuation", default: false
     t.tsvector "tsv"
+    t.datetime "moderated_at"
+    t.string "moderation_reason"
     t.index ["ancestry"], name: "index_comments_on_ancestry"
     t.index ["cached_votes_down"], name: "index_comments_on_cached_votes_down"
     t.index ["cached_votes_total"], name: "index_comments_on_cached_votes_total"
@@ -888,6 +926,17 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.index ["linkable_type", "linkable_id"], name: "index_links_on_linkable_type_and_linkable_id"
   end
 
+  create_table "llm_vendors", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "api_key"
+    t.text "script"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "model_endpoint"
+    t.index ["api_key"], name: "index_llm_vendors_on_api_key"
+  end
+
   create_table "local_census_records", id: :serial, force: :cascade do |t|
     t.string "document_number", null: false
     t.string "document_type", null: false
@@ -1247,6 +1296,13 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.integer "geozone_id"
   end
 
+  create_table "process_managers", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_process_managers_on_user_id"
+  end
+
   create_table "progress_bar_translations", id: :serial, force: :cascade do |t|
     t.integer "progress_bar_id", null: false
     t.string "locale", null: false
@@ -1317,6 +1373,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.integer "community_id"
     t.datetime "published_at", precision: nil
     t.boolean "selected", default: false
+    t.bigint "price"
     t.index ["author_id", "hidden_at"], name: "index_proposals_on_author_id_and_hidden_at"
     t.index ["author_id"], name: "index_proposals_on_author_id"
     t.index ["cached_votes_up"], name: "index_proposals_on_cached_votes_up"
@@ -1641,7 +1698,10 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at", precision: nil
     t.string "unlock_token"
-    t.boolean "guest", default: false
+    t.string "otp_secret"
+    t.integer "consumed_timestep"
+    t.boolean "otp_required_for_login"
+    t.text "otp_backup_codes"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -1824,6 +1884,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
   add_foreign_key "poll_recounts", "poll_officer_assignments", column: "officer_assignment_id"
   add_foreign_key "poll_voters", "polls"
   add_foreign_key "polls", "budgets"
+  add_foreign_key "process_managers", "users"
   add_foreign_key "proposals", "communities"
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"
