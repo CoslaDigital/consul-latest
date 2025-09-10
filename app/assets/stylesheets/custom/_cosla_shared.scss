@@ -19,11 +19,12 @@
 
 .hero-header.with-background-image {
   
-  --hero-aspect-ratio-height: 5;
+  --hero-aspect-ratio-height: 6;
   position: relative;
   overflow: hidden;
   padding: 0; // Padding is often removed when using aspect-ratio
   aspect-ratio: 16 /  var(--hero-aspect-ratio-height);
+//  aspect-ratio: 16/5;
   min-height: 400px;
   max-height: 900px;
   display: flex;
