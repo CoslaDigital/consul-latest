@@ -77,7 +77,7 @@
   --main-header: #EC407A;
   --footer: #FCE4EC;
   --top-links: var(--footer);
-  --top-links-contrast: var({$black});
+  --top-links-contrast: {$black};
   --brand-secondary: #f4b56e;
   --footer: var(--brand-secondary);
   --main-header: var(--brand);
@@ -181,7 +181,7 @@
    --top-links: #222222fc;
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+//   @include shared-styles;
 }
 
 .site-inverclyde {
