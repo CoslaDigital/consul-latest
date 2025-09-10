@@ -85,6 +85,7 @@
 }
 
 .hero-header .row {
+  align-self: center;
   padding: clamp(1.0rem, 4vw, 1.5rem);
   display: flex;
   justify-content: center;
@@ -192,7 +193,7 @@
 
 
 
-@media (max-width: 767px) {
+@media (max-width: 600px) {
   .hero-header.with-background-image {
     // 1. Use a taller aspect ratio for mobile. 
     // A 1:1 (square) or 4:5 (portrait) ratio works well.
