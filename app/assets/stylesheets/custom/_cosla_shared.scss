@@ -434,9 +434,3 @@ padding-bottom: 5rem;
   }
 }
 
-/* For debugging the hero-header background issue */
-body .site-dev .hero-header.hero-header .row::before {
-  background: linear-gradient(to top, red, blue) !important;
-  opacity: 0.7 !important;
-  display: block !important; /* Ensures it's not hidden */
-}
