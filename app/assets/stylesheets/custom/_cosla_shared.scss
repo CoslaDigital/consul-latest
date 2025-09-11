@@ -19,7 +19,7 @@
 
 .hero-header.with-background-image {
   
-  --hero-aspect-ratio-height: 6;
+  --hero-aspect-ratio-height: 5;
   position: relative;
   overflow: hidden;
   padding: 0; // Padding is often removed when using aspect-ratio
@@ -192,20 +192,6 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-
-
-@media (max-width: 600px) {
-  .hero-header.with-background-image {
-    // 1. Use a taller aspect ratio for mobile. 
-    // A 1:1 (square) or 4:5 (portrait) ratio works well.
-    // Let's use 1:1 by setting the height variable to 16.
-    --hero-aspect-ratio-height: 16;
-
-    // 2. Reduce the vertical padding to give the content more room.
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
-  }
-}
 
 /* Add hover and focus styles to make it interactive */
 .budget-header .homepage-link:hover,
