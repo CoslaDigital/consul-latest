@@ -15,7 +15,6 @@ class Budget
     end
     
     def droop_quota(votes, seats)
-      write_to_output( "<h2>Votes = #{votes}, Seats = #{seats}</h2>")
       (votes/(seats + 1)).floor + 1
     end  
     
@@ -27,14 +26,12 @@ class Budget
       write_to_output( "<p><h3>the quota is #{quota}</h3></p>")
       ballots = get_ballots
       ballot_data = get_votes_data
-     # write_to_output( "<p>About to count votes</p>")
+      #write_to_output( "<p>About to count votes</p>")
       winners = calculate_results(ballot_data, seats, quota)
-      write_to_output( "<br><p>Election Complete</p>")
-      write_to_output( "<p>Results are #{winners}</p>")
       update_winning_investments(winners)
-      #Rails.logger.info("startingto create custom page")
+      Rails.logger.info("startingto create custom page")
       update_custom_page(@log_file_name)
-      #Rails.logger.info("finished creating custom page")
+      Rails.logger.info("finished creating custom page")
       winners 
     end
     
@@ -52,6 +49,8 @@ class Budget
       initial_vote_counts = Hash.new(0)
       # Fetch all investments
       investments = @heading.investments.where(budget_id: @budget.id, selected: true)
+ 
+      investment_titles = investments.pluck(:id, :title).to_h      
       initial_vote_counts = {}
       investments.each do |investment|
         # write_to_output( "setting up #{investment.id}")
@@ -77,104 +76,114 @@ class Budget
      @elected_investments = []
      @eliminated_investments = []
      iteration = 1
-     loop do
-       write_to_output( "<br><h2>Round #{iteration}:</h2><br>")
-       write_to_output( "<p>----------------</p><br>")
-#    write_to_output( "Quota is #{quota}<br>")
-       write_to_output( "<table><thead><tr> <th>Candidate</th><th>Votes</th></tr></thead><tbody>")  
-    # Sort investments by their initial vote counts
-    sorted_investments = initial_vote_counts.sort_by { |investment_id, count| -count }
+     loop do # START OF REPLACEMENT BLOCK
+    write_to_output( "<br><h2>Round #{iteration}:</h2>")
+    write_to_output( "<p>Quota to be elected: #{quota}</p>")
+
+    # --- 1. DISPLAY CURRENT STANDINGS FIRST ---
+    sorted_investments = initial_vote_counts.sort_by { |_, count| -count }
     if sorted_investments.empty?
-     write_to_output( "<p>No more candidates to consider.</p><br>")
-     break
+      write_to_output( "<p>No more candidates to consider.</p><br>")
+      break
     end
-    # Output sorted investments to Rails logger
-    write_to_output("<p>Remaining Candidates in order of votes:</p>")
-       sorted_investments.each do |investment_id, count|
-       write_to_output("<td>#{investment_id}</td><td>#{count}</td></tr><tr>")
-#       write_to_output("<p>Investment ID: #{investment_id}, Vote Count: #{count}</p><br>")
-       investments.find_by(id: investment_id)&.update(votes: count)
+
+    write_to_output("<p><strong>Current Standings:</strong></p>")
+    write_to_output("<table><thead><tr><th>Candidate</th><th>Votes</th></tr></thead><tbody>")
+    
+    sorted_investments.each do |investment_id, count|
+      title = investment_titles[investment_id] || "Unknown Candidate"
+      # Corrected the HTML row structure and rounded the vote count for fractional votes
+      write_to_output("<tr><td>#{title} (#{investment_id})</td><td>#{count.round(2)}</td></tr>")
+      investments.find_by(id: investment_id)&.update(votes: count)
     end
-    # Check if there are any investments with enough votes to meet the quota
-    elected = sorted_investments.select { |investment_id, count| count >= quota }
-    # Log information about elected investments
-    #elected.each do |investment_id, count|
-    # write_to_output( "<p><strong>Elected: Investment #{investment_id} (votes count: #{count})</strong></p><br>"
-    #end
+    
+    # IMPORTANT: Close the table here so the standings are a complete, separate section
+    write_to_output("</tbody></table><br>")
+
+    # --- 2. NOW, DECIDE WHETHER TO ELECT OR ELIMINATE ---
+    elected = sorted_investments.select { |_, count| count >= quota }
+
     if elected.present?
-    elected.each do |investment_id, count|
-      # Add the elected investment to the list of elected investments
-      @elected_investments << investment_id
-      write_to_output( "<br><strong>Elected: Investment #{investment_id} (votes count: #{count}: exceeds quota)</strong><br>")
+      write_to_output("<strong>Action:</strong> A candidate has met or exceeded the quota.")
+      elected.each do |investment_id, count|
+        @elected_investments << investment_id
+        title = investment_titles[investment_id]
+        write_to_output( "<br><strong>Elected: #{title} (#{investment_id})</strong> (has #{count.round(2)} votes)<br>")
 
-      # Calculate surplus votes and transfer them to next preferences
-      surplus = count - quota
-      write_to_output( "<p>surplus is #{surplus}</p>")
-      if surplus > 0
-      reallocated_votes = transfer_surplus_votes(votes_data, investment_id)
-      ratio = surplus.to_f/reallocated_votes.size
-      write_to_output( "<p>#{reallocated_votes.size} ratio is #{ratio}</p>")
-      reallocated_votes.each do |id|
-      if initial_vote_counts.key?(id)
-         # Increment the vote count for the investment ID
-           initial_vote_counts[id] += ratio
-           write_to_output( "<p>Reallocated vote to investment #{id}</p><br>")
-      else
-         # Optionally, handle the case where the investment ID is not found in the hash
-          Rails.logger.warn "Investment ID #{id} not found in initial vote counts"
-       end
-      end
-      end
-      # Reduce the number of seats left to fill
-
-      empty_seats -= 1
-      write_to_output( "<p>Remaining empty seats <strong> #{empty_seats}</strong><br>")
-      # Remove the elected investment from consideration
-      initial_vote_counts.delete(investment_id)
-      # Break if no more seats left to fill
-      break if empty_seats <= 0
+        surplus = count - quota
+        if surplus > 0
+          write_to_output( "<p>Transferring #{surplus.round(2)} surplus votes...</p>")
+          # ... (rest of surplus logic is the same) ...
+          reallocated_votes = transfer_surplus_votes(votes_data, investment_id)
+          if reallocated_votes.any?
+            ratio = surplus.to_f / reallocated_votes.size
+            reallocated_votes.each do |id|
+              if initial_vote_counts.key?(id)
+                initial_vote_counts[id] += ratio
+              end
+            end
+          end
+        end
+        
+        empty_seats -= 1
+        initial_vote_counts.delete(investment_id)
+        break if empty_seats <= 0
       end
     else
-      write_to_output( "<p> No investments meet the quota, so eliminate the lowest-ranking investment</p>")
-      eliminated_investment = sorted_investments.last
-      write_to_output( "<p>Candidate to be eliminated<strong> #{eliminated_investment[0]}</strong><p><br>")
-      @eliminated_investments << eliminated_investment[0]
-      write_to_output( "<strong>Eliminated: Investment #{eliminated_investment[0]} (lowest vote count)</strong><br>")
-
-      # Remove the eliminated investment from consideration
-      initial_vote_counts.delete(eliminated_investment[0])
-
-      # Transfer votes from the eliminated investment to the next preferences
-      reallocated_votes = transfer_eliminated_votes(votes_data, eliminated_investment[0])
-      write_to_output( "<p>Reallocating Votes from Ballots: #{reallocated_votes}</p>") unless reallocated_votes.empty?
+      write_to_output("<strong>Action:</strong> No candidate met the quota. Eliminating the candidate with the fewest votes.")
       
-      reallocated_votes.each do |id|
-      if initial_vote_counts.key?(id)
-         # Increment the vote count for the investment ID
-           initial_vote_counts[id] += 1
-         #  write_to_output( "<p>Reallocated vote to investment #{id}</p><br>")
-      else
-         # Optionally, handle the case where the investment ID is not found in the hash
-          Rails.logger.warn "Investment ID #{id} not found in initial vote counts"
-       end
-  
+      eliminated_investment = sorted_investments.last
+      eliminated_id = eliminated_investment[0]
+      eliminated_title = investment_titles[eliminated_id] || "Unknown Candidate"
+      
+      write_to_output( "<br><strong>Eliminated: #{eliminated_title} (#{eliminated_id})</strong><br>")
+      @eliminated_investments << eliminated_id
+      initial_vote_counts.delete(eliminated_id)
+
+      reallocated_votes = transfer_eliminated_votes(votes_data, eliminated_id)
+      unless reallocated_votes.empty?
+        write_to_output( "<p>Reallocating #{reallocated_votes.size} votes from #{eliminated_title}...</p>")
+        reallocated_votes.each do |id|
+          if initial_vote_counts.key?(id)
+            initial_vote_counts[id] += 1
+          end
+        end
       end
       
-      # If there are no more seats left to fill, stop the loop
       break if empty_seats <= 0
     end
 
-    # Output elected and eliminated investments for this iteration
-    write_to_output( "<p><strong>End of round #{iteration} summary</strong></p><br>")
-    write_to_output( "<p><strong>Elected Candidatess: #{@elected_investments.join(', ')}</strong></p><br>") unless @elected_investments.empty?
-    write_to_output( "<p>Eliminated Candidatess: #{@eliminated_investments.join(', ')}</p>") unless @eliminated_investments.empty?
-    write_to_output( "<p>-------------\n</p><br>")
-    write_to_output( "<p>Remaining empty seats: #{empty_seats}</p><br><br>")
+    # --- 3. END OF ROUND SUMMARY ---
+    write_to_output( "<hr><p><strong>End of Round #{iteration} Summary</strong></p>")
+    unless @elected_investments.empty?
+      elected_names = @elected_investments.map { |id| investment_titles[id] }.join(', ')
+      write_to_output( "<p>Elected so far: #{elected_names}</p>")
+    end
+    write_to_output( "<p>Remaining seats to fill: #{empty_seats}</p><br>")
 
-    # Increment iteration count
     iteration += 1
-  end
+  end # END OF REPLACEMENT BLOCK  
+  # Close the table from the final round of counting
+  write_to_output("</tbody></table>") 
+  write_to_output("<hr>") # Add a dividing line
+  
+  # Create the final results announcement
+  write_to_output("<h2>✅ Election Complete: Final Results</h2>")
 
+  if @elected_investments.any?
+    winner_count = @elected_investments.size
+    candidate_word = (winner_count == 1) ? "candidate has" : "candidates have"
+    write_to_output("<p>The following <strong>#{winner_count}</strong> #{candidate_word} been elected:</p>")
+    write_to_output("<ul>")
+    @elected_investments.each do |winner_id|
+      winner_title = investment_titles[winner_id] || "Unknown Candidate"
+      write_to_output("<li><strong>#{winner_title}</strong> (ID: #{winner_id})</li>")
+    end
+    write_to_output("</ul>")
+  else
+    write_to_output("<p>No candidates were elected in this process.</p>")
+  end
+  
   @elected_investments
 end
 
