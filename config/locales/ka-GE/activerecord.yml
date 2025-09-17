@@ -267,7 +267,6 @@ ka:
         public_interests: "იმ ელემენტების კვალიფიკაციების გასაჯაროება, რომელთაც მე მივყვები"
         recommended_debates: "დებატების ირგვლივ არსებული რეკომენდაციების ჩვენება"
         recommended_proposals: "ინიციატივების ირგვლივ არსებული რეკომენდაციების ჩვენება"
-        redeemable_code: "ელ.ფოსტით მიღებული დადასტურების კოდი"
       direct_message:
         title: "სათაური"
         body: "გზავნილი"
@@ -420,15 +419,6 @@ ka:
       image:
         title: სათაური
         attachment: "აირჩიეთ ფოტოსურათი"
-      poll/question/answer:
-        title: პასუხი
-        description: აღწერა
-      poll/question/answer/translation:
-        title: პასუხი
-        description: "აღწერა"
-      poll/question/answer/video:
-        title: სათაური
-        url: სხვა სერვერზე განთავსებული ვიდეოს ბმული
       newsletter:
         segment_recipient: მიმღებები
         subject: თემა

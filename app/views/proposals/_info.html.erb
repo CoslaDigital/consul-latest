@@ -30,13 +30,15 @@
 
 <blockquote><%= @proposal.summary %></blockquote>
 
-<% if @proposal.video_url.present? %>
-  <div class="small-12 medium-7 small-centered">
-    <div class="flex-video">
-      <div id="js-embedded-video" data-video-code="<%= embedded_video_code(@proposal) %>"></div>
-    </div>
-  </div>
-<% end %>
+<div>
+<h4><%= t("budgets.investments.show.estimated_price") %></h4>
+             <p class="investment-project-amount">
+             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.price %>
+            </p>
+
+</div>
+
+<%= render Shared::EmbeddedVideoComponent.new(@proposal) %>
 
 <%= auto_link_already_sanitized_html wysiwyg(@proposal.description) %>
 

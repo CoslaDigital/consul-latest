@@ -15,6 +15,10 @@ module ActionDispatch::Routing::UrlFor
     end
   end
 
+  def process_management_polymorphic_path(resource, options = {})
+    namespaced_polymorphic_path(:process_management, resource, options)
+  end
+  
   def admin_polymorphic_path(resource, options = {})
     namespaced_polymorphic_path(:admin, resource, options)
   end
@@ -24,9 +28,9 @@ module ActionDispatch::Routing::UrlFor
   end
 
   def namespaced_polymorphic_path(namespace, resource, options = {})
-    if %w[Budget::Group Budget::Heading Poll::Booth Poll::BoothAssignment Poll::Officer
-          Poll::Question Poll::Question::Answer Poll::Question::Answer::Video Poll::Shift
-          SDG::LocalTarget].include?(resource.class.name)
+    if %w[Budget::Group Budget::Heading Legislation::DraftVersion Legislation::Proposal Legislation::Question
+          Poll::Booth Poll::BoothAssignment Poll::Officer Poll::Question Poll::Question::Option
+          Poll::Question::Option::Video Poll::Shift SDG::LocalTarget].include?(resource.class.name)
       resolve = resolve_for(resource)
       resolve_options = resolve.pop
 

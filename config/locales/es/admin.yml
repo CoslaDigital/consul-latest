@@ -16,6 +16,9 @@ es:
       unmark_featured: Quitar destacado
       edit: Editar
       configure: Configurar
+      select: Seleccionar
+      show_to_valuators: "Mostrar %{name} a evaluadores"
+      mark_as_winner: Marcar como ganador
     officing_booth:
       title: "Estás ahora mismo en la mesa ubicada en %{booth}. Si esto no es correcto no sigas adelante y llama al teléfono de incidencias. Gracias."
     banners:
@@ -78,9 +81,11 @@ es:
           ballots: "Esta acción te permitirá gestionar las urnas de votación. Usa esta opción solamente si vas a utilizar urnas físicas para recoger votos durante la votación final."
           calculate_winners: 'Tras calcular los resultados, solamente los administradores tendrán acceso a los mismos. Se harán públicos cuando el presupuesto llegue a la fase "%{phase}" <strong>si se habilita la opción "Mostrar resultados"</strong> al editar el presupuesto.'
           destroy: "Esta acción borrará el presupuesto y todos sus grupos y partidas. Esta acción no se puede deshacer."
+          questions: "Crear campos del formulario para inversiones presupuestarias" 
         edit: "Editar presupuesto"
         preview: "Previsualizar"
         preview_results: "Previsualizar resultados"
+        questions: "Organizar preguntas"
       index:
         title: Presupuestos participativos
         new_link: Crear nuevo presupuesto
@@ -210,7 +215,6 @@ es:
         submit: "Guardar partida"
       group_switcher:
         currently_showing: "Mostrando las partidas del grupo <strong>%{group}</strong>."
-        different_group: "Ir a partidas de otro grupo"
         the_other_group: "Ir a partidas del grupo %{group}."
       index:
         back: "Volver a grupos"
@@ -233,12 +237,14 @@ es:
         title: "Fases de %{budget}"
     budget_investments:
       index:
+        basic_filters:
+          valuator_or_group: Evaluador o grupo
+          title_or_id: Título o ID
         heading_filter_all: Todas las partidas
         administrator_filter_all: Todos los administradores
         valuator_filter_all: Todos los evaluadores
         tags_filter_all: Todas las etiquetas
         advanced_filters: Filtros avanzados
-        placeholder: Buscar proyectos
         filters:
           all: Todos
           without_admin: Sin administrador
@@ -268,7 +274,6 @@ es:
           unfeasible: "Inviable"
           undecided: "Sin decidir"
         selected: "Seleccionado"
-        select: "Seleccionar"
         list:
           id: ID
           title: Título
@@ -285,6 +290,8 @@ es:
           incompatible: Incompatible
           price: Precio
           author: Autor
+          ballot_lines_count: Votos
+          winner: Ganadores
         cannot_calculate_winners: El presupuesto debe estar en la fase "%{phase}" para poder calcular las propuestas ganadoras
         see_results: "Ver resultados"
         milestone_tags_filter_all: "Todas las etiquetas de seguimiento"
@@ -326,6 +333,17 @@ es:
         tags_placeholder: "Escribe las etiquetas que desees separadas por comas (,)"
         undefined: Sin definir
       search_unfeasible: Buscar inviables
+    budget_questions:
+      add_new_question: "Crear una pregunta"
+      add_new_question_description: "Añade una pregunta para el formulario de inversión del presupuesto."
+      no_questions: "No hay preguntas para mostrar"
+      title: "Gestionar preguntas para este presupuesto"  
+      new:
+        options_heading: "Opciones"
+        enabled: "Habilitado"
+        is_private: "Esta es una pregunta privada"
+        is_mandatory: "Esta es una pregunta obligatoria"
+        title: "Crear una pregunta de presupuesto"
     budgets_wizard:
       creation_timeline:
         budget: Presupuesto
@@ -664,7 +682,6 @@ es:
         index:
           title: Versiones del borrador
           create: Crear versión
-          delete: Borrar
           preview: Previsualizar
         new:
           back: Volver
@@ -697,7 +714,6 @@ es:
           back: Volver
           title: Preguntas asociadas a este proceso
           create: Crear pregunta
-          delete: Borrar
         new:
           back: Volver
           title: Crear nueva pregunta
@@ -712,6 +728,11 @@ es:
       milestones:
         index:
           title: Seguimiento
+    locales:
+      default_help_text: "Cambiar el idioma por defecto <strong>afectará a todos los usuarios</strong> que visiten la página por primera vez."
+      enabled_help_text: El idioma por defecto, seleccionado con anterioridad, se habilitará automáticamente.
+      update:
+        notice: Idiomas actualizados con éxito
     managers:
       index:
         title: Gestores
@@ -729,11 +750,12 @@ es:
     menu:
       activity: Actividad de moderadores
       admin: Menú de administración
-      banner: Gestionar banners
+      banner: Banners
       proposals: Propuestas
       proposals_topics: Temas de propuestas
       budgets: Presupuestos participativos
-      geozones: Gestionar zonas
+      geozones: Zonas
+      locales: Idiomas
       hidden_comments: Comentarios ocultos
       hidden_debates: Debates ocultos
       hidden_proposals: Propuestas ocultas
@@ -796,7 +818,7 @@ es:
       dashboard_actions: Recursos y acciones
       debates: "Debates"
       comments: "Comentarios"
-      local_census_records: Gestionar censo local
+      local_census_records: Censo local
       machine_learning: "IA / Machine learning"
       multitenancy: Multientidad
     administrators:
@@ -1127,18 +1149,11 @@ es:
         multiple_description: "Permite elegir más de una respuesta. Se puede elegir el número máximo de respuestas."
     questions:
       index:
-        title: "Preguntas de votaciones"
         create: "Crear pregunta ciudadana"
-        no_questions: "No hay ninguna pregunta ciudadana."
-        filter_poll: Filtrar por votación
         select_poll: Seleccionar votación
-        questions_tab: "Preguntas"
         successful_proposals_tab: "Propuestas que han superado el umbral"
         create_question: "Crear pregunta para votación"
         table_proposal: "Propuesta"
-        table_question: "Pregunta"
-        table_poll: "Votación"
-        poll_not_assigned: "Votación no asignada"
       edit:
         title: "Editar pregunta ciudadana"
       form:
@@ -1159,7 +1174,6 @@ es:
         edit_question: Editar pregunta
         valid_answers: Respuestas válidas
         add_answer: Añadir respuesta
-        video_url: Vídeo externo
         answers:
           title: Respuesta
           description: Descripción
@@ -1291,7 +1305,6 @@ es:
         id: ID
         author: Autor
         milestones: Hitos
-        select: Seleccionar
         selected: Seleccionada
         no_proposals: No hay propuestas.
       show:
@@ -1346,6 +1359,10 @@ es:
         sdg:
           title: Configuración ODS
           how_to_enable: 'Para mostrar las opciones de configuración de los Objetivos de Desarrollo Sostenible se debe activar "ODS" en la pestaña "Funcionalidades".'
+        cookies_consent:
+          title: Consentimiento de cookies
+        cookies_consent_banner:
+          title: Banner de consentimiento de cookies
       remote_census_general_name: Datos Generales
       remote_census_request_name: Datos Petición
       remote_census_response_name: Datos Respuesta
@@ -1482,7 +1499,6 @@ es:
           verified_users_who_didnt_vote_proposals: Usuarios verificados que no han votado propuestas
           visits: Visitas
           votes: Votos
-        budgets_title: Presupuestos participativos
         participatory_budgets: Presupuestos Participativos
         direct_messages: Mensajes directos
         proposal_notifications: Notificaciones de propuestas
@@ -1490,10 +1506,15 @@ es:
         polls: Votaciones
         sdg: ODS
       graph:
-        debate_created: Debates
-        visit: Visitas
-        level_2_user: Usuarios nivel 2
-        proposal_created: Propuestas Ciudadanas
+        budget_investment_created: Proyectos de gasto creados
+        budget_investment_supported: Proyectos de gasto apoyados
+        debate_created: Debates creados
+        legislation_annotation_created: Anotaciones creadas
+        legislation_answer_created: Repuestas de legislación colaborativa creadas
+        level_3_user: Usuarios de nivel 3 verificados
+        proposal_created: Propuestas Ciudadanas creadas
+        title: Gráficos
+        visits: Visitas
       budgets:
         no_data_before_balloting_phase: "No hay datos que mostrar hasta que la fase de votación no esté abierta."
         title: "Presupuestos participativos - Estadisticas de participación"
@@ -1607,9 +1628,9 @@ es:
             subnavigation_right: Navegación principal derecha
       images:
         index:
+          dimensions: "(%{width}x%{height})"
           title: Personalizar imágenes
           update: Actualizar
-          delete: Borrar
           image: Imagen
         update:
           notice: Imagen actualizada correctamente
@@ -1712,7 +1733,7 @@ es:
       empty: "No hay cambios registrados"
     local_census_records:
       index:
-        title: Gestionar censo local
+        title: Censo local
         create: Crear nuevo registro en el censo local
         no_local_census_records: No hay registros de censo local
         document_type: Tipo de documento
@@ -1737,7 +1758,7 @@ es:
         create:
           notice: ¡Proceso de import de registros del censo local ejecutado correctamente!
         show:
-          title: Gestionar censo local
+          title: Censo local
           subtitle: Resultados del proceso de importación
           import: Importar otro fichero
           errored: Filas erróneas
@@ -1794,3 +1815,27 @@ es:
       tags: "Etiquetas"
       tags_description: "Genera etiquetas automáticas para todos los elementos que pueden ser etiquetados."
       title: "IA / Machine learning"
+    cookies:
+      vendors:
+        empty: No se han encontrado cookies de terceros
+        third_party_cookies: Cookies de terceros
+        create_button: Nueva cookie
+        create:
+          notice: Cookie creada correctamente
+        new:
+          title: Nueva cookie
+        edit:
+          title: Editar cookie
+        update:
+          notice: Cookie actualizada correctamente
+        destroy:
+          notice: Cookie eliminada correctamente
+        form:
+          name:
+            help_text: Esta información será visible públicamente.
+          cookie:
+            help_text: Esta información se utilizará internamente. El nombre de la cookie debe ser único, solo puede contener letras, dígitos y guiones bajos.
+          description:
+            help_text: Esta información será visible públicamente.
+          script:
+            help_text: Este es el script que se ejecutará cuando esta cookie sea aceptada por el usuario. Puede introducir código Javascript aquí e introducir referencias a otro javascript de la aplicación.

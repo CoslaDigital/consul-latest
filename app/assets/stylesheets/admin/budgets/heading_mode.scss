@@ -54,9 +54,9 @@
   }
 
   p {
+    flex-grow: 1;
     font-size: $small-font-size;
     font-style: italic;
-    flex-grow: 1;
   }
 
   a {
@@ -66,12 +66,6 @@
   }
 
   .close-button {
-    border: 3px solid $admin-text;
-    border-radius: 50%;
-    color: $admin-text;
-    font-size: rem-calc(23);
-    font-weight: bold;
-    height: rem-calc(30);
-    width: rem-calc(30);
+    @include modal-close-button($admin-text);
   }
 }

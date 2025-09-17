@@ -284,7 +284,6 @@ da:
         public_interests: "Andre brugere kan se de tags, jeg følger"
         recommended_debates: "Se anbefalede debatindlæg"
         recommended_proposals: "Se anbefalede borgerforslag"
-        redeemable_code: "Verifikationskode modtaget via e-mail"
       direct_message:
         title: "Titel"
         body: "Besked"
@@ -444,15 +443,6 @@ da:
       image:
         title: Titel
         attachment: "Vedhæft fil"
-      poll/question/answer:
-        title: Svar
-        description: Beskrivelse
-      poll/question/answer/translation:
-        title: Svar
-        description: "Beskrivelse"
-      poll/question/answer/video:
-        title: Titel
-        url: Ekstern video
       newsletter:
         segment_recipient: Modtagere
         subject: Emne

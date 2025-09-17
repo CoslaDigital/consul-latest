@@ -320,7 +320,6 @@ pl:
         public_activity: "Pokazuj publicznie moją listę aktywności"
         recommended_debates: "Pokaż zalecenia debat"
         recommended_proposals: "Pokaż wnioski rekomendacji"
-        redeemable_code: "Kod weryfikacyjny otrzymany za pośrednictwem poczty e-mail"
       direct_message:
         title: "Tytuł"
         body: "Wiadomość"
@@ -476,15 +475,6 @@ pl:
       image:
         title: Tytuł
         attachment: "Załącznik"
-      poll/question/answer:
-        title: Odpowiedź
-        description: Opis
-      poll/question/answer/translation:
-        title: Odpowiedź
-        description: "Opis"
-      poll/question/answer/video:
-        title: Tytuł
-        url: Zewnętrzne video
       newsletter:
         segment_recipient: Adresaci
         subject: Temat

@@ -32,9 +32,11 @@ Puedes acceder a la página principal del proyecto en [http://consuldemocracy.or
 
 ## Configuración para desarrollo y tests
 
-**NOTA**: para unas instrucciones más detalladas consulta la [documentación](https://docs.consuldemocracy.org)
+**NOTA**: para unas instrucciones más detalladas, consulta la [documentación de instalación local](docs/es/installation/local_installation.md).
 
-Prerequisitos: tener instalado git, Ruby 3.1.4, CMake, pkg-config, shared-mime-info, Node.js 18.18.2 y PostgreSQL (9.5 o superior).
+Prerrequisitos: tener instalado git, Ruby 3.2.8, CMake, pkg-config, Node.js 18.20.3, ImageMagick y PostgreSQL (9.5 o superior).
+
+**Nota**: Es posible que ejecutar `bin/setup`, como se indica a continuación, falle si has configurado un nombre de usuario y contraseña para PostgreSQL. Si es así, edita las líneas que contienen `username:` y `password:` (añadiendo tus credenciales) en el fichero `config/database.yml` y ejecuta `bin/setup` de nuevo.
 
 ```bash
 git clone https://github.com/consuldemocracy/consuldemocracy.git
@@ -45,15 +47,17 @@ bin/rake db:dev_seed
 
 Para ejecutar la aplicación en local:
 
-```
+```bash
 bin/rails s
 ```
 
 Para ejecutar los tests:
 
-```
+```bash
 bin/rspec
 ```
+
+Nota: ejecutar todos los tests en tu máquina puede tardar más de una hora, por lo que recomendamos encarecidamente que configures un sistema de Integración Continua para ejecutarlos utilizando varios trabajos en paralelo cada vez que abras o modifiques una PR (si usas GitHub Actions o GitLab CI, esto ya está configurado en `.github/workflows/tests.yml` y `.gitlab-ci.yml`) y cuando trabajes en tu máquina ejecutes solamente los tests relacionados con tu desarrollo actual. Al configurar la aplicación por primera vez, recomendamos que ejecutes al menos un test en `spec/models/` y un test en `spec/system/` para comprobar que tu máquina está configurada para ejecutar los tests correctamente.
 
 Puedes usar el usuario administrador por defecto del fichero seeds:
 

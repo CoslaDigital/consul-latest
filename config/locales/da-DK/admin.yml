@@ -172,7 +172,6 @@ da:
         valuator_filter_all: Alle evaluatorer
         tags_filter_all: Alle tags
         advanced_filters: Flere filtre
-        placeholder: Søg efter projekter
         filters:
           all: Alle
           without_admin: Uden tildelte administrator
@@ -202,7 +201,6 @@ da:
           unfeasible: "Kan ikke gennemføres"
           undecided: "Under behandling"
         selected: "Valgt"
-        select: "Vælg"
         list:
           id: ID
           title: Titel
@@ -561,7 +559,6 @@ da:
         index:
           title: Kladdeversion
           create: Opret version
-          delete: Slet
           preview: Forhåndsvisning
         new:
           back: Tilbage
@@ -594,7 +591,6 @@ da:
           back: Tilbage
           title: Spørgsmål relateret til denne proces
           create: Stil et spørgsmål
-          delete: Slet
         new:
           back: Tilbage
           title: Stil et nyt spørgsmål
@@ -1012,18 +1008,11 @@ da:
         success_notice: "Undersøgelsen blev slettet"
     questions:
       index:
-        title: "Spørgsmål"
         create: "Stil spørgsmål"
-        no_questions: "Der er ingen spørgsmål."
-        filter_poll: Filtrer efter Afstemning
         select_poll: Vælg afstemning
-        questions_tab: "Spørgsmål"
         successful_proposals_tab: "Forslag, der har modtaget tilstrækkelig støtte"
         create_question: "Stil spørgsmål"
         table_proposal: "Borgerforslag"
-        table_question: "Spørgsmål"
-        table_poll: "Afstemning"
-        poll_not_assigned: "Afstemning ikke tildelt"
       edit:
         title: "Rediger Spørgsmål"
       new:
@@ -1040,7 +1029,6 @@ da:
         edit_question: Rediger spørgsmål
         valid_answers: Gyldige svar
         add_answer: Tilføj svar
-        video_url: Ekstern video
         answers:
           title: Svar
           description: Beskrivelse
@@ -1165,7 +1153,6 @@ da:
         title: Borgerforslag
         id: ID
         author: Oprettet af
-        select: Vælg
         selected: Valgt
         milestones: Proces
         no_proposals: Der er ingen forslag.
@@ -1311,7 +1298,6 @@ da:
           verified_users_who_didnt_vote_proposals: Verificerede brugere, der ikke stemte på nogle forslag
           visits: Besøg
           votes: Sammenlagt antal stemmer
-        budgets_title: Deltagerbudget
         participatory_budgets: Deltagerbudgetter
         direct_messages: Direkte beskeder
         proposal_notifications: Underretning om forslag
@@ -1320,7 +1306,6 @@ da:
         sdg: Verdensmål
       graph:
         debate_created: Debatforum
-        visit: Besøg
         proposal_created: Borgerforslag
       budgets:
         supporting_phase: Støt de forslag der skal gå videre
@@ -1425,7 +1410,6 @@ da:
         index:
           title: Brugerdefinerede billeder
           update: Opdater
-          delete: Slet
           image: Billede
         update:
           notice: Billedet blev opdateret

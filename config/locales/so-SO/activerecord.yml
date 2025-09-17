@@ -213,7 +213,6 @@ so:
         public_activity: "Wakiilka hay'adda / wadajirka Liiska ku saabsan waxqabadka dadweynaha"
         recommended_debates: "Muuji talooyinka dodaha"
         recommended_proposals: "Muuji talooyinka soo jeedinta"
-        redeemable_code: "Koodhka xaqiijinta ee la helay email ahaan"
       direct_message:
         title: "Ciwaan"
         body: "Fariin"
@@ -359,15 +358,6 @@ so:
       image:
         title: Ciwaan
         attachment: "Kulifaaq"
-      poll/question/answer:
-        title: Jawaab
-        description: Sharaxaad
-      poll/question/answer/translation:
-        title: Jawaab
-        description: "Sharaxaad"
-      poll/question/answer/video:
-        title: Ciwaan
-        url: Fidyoowga dibada
       newsletter:
         segment_recipient: Sooqataha
         subject: Mawduuc

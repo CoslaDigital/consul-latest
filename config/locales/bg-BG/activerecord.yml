@@ -284,7 +284,6 @@ bg:
         public_interests: "Запазване етикетите на елементите, които следя публично"
         recommended_debates: "Показване на препоръки за дискусии"
         recommended_proposals: "Показване на препоръки за предложения"
-        redeemable_code: "Код за потвърждение, получен по имейл"
       direct_message:
         title: "Заглавие"
         body: "Съобщение"
@@ -445,15 +444,6 @@ bg:
       image:
         title: Заглавие
         attachment: "Изберете изображение"
-      poll/question/answer:
-        title: Въпрос
-        description: Описание
-      poll/question/answer/translation:
-        title: Отговор
-        description: "Описание"
-      poll/question/answer/video:
-        title: Заглавие
-        url: Външно видео
       newsletter:
         segment_recipient: Получатели
         subject: Предмет

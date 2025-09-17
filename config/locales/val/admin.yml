@@ -146,7 +146,6 @@ val:
         valuator_filter_all: Tots els avaluadors
         tags_filter_all: Totes les etiquetes
         advanced_filters: Filtres avançats
-        placeholder: Buscar projectes
         filters:
           all: Totes
           without_admin: Sense administrador
@@ -175,7 +174,6 @@ val:
           unfeasible: "Inviable"
           undecided: "Sense decidir"
         selected: "Seleccionades"
-        select: "Seleccionar"
         list:
           id: ID
           title: Títol
@@ -471,7 +469,6 @@ val:
         index:
           title: Versions esborrany
           create: Crear versió
-          delete: Eliminar
           preview: Vista previa
         new:
           back: Tornar
@@ -504,7 +501,6 @@ val:
           back: Tornar
           title: Preguntes associades a aquest proces
           create: Crear pregunta
-          delete: Eliminar
         new:
           back: Tornar
           title: Crear nova pregunta
@@ -857,18 +853,11 @@ val:
         table_title: "Títol"
     questions:
       index:
-        title: "Preguntes"
         create: "Crear pregunta"
-        no_questions: "No hi ha preguntes."
-        filter_poll: Filtrar per votació
         select_poll: Seleccionar votació
-        questions_tab: "Preguntes"
         successful_proposals_tab: "Propostes que han superat el umbral"
         create_question: "Crear pregunta"
         table_proposal: "Proposta"
-        table_question: "Pregunta"
-        table_poll: "Votació"
-        poll_not_assigned: "Votació sense asignar"
       edit:
         title: "Editar pregunta ciutadana"
       new:
@@ -884,7 +873,6 @@ val:
         edit_question: Editar pregunta
         valid_answers: Respostes vàlides
         add_answer: Afegir resposta
-        video_url: Vídeo extern
         answers:
           title: Resposta
           description: Descripció
@@ -1006,7 +994,6 @@ val:
         title: Propostes
         id: ID
         author: Autor
-        select: Seleccionar
         selected: Seleccionades
         milestones: Seguiments
         no_proposals: No hi han propostes.
@@ -1139,7 +1126,6 @@ val:
           verified_users_who_didnt_vote_proposals: Usuaris verificats que no han votat propostes
           visits: Visites
           votes: Vots
-        budgets_title: Pressupostos participatius
         participatory_budgets: Pressupostos participatius
         direct_messages: Missatges directes
         proposal_notifications: Notificacions de propostes
@@ -1147,7 +1133,6 @@ val:
         polls: Votacions
       graph:
         debate_created: Debats
-        visit: Visites
         proposal_created: Propostes ciutadanes
       budget_balloting:
         vote_count: Vots
@@ -1243,7 +1228,6 @@ val:
         index:
           title: Imatges
           update: Actualitzar
-          delete: Eliminar
           image: Imatge
         update:
           notice: Imatge actualitzada correctament

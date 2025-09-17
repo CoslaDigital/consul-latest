@@ -1,10 +1,10 @@
 <% provide :title, @proposal.title %>
 <% content_for :meta_description do %><%= @proposal.summary %><% end %>
 <% provide :social_media_meta_tags do %>
-<%= render "shared/social_media_meta_tags",
-           social_url: legislation_process_proposal_url(process_id: @process),
-           social_title: @proposal.title,
-           social_description: @proposal.summary %>
+  <%= render "shared/social_media_meta_tags",
+             social_url: legislation_process_proposal_url(process_id: @process),
+             social_title: @proposal.title,
+             social_description: @proposal.summary %>
 <% end %>
 <% content_for :canonical do %>
   <%= render "shared/canonical", href: legislation_process_proposal_url(process_id: @process) %>
@@ -65,13 +65,7 @@
 
         <blockquote><%= @proposal.summary %></blockquote>
 
-        <% if @proposal.video_url.present? %>
-          <div class="small-12 medium-7 small-centered">
-            <div class="flex-video">
-              <div id="js-embedded-video" data-video-code="<%= embedded_video_code(@proposal) %>"></div>
-            </div>
-          </div>
-        <% end %>
+        <%= render Shared::EmbeddedVideoComponent.new(@proposal) %>
 
         <%= auto_link_already_sanitized_html wysiwyg(@proposal.description) %>
 

@@ -1,4 +1,9 @@
 resources :budgets, only: [:show, :index] do
+  collection do
+    get :select
+    get :select_headings
+    get :budget_headings, defaults: { format: :json }
+  end
   resources :groups, controller: "budgets/groups", only: [:show, :index]
   resources :investments, controller: "budgets/investments" do
     member do
@@ -18,8 +23,4 @@ resources :budgets, only: [:show, :index] do
   resource :results, only: :show, controller: "budgets/results"
   resource :stats, only: :show, controller: "budgets/stats"
   resource :executions, only: :show, controller: "budgets/executions"
-end
-
-resolve "Budget::Investment" do |investment, options|
-  [investment.budget, :investment, options.merge(id: investment)]
 end

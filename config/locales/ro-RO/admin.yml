@@ -207,7 +207,6 @@ ro:
         valuator_filter_all: Toți evaluatorii
         tags_filter_all: Toate etichetele
         advanced_filters: Filtre avansate
-        placeholder: Caută proiecte
         filters:
           all: Toate
           without_admin: Fără administrator atribuit
@@ -237,7 +236,6 @@ ro:
           unfeasible: "Nerealizabil"
           undecided: "Nehotărât"
         selected: "Selectat"
-        select: "Selectează"
         list:
           id: ID
           title: Titlu
@@ -612,7 +610,6 @@ ro:
         index:
           title: Versiuni schiță
           create: Crează versiune
-          delete: Șterge
           preview: Previzualizare
         new:
           back: Înapoi
@@ -645,7 +642,6 @@ ro:
           back: Înapoi
           title: Întrebări asociate acestui proces
           create: Crează întrebare
-          delete: Șterge
         new:
           back: Înapoi
           title: Crează întrebare nouă
@@ -1067,18 +1063,11 @@ ro:
         unable_notice: "Nu puteți șterge un chestionar care are voturi"
     questions:
       index:
-        title: "Întrebări"
         create: "Crează întrebare"
-        no_questions: "Nu există întrebări."
-        filter_poll: Filtrează după Chestionar
         select_poll: Selectează chestionar
-        questions_tab: "Întrebări"
         successful_proposals_tab: "Propunere de succes"
         create_question: "Crează întrebare"
         table_proposal: "Propunere"
-        table_question: "Întrebare"
-        table_poll: "Sondaj"
-        poll_not_assigned: "Sondajul nu este atribuit"
       edit:
         title: "Editează Întrebare"
       new:
@@ -1095,7 +1084,6 @@ ro:
         edit_question: Editează întrebare
         valid_answers: Întrebări valide
         add_answer: Adaugă răspuns
-        video_url: Video extern
         answers:
           title: Răspuns
           description: Descriere
@@ -1221,7 +1209,6 @@ ro:
         title: Propuneri
         id: ID
         author: Autor
-        select: Selectează
         selected: Selectat
         milestones: Repere
         no_proposals: Nu există propuneri.
@@ -1404,7 +1391,6 @@ ro:
           verified_users_who_didnt_vote_proposals: Utilizatori verificați care nu au votat propuneri
           visits: Vizite
           votes: Voturi totale
-        budgets_title: Bugetare participativă
         participatory_budgets: Bugete participative
         direct_messages: Mesaje directe
         proposal_notifications: Notificări propuneri
@@ -1413,8 +1399,6 @@ ro:
         sdg: ODD
       graph:
         debate_created: Dezbateri
-        visit: Vizite
-        level_2_user: Utilizatori de nivelul doi
         proposal_created: Propunerile cetățeanului
       budgets:
         no_data_before_balloting_phase: "Nu există date care să fie afișate înainte de faza de votare."
@@ -1526,7 +1510,6 @@ ro:
         index:
           title: Imagini personalizate
           update: Actualizează
-          delete: Șterge
           image: Imagine
         update:
           notice: Imagine actualizată cu succes

@@ -124,7 +124,6 @@ es-PE:
           unfeasible: "Inviable"
           undecided: "Sin decidir"
         selected: "Seleccionada"
-        select: "Seleccionar"
         list:
           title: Título
           supports: Apoyos
@@ -363,7 +362,6 @@ es-PE:
         index:
           title: Versiones del borrador
           create: Crear versión
-          delete: Borrar
           preview: Previsualizar
         new:
           back: Volver
@@ -395,7 +393,6 @@ es-PE:
           back: Volver
           title: Preguntas asociadas a este proceso
           create: Crear pregunta para votación
-          delete: Borrar
         new:
           back: Volver
           title: Crear nueva pregunta
@@ -646,17 +643,11 @@ es-PE:
         table_title: "Título"
     questions:
       index:
-        title: "Preguntas ciudadanas"
         create: "Crear pregunta para votación"
-        no_questions: "No hay ninguna pregunta ciudadana."
-        filter_poll: Filtrar por votación
         select_poll: Seleccionar votación
-        questions_tab: "Preguntas ciudadanas"
         successful_proposals_tab: "Propuestas que han superado el umbral"
         create_question: "Crear pregunta para votación"
         table_proposal: "la propuesta"
-        table_question: "Pregunta"
-        table_poll: "Votación"
       edit:
         title: "Editar pregunta ciudadana"
       new:
@@ -673,7 +664,6 @@ es-PE:
         edit_question: Editar pregunta
         valid_answers: Respuestas válidas
         add_answer: Añadir respuesta
-        video_url: Vídeo externo
         answers:
           title: Respuesta
           description: Descripción detallada
@@ -793,7 +783,6 @@ es-PE:
       index:
         title: Propuestas
         author: Autor
-        select: Seleccionar
         selected: Seleccionada
         milestones: Seguimiento
     hidden_proposals:
@@ -917,7 +906,6 @@ es-PE:
           verified_users_who_didnt_vote_proposals: Usuarios verificados que no han votado propuestas
           visits: Visitas
           votes: Votos
-        budgets_title: Presupuestos participativos
         participatory_budgets: Presupuestos participativos
         direct_messages: Mensajes directos
         proposal_notifications: Notificaciones de propuestas
@@ -925,7 +913,6 @@ es-PE:
         polls: Votaciones
       graph:
         debate_created: Discusiones
-        visit: Visitas
         proposal_created: Propuestas ciudadanas
       budget_balloting:
         vote_count: Votos
@@ -1006,7 +993,6 @@ es-PE:
         index:
           title: Personalizar imágenes
           update: Actualizar
-          delete: Borrar
           image: Imagen
         update:
           notice: Imagen actualizada correctamente

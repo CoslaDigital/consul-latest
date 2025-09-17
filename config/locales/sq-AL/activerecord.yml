@@ -229,7 +229,6 @@ sq:
         public_activity: "Mbaje listën e aktiviteteve të mia publike"
         recommended_debates: "Trego rekomandimet e debateve"
         recommended_proposals: "Trego rekomandimet e propozimeve"
-        redeemable_code: "Kodi i verifikimit është pranuar përmes postës elektronike"
       direct_message:
         title: "Titull"
         body: "Mesazh"
@@ -375,15 +374,6 @@ sq:
       image:
         title: Titull
         attachment: "Bashkëngjitur"
-      poll/question/answer:
-        title: Përgjigje
-        description: Përshkrimi
-      poll/question/answer/translation:
-        title: Përgjigje
-        description: "Përshkrimi"
-      poll/question/answer/video:
-        title: Titull
-        url: Video e jashtme
       newsletter:
         segment_recipient: Marrësit
         subject: Subjekt

@@ -9,7 +9,7 @@
     </h2>
     <p class="confirmed">
       <%= t("budgets.ballots.show.voted_info") %>
-    <p>
+    </p>
     <p><%= t("budgets.ballots.show.voted_info_2") %></p>
   </div>
 </header>
@@ -36,9 +36,7 @@
         <% end %>
 
         <ul class="ballot-list">
-          <%= render Budgets::Ballot::InvestmentComponent.with_collection(
-            ballot.investments.by_group(group.id)
-          ) %>
+          <%= render Budgets::Ballot::InvestmentComponent.with_collection(group_investments(group)) %>
         </ul>
       </div>
     </div>

@@ -1,3 +1,5 @@
+@use "sass:color";
+
 //  CONSUL DEMOCRACY Settings
 //  -----------------------------
 //
@@ -6,13 +8,13 @@
 //  1. Foundation settings overrides
 //  2. CONSUL DEMOCRACY variables
 //  3. Foundation overrides depending on CONSUL DEMOCRACY variables
-//  4. Foundation fixes
 
 // 1. Foundation settings overrides
 // ---------------------------------
 
 $black: #222 !default;
 $white: #fdfdfd !default;
+$dark-gray: #8a8a8a !default;
 
 $body-background: $white;
 $body-font-family: "Source Sans Pro", "Helvetica", "Arial", sans-serif !important !default;
@@ -50,11 +52,13 @@ $orbit-caption-background: #eee;
 
 $show-header-for-stacked: true !default;
 
+$switch-background: $dark-gray !default;
+
 // 2. CONSUL DEMOCRACY variables
 // -----------------------------
 
-$body-margin: calc(50vw - #{$global-width / 2}) !default;
-$full-width-margin: unquote("#{$global-width / 2} - 50vw") !default;
+$body-margin: calc(50vw - $global-width * 0.5) !default;
+$full-width-margin: unquote("#{$global-width * 0.5} - 50vw") !default;
 
 $base-font-size:      rem-calc(17) !default;
 $base-line:           rem-calc(26) !default;
@@ -64,7 +68,7 @@ $tiny-font-size:      rem-calc(12) !default;
 $font-family-serif: Georgia, "Times New Roman", Times, serif !default;
 
 $brand:             #004a83 !default;
-$brand-secondary:   darken($brand, 10%) !default;
+$brand-secondary:   color.adjust($brand, $lightness: -10%) !default;
 
 $text-medium:       #515151 !default;
 $text-light:        #bfbfbf !default;
@@ -155,23 +159,12 @@ $sdg-colors: (
 // ---------------------------------------------------------------
 
 $anchor-color: $brand !default;
-$anchor-color-hover: darken($anchor-color, 20%) !default;
+$anchor-color-hover: color.adjust($anchor-color, $lightness: -20%) !default;
 
 $tab-background-active: $white !default;
 
 $tab-item-font-size: $base-font-size !default;
-$tab-item-padding: $line-height / 2  0 !default;
+$tab-item-padding: $line-height * 0.5  0 !default;
 $tab-content-border: $border !default;
 
 $tooltip-background-color: $brand !default;
-
-// 4. Foundation fixes
-// -------------------
-
-$alert-color: null !default;
-$primary-color: null !default;
-$secondary-color: null !default;
-$success-color: null !default;
-$warning-color: null !default;
-$-zf-bp-value: null !default;
-$-zf-size: null !default;

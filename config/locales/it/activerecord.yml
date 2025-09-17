@@ -293,7 +293,6 @@ it:
         public_interests: "Mantieni pubblica le etichette di elementi che seguo"
         recommended_debates: "Mostra raccomandazioni dei dibattiti"
         recommended_proposals: "Mostra raccomandazioni proposte"
-        redeemable_code: "Il codice di verifica che hai ricevuto via email"
       direct_message:
         title: "Titolo"
         body: "Messaggio"
@@ -459,15 +458,6 @@ it:
       image:
         title: Titolo
         attachment: "Allegato"
-      poll/question/answer:
-        title: Risposta
-        description: Descrizione
-      poll/question/answer/translation:
-        title: Risposta
-        description: "Descrizione (facoltativa)"
-      poll/question/answer/video:
-        title: Titolo
-        url: Video esterno
       newsletter:
         segment_recipient: Destinatari
         subject: Oggetto

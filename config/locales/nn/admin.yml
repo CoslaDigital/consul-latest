@@ -53,7 +53,6 @@ nn:
           filter: Filter
         feasibility:
           unfeasible: "Ikke gjennomførbart"
-        select: "Velg"
         list:
           title: Tittel
           supports: Støtte
@@ -165,7 +164,6 @@ nn:
         edit:
           submit_button: Lagre endringer
         index:
-          delete: Slett
           preview: Forhåndsvisning
         table:
           title: Tittel
@@ -174,8 +172,6 @@ nn:
       questions:
         edit:
           submit_button: Lagre endringer
-        index:
-          delete: Slett
         table:
           title: Tittel
       milestones:
@@ -260,13 +256,10 @@ nn:
         table_title: "Tittel"
     questions:
       index:
-        title: "Spørsmål"
-        questions_tab: "Spørsmål"
         table_proposal: "Forslag"
       show:
         author: Forfatter
         add_answer: Legg til svar
-        video_url: Ekstern video
         answers:
           title: Svar
           documents: Dokumenter
@@ -293,7 +286,6 @@ nn:
       index:
         title: Forslag
         author: Forfatter
-        select: Velg
         milestones: Milepæler
     hidden_proposals:
       index:
@@ -338,11 +330,9 @@ nn:
           verified_users: Verifiserte brukere
           visits: Besøk
           votes: Totalt antall stemmer
-        budgets_title: Deltakende budsjettering
         polls: Avstemninger
       graph:
         debate_created: Debatter
-        visit: Besøk
       budget_balloting:
         participant_count: Deltakere
       budget_supporting:
@@ -365,7 +355,6 @@ nn:
     site_customization:
       images:
         index:
-          delete: Slett
           image: Bilde
       pages:
         page:

@@ -145,6 +145,9 @@ nl:
       local_census_record:
         one: Lokaal volkstellingsregister
         other: Lokale volkstellingsregisters
+      votation_type:
+        one: Stemvorm
+        other: Stemvormen
     attributes:
       budget:
         name: "Naam"
@@ -195,7 +198,9 @@ nl:
       geozone:
         name: Naam
         external_code: "Externe code (optioneel)"
+        color: "Kleur (optioneel)"
         census_code: "Censuscode (optioneel)"
+        geojson: "GeoJSON data (optioneel)"
         html_map_coordinates: "HTML <map> Coördinaten (optioneel)"
       milestone:
         status_id: "Huidige status (optioneel)"
@@ -285,7 +290,6 @@ nl:
         public_interests: "Wat ik volg is zichtbaar voor anderen"
         recommended_debates: "Aanbevolen debatten weergeven"
         recommended_proposals: "Laat aanbevolen voorstellen zien"
-        redeemable_code: "Verificatiecode ontvangen via email"
       direct_message:
         title: "Title"
         body: "Bericht"
@@ -451,13 +455,13 @@ nl:
       image:
         title: Titel
         attachment: "Afbeelding kiezen"
-      poll/question/answer:
+      poll/question/option:
         title: Antwoord
-        description: Omschrijving
-      poll/question/answer/translation:
+        description: Beschrijving
+      poll/question/option/translation:
         title: Antwoord
-        description: "Omschrijving"
-      poll/question/answer/video:
+        description: "Beschrijving (optioneel)"
+      poll/question/option/video:
         title: Titel
         url: Externe video
       newsletter:
@@ -480,6 +484,7 @@ nl:
         link_text: Tekst link
         link_url: URL link
         columns: Aantal kolommen
+        order: Positie
       widget/card/translation:
         label: Term (optioneel)
         title: Titel
@@ -516,7 +521,7 @@ nl:
         name: "Groepsnaam"
       local_census_record:
         document_type: Documentsoort
-        document_number: Document nummer
+        document_number: Documentnummer
         date_of_birth: Date of birth
         postal_code: Postcode
       votation_type:

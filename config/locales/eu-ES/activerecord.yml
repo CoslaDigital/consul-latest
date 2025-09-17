@@ -188,7 +188,6 @@ eu:
         official_position: "Kargu publikoa"
         official_level: "Kargu maila"
         phone_number: "Telefonoa"
-        redeemable_code: "Eskutitz bidezko egiaztapen kodea (aukerakoa)"
       direct_message:
         title: "Izenburua"
       organization:
@@ -316,15 +315,6 @@ eu:
       image:
         title: Izenburua
         attachment: "Itsatsitako fitxategia"
-      poll/question/answer:
-        title: Erantzuna
-        description: Deskribapena
-      poll/question/answer/translation:
-        title: Erantzuna
-        description: "Deskribapena"
-      poll/question/answer/video:
-        title: Izenburua
-        url: Kanpo bideoa
       newsletter:
         segment_recipient: Hartzaileak
         subject: Gaia

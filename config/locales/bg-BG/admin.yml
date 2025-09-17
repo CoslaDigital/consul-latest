@@ -190,7 +190,6 @@ bg:
         valuator_filter_all: Всички оценители
         tags_filter_all: Всички тагове
         advanced_filters: Разширени филтри
-        placeholder: Търсене на проекти
         filters:
           all: Всички
           without_admin: Без назначен администратор
@@ -220,7 +219,6 @@ bg:
           unfeasible: "Неизпълнимо"
           undecided: "Нерешено"
         selected: "Избрано"
-        select: "Избиране"
         list:
           id: Идентификация
           title: Заглавие
@@ -583,7 +581,6 @@ bg:
         index:
           title: Версии на черновата
           create: Създаване на версия
-          delete: Изтриване
           preview: Визуализация
         new:
           back: Назад
@@ -616,7 +613,6 @@ bg:
           back: Назад
           title: Въпроси, свързани с този процес
           create: Създаване на въпрос
-          delete: Изтриване
         new:
           back: Назад
           title: Създайте нов въпрос
@@ -1037,18 +1033,11 @@ bg:
         unable_notice: "Не можете да изтриете анкета с гласове"
     questions:
       index:
-        title: "Въпроси"
         create: "Създайте въпрос"
-        no_questions: "Няма въпроси."
-        filter_poll: Филтриране по анкета
         select_poll: Избиране на анкета
-        questions_tab: "Въпроси"
         successful_proposals_tab: "Успешни предложения"
         create_question: "Създайте въпрос"
         table_proposal: "Предложение"
-        table_question: "Въпрос"
-        table_poll: "Анкета"
-        poll_not_assigned: "Анкета не е назначена"
       edit:
         title: "Редактиране на въпроса"
       new:
@@ -1065,7 +1054,6 @@ bg:
         edit_question: Редактиране на въпрос
         valid_answers: Валидни отговори
         add_answer: Добавете отговор
-        video_url: Външно видео
         answers:
           title: Въпрос
           description: Описание
@@ -1190,7 +1178,6 @@ bg:
         title: Предложения
         id: Идентификация
         author: Автор
-        select: Изберете
         selected: Избрано
         milestones: Основни етапи
         no_proposals: Няма предложения.
@@ -1369,7 +1356,6 @@ bg:
           verified_users_who_didnt_vote_proposals: Проверени потребители, които не са гласували предложения
           visits: Посещения
           votes: Общо гласове
-        budgets_title: Граждански бюджет
         participatory_budgets: Граждански бюджети
         direct_messages: Директно съобщение
         proposal_notifications: Известия за предложения
@@ -1378,8 +1364,6 @@ bg:
         sdg: Цели за устойчиво развитие
       graph:
         debate_created: Дискусии
-        visit: Посещения
-        level_2_user: Потребители от ниво 2
         proposal_created: Граждански предложения
       budgets:
         no_data_before_balloting_phase: "Няма данни, които да се показват преди фазата на гласуване."
@@ -1491,7 +1475,6 @@ bg:
         index:
           title: Персонализирани изображения
           update: Актуализация
-          delete: Изтриване
           image: Изображение
         update:
           notice: Изображението е актуализирано успешно

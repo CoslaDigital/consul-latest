@@ -52,16 +52,13 @@ describe "Moderate proposal notifications" do
     describe "moderate in bulk" do
       describe "When a proposal has been selected for moderation" do
         let!(:proposal_notification) { create(:proposal_notification, created_at: Date.current - 4.days) }
+        let!(:email) { proposal_notification.author.email }
 
         before do
           visit moderation_proposal_notifications_path
-          within(".menu.simple") do
-            click_link "All"
-          end
+          click_link "All"
 
-          within("#proposal_notification_#{proposal_notification.id}") do
-            check "proposal_notification_#{proposal_notification.id}_check"
-          end
+          check proposal_notification.title
         end
 
         scenario "Hide the proposal" do
@@ -70,7 +67,7 @@ describe "Moderate proposal notifications" do
           expect(page).not_to have_css("#proposal_notification_#{proposal_notification.id}")
 
           click_link "Block users"
-          fill_in "email or name of user", with: proposal_notification.author.email
+          fill_in "email or name of user", with: email
           click_button "Search"
 
           within "tr", text: proposal_notification.author.name do
@@ -79,15 +76,12 @@ describe "Moderate proposal notifications" do
         end
 
         scenario "Block the author" do
-          author = create(:user)
-          proposal_notification.update!(author: author)
-
           accept_confirm("Are you sure? Block authors") { click_button "Block authors" }
 
           expect(page).not_to have_css("#proposal_notification_#{proposal_notification.id}")
 
           click_link "Block users"
-          fill_in "email or name of user", with: proposal_notification.author.email
+          fill_in "email or name of user", with: email
           click_button "Search"
 
           within "tr", text: proposal_notification.author.name do
@@ -108,16 +102,17 @@ describe "Moderate proposal notifications" do
         create_list(:proposal_notification, 2)
 
         visit moderation_proposal_notifications_path
+        click_link "All"
 
-        within(".js-check") { click_link "All" }
+        expect(page).to have_field type: :checkbox, count: 2
 
-        expect(all("input[type=checkbox]")).to all(be_checked)
+        within(".check-all-none") { click_button "Select all" }
 
-        within(".js-check") { click_link "None" }
+        expect(all(:checkbox)).to all(be_checked)
 
-        all("input[type=checkbox]").each do |checkbox|
-          expect(checkbox).not_to be_checked
-        end
+        within(".check-all-none") { click_button "Select none" }
+
+        all(:checkbox).each { |checkbox| expect(checkbox).not_to be_checked }
       end
 
       scenario "remembering page, filter and order" do
@@ -144,25 +139,19 @@ describe "Moderate proposal notifications" do
       expect(page).to have_link("Mark as viewed")
 
       visit moderation_proposal_notifications_path(filter: "all")
-      within(".menu.simple") do
-        expect(page).not_to have_link("All")
-        expect(page).to have_link("Pending review")
-        expect(page).to have_link("Mark as viewed")
-      end
+      expect(page).not_to have_link("All")
+      expect(page).to have_link("Pending review")
+      expect(page).to have_link("Mark as viewed")
 
       visit moderation_proposal_notifications_path(filter: "pending_review")
-      within(".menu.simple") do
-        expect(page).to have_link("All")
-        expect(page).not_to have_link("Pending review")
-        expect(page).to have_link("Mark as viewed")
-      end
+      expect(page).to have_link("All")
+      expect(page).not_to have_link("Pending review")
+      expect(page).to have_link("Mark as viewed")
 
       visit moderation_proposal_notifications_path(filter: "ignored")
-      within(".menu.simple") do
-        expect(page).to have_link("All")
-        expect(page).to have_link("Pending review")
-        expect(page).not_to have_link("Marked as viewed")
-      end
+      expect(page).to have_link("All")
+      expect(page).to have_link("Pending review")
+      expect(page).not_to have_link("Marked as viewed")
     end
 
     scenario "Filtering proposals" do

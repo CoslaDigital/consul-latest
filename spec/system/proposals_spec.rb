@@ -114,16 +114,16 @@ describe "Proposals" do
   end
 
   scenario "Show" do
-    proposal = create(:proposal)
+    proposal = create(:proposal, author: create(:user, username: "Mark Twain"))
 
     visit proposal_path(proposal)
 
     expect(page).to have_content proposal.title
     expect(page).to have_content proposal.code
     expect(page).to have_content "Proposal description"
-    expect(page).to have_content proposal.author.name
+    expect(page).to have_content "Mark Twain"
     expect(page).to have_content I18n.l(proposal.created_at.to_date)
-    expect(page).to have_css avatar(proposal.author.name)
+    expect(page).to have_avatar "M"
     expect(page.html).to include "<title>#{proposal.title}</title>"
     expect(page).not_to have_css ".js-flag-actions"
     expect(page).not_to have_css ".js-follow"
@@ -301,23 +301,30 @@ describe "Proposals" do
   context "Embedded video" do
     scenario "Show YouTube video" do
       proposal = create(:proposal, video_url: "http://www.youtube.com/watch?v=a7UFm6ErMPU")
+
       visit proposal_path(proposal)
-      expect(page).to have_css "div[id='js-embedded-video']"
-      expect(page.html).to include "https://www.youtube.com/embed/a7UFm6ErMPU"
+
+      within "#js-embedded-video" do
+        expect(page).to have_css "iframe[src='https://www.youtube-nocookie.com/embed/a7UFm6ErMPU']"
+      end
     end
 
     scenario "Show Vimeo video" do
       proposal = create(:proposal, video_url: "https://vimeo.com/7232823")
+
       visit proposal_path(proposal)
-      expect(page).to have_css "div[id='js-embedded-video']"
-      expect(page.html).to include "https://player.vimeo.com/video/7232823"
+
+      within "#js-embedded-video" do
+        expect(page).to have_css "iframe[src='https://player.vimeo.com/video/7232823?dnt=1']"
+      end
     end
 
     scenario "Dont show video" do
       proposal = create(:proposal, video_url: nil)
 
       visit proposal_path(proposal)
-      expect(page).not_to have_css "div[id='js-embedded-video']"
+
+      expect(page).not_to have_css "#js-embedded-video"
     end
   end
 
@@ -428,7 +435,7 @@ describe "Proposals" do
     expect(page).to have_field "Full name of the person submitting the proposal", with: "Isabel Garcia"
   end
 
-  scenario "Responsible name field is not shown for verified users" do
+  scenario "Responsible name field is not shown anywhere" do
     author = create(:user, :level_two)
     login_as(author)
 
@@ -446,7 +453,8 @@ describe "Proposals" do
     click_link "No, I want to publish the proposal"
     click_link "Not now, go to my proposal"
 
-    expect(Proposal.last.responsible_name).to eq(author.document_number)
+    expect(page).to have_css "h1", exact_text: "Help refugees"
+    expect(page).not_to have_content author.document_number
   end
 
   scenario "Errors on create" do
@@ -930,7 +938,7 @@ describe "Proposals" do
           expect(page).to have_content("Medium")
           expect(page).to have_css(".recommendation", count: 3)
 
-          accept_confirm { click_link "Hide recommendations" }
+          accept_confirm { click_button "Hide recommendations" }
         end
 
         expect(page).not_to have_link("recommendations")
@@ -1242,6 +1250,9 @@ describe "Proposals" do
       visit proposals_path
       fill_in "search", with: "Show you got"
       click_button "Search"
+
+      expect(page).to have_content "Search results"
+
       click_link "recommendations"
       expect(page).to have_css "a.is-active", text: "recommendations"
 
@@ -1283,22 +1294,6 @@ describe "Proposals" do
   it_behaves_like "followable", "proposal", "proposal_path", { id: "id" }
 
   it_behaves_like "imageable", "proposal", "proposal_path", { id: "id" }
-
-  it_behaves_like "nested imageable",
-                  "proposal",
-                  "new_proposal_path",
-                  {},
-                  "imageable_fill_new_valid_proposal",
-                  "Create proposal",
-                  "Proposal created successfully"
-
-  it_behaves_like "nested imageable",
-                  "proposal",
-                  "edit_proposal_path",
-                  { id: "id" },
-                  nil,
-                  "Save changes",
-                  "Proposal updated successfully"
 
   it_behaves_like "documentable", "proposal", "proposal_path", { id: "id" }
 

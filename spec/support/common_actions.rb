@@ -4,15 +4,18 @@ Dir["./spec/support/common_actions/custom/*.rb"].each { |f| require f }
 module CommonActions
   include Budgets
   include Comments
+  include Cookies
   include Debates
   include Documents
   include Emails
+  include GraphQLAPI
   include Images
   include Maps
   include Notifications
   include Polls
   include Proposals
   include RemoteCensusMock
+  include Secrets
   include Tags
   include Translations
   include Users

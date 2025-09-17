@@ -2,7 +2,6 @@
 <html <%= common_html_attributes %>>
   <head>
     <%= render "layouts/common_head", default_title: "Admin" %>
-    <%= render "layouts/no_script" %>
     <%= content_for :head %>
   </head>
 
@@ -16,8 +15,12 @@
       <nav id="side_menu" class="admin-sidebar">
         <% if namespace == "admin" %>
           <%= render Admin::MenuComponent.new %>
+        <% elsif namespace == "process_management" %>
+          <%= render Admin::MenuComponent.new %>
         <% elsif namespace == "sdg_management" %>
           <%= render SDGManagement::MenuComponent.new %>
+        <% elsif namespace == "officing" %>
+          <%= render Officing::MenuComponent.new(voter_user: @user) %>
         <% else %>
           <%= render "/#{namespace}/menu" %>
         <% end %>
@@ -30,7 +33,7 @@
         <%= render "layouts/flash" %>
         <%= render "layouts/officing_booth" if controller.class.module_parent == Officing && session[:booth_id].present? %>
         <%= yield %>
-      </div>
+      </main>
     </div>
   </body>
 </html>

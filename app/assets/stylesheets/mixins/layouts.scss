@@ -33,7 +33,7 @@
 }
 
 @mixin full-width-cover($adjust-margin: true, $adjust-padding: false) {
-  $global-padding: rem-calc(map-get($grid-column-gutter, medium)) / 2;
+  $global-padding: rem-calc(map-get($grid-column-gutter, medium)) * 0.5;
   bottom: 0;
   content: "";
   display: block;
@@ -44,7 +44,7 @@
   top: 0;
 
   @if $adjust-padding {
-    $small-padding: rem-calc(map-get($grid-column-gutter, small)) / 2;
+    $small-padding: rem-calc(map-get($grid-column-gutter, small)) * 0.5;
 
     left: -$small-padding;
     right: -$small-padding;
@@ -58,11 +58,11 @@
   @include breakpoint($global-width) {
 
     @if $adjust-padding and $adjust-margin {
-      left: calc(#{$full-width-margin} - #{$global-padding});
-      right: calc(#{$full-width-margin} - #{$global-padding});
+      left: calc($full-width-margin - $global-padding);
+      right: calc($full-width-margin - $global-padding);
     } @else if $adjust-margin {
-      left: calc(#{$full-width-margin});
-      right: calc(#{$full-width-margin});
+      left: calc($full-width-margin);
+      right: calc($full-width-margin);
     }
   }
 }
@@ -100,8 +100,8 @@
     content: "";
     height: 100%;
     position: absolute;
-    top: 0;
     right: 100%;
+    top: 0;
     width: 100vw;
   }
 }

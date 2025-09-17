@@ -20,11 +20,11 @@
         pass += possible_chars.charAt(Math.floor(Math.random() * possible_chars.length)).toUpperCase();
       }
 
-      for (var i = 0; i < password_complexity.digit; i++) {
+      for (var j = 0; j < password_complexity.digit; j++) {
         pass += possible_digits.charAt(Math.floor(Math.random() * possible_digits.length));
       }
 
-      for (var i = 0; i < password_complexity.symbol; i++) {
+      for (var k = 0; k < password_complexity.symbol; k++) {
         pass += possible_symbols.charAt(Math.floor(Math.random() * possible_symbols.length));
       }
 
@@ -39,14 +39,13 @@
         e.stopPropagation();
         $("#user_password").val(App.Managers.generatePassword());
       });
-      $(".show-password").on("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      $(".show-password").on("click", function() {
         if ($("#user_password").is("input[type='password']")) {
           App.Managers.togglePassword("text");
         } else {
           App.Managers.togglePassword("password");
         }
+        $(this).attr("aria-pressed", !JSON.parse($(this).attr("aria-pressed")));
       });
     }
   };

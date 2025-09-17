@@ -153,7 +153,6 @@ pt-BR:
     legislation/process: processo
     legislation/question: pergunta
     poll/shift: Turno
-    poll/question/answer: Resposta
     user: Conta
     verification/sms: telefone
     signature_sheet: Folha de assinatura
@@ -556,8 +555,6 @@ pt-BR:
         support: "Você apenas precisa clicar no botão 'Apoiar esta proposta' logo abaixo para se informar sobre ela antes de apoiá-la. Somente as propostas que conseguirem o máximo de apoio serão executadas pela Prefeitura. Assim, tenho certeza que você me ajudará!"
         share: "E se você fizer o grande favor de compartilhar a minha proposta com seus amigos, familiares e contatos, vai ser ótimo!"
   polls:
-    all: "Tudo"
-    no_dates: "nenhuma data atribuída"
     dates: "De %{open_at} para %{closed_at}"
     final_date: "Contagem final/resultados"
     index:
@@ -658,7 +655,6 @@ pt-BR:
       author_deleted: Usuário excluído
       email_deleted: Email excluído
     back: Voltar
-    check: Selecionar
     check_all: Tudo
     check_none: Nenhum
     collective: Coletivo
@@ -726,7 +722,6 @@ pt-BR:
       see_more: Ver mais recomendações
       hide: Ocultar recomendações
     translations:
-      select_language_prompt: Selecionar idioma
       remove_language: Remover idioma
       add_language: E o idioma
       languages_in_use:
@@ -743,18 +738,6 @@ pt-BR:
     youtube: "%{org} YouTube"
     telegram: "%{org} Telegram"
     instagram: "%{org} Instagram"
-  stats:
-    index:
-      visits: Visitas
-      debates: Debates
-      proposals: Propostas
-      comments: Comentários
-      proposal_votes: Votos em propostas
-      debate_votes: Votos em debates
-      comment_votes: Votos em comentários
-      votes: Total de votos
-      verified_users: Usuários verificados
-      unverified_users: Usuários não verificados
   unauthorized:
     default: Você não possui permissão de acesso a esta página.
     manage:

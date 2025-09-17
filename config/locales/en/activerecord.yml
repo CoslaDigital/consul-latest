@@ -151,6 +151,9 @@ en:
       votation_type:
         one: Votation type
         other: Votation types
+      cookies/vendor:
+        one: cookie vendor
+        other: cookie vendors
     attributes:
       budget:
         name: "Name"
@@ -177,9 +180,9 @@ en:
         description: "Description"
         external_url: "Link to additional documentation"
         administrator_id: "Administrator"
-        location: "Location additional info"
-        organization_name: "If you are proposing in the name of a collective/organization, or on behalf of more people, write its name"
-        image: "Proposal descriptive image"
+        location: "Tell us more about the location"
+        organization_name: "If you are proposing on behalf of a group or organization write its name"
+        image: "Project image"
         image_title: "Image title"
         duration: "Time scope"
         feasibility_feasible: "Feasible"
@@ -293,7 +296,6 @@ en:
         public_interests: "Keep the elements I follow public"
         recommended_debates: "Recommend debates to me"
         recommended_proposals: "Recommend proposals to me"
-        redeemable_code: "Verification code received via email"
       direct_message:
         title: "Title"
         body: "Message"
@@ -534,6 +536,10 @@ en:
       votation_type/vote_type:
         unique: Unique answer
         multiple: Multiple answers
+      cookies/vendor:
+        name: Vendor name
+        cookie: Cookie name
+        script: Javascript code
     errors:
       models:
         user:
@@ -551,7 +557,8 @@ en:
         geozone:
           attributes:
             geojson:
-              invalid: "The GeoJSON provided does not follow the correct format. It must follow the \"Polygon\" or \"MultiPolygon\" type format."
+              invalid: "The GeoJSON provided does not follow the correct format. It must follow the RFC 7946 standard format"
+              invalid_coordinates: "The GeoJSON provided contains invalid coordinates; the coordinates must be in the required \"Longitude, Latitude\" format and follow the RFC 7946 standard format"
         image:
           attributes:
             attachment:

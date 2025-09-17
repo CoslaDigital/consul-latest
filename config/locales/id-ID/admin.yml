@@ -142,7 +142,6 @@ id:
         valuator_filter_all: Semua penilai
         tags_filter_all: Semua tag
         advanced_filters: Saring lanjutan
-        placeholder: Cari proyek
         filters:
           all: Semua
           without_admin: Tanpa ditugaskan admin
@@ -169,7 +168,6 @@ id:
           unfeasible: "Tidak layak"
           undecided: "Bimbang"
         selected: "Dipilih"
-        select: "Pilih"
         list:
           id: ID
           title: Judul
@@ -425,7 +423,6 @@ id:
         index:
           title: Rancangan versi
           create: Membuat versi
-          delete: Hapus
           preview: Tinjauan
         new:
           back: Kembali
@@ -457,7 +454,6 @@ id:
           back: Kembali
           title: Pertanyaan yang terkait dengan proses ini
           create: Membuat pertanyaan
-          delete: Hapus
         new:
           back: Kembali
           title: Membuat pertanyaan baru
@@ -714,15 +710,10 @@ id:
         table_title: "Judul"
     questions:
       index:
-        title: "Pertanyaan"
         create: "Membuat pertanyaan"
-        no_questions: "Tidak ada pertanyaan."
-        questions_tab: "Pertanyaan"
         successful_proposals_tab: "Sukses proposal"
         create_question: "Membuat pertanyaan"
         table_proposal: "Usulan"
-        table_question: "Pertanyaan"
-        table_poll: "Jajak pendapat"
       edit:
         title: "Edit Pertanyaan"
       new:
@@ -737,7 +728,6 @@ id:
         question: Pertanyaan
         valid_answers: Jawaban yang sah
         add_answer: Tambahkan jawaban
-        video_url: Video eksternal
         answers:
           title: Jawaban
           description: Deskripsi
@@ -856,7 +846,6 @@ id:
         title: Proposal
         id: ID
         author: Penulis
-        select: Pilih
         selected: Dipilih
         milestones: Tonggak
     hidden_proposals:
@@ -977,7 +966,6 @@ id:
           verified_users_who_didnt_vote_proposals: Pengguna terverifikasi yang tidak votes proposal
           visits: Mengunjungi
           votes: Total suara
-        budgets_title: Penganggaran partisipatif
         participatory_budgets: Anggaran Partisipatif
         direct_messages: Pesan langsung
         proposal_notifications: Proposal pemberitahuan
@@ -985,7 +973,6 @@ id:
         polls: Jajak pendapat
       graph:
         debate_created: Perdebatan
-        visit: Mengunjungi
         proposal_created: Usulan warga
       budget_balloting:
         vote_count: Suara
@@ -1064,7 +1051,6 @@ id:
         index:
           title: Gambar Khusus
           update: Perbarui
-          delete: Hapus
           image: Gambar
         update:
           notice: Gambar berhasil diperbarui

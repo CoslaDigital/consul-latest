@@ -163,7 +163,6 @@ uk-UA:
     legislation/process: процес
     legislation/question: запитання
     poll/shift: Зміна
-    poll/question/answer: Відповідь
     user: Обліковий запис
     verification/sms: телефон
     signature_sheet: Підписний лист
@@ -588,8 +587,6 @@ uk-UA:
         support: "Все, що потрібно зробити - натиснути на кнопку \"Підтримати цю пропозицію\", яку ви побачите нижче. Перед тим, як підтримати пропозицію, ви можете ознайомитися з нею.\nЛише ті пропозиції, які отримають максимальну підтримку, будуть роглянуті міською радою. Я впевнений (-на), що ваша підтримка допоможе!"
         share: "Також ви зробите мені велику послугу, якщо поділитеся моєю пропозицією зі своїми друзями, родиною та контактами - це було б чудово!"
   polls:
-    all: "Усі"
-    no_dates: "без призначеної дати"
     dates: "Від %{open_at} до %{closed_at}"
     final_date: "Остаточний перерахунок/Результати"
     index:
@@ -686,7 +683,6 @@ uk-UA:
       author_deleted: Користувача видалено
       email_deleted: Електронну адресу видалено
     back: Повернутися
-    check: Обрати
     check_all: Усі
     check_none: Жодного
     collective: Колективні
@@ -760,7 +756,6 @@ uk-UA:
       see_more: Переглянути більше рекомендацій
       hide: Приховати рекомендації
     translations:
-      select_language_prompt: Обрати мову
       remove_language: Видалити мову
       add_language: Додати мову
       languages_in_use:
@@ -775,18 +770,6 @@ uk-UA:
     youtube: "%{org} YouTube"
     telegram: "%{org} Telegram"
     instagram: "%{org} Instagram"
-  stats:
-    index:
-      visits: Відвідування
-      debates: Обговорення
-      proposals: Пропозиції
-      comments: Коментарі
-      proposal_votes: Голоси за пропозиції
-      debate_votes: Голоси за обговорення
-      comment_votes: Голоси за коментарі
-      votes: Усі голоси
-      verified_users: Перевірені користувачі
-      unverified_users: Неперевірені користувачі
   unauthorized:
     default: Ви не маєте дозволу на відвідання цієї сторінки.
     manage:

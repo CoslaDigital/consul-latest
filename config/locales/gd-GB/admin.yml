@@ -213,7 +213,6 @@ gd:
         submit: "Sàbhail bann-sinn"
       group_switcher:
         currently_showing: "A’ sealltainn cinn-sgrìobhaidh sam bith sa bhuidhinn <strong>%{group}</strong> ."
-        different_group: "Stiùirich cinn-sgrìobhaidh à bhuidhinn eile %{group}."
         the_other_group: "Stiùirich cinn-sgrìobhaidh sa bhuidhinn %{group}."
       index:
         back: "Air ais do na buidhnean"
@@ -241,7 +240,6 @@ gd:
         valuator_filter_all: A h-uile neach-luachaidh
         tags_filter_all: Gach taga
         advanced_filters: Criathragan adhartach
-        placeholder: Lorg pròiseactan
         filters:
           all: A h-uile
           without_admin: Gun rianaire ainmichte
@@ -271,7 +269,6 @@ gd:
           unfeasible: "Neo-dhèante"
           undecided: "Gun cho-dhùnadh"
         selected: "Na thagh thu"
-        select: "Tagh"
         list:
           id: ID
           title: Tiotal
@@ -657,7 +654,6 @@ gd:
         index:
           title: Dreachdan
           create: Cruthaich dreachd
-          delete: Sguab às
           preview: Ro-sheall
         new:
           back: Air ais
@@ -690,7 +686,6 @@ gd:
           back: Air ais
           title: Ceistean co-cheangailte ris a’ phròiseas seo
           create: Cruthaich ceist
-          delete: Sguab às
         new:
           back: Air ais
           title: Cruthaich ceist ùr
@@ -1120,18 +1115,11 @@ gd:
         multiple_description: "Tha seo a’ ceadachadh grunn fhreagairtean a thaghadh. Tha e comasach an àireamh as motha de fhreagairtean a tha ceadaichte a shuidheachadh."
     questions:
       index:
-        title: "Ceistean"
         create: "Cruthaich ceist"
-        no_questions: "Chan eil ceist sam bith ann."
-        filter_poll: Criathraich a rèir cinn-latha
         select_poll: Tagh cunntas-bheachd
-        questions_tab: "Ceistean"
         successful_proposals_tab: "Molaidhean soirbheachail"
         create_question: "Cruthaich ceist"
         table_proposal: "Moladh"
-        table_question: "Ceist"
-        table_poll: "Cunntas-bheachd"
-        poll_not_assigned: "Chan eil a’ bhòt air a shònrachadh"
       edit:
         title: "Deasaich Ceist"
       form:
@@ -1152,7 +1140,6 @@ gd:
         edit_question: Deasaich ceist
         valid_answers: Freagairtean dligheach
         add_answer: Cuir freagairt ris
-        video_url: Bhidio air an taobh a-muigh
         answers:
           title: Freagairt
           description: Tuairisgeul
@@ -1285,7 +1272,6 @@ gd:
         title: Molaidhean
         id: ID
         author: Ùghdar
-        select: Tagh
         selected: Na thagh thu
         milestones: Clachan-mìle
         no_proposals: Chan eil moladh sam bith ann.
@@ -1474,7 +1460,6 @@ gd:
           verified_users_who_didnt_vote_proposals: Cleachdaichean dearbhte nach do bhòt airson molaidhean
           visits: Tadhalan
           votes: Bhòtaichean iomlan
-        budgets_title: Buidseatan Com-pàirteachail
         participatory_budgets: Buidseatan Com-pàirteachail
         direct_messages: Teachdaireachdan dìreach
         proposal_notifications: Brathan mu mholaidhean
@@ -1483,8 +1468,6 @@ gd:
         sdg: SDG
       graph:
         debate_created: Deasbadan
-        visit: Tadhalan
-        level_2_user: Cleachdaichean ìre 2
         proposal_created: Molaidhean saoranach
       budgets:
         no_data_before_balloting_phase: "Chan eil dàta sam bith ri shealltainn ron ìre baileat."
@@ -1596,7 +1579,6 @@ gd:
         index:
           title: Dealbh gnàthaichte
           update: Ùraich
-          delete: Sguab às
           image: Ìomhaigh
         update:
           notice: Chaidh an dealbh ùrachadh

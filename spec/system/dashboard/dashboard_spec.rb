@@ -47,14 +47,6 @@ describe "Proposal's dashboard" do
     end
   end
 
-  scenario "Dashboard progress show proposed actions" do
-    action = create(:dashboard_action, :proposed_action, :active)
-
-    visit progress_proposal_dashboard_path(proposal)
-
-    expect(page).to have_content(action.title)
-  end
-
   scenario "Dashboard progress show proposed actions truncated description" do
     action = create(:dashboard_action, :proposed_action, :active, description: "One short action")
     action_long = create(:dashboard_action, :proposed_action, :active,
@@ -100,45 +92,42 @@ describe "Proposal's dashboard" do
   end
 
   scenario "Dashboard progress display proposed_action pending on his section" do
-    action = create(:dashboard_action, :proposed_action, :active)
+    create(:dashboard_action, :proposed_action, :active, title: "Expand!")
 
     visit progress_proposal_dashboard_path(proposal)
 
     within "#proposed_actions_pending" do
-      expect(page).to have_content(action.title)
+      expect(page).to have_content "Expand!"
     end
-  end
 
-  scenario "Dashboard progress display proposed_action done on his section" do
-    action = create(:dashboard_action, :proposed_action, :active)
-
-    visit progress_proposal_dashboard_path(proposal)
-    find(:css, "#dashboard_action_#{action.id}_execute").click
+    click_button "Mark Expand! as done"
 
     within "#proposed_actions_done" do
-      expect(page).to have_content(action.title)
+      expect(page).to have_content "Expand!"
     end
-  end
 
-  scenario "Dashboard progress can execute proposed action" do
-    action = create(:dashboard_action, :proposed_action, :active)
-
-    visit progress_proposal_dashboard_path(proposal)
-    expect(page).to have_content(action.title)
-
-    find(:css, "#dashboard_action_#{action.id}_execute").click
-    expect(page).not_to have_css "#dashboard_action_#{action.id}_execute"
+    expect(page).not_to have_button "Mark Expand! as done"
+    expect(page).to have_button "Unmark Expand! as done"
   end
 
   scenario "Dashboard progress can unexecute proposed action" do
-    action = create(:dashboard_action, :proposed_action, :active)
+    action = create(:dashboard_action, :proposed_action, :active, title: "Reinforce!")
     create(:dashboard_executed_action, proposal: proposal, action: action)
 
     visit progress_proposal_dashboard_path(proposal)
-    expect(page).to have_content(action.title)
 
-    find(:css, "#dashboard_action_#{action.id}_unexecute").click
-    expect(page).to have_css "#dashboard_action_#{action.id}_execute"
+    within "#proposed_actions_done" do
+      expect(page).to have_content "Reinforce!"
+    end
+
+    click_button "Unmark Reinforce! as done"
+
+    within "#proposed_actions_pending" do
+      expect(page).to have_content "Reinforce!"
+    end
+
+    expect(page).not_to have_button "Unmark Reinforce! as done"
+    expect(page).to have_button "Mark Reinforce! as done"
   end
 
   scenario "Dashboard progress dont show proposed actions with published_proposal: true" do
@@ -178,7 +167,7 @@ describe "Proposal's dashboard" do
       expect(page).to have_content(solved.title)
 
       within "div#dashboard_action_#{available.id}" do
-        expect(page).to have_link("Request resource")
+        expect(page).to have_link "See resource"
       end
 
       within "div#dashboard_action_#{requested.id}" do
@@ -225,7 +214,7 @@ describe "Proposal's dashboard" do
       expect(page).to have_content(solved.title)
 
       within "div#dashboard_action_#{available.id}" do
-        expect(page).to have_link("Request resource")
+        expect(page).to have_link "See resource"
       end
 
       within "div#dashboard_action_#{requested.id}" do
@@ -308,7 +297,8 @@ describe "Proposal's dashboard" do
     visit proposal_dashboard_path(proposal)
     click_link(feature.title)
 
-    expect(page).not_to have_button("Request")
+    expect(page).to have_content feature.description
+    expect(page).not_to have_button "Request"
   end
 
   scenario "Resource admin request button do not appear on archived proposals" do
@@ -323,8 +313,8 @@ describe "Proposal's dashboard" do
       click_link(feature.title)
     end
 
-    expect(page).not_to have_button("Request")
-    expect(page).to have_content("This proposal is archived and can not request resources.")
+    expect(page).to have_content "This proposal is archived and can not request resources."
+    expect(page).not_to have_button "Request"
   end
 
   scenario "Dashboard has a link to dashboard community" do
@@ -471,10 +461,10 @@ describe "Proposal's dashboard" do
   end
 
   scenario "On recommended actions section display proposed_action done on his section" do
-    action = create(:dashboard_action, :proposed_action, :active)
+    action = create(:dashboard_action, :proposed_action, :active, title: "Make progress")
 
     visit recommended_actions_proposal_dashboard_path(proposal.to_param)
-    find(:css, "#dashboard_action_#{action.id}_execute").click
+    click_button "Mark Make progress as done"
 
     within "#proposed_actions_done" do
       expect(page).to have_content(action.title)

@@ -71,11 +71,11 @@ module Abilities
       can [:create, :destroy], Follow, user_id: user.id
 
       can [:destroy], Document do |document|
-        document.documentable_type != "Poll::Question::Answer" && document.documentable&.author_id == user.id
+        document.documentable_type != "Poll::Question::Option" && document.documentable&.author_id == user.id
       end
 
       can [:destroy], Image do |image|
-        image.imageable_type != "Poll::Question::Answer" && image.imageable&.author_id == user.id
+        image.imageable_type != "Poll::Question::Option" && image.imageable&.author_id == user.id
       end
 
       can [:create, :destroy], DirectUpload
@@ -84,6 +84,8 @@ module Abilities
         can [:create, :destroy], ActsAsVotable::Vote, voter_id: user.id, votable_type: "Debate"
         can [:create, :destroy], ActsAsVotable::Vote, voter_id: user.id, votable_type: "Comment"
       end
+
+      can [:budget_headings, :select, :select_headings], Budget
 
       if user.level_two_or_three_verified?
         can :vote, Proposal, &:published?

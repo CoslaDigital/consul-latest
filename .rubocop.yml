@@ -4,13 +4,15 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-rspec_rails
 
 AllCops:
   DisplayCopNames: true
   DisplayStyleGuide: true
   Exclude:
     - "db/schema.rb"
-    - "lib/ckeditor/backend/active_storage.rb"
+    - "app/lib/ckeditor/backend/active_storage.rb"
+    - "vendor/**/*"
   DisabledByDefault: true
 
 Bundler/DuplicatedGem:
@@ -282,6 +284,9 @@ Lint/BooleanSymbol:
 Lint/ConstantDefinitionInBlock:
   Enabled: true
 
+Lint/ConstantReassignment:
+  Enabled: true
+
 Lint/DeprecatedClassMethods:
   Enabled: true
 
@@ -297,6 +302,9 @@ Lint/EmptyBlock:
 Lint/EmptyFile:
   Enabled: true
 
+Lint/HashNewWithKeywordArgumentsAsDefault:
+  Enabled: true
+
 Lint/LiteralAsCondition:
   Enabled: true
 
@@ -304,6 +312,9 @@ Lint/NonAtomicFileOperation:
   Enabled: true
 
 Lint/ParenthesesAsGroupedExpression:
+  Enabled: true
+
+Lint/RedundantSafeNavigation:
   Enabled: true
 
 Lint/RedundantStringCoercion:
@@ -315,6 +326,9 @@ Lint/SafeNavigationChain:
 Lint/ShadowingOuterLocalVariable:
   Enabled: true
 
+Lint/SharedMutableDefault:
+  Enabled: true
+
 Lint/SymbolConversion:
   Enabled: true
   Exclude:
@@ -322,6 +336,9 @@ Lint/SymbolConversion:
     - "db/dev_seeds/settings.rb"
 
 Lint/UselessAssignment:
+  Enabled: true
+
+Lint/UselessDefined:
   Enabled: true
 
 Lint/Void:
@@ -333,6 +350,9 @@ Naming/BlockForwarding:
     - "app/controllers/application_controller.rb"
     - "app/controllers/management/base_controller.rb"
     - "app/controllers/subscriptions_controller.rb"
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: true
 
 Naming/VariableName:
   Enabled: true
@@ -364,6 +384,9 @@ Rails/ActiveRecordCallbacksOrder:
 Rails/AddColumnIndex:
   Enabled: true
 
+Rails/CompactBlank:
+  Enabled: true
+
 Rails/CreateTableWithTimestamps:
   Enabled: true
   Exclude:
@@ -372,9 +395,6 @@ Rails/CreateTableWithTimestamps:
     - "db/migrate/*create_active_storage_variant_records.active_storage.rb"
 
 Rails/Date:
-  Enabled: true
-
-Rails/DeprecatedActiveModelErrorsMethods: # TODO: Remove after upgrading to Rails 7
   Enabled: true
 
 Rails/DurationArithmetic:
@@ -388,6 +408,12 @@ Rails/DynamicFindBy:
     - find_by_slug_or_id!
     - find_by_manager_login
 
+Rails/EnumHash:
+  Enabled: true
+
+Rails/EnumSyntax:
+  Enabled: true
+
 Rails/EnumUniqueness:
   Enabled: true
 
@@ -398,6 +424,8 @@ Rails/FindBy:
   Enabled: true
   Include:
     - "**/*.rb"
+  Exclude:
+    - "config/initializers/ahoy.rb"
 
 Rails/FindEach:
   Enabled: true
@@ -480,7 +508,7 @@ Rails/SkipsModelValidations:
     - update_attribute
   Exclude:
     - app/models/tenant.rb
-    - lib/acts_as_paranoid_aliases.rb
+    - app/lib/acts_as_paranoid_aliases.rb
 
 Rails/TimeZone:
   Enabled: true
@@ -516,6 +544,9 @@ Rails/WhereNot:
 Rails/WhereNotWithMultipleConditions:
   Enabled: true
 
+Rails/WhereRange:
+  Enabled: true
+
 RSpec/AroundBlock:
   Enabled: true
 
@@ -529,18 +560,20 @@ RSpec/BeNil:
   Enabled: true
   EnforcedStyle: be
 
-RSpec/Capybara/FeatureMethods:
-  Enabled: true
-  EnabledMethods:
-    - scenario
-    - xscenario
-
 RSpec/ContextMethod:
   Enabled: true
 
 RSpec/DescribedClass:
   Enabled: true
   EnforcedStyle: explicit
+
+RSpec/Dialect:
+  Enabled: true
+  PreferredMethods:
+    background: :before
+    given:      :let
+    given!:     :let!
+    feature:    :describe
 
 RSpec/EmptyExampleGroup:
   Enabled: true
@@ -558,10 +591,16 @@ RSpec/EmptyLineAfterExampleGroup:
   Exclude:
     - spec/factories/**/*
 
+RSpec/EmptyOutput:
+  Enabled: true
+
 RSpec/ExampleWording:
   Enabled: true
 
 RSpec/ExcessiveDocstringSpacing:
+  Enabled: true
+
+RSpec/ExpectInLet:
   Enabled: true
 
 RSpec/Focus:
@@ -574,6 +613,7 @@ RSpec/InstanceVariable:
   Enabled: true
   Exclude:
     - spec/controllers/concerns/has_orders_spec.rb
+    - spec/form_builders/translatable_form_builder_spec.rb
 
 RSpec/LetBeforeExamples:
   Enabled: true
@@ -584,22 +624,13 @@ RSpec/LetSetup:
 RSpec/MetadataStyle:
   Enabled: true
 
+RSpec/MissingExpectationTargetMethod:
+  Enabled: true
+
 RSpec/NotToNot:
   Enabled: true
 
 RSpec/OverwritingSetup:
-  Enabled: true
-
-RSpec/Rails/HaveHttpStatus:
-  Enabled: true
-
-RSpec/Rails/InferredSpecType:
-  Enabled: true
-
-RSpec/Rails/NegationBeValid:
-  Enabled: true
-
-RSpec/Rails/TravelAround:
   Enabled: true
 
 RSpec/ReceiveMessages:
@@ -626,7 +657,25 @@ RSpec/SpecFilePathFormat:
 RSpec/SpecFilePathSuffix:
   Enabled: true
 
+RSpec/UndescriptiveLiteralsDescription:
+  Enabled: true
+
+RSpec/VerifiedDoubleReference:
+  Enabled: true
+
 RSpec/VoidExpect:
+  Enabled: true
+
+RSpecRails/HaveHttpStatus:
+  Enabled: true
+
+RSpecRails/InferredSpecType:
+  Enabled: true
+
+RSpecRails/NegationBeValid:
+  Enabled: true
+
+RSpecRails/TravelAround:
   Enabled: true
 
 Security/Eval:
@@ -647,6 +696,9 @@ Style/AccessorGrouping:
 Style/AndOr:
   Enabled: true
 
+Style/ArgumentsForwarding:
+  Enabled: true
+
 Style/ArrayCoercion:
   Enabled: true
 
@@ -656,6 +708,9 @@ Style/ArrayIntersect:
 Style/BlockDelimiters:
   Enabled: true
 
+Style/CaseLikeIf:
+  Enabled: true
+
 Style/ClassCheck:
   Enabled: true
 
@@ -663,6 +718,9 @@ Style/ClassVars:
   Enabled: true
 
 Style/CollectionMethods:
+  Enabled: true
+
+Style/DigChain:
   Enabled: true
 
 Style/FileRead:
@@ -677,9 +735,11 @@ Style/HashConversion:
 Style/HashExcept:
   Enabled: true
 
+Style/HashSlice:
+  Enabled: true
+
 Style/HashSyntax:
   Enabled: true
-  EnforcedShorthandSyntax: either
 
 Style/HashTransformKeys:
   Enabled: true
@@ -704,7 +764,13 @@ Style/InvertibleUnlessCondition:
     :present?: :blank?
     :zero?: ~
 
+Style/KeywordArgumentsMerging:
+  Enabled: true
+
 Style/LineEndConcatenation:
+  Enabled: true
+
+Style/MapIntoArray:
   Enabled: true
 
 Style/MapToHash:
@@ -740,6 +806,9 @@ Style/RaiseArgs:
 Style/RedundantArgument:
   Enabled: true
 
+Style/RedundantBegin:
+  Enabled: true
+
 Style/RedundantCondition:
   Enabled: true
 
@@ -755,6 +824,12 @@ Style/RedundantInterpolation:
 Style/RedundantParentheses:
   Enabled: true
 
+Style/RedundantRegexpArgument:
+  Enabled: true
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+
 Style/RedundantReturn:
   Enabled: true
 
@@ -765,6 +840,9 @@ Style/RedundantStringEscape:
   Enabled: true
 
 Style/SafeNavigation:
+  Enabled: true
+
+Style/SingleLineDoEndBlock:
   Enabled: true
 
 Style/SingleLineMethods:
@@ -781,6 +859,11 @@ Style/StringLiterals:
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+Style/SuperArguments:
+  Enabled: true
+  Exclude:
+    - "config/initializers/ahoy.rb"
 
 Style/SymbolProc:
   Enabled: true

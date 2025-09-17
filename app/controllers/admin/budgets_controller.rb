@@ -8,9 +8,24 @@ class Admin::BudgetsController < Admin::BaseController
   has_filters %w[all open finished], only: :index
 
   before_action :load_budget, except: [:index]
-  load_and_authorize_resource
+  load_and_authorize_resource class: "Budget"
 
   def index
+    # --- MANUAL DEBUGGING CODE ---
+    Rails.logger.debug "--- CanCanCan Debug in BudgetsController#index ---"
+    Rails.logger.debug "Current User: #{current_user.inspect}"
+    Rails.logger.debug "Ability Class being used: #{current_ability.class.name}"
+
+    # 1. Manual Authorization Step
+    # This will raise the CanCan::AccessDenied error if it fails,
+    # pinpointing the exact moment of failure.
+#    authorize! :index, Budget
+
+    # 2. Manual Loading Step
+    # This shows you the collection of budgets the user is allowed to see.
+#    @budgets = Budget.accessible_by(current_ability)
+#    Rails.logger.debug "Accessible Budgets Found: #{@budgets.count}"
+#    Rails.logger.debug "------------------------------------------------"
     @budgets = Budget.send(@current_filter).order(created_at: :desc).page(params[:page])
   end
 
@@ -66,6 +81,7 @@ class Admin::BudgetsController < Admin::BaseController
         :currency_symbol,
         :voting_style,
         :hide_money,
+        :part_fund,
         administrator_ids: [],
         valuator_ids: [],
         image_attributes: image_attributes

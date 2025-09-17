@@ -161,7 +161,6 @@ ro:
     legislation/process: proces
     legislation/question: întrebare
     poll/shift: Schimb
-    poll/question/answer: Răspuns
     user: Cont
     verification/sms: telefon
     signature_sheet: Foaie de semnături
@@ -576,8 +575,6 @@ ro:
         support: "Trebuie doar să faceți clic pe butonul pe care îl veți vedea mai jos „Sprijină această propunere” și vă puteți informa înainte de a o promova. Doar propunerile care vor obține sprijinul maxim vor fi trimise de către Primărie și am crezut că dumneavoastră sunt sigur că mă veți ajuta!"
         share: "Și dacă, de asemenea, îmi faci o mare favoare a-mi distribui propunerea cu prietenii, familia și persoanele de contact, ar fi perfect!"
   polls:
-    all: "Tot"
-    no_dates: "nu există date atribuite"
     dates: "De la %{open_at} către %{closed_at}"
     final_date: "Renumărări/ Rezultate finale"
     index:
@@ -678,7 +675,6 @@ ro:
       author_deleted: Utilizator șters
       email_deleted: Email șters
     back: Mergi înapoi
-    check: Selectează
     check_all: Tot
     check_none: Nici unul
     collective: Colectiv
@@ -749,7 +745,6 @@ ro:
       see_more: Vezi mai multe recomandări
       hide: Ascunde recomandări
     translations:
-      select_language_prompt: Alege limba
       remove_language: Șterge limbă
       add_language: Adaugă limbă
       languages_in_use:
@@ -763,18 +758,6 @@ ro:
     youtube: "%{org} YouTube"
     telegram: "%{org} Telegram"
     instagram: "%{org} Instagram"
-  stats:
-    index:
-      visits: Vizite
-      debates: Dezbateri
-      proposals: Propuneri
-      comments: Comentarii
-      proposal_votes: Votează propuneri
-      debate_votes: Votează dezbateri
-      comment_votes: Votează pe comentarii
-      votes: Voturi totale
-      verified_users: Utilizatori verificați
-      unverified_users: Utilizatori neverificați
   unauthorized:
     default: Nu aveți permisiune să accesați această pagină.
     manage:

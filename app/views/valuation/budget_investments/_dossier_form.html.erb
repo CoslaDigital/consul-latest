@@ -6,21 +6,21 @@
       <fieldset class="fieldset">
         <legend><%= t("valuation.budget_investments.edit.feasibility") %></legend>
         <div class="small-4 column">
-            <span class="radio">
-              <%= f.radio_button :feasibility, "undecided" %>
-            </span>
+          <span class="radio">
+            <%= f.radio_button :feasibility, "undecided" %>
+          </span>
         </div>
 
         <div class="small-4 column">
-            <span class="radio">
-              <%= f.radio_button :feasibility, "feasible" %>
-            </span>
+          <span class="radio">
+            <%= f.radio_button :feasibility, "feasible" %>
+          </span>
         </div>
 
         <div class="small-4 column">
-            <span class="radio">
-              <%= f.radio_button :feasibility, "unfeasible" %>
-            </span>
+          <span class="radio">
+            <%= f.radio_button :feasibility, "unfeasible" %>
+          </span>
         </div>
       </fieldset>
     </div>
@@ -44,6 +44,11 @@
           <%= f.number_field :price,
                              label: t("valuation.budget_investments.edit.price", currency: budget.currency_symbol),
                              max: 1000000000000000 %>
+        </div>
+<div class="small-12 medium-6 column">
+          <%= f.number_field :estimated_price,
+            label: t("valuation.budget_investments.edit.estimated_price", currency: budget.currency_symbol),
+            max: 1000000000000000 %>
         </div>
 
         <div class="small-12 medium-6 column end">

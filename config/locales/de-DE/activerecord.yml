@@ -285,7 +285,6 @@ de:
         public_interests: "Die Bezeichnungen der Elemente denen ich folge öffentlich zugänglich halten"
         recommended_debates: "Debatten-Empfehlungen anzeigen"
         recommended_proposals: "Antrags-Empfehlungen anzeigen"
-        redeemable_code: "Bestätigungscode per Post (optional)"
       direct_message:
         title: "Titel"
         body: "Nachricht"
@@ -451,15 +450,6 @@ de:
       image:
         title: Titel
         attachment: "Anhang"
-      poll/question/answer:
-        title: Antwort
-        description: Beschreibung
-      poll/question/answer/translation:
-        title: Antwort
-        description: "Beschreibung"
-      poll/question/answer/video:
-        title: Titel
-        url: Externes Video
       newsletter:
         segment_recipient: Empfänger*innen
         subject: Betreff

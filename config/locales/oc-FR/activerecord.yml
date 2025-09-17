@@ -263,7 +263,6 @@ oc:
         public_interests: "Gardatz las etiquetas dels elements que seguissi de publics"
         recommended_debates: "Mòstra de recomandacions de debats"
         recommended_proposals: "Mòstra de recomandacions de proposicions"
-        redeemable_code: "Còdi de verificacion per carta (opcional)"
       direct_message:
         title: "Títol"
         body: "Messatge"
@@ -416,15 +415,6 @@ oc:
       image:
         title: Títol
         attachment: "Escuelh l'image"
-      poll/question/answer:
-        title: Responsa
-        description: Descripcion detalhada
-      poll/question/answer/translation:
-        title: Responsa
-        description: "Descripcion detalhada"
-      poll/question/answer/video:
-        title: Títol
-        url: Vidèo extèrne
       newsletter:
         segment_recipient: Destinataris
         subject: Matèria

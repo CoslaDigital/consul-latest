@@ -146,7 +146,6 @@ bs:
         valuator_filter_all: Svi procjenitelji
         tags_filter_all: Svi tagovi
         advanced_filters: Napredni filteri
-        placeholder: Nađi projekte
         filters:
           all: Sve
           without_admin: Bez dodijeljenog administratora
@@ -175,7 +174,6 @@ bs:
           unfeasible: "Nije izvodivo"
           undecided: "Nije odlučeno"
         selected: "Odabrano"
-        select: "Odaberi"
         list:
           id: Identifikacioni broj
           title: Naziv
@@ -526,7 +524,6 @@ bs:
         index:
           title: Nacrtne verzije
           create: Kreiraj verziju
-          delete: Obriši
           preview: Pregled
         new:
           back: Nazad
@@ -559,7 +556,6 @@ bs:
           back: Nazad
           title: Pitanja vezana za ovaj proces
           create: Napiši pitanje
-          delete: Obriši
         new:
           back: Nazad
           title: Napiši novo pitanje
@@ -967,18 +963,11 @@ bs:
         unable_notice: "Ne možete obrisati anketu koja je dobila glasove"
     questions:
       index:
-        title: "Pitanja"
         create: "Formuliši pitanje"
-        no_questions: "Nema pitanja."
-        filter_poll: Suzi pretragu po glasačkim anketama
         select_poll: Odaberi glasačku anketu
-        questions_tab: "Pitanja"
         successful_proposals_tab: "Uspješni prijedlozi"
         create_question: "Formuliši pitanje"
         table_proposal: "Prijedlog"
-        table_question: "Pitanje"
-        table_poll: "Glasačka anketa"
-        poll_not_assigned: "Glasačka anketa nije definisana"
       edit:
         title: "Edituj pitanje"
       new:
@@ -995,7 +984,6 @@ bs:
         edit_question: Edituj pitanje
         valid_answers: Relevantni odgovori
         add_answer: Dodaj odgovor
-        video_url: Eksterni video
         answers:
           title: Odgovor
           description: Opis
@@ -1121,7 +1109,6 @@ bs:
         title: Prijedlozi
         id: Identifikacioni broj
         author: Autor
-        select: Odaberi
         selected: Odabrano
         milestones: Rokovi
         no_proposals: Nema prijedloga.
@@ -1264,7 +1251,6 @@ bs:
           verified_users_who_didnt_vote_proposals: Potvrđeni korisnici koji nisu glasali za prijedloge
           visits: Posjete
           votes: Ukupno glasova
-        budgets_title: Participativno budžetiranje
         participatory_budgets: Participativni budžeti
         direct_messages: Direktne poruke
         proposal_notifications: Obavijesti o prijedlogu
@@ -1272,8 +1258,6 @@ bs:
         polls: Glasačke ankete
       graph:
         debate_created: Debate
-        visit: Posjete
-        level_2_user: Korisnici na drugom stupnju
         proposal_created: Građanski prijedlozi
       budgets:
         title: "Participativni budžeti - Statistika za učešće"
@@ -1377,7 +1361,6 @@ bs:
         index:
           title: Prilagođene slike
           update: Ažuriraj
-          delete: Obriši
           image: Slika
         update:
           notice: Slika uspješno ažurirana

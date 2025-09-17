@@ -7,13 +7,8 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
 
   private
 
-    def action(action_name, **options)
-      render Admin::ActionComponent.new(
-        action_name,
-        budget,
-        "aria-describedby": true,
-        **options
-      )
+    def action(action_name, **)
+      render Admin::ActionComponent.new(action_name, budget, "aria-describedby": true, **)
     end
 
     def actions
@@ -21,6 +16,10 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
         calculate_winners: {
           hint: winners_hint,
           html: winners_action
+        },
+        manage_questions: {
+          hint: manage_questions_hint,
+          html: manage_questions_action
         },
         ballots: {
           hint: ballots_hint,
@@ -40,11 +39,18 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
     def winners_hint
       t("admin.budgets.actions.descriptions.calculate_winners", phase: t("budgets.phase.finished"))
     end
+    
+    def manage_questions_action
+      render Admin::Budgets::QuestionsComponent.new(budget)
+    end
+
+    def manage_questions_hint
+      t("admin.budgets.actions.descriptions.manage_questions")
+    end
 
     def destroy_action
       action(:destroy,
              text: t("admin.budgets.edit.delete"),
-             method: :delete,
              confirm: t("admin.budgets.actions.confirm.destroy"),
              disabled: budget.investments.any? || budget.poll)
     end

@@ -160,7 +160,6 @@ sr:
         valuator_filter_all: Сви оцењивачи
         tags_filter_all: Све ознаке
         advanced_filters: Унапређени филтери
-        placeholder: Претражите пројекте
         filters:
           all: Све
           without_admin: Без додељеног администратора
@@ -190,7 +189,6 @@ sr:
           unfeasible: "Неизводљиво"
           undecided: "Неодлучено"
         selected: "Изабрано"
-        select: "Изабери"
         list:
           id: ИД
           title: Назив
@@ -549,7 +547,6 @@ sr:
         index:
           title: Верзије нацрта
           create: Креирај верзију
-          delete: Обриши
           preview: Прегледај
         new:
           back: Назад
@@ -582,7 +579,6 @@ sr:
           back: Назад
           title: Питања која се односе на овај процес
           create: Креирајте питање
-          delete: Обрисати
         new:
           back: Назад
           title: Креирати ново питање
@@ -1003,18 +999,11 @@ sr:
         unable_notice: "Не можете избрисати анкету која има гласове"
     questions:
       index:
-        title: "Питања"
         create: "Креирајте питање"
-        no_questions: "Нема питања."
-        filter_poll: Филтрирати по анкети
         select_poll: Одредити анкету
-        questions_tab: "Питања"
         successful_proposals_tab: "Успешни предлози"
         create_question: "Креирати питање"
         table_proposal: "Предлог"
-        table_question: "Питање"
-        table_poll: "Анкета"
-        poll_not_assigned: "Анкета није додељена"
       edit:
         title: "Уредити питање"
       new:
@@ -1031,7 +1020,6 @@ sr:
         edit_question: Уредити питање
         valid_answers: Важећи одговор
         add_answer: Додати одговор
-        video_url: Спољни видео
         answers:
           title: Одговор
           description: Опис
@@ -1157,7 +1145,6 @@ sr:
         title: Предлози
         id: ИД
         author: Аутор
-        select: Одабрати
         selected: Одабрано
         milestones: Прекретнице
         no_proposals: Нема предлога.
@@ -1325,7 +1312,6 @@ sr:
           verified_users_who_didnt_vote_proposals: Потврђени корисници који нису гласали предлоге
           visits: Посете
           votes: Укупни гласови
-        budgets_title: Партиципативни буџети
         participatory_budgets: Партиципативни Буџети
         direct_messages: Директне поруке
         proposal_notifications: Обавештења о предлозима
@@ -1333,8 +1319,6 @@ sr:
         polls: Гласање
       graph:
         debate_created: Расправе
-        visit: Посете
-        level_2_user: Корисници нивоа два
         proposal_created: Предлози грађана
       budgets:
         no_data_before_balloting_phase: "Не постоје подаци за приказивање пре почетка фазе."
@@ -1441,7 +1425,6 @@ sr:
         index:
           title: Прилагођене слике
           update: Ажурирање
-          delete: Обрисати
           image: Слика
         update:
           notice: Слика је успшено креирана

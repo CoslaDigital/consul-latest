@@ -1,6 +1,6 @@
-FROM ruby:3.1.4-bullseye
+FROM ruby:3.2.8-bookworm
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install essential Linux packages
 RUN apt-get update -qq \
@@ -14,12 +14,11 @@ RUN apt-get update -qq \
     memcached \
     pkg-config \
     postgresql-client \
-    shared-mime-info \
     sudo \
     unzip
 
 # Install Chromium for E2E integration tests
-RUN apt-get update -qq && apt-get install -y chromium
+RUN apt-get update -qq && apt-get install -y chromium chromium-driver
 
 # Files created inside the container repect the ownership
 RUN adduser --shell /bin/bash --disabled-password --gecos "" consul \
@@ -30,7 +29,7 @@ RUN echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi
 RUN chmod 0440 /etc/sudoers.d/secure_path
 
 # Define where our application will live inside the image
-ENV RAILS_ROOT /var/www/consul
+ENV RAILS_ROOT=/var/www/consul
 
 # Create application home. App server will need the pids dir so just create everything in one shot
 RUN mkdir -p $RAILS_ROOT/tmp/pids
@@ -47,6 +46,7 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
 
 # Use the Gemfiles as Docker cache markers. Always bundle before copying app src.
 # (the src likely changed and we don't want to invalidate Docker's cache too early)
+COPY .ruby-version ./
 COPY Gemfile* ./
 RUN bundle install
 

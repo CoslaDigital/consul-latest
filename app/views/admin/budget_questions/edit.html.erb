@@ -1,0 +1,14 @@
+<%# app/views/admin/budget_questions/edit.html.erb %>
+
+<%# Use your existing back_link_to helper, pointing to the questions index for this budget %>
+<%= back_link_to admin_budget_budget_questions_path(@budget) %>
+
+<h2 class="margin-top"><%= t("admin.budget_questions.edit.title") %></h2>
+
+<%# Optional: Display validation errors here if not handled within the form partial %>
+<%# <%= render "admin/shared/error_messages", resource: @budget_question if @budget_question.errors.any? %>
+
+<div class="budget-question-form"> <%# Or a more generic class if you prefer %>
+  <%# Render the form partial, passing the @budget_question and parent @budget %>
+  <%= render "form", budget_question: @budget_question, budget: @budget %>
+</div>

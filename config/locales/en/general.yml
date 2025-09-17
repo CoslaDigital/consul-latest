@@ -162,7 +162,7 @@ en:
     legislation/process: process
     legislation/question: question
     poll/shift: Shift
-    poll/question/answer: Answer
+    poll/question/option: Answer
     user: Account
     verification/sms: phone
     signature_sheet: Signature sheet
@@ -198,6 +198,7 @@ en:
       consul: CONSUL DEMOCRACY application
       consul_url: https://github.com/consuldemocracy/consuldemocracy
       copyright: CONSUL DEMOCRACY, %{year}
+      cookies_consent_management: Manage cookies
       description: This portal uses the %{consul} which is %{open_source}.
       open_source: open-source software
       open_source_url: http://www.gnu.org/licenses/agpl-3.0.html
@@ -251,8 +252,8 @@ en:
       mark_as_unread: Mark as unread
       notifiable_hidden: This resource is not available anymore.
   map:
-    title: "Districts"
-    proposal_for_district: "Start a proposal for your district"
+    title: "Administrative Areas"
+    proposal_for_district: "Start a proposal for your area"
     start_proposal: Create a proposal
   omniauth:
     facebook:
@@ -270,12 +271,17 @@ en:
       sign_in: Sign in with Wordpress
       sign_up: Sign up with Wordpress
       name: Wordpress
+    saml:
+      sign_in: Sign in with mygovscot myaccount
+      sign_up: Sign up with Saml
+      name: Saml
     twitter:
       sign_in: Sign in with Twitter
       sign_up: Sign up with Twitter
       name: Twitter
     info:
-      sign_in: "Sign in with:"
+      sign_in: "You can sign in with any of the methods on this page"
+      sign_in_help: ""
       sign_up: "Sign up with:"
     or_fill: "Or fill the following form:"
   proposals:
@@ -311,8 +317,12 @@ en:
       done: Done
       other: Other
     form:
+      geozone: Geographic Area
+      geozone_help: "This is the area in which your reside"
       proposal_responsible_name_note: "(individually or as representative of a collective; will not be displayed publically)"
-      proposal_summary_note: "(maximum 200 characters)"
+      proposal_title_note: "Give a suitable name to your proposal"
+      proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
+      proposal_description_note: "Provide a detailed description of your project"
       proposal_video_url_note: You may add a link to YouTube or Vimeo
       tag_category_label: "Categories"
       tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
@@ -410,6 +420,7 @@ en:
       code: "Proposal code:"
       comments_tab: Comments
       dashboard_proposal_link: Dashboard
+      budget_investment_link: Create Budget Proposal 
       flag: This proposal has been flagged as inappropriate by several users.
       notifications_tab: Notifications
       milestones_tab: Milestones
@@ -474,6 +485,8 @@ en:
       see_proposed_actions: Check out recommended actions
       hide_proposed_actions: Hide recommended actions
       pending_title: Pending
+      execute: "Mark %{name} as done"
+      unexecute: "Unmark %{name} as done"
       show_description: Show description
       without_pending_actions: No recommended actions pending
       done_title: Done
@@ -568,8 +581,6 @@ en:
         support: "You just have to click on the button that you will see below 'Support this proposal' and you can inform yourself about before promoting it. Only the proposals that achieve the maximum support will be carried out by the City Council, and I thought that you, I'm sure you help me achieve it!"
         share: "And if you also do me the great favor of sharing my proposal with your friends, family and contacts, it would be perfect!"
   polls:
-    all: "All"
-    no_dates: "no date assigned"
     dates: "From %{open_at} to %{closed_at}"
     final_date: "Final recounts/Results"
     index:
@@ -581,7 +592,7 @@ en:
       participate_button_expired: "Poll ended"
       no_geozone_restricted: "All city"
       geozone_restricted: "Districts"
-      geozone_info: "Can participate people in the Census of: "
+      geozone_info: "Only residents in the following areas can participate: "
       already_answer: "You already have participated in this poll"
       not_logged_in: "You must sign in or sign up to participate"
       unverified: "You must verify your account to participate"
@@ -645,6 +656,8 @@ en:
     show:
       back: "Go back to my content"
   shared:
+    actions:
+      label: "%{action} %{name}"
     edit: "Edit"
     filter: "Filter"
     save: "Save"
@@ -674,9 +687,8 @@ en:
       author_deleted: User deleted
       email_deleted: Email deleted
     back: Go back
-    check: Select
-    check_all: All
-    check_none: None
+    check_all: Select all
+    check_none: Select none
     collective: Collective
     flag: Flag as inappropriate
     follow: "Follow"
@@ -742,7 +754,7 @@ en:
         see_more: See more recommendations
         hide: Hide recommendations
     translations:
-      select_language_prompt: Choose language
+      current_language: Current language
       remove_language: Remove language
       add_language: Add language
       languages_in_use:
@@ -750,6 +762,7 @@ en:
         one: "1 language in use"
         other: "%{count} languages in use"
     optional: "Optional fields"
+    optional_note: "Please add additional information below"
     required: "Required fields"
     comments:
       one: "1 comment"
@@ -761,18 +774,8 @@ en:
     youtube: "%{org} YouTube"
     telegram: "%{org} Telegram"
     instagram: "%{org} Instagram"
-  stats:
-    index:
-      visits: Visits
-      debates: Debates
-      proposals: Proposals
-      comments: Comments
-      proposal_votes: Votes on proposals
-      debate_votes: Votes on debates
-      comment_votes: Votes on comments
-      votes: Total votes
-      verified_users: Verified users
-      unverified_users: Unverified users
+  ip_denied_handler:
+    unauthorized: "Access denied. Your IP address is not allowed."
   unauthorized:
     default: You do not have permission to access this page.
     manage:
@@ -943,3 +946,21 @@ en:
   machine_learning:
     comments_summary: "Comments summary"
     info_text: "Content generated by AI / Machine Learning"
+  cookies_consent:
+    accept_all_cookies: "Accept all"
+    accept_essential_cookies: "Accept essential cookies"
+    message: "Cookies help us deliver our services. By using our services, you agree to our use of cookies."
+    more_info_link: "More information about cookies"
+    management: "Manage cookies"
+    title: "Cookies policy"
+  cookies_management:
+    title: Cookies management
+    description: This website uses own and third party cookies for its proper functioning. By clicking the Accept all button, you agree to the use of these technologies and the processing of your data for these purposes.
+    essentials:
+      title: Essential cookies
+      description: They are used for many different purposes, such as recognising you as a user, choosing the language or customising the way in which content is displayed.
+      hint: Without these, basic navigation functions will be impaired, so they should always be active.
+    third_party:
+      title: Third party cookies
+      description: This website use third-party cookies. These cookies can enhance functionality or collect information to improve your user experience.
+    save_preferences: Save preferences

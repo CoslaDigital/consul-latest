@@ -416,7 +416,6 @@ ar:
         public_activity: "أترك قائمة الأنشطة الخاصة بي عامة"
         recommended_debates: "إظهار توصيات المناقشات"
         recommended_proposals: "إظهار توصيات المقترحات"
-        redeemable_code: "رمز التحقق الواردة عبر البريد الإلكتروني"
       direct_message:
         title: "عنوان"
         body: "رسالة"
@@ -569,15 +568,6 @@ ar:
       image:
         title: عنوان
         attachment: "مرفق"
-      poll/question/answer:
-        title: الإجابة
-        description: الوصف
-      poll/question/answer/translation:
-        title: الإجابة
-        description: "الوصف"
-      poll/question/answer/video:
-        title: عنوان
-        url: فيديو خارجي
       newsletter:
         segment_recipient: المستلمين
         subject: الموضوع

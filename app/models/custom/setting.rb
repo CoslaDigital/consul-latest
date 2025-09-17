@@ -1,4 +1,4 @@
-require_dependency Rails.root.join("app", "models", "setting").to_s
+load Rails.root.join("app", "models", "setting.rb")
 
 class Setting
   class << self
@@ -24,8 +24,30 @@ class Setting
       else
         consul_defaults.merge({
           # Overwrite default CONSUL DEMOCRACY settings or add new settings here
+          "feature.saml_login": true,
+          "feature.valid_geozone": true,
+          "feature.hide_comments": false,
+          "feature.hide_votes": false,
+          "feature.hide_local_login": false,
+          "feature.demographics": false
         })
       end
+    end
+    
+    def resources_visible?
+      Setting["feature.resources"] == "active"
+    end
+
+    def hide_votes?
+      Setting["feature.hide_votes"] == "active"
+    end
+
+    def hide_comments?
+      Setting["feature.hide_comments"] == "active"
+    end
+    
+    def hide_local_login?
+      Setting["feature.hide_local_login"] == "active"
     end
   end
 end

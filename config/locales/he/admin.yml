@@ -167,7 +167,6 @@ he:
         valuator_filter_all: כל המעריכים
         tags_filter_all: כל התגיות
         advanced_filters: סינון מתקדם
-        placeholder: חיפוש פרויקטים
         filters:
           all: כולם
           without_admin: מבלי להקצות מנהל/ת
@@ -196,7 +195,6 @@ he:
           unfeasible: "אינו בר ביצוע"
           undecided: "טרם הוחלט"
         selected: "נבחר"
-        select: "בחר"
         list:
           id: מזהה
           title: כותרת
@@ -554,7 +552,6 @@ he:
         index:
           title: גירסת הטיוטה
           create: יצירת גירסה
-          delete: מחיקה
           preview: תצוגה מקדימה
         new:
           back: חזרה
@@ -587,7 +584,6 @@ he:
           back: חזרה
           title: שאלות הקשורות לתהליך זה
           create: יצירת שאלה
-          delete: מחיקה
         new:
           back: חזרה
           title: יצירת שאלה חדשה
@@ -1008,18 +1004,11 @@ he:
         unable_notice: "לא ניתן למחוק סקר שיש לו הצבעות"
     questions:
       index:
-        title: "שאלות"
         create: "יצירת שאלה חדשה"
-        no_questions: "לא נמצאו שאלות."
-        filter_poll: סנן לפי סקר
         select_poll: בחר סקר
-        questions_tab: "שאלות"
         successful_proposals_tab: "הצעות מוצלחות"
         create_question: "יצירת שאלה חדשה"
         table_proposal: "הצעה"
-        table_question: "שאלה"
-        table_poll: "הצבעה"
-        poll_not_assigned: "לא הוקצה סקר"
       edit:
         title: "ערוך שאלה"
       new:
@@ -1036,7 +1025,6 @@ he:
         edit_question: ערוך שאלה
         valid_answers: תשובות חוקיות
         add_answer: הוסף שאלה
-        video_url: מקור וידאו חיצוני
         answers:
           title: תשובה
           description: תיאור
@@ -1163,7 +1151,6 @@ he:
         title: הצעות
         id: מזהה
         author: מחבר/ת
-        select: בחר
         selected: נבחר
         milestones: אבני דרך
         no_proposals: לא נמצאו הצעות.
@@ -1320,7 +1307,6 @@ he:
           verified_users_who_didnt_vote_proposals: משתמשים מאומתים שלא הצביעו על הצעות
           visits: ביקורים
           votes: סך הכל הצבעות
-        budgets_title: מימון השתתפותי
         participatory_budgets: תקציבים שיתופיים
         direct_messages: הודעות ישירות
         proposal_notifications: התראות להצעות
@@ -1328,8 +1314,6 @@ he:
         polls: סקרים
       graph:
         debate_created: דיונים
-        visit: ביקורים
-        level_2_user: משתמשים ברמה 2
         proposal_created: הצעות תושבים
       budgets:
         no_data_before_balloting_phase: "אין נתונים להצגה לפני שלב ההצבעה."
@@ -1434,7 +1418,6 @@ he:
         index:
           title: תמונות מותאמות אישית
           update: עדכן
-          delete: מחיקה
           image: תמונה
         update:
           notice: התמונה עודכנה בהצלחה

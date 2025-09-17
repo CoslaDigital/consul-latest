@@ -16,6 +16,8 @@ cs:
       unmark_featured: Zrušit označení
       edit: Upravit
       configure: Nastavení
+      select: Vybrat
+      show_to_valuators: "Zobrazit %{name} hodnotitelům"
     officing_booth:
       title: "Obsluhujete hlasovací kabinu na adrese %{booth}. Pokud to není správně, nepokračujte a zavolejte na telefonní číslo nápovědy. Děkujeme."
     banners:
@@ -170,6 +172,8 @@ cs:
         calculate: Vypočítat vítěznou investici
         calculated: Výpočet vítězných investic může chvíli trvat.
         recalculate: Přepočítat vítězné investice
+      ballots:
+        feature_disabled: 'Chcete-li vytvářet hlasovací kabiny, musí být povolena funkce <strong>Ankety</strong>. Můžete jej povolit na stránce <a href="%{link}">konfigurace nastavení</a>.'
     budget_groups:
       name: "Název"
       headings_name: "Kapitoly"
@@ -214,7 +218,6 @@ cs:
         submit: "Uložit hadpisy"
       group_switcher:
         currently_showing: "Zobrazení rozpočtových položek ze skupiny <strong>%{group}</strong>."
-        different_group: "Správa rozpočtových položek z jiné skupiny"
         the_other_group: "Správa položek ze skupiny %{group}."
       index:
         back: "Jít zpět do skupin"
@@ -237,12 +240,14 @@ cs:
         title: "%{budget} fáze"
     budget_investments:
       index:
+        basic_filters:
+          valuator_or_group: Hodnotitel nebo skupina
+          title_or_id: Název nebo ID
         heading_filter_all: Všechny kapitoly
         administrator_filter_all: Všichni administrátoři
         valuator_filter_all: Všichni hodotitelé
         tags_filter_all: Všechny štítky
         advanced_filters: Pokročilé filtry
-        placeholder: Prohledat projekty
         filters:
           all: Vše
           without_admin: Bez přidělené role admin
@@ -272,7 +277,6 @@ cs:
           unfeasible: "Nerealizovatelné"
           undecided: "Nerozhodnuté"
         selected: "Vybrané"
-        select: "Vybrat"
         list:
           id: ID
           title: Předmět
@@ -455,6 +459,16 @@ cs:
         back: Přejít zpět na %{org}
         title: Administrace
         description: Vítejte v admin panelu portálu %{org}.
+        info: |-
+          <p>Je to místo, kde jako správce realizujete a dohlížíte na proces participace občanů ve vašem městě nebo regionu.</p>
+
+          <p>Jste nyní jedním ze stovek úřadů a obcí po celém světě, které využívají platformu CONSUL DEMOCRACY k zavádění občanské participace do praxe. Gratulujeme!</p>
+
+          <p>Nadace CONSUL DEMOCRACY je srdcem celosvětové komunity uživatelů. Rádi bychom vás požádali, abyste se nám ozvali, abychom získali přehled o tom, kdo software používá, a zjistili, jak bychom mohli pomoci s implementací nebo používáním. Nemůžeme se dočkat, až vás přivítáme v komunitě.</p>
+
+          <p>Šťastnou administraci!</p>
+
+          <p>Pozdravuje vás tým nadace CONSUL DEMOCRACY.</p>
       actions:
         index:
           description: "Když uživatelé vytvářejí návrhy, mají přístup k ovládacímu panelu svého návrhu, kde mohou navrhnout zdroje a doporučení, aby získali podporu pro svůj nápad."
@@ -658,7 +672,6 @@ cs:
         index:
           title: Pracovní verze
           create: Vytvořit verzi
-          delete: Smazat
           preview: Náhled
         new:
           back: Zpět
@@ -691,7 +704,6 @@ cs:
           back: Zpět
           title: Otázky spojené s tímto procesem
           create: Vytvořit otázku
-          delete: Smazat
         new:
           back: Zpět
           title: Vytvořit otázku
@@ -706,6 +718,11 @@ cs:
       milestones:
         index:
           title: Sledované
+    locales:
+      default_help_text: "Jedná se o výchozí jazyk aplikace a jeho změna <strong>ovlivní každého uživatele</strong>, který navštíví webovou stránku poprvé."
+      enabled_help_text: Výše zvolený výchozí jazyk bude zahrnut automaticky.
+      update:
+        notice: Jazyky úspěšně aktualizovány
     managers:
       index:
         title: Manažeři
@@ -728,6 +745,7 @@ cs:
       proposals_topics: Témata návrhů
       budgets: Participativní rozpočty
       geozones: Správa geografických oblastí
+      locales: Jazyky
       hidden_comments: Skryté komentáře
       hidden_debates: Skrýt debaty
       hidden_proposals: Skryté návrhy
@@ -1123,18 +1141,11 @@ cs:
         multiple_description: "Umožňuje vybrat více odpovědí. Je možné nastavit maximální počet odpovědí."
     questions:
       index:
-        title: "Otázky"
         create: "Vytvořit otázku"
-        no_questions: "Nejsou k dispozici žádné otázky."
-        filter_poll: Filtrovat podle ankety
         select_poll: Vyberte anketu
-        questions_tab: "Otázky"
         successful_proposals_tab: "Úspěšné návrhy"
         create_question: "Vytvořit otázku"
         table_proposal: "Návrhy"
-        table_question: "Question"
-        table_poll: "Průzkum"
-        poll_not_assigned: "Anketa není přiřazena"
       edit:
         title: "Upravit dotaz"
       form:
@@ -1155,7 +1166,6 @@ cs:
         edit_question: Upravit dotaz
         valid_answers: Správné odpovědi
         add_answer: Upravit odpověď
-        video_url: External video
         answers:
           title: Answer
           description: Description
@@ -1288,7 +1298,6 @@ cs:
         title: Návrhy
         id: ID
         author: Autor
-        select: Vybrat
         selected: Vybrané
         milestones: Milníky
         no_proposals: Neexistují žádné návrhy.
@@ -1398,6 +1407,8 @@ cs:
       index:
         title: Geozóna
         create: Vytvořit geozónu
+        geojson_map: GeoJSON Mapa
+        geojson_map_help: "Pokud jsou k dispozici souřadnice GeoJSON, zobrazí se na mapě níže"
       geozone:
         name: Název
         external_code: Externí kód
@@ -1484,7 +1495,6 @@ cs:
           verified_users_who_didnt_vote_proposals: Počet ověřených uživatelů, kteří nehlasovali o návrzích
           visits: Návštěvy
           votes: Hlasů celkem
-        budgets_title: Participativní rozpočtování
         participatory_budgets: Participativní rozpočty
         direct_messages: Soukromé zprávy
         proposal_notifications: Upozornění k návrhům
@@ -1492,10 +1502,15 @@ cs:
         polls: Průzkum
         sdg: SDG
       graph:
+        budget_investment_created: Rozpočtová investice vytvořena
+        budget_investment_supported: Podporované rozpočtové investice
         debate_created: Debaty
-        visit: Návštěvy
-        level_2_user: Počet uživatelů druhé úrovně
+        legislation_annotation_created: Vytvořené anotace právních předpisů
+        legislation_answer_created: Vytvořené odpovědi na právní předpisy
+        level_3_user: Ověření uživatelů 3. úrovně
         proposal_created: Návrhy občanů
+        title: Grafy
+        visits: Návštěvy
       budgets:
         no_data_before_balloting_phase: "Před fází hlasování nejsou k dispozici žádné údaje."
         title: "Participativní rozpočty - statistiky účasti"
@@ -1609,9 +1624,9 @@ cs:
             subnavigation_right: Hlavní navigace vpravo
       images:
         index:
+          dimensions: "(%{width}x%{height})"
           title: Vlastní obrázky
           update: Aktualizovat
-          delete: Smazat
           image: Image
         update:
           notice: Obrázek byl úspěšně aktualizován
@@ -1652,6 +1667,7 @@ cs:
           create_card: Vytvořit kartu
           no_cards: Nemáte žádnou kartu.
           columns_help: "Šířka karty v počtu sloupců. Na mobilních obrazovkách je vždy šířka 100 %."
+          order_help: "Můžete zadat pozici, na které bude tato karta zobrazena."
           create:
             notice: "Karta úspěšně vytvořena!"
           update:
