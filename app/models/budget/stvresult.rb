@@ -20,53 +20,60 @@ class Budget
     end
 
     def calculate_stv_winners
+      # ----------------------------------------------------------------
+      # Gather all the initial data for the election.
+      # ----------------------------------------------------------------
       reset_winners
 
-      # --- 1. Gather all election parameters at the start ---
+      summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
+      detail_slug  = "stv_details_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
+      summary_title = "Election Results: #{@budget.name}"
+      detail_title  = "Detailed Election Log: #{@budget.name}"
+
       seats = budget.stv_winners
       votes_cast = budget.ballots.count
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
-      candidate_count = candidates.count
       quota = droop_quota(votes_cast, seats)
       investment_titles = candidates.pluck(:id, :title).to_h
-
-      # --- 2. Write the introductory block ---
-      write_to_output("<h1>STV Election Results</h1>")
-      write_to_output("<h2>#{@budget.name} - #{@heading.name}</h2>")
-      write_to_output("<hr>")
-      write_to_output("<h3>🗳️ Election Summary</h3>")
-      write_to_output("<ul>")
-      write_to_output("  <li><strong>Seats to fill:</strong> #{seats}</li>")
-      write_to_output("  <li><strong>Total Candidates:</strong> #{candidate_count}</li>")
-      write_to_output("  <li><strong>Total Valid Votes Cast:</strong> #{votes_cast}</li>")
-      write_to_output("</ul>")
-      write_to_output("<h3>👥 Candidates</h3>")
-      write_to_output("<p>The following #{candidate_count} candidates were on the ballot:</p>")
-      write_to_output("<div style='column-count: 2; column-gap: 20px;'>")
-      write_to_output("<ul>")
-      investment_titles.values.sort.each do |title|
-        write_to_output("<li>#{title}</li>")
-      end
-      write_to_output("</ul>")
-      write_to_output("</div>")
-      write_to_output("<h3>🎯 About the Quota</h3>")
-      write_to_output("<p>The quota is the minimum number of votes a candidate needs to be guaranteed election. Once a candidate reaches this target, they are elected.</p>")
-      write_to_output("<p>This election uses the <strong>Droop Quota</strong>, calculated with the formula below:</p>")
-      write_to_output("<div style='background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace;'>")
-      write_to_output("  Quota = floor(Total Votes / (Seats + 1)) + 1<br>")
-      write_to_output("  Quota = floor(#{votes_cast} / (#{seats} + 1)) + 1 = <strong>#{quota}</strong>")
-      write_to_output("</div>")
-      write_to_output("<hr>")
-
-      # --- 3. Proceed with the calculation ---
       ballot_data = get_votes_data
-      winners = calculate_results(ballot_data, seats, quota, investment_titles)
 
-      update_winning_investments(winners)
-      update_custom_page(@log_file_name)
-      winners
+      calculator = ::StvCalculator.new
+      result = calculator.calculate(ballot_data, seats, quota, investment_titles)
+      # Render the summary report using the new component
+      summary_html_report = ApplicationController.render(
+      StvSummaryReportComponent.new(
+        result: result,
+        budget: @budget,
+        heading: @heading,
+        candidates: candidates,
+        votes_cast: votes_cast,
+        quota: quota,
+        report_title: summary_title,
+        detail_page_slug: detail_slug
+      ),
+      layout: false
+      )
+
+
+      # Render the final HTML report using the ViewComponent
+      detailed_html_report = ApplicationController.render(
+      StvDetailReportComponent.new(
+        rounds: result.rounds,
+        investment_titles: investment_titles,
+        ),
+        layout: false
+      )
+
+      # Update the database with the final results
+      update_winning_investments(result.winners)
+      update_custom_page(summary_html_report, summary_title, summary_slug)
+      update_custom_page(detailed_html_report, detail_title, detail_slug)
+
+      # Return the array of winner IDs.
+      result.winners
     end
-
+    
+        
     def get_ballots
       budget.ballots
     end
@@ -280,7 +287,21 @@ class Budget
       votes_data
     end
 
-    def update_custom_page(filename)
+
+    def update_custom_page(html_content, page_title, page_slug)
+      file_name_for_slug = "stv_voting_#{@budget.name}_#{@heading.name}"
+      slug = file_name_for_slug.downcase.tr(' ', '-')
+  
+      page = SiteCustomization::Page.find_or_initialize_by(slug: page_slug)
+
+      if page.update(status: 'published', title: page_title, content: html_content)
+       Rails.logger.info "Page '#{page_title}' updated successfully."
+      else
+       Rails.logger.error "Failed to update page '#{page_title}': #{page.errors.full_messages.join(", ")}"
+     end
+   end
+
+    def old_update_custom_page(filename, page_title)
       file_path = Rails.root.join('log', filename)
       if File.exist?(file_path)
         file_content = File.read(file_path)
