@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -334,6 +334,24 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.index ["starts_at"], name: "index_budget_phases_on_starts_at"
   end
 
+  create_table "budget_question_translations", force: :cascade do |t|
+    t.integer "budget_question_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.text "text"
+    t.text "hint"
+  end
+
+  create_table "budget_questions", force: :cascade do |t|
+    t.bigint "budget_id"
+    t.boolean "enabled", default: true
+    t.boolean "is_mandatory"
+    t.text "hint"
+    t.boolean "is_private", default: false
+    t.index ["budget_id"], name: "index_budget_questions_on_budget_id"
+  end
+
   create_table "budget_reclassified_votes", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.integer "investment_id"
@@ -395,7 +413,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.string "voting_style", default: "knapsack"
     t.boolean "published"
     t.boolean "hide_money", default: false
-    t.boolean "part_fund"
     t.boolean "stv"
     t.integer "stv_winners"
     t.boolean "part_fund"
@@ -1250,6 +1267,13 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
     t.integer "geozone_id"
   end
 
+  create_table "process_managers", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_process_managers_on_user_id"
+  end
+
   create_table "progress_bar_translations", id: :serial, force: :cascade do |t|
     t.integer "progress_bar_id", null: false
     t.string "locale", null: false
@@ -1827,6 +1851,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_13_014205) do
   add_foreign_key "poll_recounts", "poll_officer_assignments", column: "officer_assignment_id"
   add_foreign_key "poll_voters", "polls"
   add_foreign_key "polls", "budgets"
+  add_foreign_key "process_managers", "users"
   add_foreign_key "proposals", "communities"
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"
