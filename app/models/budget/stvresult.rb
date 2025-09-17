@@ -7,6 +7,7 @@ class Budget
       @heading = heading
       @elected_investments = []
       @eliminated_investments = []
+      @elimination_log = []
       @log_file_name = "stv_voting_#{budget.name}_#{heading.name}.log"
       log_path = Rails.root.join('log', @log_file_name)
       File.open(log_path, 'w') {}
@@ -19,22 +20,62 @@ class Budget
     end  
     
     def calculate_stv_winners
-      reset_winners
-      seats = budget.stv_winners
-      votes = budget.ballots.count
-      quota = droop_quota(votes, seats) # Calculate the Droop quota once
-      write_to_output( "<p><h3>the quota is #{quota}</h3></p>")
-      ballots = get_ballots
-      ballot_data = get_votes_data
-      #write_to_output( "<p>About to count votes</p>")
-      winners = calculate_results(ballot_data, seats, quota)
-      update_winning_investments(winners)
-      Rails.logger.info("startingto create custom page")
-      update_custom_page(@log_file_name)
-      Rails.logger.info("finished creating custom page")
-      winners 
-    end
-    
+  reset_winners
+
+  # --- 1. Gather all election parameters at the start ---
+  seats = budget.stv_winners
+  votes_cast = budget.ballots.count
+  candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
+  candidate_count = candidates.count
+  quota = droop_quota(votes_cast, seats)
+  
+  # Create the title lookup hash here to pass to the next method
+  investment_titles = candidates.pluck(:id, :title).to_h
+
+  # --- 2. Write the new, detailed introductory block ---
+  write_to_output("<h1>STV Election Results</h1>")
+  write_to_output("<h2>#{@budget.name} - #{@heading.name}</h2>")
+  write_to_output("<hr>")
+
+  write_to_output("<h3>🗳️ Election Summary</h3>")
+  write_to_output("<ul>")
+  write_to_output("  <li><strong>Seats to fill:</strong> #{seats}</li>")
+  write_to_output("  <li><strong>Total Candidates:</strong> #{candidate_count}</li>")
+  write_to_output("  <li><strong>Total Valid Votes Cast:</strong> #{votes_cast}</li>")
+  write_to_output("</ul>")
+  write_to_output("<h3>👥 Candidates</h3>")
+  write_to_output("<p>The following #{candidate_count} candidates were on the ballot:</p>")
+  # Create a multi-column list for readability, especially with many candidates.
+  write_to_output("<div style='column-count: 2; column-gap: 20px;'>")
+  write_to_output("<ul>")
+  # Sort the candidate names alphabetically
+  investment_titles.values.sort.each do |title|
+    write_to_output("<li>#{title}</li>")
+  end
+  write_to_output("</ul>")
+  write_to_output("</div>")  
+  write_to_output("<h3>🎯 About the Quota</h3>")
+  write_to_output("<p>The quota is the minimum number of votes a candidate needs to be guaranteed election. Once a candidate reaches this target, they are elected.</p>")
+  write_to_output("<p>This election uses the <strong>Droop Quota</strong>, calculated with the formula below:</p>")
+  
+  # A styled box to make the formula and calculation stand out
+  write_to_output("<div style='background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace;'>")
+  write_to_output("  Quota = floor(Total Votes / (Seats + 1)) + 1<br>")
+  write_to_output("  Quota = floor(#{votes_cast} / (#{seats} + 1)) + 1 = <strong>#{quota}</strong>")
+  write_to_output("</div>")
+  write_to_output("<hr>")
+
+
+  # --- 3. Proceed with the calculation ---
+  ballot_data = get_votes_data
+  # Pass the investment_titles hash to the calculation method
+  winners = calculate_results(ballot_data, seats, quota, investment_titles)
+  
+  update_winning_investments(winners)
+  update_custom_page(@log_file_name)
+  winners
+end
+        
     def get_ballots
     ballots = budget.ballots
     end
@@ -45,16 +86,12 @@ class Budget
      end
     end
   
-    def calculate_results(votes_data, seats, quota)
+    def calculate_results(votes_data, seats, quota, investment_titles)
       initial_vote_counts = Hash.new(0)
-      # Fetch all investments
-      investments = @heading.investments.where(budget_id: @budget.id, selected: true)
- 
-      investment_titles = investments.pluck(:id, :title).to_h      
       initial_vote_counts = {}
-      investments.each do |investment|
+      investment_titles.keys.each do |investment_id|
         # write_to_output( "setting up #{investment.id}")
-        initial_vote_counts[investment.id] = 0
+        initial_vote_counts[investment_id] = 0
       end
       empty_seats = seats
       write_to_output( "About to get the data, Seats to fill: #{empty_seats}<br>")
@@ -94,7 +131,6 @@ class Budget
       title = investment_titles[investment_id] || "Unknown Candidate"
       # Corrected the HTML row structure and rounded the vote count for fractional votes
       write_to_output("<tr><td>#{title} (#{investment_id})</td><td>#{count.round(2)}</td></tr>")
-      investments.find_by(id: investment_id)&.update(votes: count)
     end
     
     # IMPORTANT: Close the table here so the standings are a complete, separate section
@@ -135,7 +171,7 @@ class Budget
       eliminated_investment = sorted_investments.last
       eliminated_id = eliminated_investment[0]
       eliminated_title = investment_titles[eliminated_id] || "Unknown Candidate"
-      
+      @elimination_log << { round: iteration, title: eliminated_title, id: eliminated_id, votes: eliminated_votes }
       write_to_output( "<br><strong>Eliminated: #{eliminated_title} (#{eliminated_id})</strong><br>")
       @eliminated_investments << eliminated_id
       initial_vote_counts.delete(eliminated_id)
@@ -179,16 +215,32 @@ class Budget
       winner_title = investment_titles[winner_id] || "Unknown Candidate"
       write_to_output("<li><strong>#{winner_title}</strong> (ID: #{winner_id})</li>")
     end
+    if @elimination_log.any?
+    write_to_output("<h3>📊 Order of Elimination</h3>")
+    write_to_output("<table><thead><tr><th>Round</th><th>Candidate Eliminated</th><th>Votes at Elimination</th></tr></thead><tbody>")
+    
+    @elimination_log.each do |log_entry|
+      write_to_output("<tr>")
+      write_to_output("  <td>#{log_entry[:round]}</td>")
+      write_to_output("  <td>#{log_entry[:title]} (#{log_entry[:id]})</td>")
+      write_to_output("  <td>#{log_entry[:votes].round(2)}</td>")
+      write_to_output("</tr>")
+    end
     write_to_output("</ul>")
   else
     write_to_output("<p>No candidates were elected in this process.</p>")
   end
-  
+  if @elected_investments.size < seats
+    unfilled_seats = seats - @elected_investments.size
+    write_to_output("<p><strong>Notice:</strong> #{unfilled_seats} seat(s) could not be filled because there were no more candidates with enough transferable votes to reach the quota.</p>")
+  end  
   @elected_investments
 end
 
 def transfer_eliminated_votes(votes_data, eliminated_investment_id)
   reallocated_votes = []
+  exhausted_ballot_count = 0
+  
    write_to_output( "<p>Reallocating votes for #{eliminated_investment_id}</p>")
   votes_data.each do |vote|
     if vote[:rankings].first == eliminated_investment_id
@@ -200,18 +252,18 @@ def transfer_eliminated_votes(votes_data, eliminated_investment_id)
           reallocated_votes << next_preference.to_i
           break
         elsif next_preference.nil? || next_preference == eliminated_investment_id
-          write_to_output( "<p>All next preferences for vote #{vote} are already elected or eliminated.</p>")
+          exhausted_ballot_count += 1
           break
         end
 
         next_preference_index += 1
       end
-      
       vote[:rankings].shift  # Remove the eliminated investment from the first preference
     end
   end
-
-#  write_to_output( "Reallocated votes: #{reallocated_votes}")
+  if exhausted_ballot_count > 0
+    write_to_output("<p><em>(#{exhausted_ballot_count} votes could not be transferred as they had no further valid preferences.)</em></p>")
+  end
   reallocated_votes
 end
 
@@ -228,11 +280,6 @@ end
 
 def transfer_surplus_votes(votes_data, elected_investment_id )
   surplus_contributing_ballots = []
-  puts "Inspecting votes_data structure:"
-  puts votes_data.inspect
-  puts elected_investment_id
-  #surplus_contributing_votes = votes_data.count { |_, vote| vote[:rankings].first == elected_investment_id }
-  #transfer_ratio = surplus.to_f / surplus_contributing_votes
   write_to_output( "<p>elected id is #{elected_investment_id}</p>")
 
   # Transfer surplus votes proportionally to next preferences
@@ -244,7 +291,6 @@ def transfer_surplus_votes(votes_data, elected_investment_id )
       end
     end
   end
-  write_to_output( "#{surplus_contributing_ballots}")
   surplus_contributing_ballots
 end
 
