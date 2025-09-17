@@ -1,0 +1,93 @@
+<%# Main Title and Header %>
+<h1><%= @report_title %></h1>
+<h2>Details for: <%= @heading.name %></h2>
+<hr>
+
+<%# --- Election Summary Section --- %>
+<h3>🗳️ Election Summary</h3>
+<ul>
+  <%# Calculate total seats from the result object %>
+  <% total_seats = @result.unfilled_seats + @result.winners.size %>
+  <li><strong>Seats to fill:</strong> <%= total_seats %></li>
+  <li><strong>Total Candidates:</strong> <%= @candidates.count %></li>
+  <li><strong>Total Valid Votes Cast:</strong> <%= @votes_cast %></li>
+</ul>
+
+<%# --- List of Candidates Section --- %>
+<h3>👥 Candidates</h3>
+<p>The following <%= @candidates.count %> candidates were on the ballot:</p>
+<div style='column-count: 2; column-gap: 20px;'>
+  <ul>
+    <%# Get a sorted list of titles from the full candidate objects %>
+    <% @candidates.map(&:title).sort.each do |title| %>
+      <li><%= title %></li>
+    <% end %>
+  </ul>
+</div>
+
+<%# --- Quota Explanation Section --- %>
+<h3>🎯 About the Quota</h3>
+<p>The quota is the minimum number of votes a candidate needs to be guaranteed election. Once a candidate reaches this target, they are elected.</p>
+<p>This election uses the <strong>Droop Quota</strong>, calculated with the formula below:</p>
+<div style='background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace;'>
+  Quota = floor(Total Votes / (Seats + 1)) + 1<br>
+  Quota = floor(<%= @votes_cast %> / (<%= total_seats %> + 1)) + 1 = <strong><%= @quota %></strong>
+</div>
+
+<%# --- Link to Detailed Report --- %>
+<% if @detail_page_slug.present? %>
+  <hr>
+  <p style="text-align: center; font-size: 1.1em;">
+    <a href="/<%= @detail_page_slug %>">➡️ View the detailed round-by-round election count</a>
+  </p>
+<% end %>
+<hr>
+
+<%# --- FINAL RESULTS Section --- %>
+<h2>✅ Election Complete: Final Results</h2>
+
+<%# List of Elected Winners %>
+<% if @result.winners.any? %>
+  <% winner_count = @result.winners.size %>
+  <% candidate_word = (winner_count == 1) ? "candidate has" : "candidates have" %>
+  <p>The following <strong><%= winner_count %></strong> <%= candidate_word %> been elected:</p>
+  <ul>
+    <%# Look up winner titles from the @candidates collection %>
+    <% @result.winners.each do |winner_id| %>
+      <% winner_title = @candidates.find { |c| c.id == winner_id }&.title || "Unknown Candidate" %>
+      <li><strong><%= winner_title %></strong> (ID: <%= winner_id %>)</li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No candidates were elected in this process.</p>
+<% end %>
+
+<%# Order of Elimination Table %>
+<% if @result.elimination_log.any? %>
+  <h3>📊 Order of Elimination</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Round</th>
+        <th>Candidate Eliminated</th>
+        <th>Votes at Elimination</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.elimination_log.each do |log_entry| %>
+        <tr>
+          <td><%= log_entry[:round] %></td>
+          <td><%= log_entry[:title] %> (<%= log_entry[:id] %>)</td>
+          <td><%= log_entry[:votes].round(2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%# Notice for Unfilled Seats %>
+<% if @result.unfilled_seats > 0 %>
+  <p>
+    <strong>Notice:</strong> <%= @result.unfilled_seats %> seat(s) could not be filled because there were no more candidates with enough transferable votes to reach the quota.
+  </p>
+<% end %>

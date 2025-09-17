@@ -1,0 +1,48 @@
+<%# In app/components/stv_detail_report_component.html.erb %>
+
+<h1>Detailed Election Log</h1>
+<hr>
+
+<% @rounds.each do |round| %>
+  <br><h2>Round <%= round[:iteration] %>:</h2>
+  <p>Quota to be elected: <%= round[:quota] %></p>
+
+  <p><strong>Current Standings:</strong></p>
+  <table>
+    <thead><tr><th>Candidate</th><th>Votes</th></tr></thead>
+    <tbody>
+      <% round[:standings].each do |id, count| %>
+        <tr>
+          <td><%= @investment_titles[id] || "Unknown" %> (<%= id %>)</td>
+          <td><%= count.round(2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <br>
+
+  <%# --- NEW: Display detailed action info --- %>
+  <% if round[:action][:type] == :election %>
+    <strong>Action: Candidate(s) Elected</strong>
+    <% round[:action][:details].each do |detail| %>
+      <p style="margin-left: 20px;">
+        ➡️ <strong>Elected: <%= detail[:title] %> (<%= detail[:id] %>)</strong> with <%= detail[:count].round(2) %> votes.<br>
+        <% if detail[:surplus] > 0 %>
+          <em>Transferring <%= detail[:surplus].round(2) %> surplus votes.</em>
+        <% end %>
+      </p>
+    <% end %>
+  <% elsif round[:action][:type] == :elimination %>
+    <strong>Action: Candidate Eliminated</strong>
+    <% details = round[:action][:details] %>
+    <p style="margin-left: 20px;">
+      ❌ <strong>Eliminated: <%= details[:title] %> (<%= details[:id] %>)</strong> with <%= details[:count].round(2) %> votes.<br>
+      <em>Transferring <%= details[:reallocated_count] %> votes.</em><br>
+      <% if details[:exhausted_count] > 0 %>
+        <em>(<strong><%= details[:exhausted_count] %></strong> votes became exhausted and could not be transferred.)</em>
+      <% end %>
+    </p>
+  <% end %>
+
+  <hr>
+<% end %>
