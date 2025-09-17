@@ -6,6 +6,26 @@ module ApplicationHelper
     url_for(request.query_parameters.merge(query_parameters).merge(only_path: true))
   end
 
+  
+  def custom_t(budget, full_key, **options)
+    key_string = full_key.to_s
+
+    # Only apply special logic if the budget is an election and the key matches our patterns
+    if budget.election? && (key_string.start_with?("admin.budgets") || key_string.start_with?("budgets"))
+      
+      # Replace the first occurrence of "budgets" with "elections"
+      primary_key = key_string.sub("budgets", "elections")
+      
+      # The original key is always the fallback
+      fallback_key = key_string.to_sym
+      
+      t(primary_key, default: fallback_key, **options)
+    else
+      # For all other cases, just behave like the normal t() helper
+      t(key_string, **options)
+    end
+  end
+
   def rtl?(locale = I18n.locale)
     %i[ar fa he].include?(locale)
   end
