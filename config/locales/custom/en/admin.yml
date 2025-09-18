@@ -1,9 +1,0 @@
-en:
-  admin:
-    budgets:
-      edit:
-        stv: "Enable Single Transferable Vote"
-        stv_help_text: "If this option is checked, winners will be calculated using the single transferable vote system"
-        stv_winners: "Number of winners"
-        stv_winners_help_text: "The number of winners to be calculated using the single transferable vote system"
-        
