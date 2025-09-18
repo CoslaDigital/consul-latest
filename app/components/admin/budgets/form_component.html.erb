@@ -56,19 +56,21 @@
     </div>
      </fieldset>
 <fieldset>
-    <legend>Single Transferable Vote</legend>
-    <div class="row expanded highlight">
-      <div class="small-12 medium-4 column">
-        <p class="form-label"><%= t("admin.budgets.edit.stv") %></p>
-        <p class="help-text"><%= t("admin.budgets.edit.stv_help_text") %></p>
-        <%= f.check_box :stv %>
-      </div>
-      <div class="small-12 medium-2 column end">
-        <p class="form-label"><%= t("admin.budgets.edit.stv_winners") %></p>
-        <p class="help-text"><%= t("admin.budgets.edit.stv_winners_help_text") %></p>
-        <%= f.number_field :stv_winners, min: 0 %>
-      </div>
+<fieldset>
+  <legend>Single Transferable Vote</legend>
+  <div class="row expanded highlight">
+    <div class="small-12 medium-4 column">
+      <%= f.check_box :stv, hint: t("admin.budgets.edit.stv_help_text") %>
     </div>
+
+    <div class="small-12 medium-4 column">
+      <%= f.check_box :stv_dynamic_quota, hint: t("admin.budgets.edit.stv_dynamic_quota_help_text") %>
+    </div>
+
+    <div class="small-12 medium-2 column end">
+      <%= f.number_field :stv_winners, hint: t("admin.budgets.edit.stv_winners_help_text"), min: 0 %>
+    </div>
+  </div>
 </fieldset>
 <fieldset>
 

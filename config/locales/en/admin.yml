@@ -148,6 +148,12 @@ en:
         hide_money_help_text: "If this option is checked, all fields showing the amount of money will be hidden throughout the process."
         part_fund: "Part Fund Winners"
         part_fund_help_text: "If this option is checked, if there is insufficient budget left, the next most voted for investment will be offered part funding"
+        stv_dynamic_quota: "Dynamic Quota"
+        stv_dynamic_quota_help_text: "Recalculate the quota after each round based on remaining valid votes and seats."
+        stv: "Use Single Transferable Vote"
+        stv_help_text: "To be use with Elections and using approval voting"
+        stv_winners: "Number of seats"
+        stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
         success_notice: Budget deleted successfully
         unable_notice: You cannot delete a budget that has associated investments

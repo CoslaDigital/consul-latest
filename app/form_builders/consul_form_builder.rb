@@ -20,7 +20,7 @@ class ConsulFormBuilder < FoundationRailsHelper::FormBuilder
   end
 
   def check_box(attribute, options = {})
-    if options[:label] == false
+    checkbox_with_label = if options[:label] == false
       super
     else
       label = tag.span sanitized_label_text(attribute, options[:label]), class: "checkbox"
@@ -30,6 +30,11 @@ class ConsulFormBuilder < FoundationRailsHelper::FormBuilder
         label_options: { class: "checkbox-label" }.merge(label_options_for(options))
       ))
     end
+    help_text_html = help_text(attribute, options)
+
+  # Combine the checkbox and its help text.
+  checkbox_with_label + help_text_html
+    
   end
 
   def radio_button(attribute, tag_value, options = {})
