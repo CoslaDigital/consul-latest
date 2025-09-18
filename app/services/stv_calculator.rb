@@ -24,6 +24,12 @@ def calculate(ballot_data, seats, quota, investment_titles)
   rounds_log = []
   empty_seats = seats
   iteration = 1
+  # Store a copy of the original votes for tie-breaking
+  first_preference_votes = initial_vote_counts.dup
+
+  # Initialize a hash to store vote history
+  vote_history = Hash.new { |h, k| h[k] = [] }
+
 
   # --- 2. Calculation Loop ---
   loop do
@@ -69,10 +75,13 @@ def calculate(ballot_data, seats, quota, investment_titles)
       elimination_details = {}
       
       if tied_candidates.size > 1
-        # A tie has occurred, resolve by lot
-        tied_names = tied_candidates.map { |id, _| investment_titles[id] }.join(', ')
-        elimination_details[:tie_resolved_by_lot] = "Tie for last place between: #{tied_names} (all with #{min_votes.round(2)} votes)."
-        eliminated_id = tied_candidates.sample[0]
+        # A tie has occurred, call the new tie-breaking method
+          tied_ids = tied_candidates.map { |id, _| id }
+          tie_break_result = resolve_scottish_tie(tied_ids, vote_history, first_preference_votes)
+          eliminated_id = tie_break_result[:id]
+          
+          # Log the reason for the report
+          elimination_details[:tie_break_message] = format_tie_break_message(tie_break_result, investment_titles)
       else
         # No tie
         eliminated_id = tied_candidates.first[0]
@@ -122,7 +131,58 @@ end
 
   
   private
+  
+  def format_tie_break_message(tie_break_result, investment_titles)
+  details = tie_break_result[:details]
+  
+  case tie_break_result[:reason]
+  when :previous_round
+    comparison_text = details[:comparison].map do |id, count|
+      "#{investment_titles[id]}: #{count.round(2)}"
+    end.join(', ')
+    "Tie resolved by checking votes from Round #{details[:round]}. Counts were: #{comparison_text}."
+  when :first_preference
+    comparison_text = details[:comparison].map do |id, count|
+      "#{investment_titles[id]}: #{count.round(2)}"
+    end.join(', ')
+    "Tie resolved by checking original first preference votes. Counts were: #{comparison_text}."
+  when :random_lot
+    tied_names = details[:tied_candidates].map { |id| investment_titles[id] }.join(', ')
+    "Tie could not be resolved by vote counts. A random draw was used to select a candidate for elimination from: #{tied_names}."
+  end
+  end
+  
+  def resolve_scottish_tie(tied_ids, vote_history, first_preference_votes)
+  # Rule 1: Check previous rounds' votes.
+  last_round_index = (vote_history[tied_ids.first] || []).size - 1
+  if last_round_index >= 0
+    (last_round_index).downto(0) do |round_idx|
+      comparison = tied_ids.each_with_object({}) { |id, h| h[id] = vote_history[id][round_idx] }
+      min_past_vote = comparison.values.min
+      candidates_at_min = comparison.keys.filter { |id| comparison[id] == min_past_vote }
+      
+      if candidates_at_min.size == 1
+        return { id: candidates_at_min.first, reason: :previous_round, 
+                 details: { round: round_idx + 1, comparison: comparison } }
+      end
+    end
+  end
 
+  # Rule 2: Check first preference votes.
+  comparison = tied_ids.each_with_object({}) { |id, h| h[id] = first_preference_votes[id] }
+  min_first_pref = comparison.values.min
+  candidates_at_min_first_pref = comparison.keys.filter { |id| comparison[id] == min_first_pref }
+  
+  if candidates_at_min_first_pref.size == 1
+    return { id: candidates_at_min_first_pref.first, reason: :first_preference, 
+             details: { comparison: comparison } }
+  end
+
+  # Rule 3: Decide by lot.
+  { id: candidates_at_min_first_pref.sample, reason: :random_lot, 
+    details: { tied_candidates: candidates_at_min_first_pref } }
+  end
+   
   def transfer_eliminated_votes(ballot_data, eliminated_investment_id)
     reallocated_votes = []
     exhausted_count = 0
