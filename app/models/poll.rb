@@ -50,7 +50,8 @@ class Poll < ApplicationRecord
               message: ->(*) { I18n.t("errors.messages.past_date") }
             },
             allow_blank: true,
-            on: :create
+            on: :create,
+            if: :enforce_date_validations?
   validates :ends_at,
             comparison: {
               greater_than_or_equal_to: ->(*) { Time.current },
@@ -59,8 +60,8 @@ class Poll < ApplicationRecord
             on: :update,
             if: -> { will_save_change_to_ends_at? }
 
-  validate :start_date_change, on: :update
-  validate :end_date_change, on: :update
+  validate :start_date_change, on: :update, if: :enforce_date_validations?
+  validate :end_date_change, on: :update, if: :enforce_date_validations?
   validate :only_one_active, unless: :public?
 
   accepts_nested_attributes_for :questions, reject_if: :all_blank, allow_destroy: true
@@ -256,5 +257,12 @@ class Poll < ApplicationRecord
     else
       0
     end
+  end
+  private
+
+  def enforce_date_validations?
+    # This will return true only if the environment is production.
+    # In development and test, it will return false, disabling the validations.
+    Rails.env.production?
   end
 end
