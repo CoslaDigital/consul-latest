@@ -54,7 +54,23 @@
         <%= f.check_box :part_fund %>
       </div>
     </div>
-
+     </fieldset>
+<fieldset>
+    <legend>Single Transferable Vote</legend>
+    <div class="row expanded highlight">
+      <div class="small-12 medium-4 column">
+        <p class="form-label"><%= t("admin.budgets.edit.stv") %></p>
+        <p class="help-text"><%= t("admin.budgets.edit.stv_help_text") %></p>
+        <%= f.check_box :stv %>
+      </div>
+      <div class="small-12 medium-2 column end">
+        <p class="form-label"><%= t("admin.budgets.edit.stv_winners") %></p>
+        <p class="help-text"><%= t("admin.budgets.edit.stv_winners_help_text") %></p>
+        <%= f.number_field :stv_winners, min: 0 %>
+      </div>
+    </div>
+</fieldset>
+<fieldset>
 
     <% unless wizard? %>
       <div class="small-12 medium-6 column">

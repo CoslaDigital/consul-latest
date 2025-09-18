@@ -3,6 +3,7 @@ load Rails.root.join("app", "models", "budget", "investment.rb")
 class Budget
   class Investment < ApplicationRecord
     has_many :answers, class_name: "Investment::Answer"
+     scope :sort_by_votes, -> { order(votes: :desc) }
     accepts_nested_attributes_for :answers
 
     validates_translation :description, presence: false,
