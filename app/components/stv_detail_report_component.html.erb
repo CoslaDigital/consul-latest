@@ -35,15 +35,12 @@
   <% elsif round[:action][:type] == :elimination %>
     <strong>Action: Candidate Eliminated</strong>
     <% details = round[:action][:details] %>
-    <%# NEW: Check if a tie-break occurred and display the notice %>
-  <% if details[:tie_resolved_by_lot] %>
-    <div style="border: 1px solid #cc0000; padding: 10px; margin: 10px 0; background-color: #fff5f5;">
+     <% if details[:tie_break_message] %>
+    <div style="border: 1px solid #cc0000; padding: 10px; ...">
       <strong style="color: #cc0000;">Tie-Break Occurred:</strong><br>
-      <em><%= details[:tie_resolved_by_lot] %> A random draw (drawing of lots) was used to select the candidate for elimination.</em>
+      <em><%= details[:tie_break_message] %></em>
     </div>
-  <% end %>
-
-
+    <% end %>
     <p style="margin-left: 20px;">
       ❌ <strong>Eliminated: <%= details[:title] %> (<%= details[:id] %>)</strong> with <%= details[:count].round(2) %> votes.<br>
       <em>Transferring <%= details[:reallocated_count] %> votes.</em><br>
