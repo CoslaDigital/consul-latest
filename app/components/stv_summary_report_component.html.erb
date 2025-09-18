@@ -27,6 +27,12 @@
 
 <%# --- Quota Explanation Section --- %>
 <h3>🎯 About the Quota</h3>
+<% if @dynamic_quota_enabled %>
+  <div style="padding: 10px; margin-bottom: 1em; background-color: #eef; border: 1px solid #aac;">
+    <strong>Notice:</strong> Dynamic Quota Recalculation is enabled. The initial quota is shown below, but it will be updated in each round of the detailed count.
+  </div>
+<% end %>
+
 <p>The quota is the minimum number of votes a candidate needs to be guaranteed election. Once a candidate reaches this target, they are elected.</p>
 <p>This election uses the <strong>Droop Quota</strong>, calculated with the formula below:</p>
 <div style='background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace;'>

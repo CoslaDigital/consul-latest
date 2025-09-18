@@ -7,7 +7,7 @@ class StvCalculator
   end
   
   # The main public method that runs the STV algorithm.
-def calculate(ballot_data, seats, quota, investment_titles)
+def calculate(ballot_data, seats, quota, investment_titles, dynamic_quota_enabled: false)
   # --- 1. Setup Phase ---
   initial_vote_counts = {}
   investment_titles.keys.each { |id| initial_vote_counts[id] = 0 }
@@ -37,15 +37,26 @@ def calculate(ballot_data, seats, quota, investment_titles)
     if sorted_investments.empty? || empty_seats <= 0
       break
     end
+    # 1. Determine the quota and calculation details for this round first.
+  current_quota, quota_calc_details = if dynamic_quota_enabled && empty_seats > 0
+    remaining_votes = initial_vote_counts.values.sum
+    new_quota = (remaining_votes / (empty_seats + 1)).floor + 1
+    calculation_details = { votes: remaining_votes, seats: empty_seats }
+    [new_quota, calculation_details]
+  else
+    [initial_quota, nil]
+  end
 
-    current_round_data = {
-      iteration: iteration,
-      quota: quota,
-      standings: sorted_investments,
-      action: nil
-    }
+  # 2. Now, create the hash for the round's log with all the correct data.
+  current_round_data = {
+    iteration: iteration,
+    quota: current_quota,
+    quota_calculation: quota_calc_details,
+    standings: sorted_investments,
+    action: nil
+  }    
 
-    elected_in_round = sorted_investments.select { |_, count| count >= quota }
+    elected_in_round = sorted_investments.select { |_, count| count >= current_quota }
 
     if elected_in_round.present?
       election_details = []
@@ -53,7 +64,7 @@ def calculate(ballot_data, seats, quota, investment_titles)
         break if empty_seats <= 0
         @elected_investments << investment_id
         title = investment_titles[investment_id]
-        surplus = count - quota
+        surplus = count - current_quota
 
         reallocated_votes = transfer_surplus_votes(ballot_data, investment_id)
         if surplus > 0 && reallocated_votes.any?

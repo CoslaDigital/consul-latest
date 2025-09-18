@@ -36,9 +36,9 @@ class Budget
       quota = droop_quota(votes_cast, seats)
       investment_titles = candidates.pluck(:id, :title).to_h
       ballot_data = get_votes_data
-
+      dynamic_quota_enabled = @budget.stv_dynamic_quota?
       calculator = ::StvCalculator.new
-      result = calculator.calculate(ballot_data, seats, quota, investment_titles)
+      result = calculator.calculate(ballot_data, seats, quota, investment_titles, dynamic_quota_enabled: dynamic_quota_enabled)
       # Render the summary report using the new component
       summary_html_report = ApplicationController.render(
       StvSummaryReportComponent.new(
@@ -49,7 +49,8 @@ class Budget
         votes_cast: votes_cast,
         quota: quota,
         report_title: summary_title,
-        detail_page_slug: detail_slug
+        detail_page_slug: detail_slug,
+        dynamic_quota_enabled: dynamic_quota_enabled
       ),
       layout: false
       )
@@ -60,6 +61,7 @@ class Budget
       StvDetailReportComponent.new(
         rounds: result.rounds,
         investment_titles: investment_titles,
+        dynamic_quota_enabled: dynamic_quota_enabled
         ),
         layout: false
       )
