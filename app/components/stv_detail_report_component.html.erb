@@ -6,7 +6,14 @@
 <% @rounds.each do |round| %>
   <br><h2>Round <%= round[:iteration] %>:</h2>
   <p>Quota to be elected: <%= round[:quota] %></p>
-
+  <% if round[:quota_calculation] %>
+    <% calc = round[:quota_calculation] %>
+    <p style="font-size: 0.9em; color: #555;">
+      <em>
+        Calculation: floor(<%= calc[:votes].round(2) %> votes / (<%= calc[:seats] %> seats + 1)) + 1
+      </em>
+    </p>
+  <% end %>
   <p><strong>Current Standings:</strong></p>
   <table>
     <thead><tr><th>Candidate</th><th>Votes</th></tr></thead>
