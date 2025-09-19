@@ -1,0 +1,168 @@
+<%# This is the combined report for the PDF, rendered by Wicked PDF %>
+<%# It assumes the controller provides @budget, @heading, @result, @candidates, @votes_cast, and @quota %>
+
+<%# ---------------------------------------------------------------- %>
+<%# PART 1: THE SUMMARY REPORT                                     %>
+<%# ---------------------------------------------------------------- %>
+
+<%# Main Title and Header %>
+<h1>Election Results: <%= @budget.name %></h1>
+<h2>Details for: <%= @heading.name %></h2>
+<hr>
+
+<%# Election Summary Section %>
+<h3>🗳️ Election Summary</h3>
+<ul>
+  <% total_seats = @result.unfilled_seats + @result.winners.size %>
+  <li><strong>Seats to fill:</strong> <%= total_seats %></li>
+  <li><strong>Total Candidates:</strong> <%= @candidates.count %></li>
+  <li><strong>Total Valid Votes Cast:</strong> <%= @votes_cast %></li>
+</ul>
+
+<%# List of Candidates Section %>
+<h3>👥 Candidates</h3>
+<p>The following <%= @candidates.count %> candidates were on the ballot:</p>
+<div style='column-count: 2; column-gap: 20px;'>
+  <ul>
+    <% @candidates.map(&:title).sort.each do |title| %>
+      <li><%= title %></li>
+    <% end %>
+  </ul>
+</div>
+
+<%# Quota Explanation Section %>
+<h3>🎯 About the Quota</h3>
+<% if @budget.stv_dynamic_quota? %>
+  <div style="padding: 10px; margin-bottom: 1em; background-color: #eef; border: 1px solid #aac;">
+    <strong>Notice:</strong> Dynamic Quota Recalculation was enabled. The initial quota is shown below, but it was updated in each round of the detailed count.
+  </div>
+<% end %>
+<p>The quota is the minimum number of votes a candidate needs to be guaranteed election. Once a candidate reaches this target, they are elected.</p>
+<p>This election uses the <strong>Droop Quota</strong>. The initial calculation was:</p>
+<div style='background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace;'>
+  Quota = floor(Total Votes / (Seats + 1)) + 1<br>
+  Quota = floor(<%= @votes_cast %> / (<%= total_seats %> + 1)) + 1 = <strong><%= @quota %></strong>
+</div>
+<hr>
+
+<%# Final Results Section %>
+<h2>✅ Election Complete: Final Results</h2>
+
+<%# List of Elected Winners %>
+<% if @result.winners.any? %>
+  <% winner_count = @result.winners.size %>
+  <% candidate_word = (winner_count == 1) ? "candidate has" : "candidates have" %>
+  <p>The following <strong><%= winner_count %></strong> <%= candidate_word %> been elected:</p>
+  <ul>
+    <% @result.winners.each do |winner_id| %>
+      <% winner_title = @candidates.find { |c| c.id == winner_id }&.title || "Unknown Candidate" %>
+      <li><strong><%= winner_title %></strong> (ID: <%= winner_id %>)</li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No candidates were elected in this process.</p>
+<% end %>
+
+<%# Order of Elimination Table %>
+<% if @result.elimination_log.any? %>
+  <h3>📊 Order of Elimination</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background-color: #f0f0f0;">
+        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Round</th>
+        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Candidate Eliminated</th>
+        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Votes at Elimination</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.elimination_log.each do |log_entry| %>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= log_entry[:round] %></td>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= log_entry[:title] %> (<%= log_entry[:id] %>)</td>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= log_entry[:votes].round(2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%# Notice for Unfilled Seats %>
+<% if @result.unfilled_seats > 0 %>
+  <p>
+    <strong>Notice:</strong> <%= @result.unfilled_seats %> seat(s) could not be filled because there were no more candidates with enough transferable votes to reach the quota.
+  </p>
+<% end %>
+
+
+<%# ---------------------------------------------------------------- %>
+<%# PART 2: THE DETAILED REPORT                                    %>
+<%# ---------------------------------------------------------------- %>
+
+<%# This CSS forces a page break in the final PDF document %>
+<div style="page-break-before: always;"></div>
+
+<h1>Detailed Election Log</h1>
+<hr>
+
+<% @result.rounds.each do |round| %>
+  <br><h2>Round <%= round[:iteration] %>:</h2>
+  <p>Quota to be elected: <strong><%= round[:quota] %></strong></p>
+
+  <% if round[:quota_calculation] %>
+    <% calc = round[:quota_calculation] %>
+    <p style="font-size: 0.9em; color: #555;">
+      <em>
+        Calculation: floor(<%= calc[:votes].round(2) %> votes / (<%= calc[:seats] %> seats + 1)) + 1
+      </em>
+    </p>
+  <% end %>
+
+  <p><strong>Current Standings:</strong></p>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background-color: #f0f0f0;">
+        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Candidate</th>
+        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Votes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% round[:standings].each do |id, count| %>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= @investment_titles[id] || "Unknown" %> (<%= id %>)</td>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= count.round(2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <br>
+
+  <% action = round[:action] %>
+  <% if action[:type] == :election %>
+    <strong>Action: Candidate(s) Elected</strong>
+    <% action[:details].each do |detail| %>
+      <p style="margin-left: 20px;">
+        ➡️ <strong>Elected: <%= detail[:title] %> (<%= detail[:id] %>)</strong> with <%= detail[:count].round(2) %> votes.<br>
+        <% if detail[:surplus] > 0 %>
+          <em>Transferring <%= detail[:surplus].round(2) %> surplus votes.</em>
+        <% end %>
+      </p>
+    <% end %>
+  <% elsif action[:type] == :elimination %>
+    <strong>Action: Candidate Eliminated</strong>
+    <% details = action[:details] %>
+    <% if details[:tie_break_message] %>
+      <div style="border: 1px solid #cc0000; padding: 10px; margin: 10px 0; background-color: #fff5f5;">
+        <strong style="color: #cc0000;">Tie-Break Occurred:</strong><br>
+        <em><%= details[:tie_break_message] %></em>
+      </div>
+    <% end %>
+    <p style="margin-left: 20px;">
+      ❌ <strong>Eliminated: <%= details[:title] %> (<%= details[:id] %>)</strong> with <%= details[:count].round(2) %> votes.<br>
+      <em>Transferring <%= details[:reallocated_count] %> votes.</em><br>
+      <% if details[:exhausted_count] > 0 %>
+        <em>(<strong><%= details[:exhausted_count] %></strong> votes became exhausted and could not be transferred.)</em>
+      <% end %>
+    </p>
+  <% end %>
+  <hr>
+<% end %>

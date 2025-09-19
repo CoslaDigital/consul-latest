@@ -1,0 +1,61 @@
+(function() {
+  "use strict";
+
+  // Define the new object on the global App namespace
+  App.AdminBudgetForm = {
+    // This is the main logic function
+    toggleFields: function() {
+      // Find the form and the data attribute containing the voting style options
+      var form = $(".budgets-form");
+      var allVotingStyles = form.data("budget-form-voting-styles-value");
+      
+      // Get the currently selected 'kind' (budget or election)
+      var kind = $("#budget_kind").val();
+      
+      // Get the specific voting styles for the selected kind
+      var stylesForKind = allVotingStyles[kind] || [];
+      
+      // Find the elements we need to show/hide and update
+      var budgetFields = $("[data-budget-form-target='budgetFields']");
+      var electionFields = $("[data-budget-form-target='electionFields']");
+      var votingStyleSelect = $("[data-budget-form-target='votingStyleSelect']");
+      
+      // Show/hide the correct field sections
+      if (kind === "budget") {
+        budgetFields.show();
+        electionFields.hide();
+      } else if (kind === "election") {
+        budgetFields.hide();
+        electionFields.show();
+      }
+      
+      // --- Update the 'Voting Style' dropdown ---
+      // Clear any existing options
+      votingStyleSelect.empty();
+      
+      // Add the new options for the selected kind
+      $.each(stylesForKind, function(index, style) {
+        // style[0] is the text (e.g., "Knapsack"), style[1] is the value (e.g., "knapsack")
+        votingStyleSelect.append($("<option>").val(style[1]).text(style[0]));
+      });
+    },
+
+    // This function attaches the event listener
+    attachChangeListener: function() {
+      // When the 'kind' dropdown changes, run the toggleFields logic
+      $("#budget_kind").on("change", function() {
+        App.AdminBudgetForm.toggleFields();
+      });
+    },
+
+    // This is the entry point, called from the view
+    initialize: function() {
+      // Set the correct fields on page load
+      App.AdminBudgetForm.toggleFields();
+      
+      // Listen for any future changes
+      App.AdminBudgetForm.attachChangeListener();
+    }
+  };
+
+}).call(this);

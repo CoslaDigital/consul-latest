@@ -10,6 +10,8 @@ var initialize_modules = function() {
 
   // Add calls to your custom code here; this will be called when
   // loading a page.
+App.AdminBudgetForm.initialize();
+
 };
 
 var destroy_non_idempotent_modules = function() {

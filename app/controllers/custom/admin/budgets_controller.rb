@@ -55,7 +55,7 @@ class Admin::BudgetsController < Admin::BaseController
     alias_method :consul_allowed_params, :allowed_params
         
     def allowed_params
-      consul_allowed_params + [:stv, :stv_winners, :stv_dynamic_quota]
+      consul_allowed_params + [:stv, :stv_winners, :stv_dynamic_quota, :kind]
     end
 
 end

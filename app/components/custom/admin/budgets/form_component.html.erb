@@ -1,0 +1,163 @@
+<%= translatable_form_for [namespace, budget], html: { 
+      class: "budgets-form", 
+      data: { 
+        controller: "budget-form", 
+        "budget-form-voting-styles-value": voting_styles_for_js 
+      } 
+    } do |f| %>
+
+  <%= render Admin::BudgetsWizard::ModeFieldComponent.new if wizard? %>
+  <%= render "shared/errors", resource: budget %>
+
+  <%# --- General Settings --- %>
+  <fieldset>
+    <legend><%= t("admin.budgets.edit.info.budget_settings") %></legend>
+    <%= render "shared/globalize_locales", resource: budget %>
+
+    <div class="row expanded">
+      <div class="small-12 medium-6 large-4 column">
+        <%= f.select :kind, kind_select_options, { label: "Type" }, { data: { action: "budget-form#toggleFields" } } %>
+      </div>
+    </div>
+    
+    <%= f.translatable_fields do |translations_form| %>
+      <div class="row expanded">
+        <div class="small-12 medium-9 large-8 column">
+          <%= translations_form.text_field :name, maxlength: Budget.title_max_length, hint: t("admin.budgets.edit.name_description") %>
+        </div>
+      </div>
+      <%# ... other translatable fields like main_link_text/url ... %>
+    <% end %>
+  </fieldset>
+
+  <%# --- Voting Options (Now combined and dynamic) --- %>
+  <fieldset>
+    <legend>Voting Options</legend>
+    <div class="row expanded highlight">
+      <div class="small-12 medium-6 column">
+        <%= f.select :voting_style, voting_styles_select_options, {}, { data: { "budget-form-target": "votingStyleSelect" } } %>
+      </div>
+    </div>
+  </fieldset>
+
+  <%# --- Dynamic Budget Options --- %>
+  <div data-budget-form-target="budgetFields">
+    <fieldset>
+      <legend><%= t("admin.budgets.edit.budget_options") %></legend>
+      <div class="row expanded highlight">
+        <div class="small-12 medium-6 column">
+          <%= f.select :currency_symbol, currency_symbol_select_options %>
+        </div>
+        <div class="small-12 medium-6 column">
+          <%= f.check_box :part_fund, hint: t("admin.budgets.edit.part_fund_help_text") %>
+        </div>
+      </div>
+       <div class="row expanded highlight">
+        <div class="small-12 medium-6 column">
+           <%= f.check_box :hide_money, hint: t("admin.budgets.edit.hide_money_help_text") %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <%# --- Dynamic Election Options --- %>
+  <div data-budget-form-target="electionFields">
+    <fieldset>
+      <legend><%= t("admin.budgets.edit.election_options") %></legend>
+      <div class="row expanded highlight">
+        <div class="small-12 medium-4 column">
+          <%= f.check_box :stv, hint: t("admin.budgets.edit.stv_help_text") %>
+        </div>
+        <div class="small-12 medium-4 column">
+          <%= f.check_box :stv_dynamic_quota, hint: t("admin.budgets.edit.stv_dynamic_quota_help_text") %>
+        </div>
+        <div class="small-12 medium-4 column">
+          <%= f.number_field :stv_winners, hint: t("admin.budgets.edit.stv_winners_help_text"), min: 0 %>
+        </div>
+      </div>
+      <div class="row expanded highlight">
+        <div class="small-12 medium-6 column">
+          <%= f.check_box :hide_money, { checked: true, disabled: true, hint: t("admin.budgets.edit.hide_money_election_help_text") } %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <%# ... (rest of the form: Phases, Image, Staff, etc.) ... %>
+  <%# Ensure all rows containing inputs use class="row expanded" to fix indentation %>
+  <fieldset>
+      <legend>Results</legend>
+      <div class="row expanded">
+        <div class="small-12 column">
+          <%= render "admin/shared/show_results_fields", form: f %>
+        </div>
+      </div>
+    </fieldset>
+
+  <%# --- Phase Settings --- %>
+  <% unless wizard? %>
+    <fieldset>
+      <legend><%= t("admin.budgets.edit.phases_caption") %></legend>
+      <div class="row expanded">
+        <div class="small-12 medium-6 column">
+          <%= f.select :phase, phases_select_options %>
+        </div>
+      </div>
+    </fieldset>
+  <% end %>
+
+  <%# --- Image Settings --- %>
+  <% if feature?(:allow_images) %>
+    <fieldset>
+      <legend>Image</legend>
+      <div class="row expanded">
+        <div class="small-12 column">
+          <%= render Images::NestedComponent.new(f) %>
+          <p class="help-text"><%= t("admin.budgets.edit.image_description") %></p>
+        </div>
+      </div>
+    </fieldset>
+  <% end %>
+
+  <%# --- Staff Settings --- %>
+  <fieldset>
+    <legend><%= t("admin.budgets.edit.info.staff_settings") %></legend>
+    <div class="row expanded">
+      <% %w[administrators valuators].each do |staff| %>
+        <div class="small-12 medium-6 large-4 column">
+          <%= link_to t("admin.budgets.edit.#{staff}", count: budget.send(staff).count),
+                      "#",
+                      class: "button expanded hollow js-budget-show-#{staff}-list js-budget-show-users-list",
+                      data: { toggle: "#{staff}_list", texts: t("admin.budgets.edit.#{staff}") } %>
+        </div>
+      <% end %>
+    </div>
+    <%= render "/admin/budgets/association", assignable_type: "administrators", assignables: admins, form: f %>
+    <%= render "/admin/budgets/association", assignable_type: "valuators", assignables: valuators, form: f %>
+  </fieldset>
+
+  <%# --- Results Settings --- %>
+  <% unless wizard? %>
+    <fieldset>
+      <legend>Results</legend>
+      <div class="row expanded">
+        <div class="small-12 column">
+          <%= render "admin/shared/show_results_fields", form: f %>
+        </div>
+      </div>
+    </fieldset>
+  <% end %>
+
+  <%# --- SUBMIT BUTTON SECTION --- %>
+  <div class="row expanded">
+    <div class="small-12 column">
+      <div class="clear small-12 medium-4 large-3 inline-block">
+        <% if wizard? %>
+          <%= f.submit t("admin.budgets_wizard.budgets.continue"), class: "button success expanded" %>
+        <% else %>
+          <%= f.submit nil, class: "button success" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
