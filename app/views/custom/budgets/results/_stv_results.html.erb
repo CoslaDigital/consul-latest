@@ -1,0 +1,43 @@
+<h4><%= @heading.name %></h4>
+
+<div class="callout primary">
+  <p>The winners for this election were determined using the <strong>Single Transferable Vote (STV)</strong> method.</p>
+</div>
+<h5>Elected Candidates</h5>
+<% if @investments.winners.any? %>
+  <table style="background-color: #f9f9f9; border: 1px solid #eee; border-radius: 5px; width: 100%;">
+    <tbody>
+      <% @investments.winners.each do |winner| %>
+        <tr style="border-top: 1px solid #eee;">
+          <td style="width: 70px; padding: 10px;">
+            <%# Only render an image if one exists, otherwise this cell is empty %>
+            <% if winner.image.present? %>
+              <%# Use the new :portrait variant %>
+              <%= image_tag winner.image.variant(:portrait),
+                            alt: winner.title,
+                            class: "stv-winner-portrait" %>
+            <% end %>
+          </td>
+          <td style="vertical-align: middle;">
+            <span class="icon-check success"></span>
+            <%= link_to winner.title, budget_investment_path(@budget, winner) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>There were no winners in this election.</p>
+<% end %>
+
+<hr>
+
+<%# --- Links to the custom results pages created --- %>
+<% summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-') %>
+<% detail_slug = "stv_details_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-') %>
+
+<p>For a full breakdown of the results, please see the reports below:</p>
+<ul class="menu vertical">
+  <li><%= link_to "View Final Results Summary", "/#{summary_slug}" %></li>
+  <li><%= link_to "View Detailed Round-by-Round Log", "/#{detail_slug}" %></li>
+</ul>
