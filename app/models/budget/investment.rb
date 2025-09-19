@@ -136,7 +136,8 @@ class Budget
     before_validation :set_denormalized_ids
     before_save :calculate_confidence_score
     before_create :set_original_heading_id
-    after_save :recalculate_heading_winners
+    after_save :recalculate_heading_winners, unless: -> { budget.stv? }
+
 
     def comments_count
       comments.count
@@ -349,6 +350,7 @@ end
     end
 
     def recalculate_heading_winners
+      Rails.logger.warn "--- [DEBUG] CALLBACK TRIGGERED: recalculate_heading_winners for Investment ##{self.id} ---"
       Budget::Result.new(budget, heading).calculate_winners if saved_change_to_incompatible?
     end
 

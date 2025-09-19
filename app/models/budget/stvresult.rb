@@ -268,12 +268,57 @@ class Budget
       end
       surplus_contributing_ballots
     end
-
+    
     def update_winning_investments(winning_investment_ids)
+  ids = winning_investment_ids.to_a
+  Rails.logger.info "--- [DEBUG] STARTING update_winning_investments for IDs: #{ids.inspect} ---"
+  return if ids.empty?
+
+  investments = Budget::Investment.unscoped.where(id: ids)
+
+  investments.each do |investment|
+    Rails.logger.info "--- [DEBUG] About to set winner=true for Investment ##{investment.id} ---"
+    
+    investment.class.without_auditing do
+      investment.update!(winner: true)
+    end
+    
+    # Check the flag immediately after updating
+    investment.reload
+    Rails.logger.info "--- [DEBUG] FINISHED update for Investment ##{investment.id}. Current winner status: #{investment.winner} ---"
+  end
+  
+  Rails.logger.info "--- [DEBUG] FINISHED update_winning_investments. ---"
+end
+
+    
+    
+    def oldupdate_winning_investments(winning_investment_ids)
       Budget::Investment.where(id: winning_investment_ids).update_all(winner: true)
     end
 
     def get_votes_data(ballots = get_ballots)
+  # Get all the ballot IDs for the current budget in one query
+  ballot_ids = ballots.pluck(:id)
+  
+  # Get all the lines for ALL those ballots in a single query
+  all_lines = Budget::Ballot::Line.where(ballot_id: ballot_ids)
+                                  .select(:ballot_id, :investment_id)
+  
+  # Group the lines by their ballot_id in memory (very fast)
+  lines_by_ballot = all_lines.group_by(&:ballot_id)
+  
+  # Transform the grouped data into the required array of hashes format,
+  # preserving the original order of ballots.
+  ballot_ids.map do |id|
+    # Find the lines for the current ballot id, convert them to an array of investment_ids,
+    # or return an empty array if the ballot had no lines.
+    rankings = lines_by_ballot[id]&.map(&:investment_id) || []
+    { rankings: rankings }
+  end
+end
+
+    def old_get_votes_data(ballots = get_ballots)
       votes_data = []
       ballots.each do |ballot|
         votes_data.concat(get_ballot_lines(ballot.id))
@@ -281,7 +326,7 @@ class Budget
       votes_data
     end
 
-    def get_ballot_lines(ballot_id)
+    def old_get_ballot_lines(ballot_id)
       ballot_lines = Budget::Ballot::Line.where(ballot_id: ballot_id)
       votes_data = []
       rankings = ballot_lines.pluck(:investment_id)

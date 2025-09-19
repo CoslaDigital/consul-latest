@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
+ActiveRecord::Schema[7.0].define(version: 2025_09_18_144823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -435,6 +435,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.boolean "stv"
     t.integer "stv_winners"
     t.boolean "part_fund"
+    t.boolean "stv_dynamic_quota"
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
