@@ -49,7 +49,7 @@ class Admin::BudgetsController < Admin::BaseController
       @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
     end
 
-    @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
+    #@budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
     redirect_to admin_budget_budget_investments_path(
                   budget_id: @budget.id,
                   advanced_filters: ["winners"]

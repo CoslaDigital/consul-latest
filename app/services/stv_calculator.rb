@@ -44,7 +44,7 @@ def calculate(ballot_data, seats, quota, investment_titles, dynamic_quota_enable
     calculation_details = { votes: remaining_votes, seats: empty_seats }
     [new_quota, calculation_details]
   else
-    [initial_quota, nil]
+    [quota, nil]
   end
 
   # 2. Now, create the hash for the round's log with all the correct data.

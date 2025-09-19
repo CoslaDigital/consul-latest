@@ -5,6 +5,7 @@ class Budget
                         ballot_lines_count: "ballot_lines_count" }.freeze
 
     include Measurable
+    include Sanitizable
     include Taggable
     include Searchable
     include Reclassification
@@ -135,7 +136,7 @@ class Budget
     before_validation :set_denormalized_ids
     before_save :calculate_confidence_score
     before_create :set_original_heading_id
-    after_save :recalculate_heading_winners#, unless: -> { budget.stv? }
+    after_save :recalculate_heading_winners, unless: -> { budget.stv? }
 
 
     def comments_count
@@ -302,16 +303,16 @@ class Budget
       return :invalid_geozone unless valid_geozone?(user)
       nil
     end
-    
+
     def goodvalid_geozone?(user)
       heading.geozone_id.nil? || (heading.geozone_id == user.geozone_id)
     end
-    
+
     def valid_geozone?(user)
   # --- Log Inputs ---
   # Logs the username and their geozone ID
   Rails.logger.info "Geozone Check - User: #{user.username} (User Geozone ID: #{user.geozone_id})"
-  
+
   # Logs the heading's restriction status and its list of geozones
   Rails.logger.info "Geozone Check - Heading Restricted: #{heading.geozone_restricted}"
   Rails.logger.info "Geozone Check - Heading Geozone IDs: #{heading.geozone_ids.inspect}"
@@ -319,7 +320,7 @@ class Budget
   # --- Log Logic Checks ---
   # 1. Check if the heading is restricted at all
   is_restricted = heading.geozone_restricted
-  
+
   # 2. Check if the user's geozone ID is in the heading's list
   is_match = heading.geozone_ids.include?(user.geozone_id)
   Rails.logger.info "Geozone Check - Does user geozone match heading list? #{is_match}"
@@ -330,12 +331,12 @@ class Budget
   # OR
   # 2. The user's geozone ID is a match (valid = true)
   valid = !is_restricted || is_match
-  
+
   Rails.logger.info "Geozone Check - Final Result (Not Restricted OR Match): #{valid}"
 
   valid
    end
-    
+
     def permission_problem?(user)
       permission_problem(user).present?
     end
@@ -398,7 +399,7 @@ class Budget
     def should_show_price_explanation?
       should_show_price? && price_explanation.present?
     end
-    
+
     def should_show_estimated_price?
       estimated_price.present? && budget.show_money?
     end
