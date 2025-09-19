@@ -7,7 +7,8 @@ class Image < ApplicationRecord
       larger: { resize: "1920x" },
       large: { resize: "x#{Setting["uploads.images.min_height"]}" },
       medium: { gravity: "center", resize: "300x300^", crop: "300x300+0+0" },
-      thumb: { gravity: "center", resize: "140x245^", crop: "140x245+0+0" }
+      thumb: { gravity: "center", resize: "140x245^", crop: "140x245+0+0" },
+      portrait: { gravity: "center", resize: "160x160^", crop: "160x160+0+0" }
     }
   end
 

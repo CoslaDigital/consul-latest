@@ -301,4 +301,12 @@ padding-bottom: 5rem;
         background-image: image-url("leaflet/layers-2x.png");
         background-size: 26px 26px;
   }
+
+/* Using a new class for the portrait image */
+.stv-winner-portrait {
+  width: 60px;  /* Slightly larger for a portrait */
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%; /* Make it circular for a nice headshot effect */
+}
 }
