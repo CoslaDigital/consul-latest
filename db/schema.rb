@@ -436,6 +436,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.integer "stv_winners"
     t.boolean "part_fund"
     t.boolean "stv_dynamic_quota"
+    t.string "kind", default: "budget", null: false
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
