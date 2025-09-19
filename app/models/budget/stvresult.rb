@@ -4,13 +4,14 @@ class Budget
   class Stvresult
     attr_accessor :budget, :heading, :current_investment
 
-    def initialize(budget, heading)
+    def initialize(budget, heading, user:)
       @budget = budget
       @heading = heading
       @elected_investments = []
       @eliminated_investments = []
       @elimination_log = []
       @log_file_name = "stv_voting_#{budget.name}_#{heading.name}.log"
+      @user = user
       log_path = Rails.root.join('log', @log_file_name)
       File.open(log_path, 'w') {}
     end
@@ -65,6 +66,37 @@ class Budget
         ),
         layout: false
       )
+
+      pdf_html_content = ApplicationController.render(
+    template: "budgets/results/stv_report_pdf",
+    layout: "pdf",
+    assigns: { # Pass all necessary instance variables to the template
+      budget: @budget,
+      heading: @heading,
+      result: result,
+      candidates: candidates,
+      votes_cast: votes_cast,
+      quota: quota,
+      investment_titles: investment_titles
+    }
+  )
+
+  # --- Generate the PDF and attach it to the budget ---
+  pdf_file = WickedPdf.new.pdf_from_string(pdf_html_content)
+  
+  # First, remove any old report to avoid duplicates
+  @budget.documents.where(title: "STV Full Report").destroy_all
+  
+  # Attach the new one using your Documentable concern
+  @budget.documents.create!(
+    title: "STV Full Report",
+    user: @user,
+    attachment: {
+      io: StringIO.new(pdf_file), # Treat the in-memory PDF string as a file
+      filename: "stv_report_#{@budget.slug}.pdf",
+      content_type: "application/pdf"
+    }
+  )
 
       # Update the database with the final results
       update_winning_investments(result.winners)

@@ -31,13 +31,19 @@
 <% end %>
 
 <hr>
+<%# Find the STV report document attached to the budget %>
+<% stv_report_document = @budget.documents.find_by(title: "STV Full Report") %>
 
-<%# --- Links to the custom results pages created --- %>
-<% summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-') %>
-<% detail_slug = "stv_details_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-') %>
-
+<%# Display the download link if the document exists %>
+<% if stv_report_document %>
+  <p>
+    <%= link_to "Download Full Report (PDF)", 
+                rails_blob_path(stv_report_document.attachment, disposition: "attachment"), 
+                class: "button" %>
+  </p>
+<% end %>
 <p>For a full breakdown of the results, please see the reports below:</p>
 <ul class="menu vertical">
-  <li><%= link_to "View Final Results Summary", "/#{summary_slug}" %></li>
-  <li><%= link_to "View Detailed Round-by-Round Log", "/#{detail_slug}" %></li>
+  <li><%= link_to "View Final Results Summary", "/#{@summary_slug}" %></li>
+  <li><%= link_to "View Detailed Round-by-Round Log", "/#{@detail_slug}" %></li>
 </ul>
