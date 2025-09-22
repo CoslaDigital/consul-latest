@@ -83,17 +83,6 @@
     </fieldset>
   </div>
 
-  <%# ... (rest of the form: Phases, Image, Staff, etc.) ... %>
-  <%# Ensure all rows containing inputs use class="row expanded" to fix indentation %>
-  <fieldset>
-      <legend>Results</legend>
-      <div class="row expanded">
-        <div class="small-12 column">
-          <%= render "admin/shared/show_results_fields", form: f %>
-        </div>
-      </div>
-    </fieldset>
-
   <%# --- Phase Settings --- %>
   <% unless wizard? %>
     <fieldset>
