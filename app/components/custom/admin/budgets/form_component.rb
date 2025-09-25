@@ -6,6 +6,8 @@ class Admin::Budgets::FormComponent < ApplicationComponent
   include GlobalizeHelper
   include Admin::Namespace
 
+  use_helpers :custom_t
+
   attr_reader :budget, :wizard
   alias_method :wizard?, :wizard
   
