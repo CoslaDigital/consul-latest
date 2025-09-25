@@ -84,16 +84,19 @@ class Budget
   # --- Generate the PDF and attach it to the budget ---
   pdf_file = WickedPdf.new.pdf_from_string(pdf_html_content)
   
+  # Define a heading-specific title for the document
+  document_title = "STV Full Report: #{@heading.name}"
+  
   # First, remove any old report to avoid duplicates
-  @budget.documents.where(title: "STV Full Report").destroy_all
+  @heading.documents.where(title: document_title).destroy_all
   
   # Attach the new one using your Documentable concern
-  @budget.documents.create!(
-    title: "STV Full Report",
+  @heading.documents.create!(
+    title: "STV Full Report: #{@heading.name}",
     user: @user,
     attachment: {
       io: StringIO.new(pdf_file), # Treat the in-memory PDF string as a file
-      filename: "stv_report_#{@budget.slug}.pdf",
+      filename: "stv_report_#{@budget.slug}_#{@heading.slug}.pdf",
       content_type: "application/pdf"
     }
   )

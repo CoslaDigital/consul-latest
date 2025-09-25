@@ -5,7 +5,47 @@ module ApplicationHelper
   def current_path_with_query_params(query_parameters)
     url_for(request.query_parameters.merge(query_parameters).merge(only_path: true))
   end
+  
+  def custom_t(full_key, **options)
+  key_string = full_key.to_s
+  kind = "budget" # Start with the default kind
 
+  # Infer the kind from the @budget instance variable if it exists.
+  # Since the object is always @budget, we no longer need to check for @election.
+  if instance_variable_defined?(:@budget) && @budget.present?
+    kind = @budget.kind
+  end
+
+  # Only apply special logic if the key matches our patterns
+  if key_string.start_with?("admin.budgets") || key_string.start_with?("budgets")
+    plural_kind = kind.pluralize
+
+    # Replace the base term "budgets" with the dynamic term from the kind
+    primary_key = key_string.sub("budgets", plural_kind)
+
+    # The original key is always the fallback
+    fallback_key = key_string.to_sym
+
+
+    # --- Add these lines for debugging ---
+Rails.logger.debug "--- Debug custom_t ---"
+Rails.logger.debug "Original Key: #{key_string}"
+Rails.logger.debug "Inferred Kind: #{kind}"
+Rails.logger.debug "Primary Key (Attempting): #{primary_key}"
+Rails.logger.debug "Fallback Key: #{fallback_key}"
+# ------------------------------------
+
+    # Call the translation helper with the new primary key and fallback
+    t(primary_key, default: fallback_key, **options)
+    
+  else
+    # For all other keys, behave like the normal t() helper
+    t(key_string, **options)
+  end
+end
+  
+
+      
   def rtl?(locale = I18n.locale)
     %i[ar fa he].include?(locale)
   end
