@@ -259,4 +259,17 @@
    @include shared-styles;
 }
 
+ .site-highland {
+  --brand: #522e91;
+  --brand-secondary: #00833e;
+  --brand-contrast: #FFFFFF;
+  --footer: #0069aa;
+  --footer-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+   --top-links: #00833e;
+  --top-links-contrast: #FFFFFF;
+  @import "cosla_shared";
+  @include shared-styles;
+  }
+
 
