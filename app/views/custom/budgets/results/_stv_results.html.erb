@@ -31,8 +31,9 @@
 <% end %>
 
 <hr>
-<%# Find the STV report document attached to the budget %>
-<% stv_report_document = @budget.documents.find_by(title: "STV Full Report") %>
+<% document_title = "STV Full Report: #{@heading.name}" %>
+<%# Find the STV report document attached to the budget heading %>
+<% stv_report_document = @heading.documents.find_by(title: document_title) %>
 
 <%# Display the download link if the document exists %>
 <% if stv_report_document %>

@@ -21,12 +21,12 @@
 <%= render_image(investment.image, :large, true) if investment.image.present? %>
 
 <p id="investment_code">
-  <%= sanitize(t("budgets.investments.show.code", code: investment.id)) %>
+  <%= sanitize(custom_t("budgets.investments.show.code", code: investment.id)) %>
 </p>
 
  <div>
 <% if investment.should_show_estimated_price? %>
-  <h3><%= t("budgets.investments.show.estimated_price") %></h3>
+  <h3><%= custom_t("budgets.investments.show.estimated_price") %></h3>
   <p class="investment-project-amount">
     <%= investment.formatted_estimated_price %>
   </p>
@@ -35,10 +35,10 @@
 </div>
 <div>
 
-<h3><%= t("budgets.investments.show.summary") %></h3>
+<h3><%= custom_t("budgets.investments.show.summary") %></h3>
 <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
 <hr>
-<h3><%= t("budgets.investments.show.description") %></h3>
+<h3><%= custom_t("budgets.investments.show.description") %></h3>
 <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
 </div>
 <hr>
@@ -55,7 +55,7 @@
         <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
       <% else %>
         <%# Optional: Show a placeholder if the user is not authorized. %>
-        <em><small><%= t("custom.answers.private_answer_placeholder", default: "The answer to this question is private.") %></small></em>
+        <em><small><%= custom_t("custom.answers.private_answer_placeholder", default: "The answer to this question is private.") %></small></em>
       <% end %>
 
     <% end %>
@@ -68,7 +68,7 @@
   <div class="video-link">
     <p>
       <span class="icon-video"></span>&nbsp;
-      <strong><%= t("proposals.show.title_video_url") %></strong>
+      <strong><%= custom_t("proposals.show.title_video_url") %></strong>
     </p>
     <%= sanitize_and_auto_link @investment.video_url %>
   </div>
@@ -82,13 +82,13 @@
 
 <% if investment.location.present? %>
   <p>
-    <%= sanitize(t("budgets.investments.show.location", location: investment.location)) %>
+    <%= sanitize(custom_t("budgets.investments.show.location", location: investment.location)) %>
   </p>
 <% end %>
 
 <% if investment.organization_name.present? %>
   <p>
-    <%= sanitize(t("budgets.investments.show.organization_name", name: investment.organization_name)) %>
+    <%= sanitize(custom_t("budgets.investments.show.organization_name", name: investment.organization_name)) %>
   </p>
 <% end %>
 
@@ -105,13 +105,13 @@
 <% end %>
 
 <% if investment.should_show_unfeasibility_explanation? %>
-  <h2><%= t("budgets.investments.show.unfeasibility_explanation") %></h2>
+  <h2><%= custom_t("budgets.investments.show.unfeasibility_explanation") %></h2>
   <p><%= investment.unfeasibility_explanation %></p>
 <% end %>
 
 <% if investment.should_show_price_explanation? %>
   <h2 id="price_explanation" data-magellan-target="price_explanation">
-    <%= t("budgets.investments.show.price_explanation") %>
+    <%= custom_t("budgets.investments.show.price_explanation") %>
   </h2>
   <p><%= investment.price_explanation %></p>
 <% end %>
