@@ -310,6 +310,7 @@ Devise.setup do |config|
     saml_settings[:idp_sso_service_url] = Rails.application.secrets.saml_idp_sso_service_url
     saml_settings[:sp_entity_id] = Rails.application.secrets.saml_sp_entity_id
     saml_settings[:allowed_clock_drift] = 1.hour
+    saml_setttings[:idp_cert] = Rails.application.secrets.saml_idp_cert
     saml_settings[:idp_cert_multi] = nil
     saml_settings[:certificate] = Rails.application.secrets.saml_certificate
     saml_settings[:private_key] = Rails.application.secrets.saml_private_key
