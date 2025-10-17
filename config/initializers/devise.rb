@@ -310,13 +310,13 @@ Devise.setup do |config|
     saml_settings[:idp_sso_service_url] = Rails.application.secrets.saml_idp_sso_service_url
     saml_settings[:sp_entity_id] = Rails.application.secrets.saml_sp_entity_id
     saml_settings[:allowed_clock_drift] = 1.hour
-
+    saml_settings[:idp_cert_multi] = nil
     saml_settings[:certificate] = Rails.application.secrets.saml_certificate
     saml_settings[:private_key] = Rails.application.secrets.saml_private_key
     saml_settings[:issuer] = Rails.application.secrets.saml_issuer
     saml_settings[:name_identifier_format] = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
-    saml_settings[:security] = { authn_requests_signed: false,
-                    want_assertions_signed: false,
+    saml_settings[:security] = { authn_requests_signed: true,
+                    want_assertions_signed: true,
                     want_assertions_encrypted: true,
                     metadata_signed: false,
                     embed_sign: false,
