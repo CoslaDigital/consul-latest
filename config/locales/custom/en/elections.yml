@@ -45,21 +45,21 @@ en:
     phase:
       drafting: Draft (Not visible to the public)
       informing: Information
-      accepting: Accepting projects
-      reviewing: Reviewing projects
-      selecting: Selecting projects
-      valuating: Valuating projects
-      publishing_prices: Publishing projects prices
-      balloting: Voting projects
+      accepting: Accepting candidates
+      reviewing: Reviewing candidates
+      selecting: Selecting candidates
+      valuating: Evaluating Candidates
+      publishing_prices: Publishing Candidates
+      balloting: Voting
       reviewing_ballots: Reviewing voting
-      finished: Finished budget
+      finished: Finished Election
     index:
       title: Elections
-      empty_budgets: There are no budgets.
+      empty_budgets: There are no elections.
       section_header:
         icon_alt: Elections icon
         title: Elections
-        help: Help with participatory budgets
+        help: Help with elections
       all_phases: Elections phases
       next_phase: Next phase
       prev_phase: Previous phase
@@ -107,8 +107,8 @@ en:
               one: "<strong>You voted one proposal with a cost of %{amount_spent}</strong>"
               other: "<strong>You voted %{count} proposals with a cost of %{amount_spent}</strong>"
             approval:
-              one: "<strong>You voted one proposal</strong>"
-              other: "<strong>You voted %{count} proposals</strong>"
+              one: "<strong>You voted for one candidate</strong>"
+              other: "<strong>You voted %{count} candidates</strong>"
           change_vote_info:
             knapsack: "You can %{link} at any time until %{phase_end_date}. No need to spend all the money available."
             approval: "You can %{link} at any time until %{phase_end_date}."
@@ -116,11 +116,11 @@ en:
           different_heading_assigned: "You have active votes in another heading: %{heading_link}"
           change_ballot: "If you change your mind you can remove your votes in %{check_ballot} and start again."
           check_ballot_link: "check my votes"
-          zero: You have not voted any candidate project in this group.
+          zero: You have not voted any candidate in this group.
           verified_only: "To create a new candidate %{verify}."
           create: "Create a candidate"
           not_logged_in: "To create a new candidate you must %{sign_in} or %{sign_up}."
-        filter: "Filtering projects by"
+        filter: "Filtering candidates by"
         filters:
           not_unfeasible: "Active"
           selected: "Active"
@@ -132,7 +132,7 @@ en:
           confidence_score: highest rated
           price: by price
       share:
-        message: "I created the investment project %{title} in %{handle}. Create an investment project too!"
+        message: "I created a nomination %{title} in %{handle}. Create a nomination too!"
       show:
         author_deleted: User deleted
         price_explanation: Price explanation
@@ -150,7 +150,7 @@ en:
         comments_tab: Comments
         milestones_tab: Milestones
         author: Author
-        project_unfeasible: "This investment project <strong>has been marked as not feasible</strong> and will not go to balloting phase."
+        project_unfeasible: "This candidate <strong>has been marked as not feasible</strong> and will not go to balloting phase."
         project_selected: "This investment project <strong>has been selected</strong> for balloting phase."
         project_winner: "Winning candidate"
         project_not_selected: "This investment project <strong>has not been selected</strong> for balloting phase."
@@ -172,10 +172,10 @@ en:
         check_ballot_link: "check my votes"
         price: "Total budget"
       votes:
-        already_supported: "You have already supported this investment project. Share it!"
+        already_supported: "You have already supported this candidate. Share it!"
         confirm_group:
-          one: "You can only support investments in %{count} district. If you continue you cannot change the election of your district. Are you sure?"
-          other: "You can only support investments in %{count} districts. If you continue you cannot change the election of your district. Are you sure?"
+          one: "You can only support candidates in %{count} district. If you continue you cannot change the election of your district. Are you sure?"
+          other: "You can only support candidates in %{count} districts. If you continue you cannot change the election of your district. Are you sure?"
         remove_support: "Remove your support"
         remove_support_label: "Remove your support to %{investment}"
         support: "Support"
@@ -210,19 +210,19 @@ en:
       show_all_link: Show all
       price: Price
       amount_available: Available budget
-      accepted: "Accepted investment: "
+      accepted: "Accepted candidate: "
       discarded: "Discarded investment: "
       incompatibles: Incompatibles
       investment_title: Candidate name
       investment_proyects: List of all candidates
-      unfeasible_investment_proyects: List of all unfeasible investment projects
-      not_selected_investment_proyects: List of all investment projects not selected for balloting
+      unfeasible_investment_proyects: List of all unfeasible candidates
+      not_selected_investment_proyects: List of all candidates not selected for balloting
     executions:
       link: "Milestones"
       page_title: "%{budget} - Milestones"
       heading: "Participatory budget Milestones"
       heading_selection_title: "By district"
-      no_winner_investments: "No winner investments in this state"
+      no_winner_investments: "No winning candidates in this state"
       filters:
         status:
           label: "Project's current state"
