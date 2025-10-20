@@ -3,10 +3,22 @@
 
 <%= render "devise/omniauth_form", action: "sign_in" %>
 
+<div class="small-12 column">
+        <%# This block will only render if your secrets are configured %>
+        <% if ys_configured? %>
+          <p>
+            <%= link_to "Sign in with your YS Number", new_ys_login_path, class: "button hollow" %>
+         </p>
+        <% end %>
+      </div>
+
+
 <p>
   <%= sanitize(t("devise_views.shared.links.signup",
                  signup_link: link_to(t("devise_views.shared.links.signup_link"), new_user_registration_path))) %>
 </p>
+
+
 
 <div id="admin_login" style="visibility:<%= Setting.hide_local_login? ? "hidden" : "visible" %>">
 
@@ -15,12 +27,6 @@
 
   <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
     <div class="row">
-      <div class="small-12 column">
-        <%# This block will only render if your secrets are configured %>
-        <% if ys_configured? %>
-          <p class="help-text"><em><%= t("devise.sessions.ys_sign_in_description") %></em></p>
-        <% end %>
-      </div>
       <div class="small-12 column">
         <%= f.text_field :login, autofocus: true %>
       </div>
