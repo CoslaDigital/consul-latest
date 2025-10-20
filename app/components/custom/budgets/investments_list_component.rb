@@ -1,0 +1,35 @@
+class Budgets::InvestmentsListComponent < ApplicationComponent; end
+
+load Rails.root.join("app","components","budgets","investments_list_component.rb")
+
+class Budgets::InvestmentsListComponent < ApplicationComponent
+  attr_reader :budget
+  use_helpers :custom_t
+  
+  
+  def initialize(budget)
+    @budget = budget
+  end
+
+  def investments(limit: 9)
+    case budget.phase
+    when "accepting", "reviewing"
+      budget.investments.sample(limit)
+    when "selecting", "valuating"
+      budget.investments.feasible.sample(limit)
+    when "publishing_prices", "balloting", "reviewing_ballots"
+      budget.investments.selected.sample(limit)
+    else
+      budget.investments.none
+    end
+  end
+
+
+  def see_all_path
+    if budget.single_heading?
+      budget_investments_path(budget)
+    else
+      budget_groups_path(budget)
+    end
+  end
+end
