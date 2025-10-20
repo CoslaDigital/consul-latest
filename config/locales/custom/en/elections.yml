@@ -55,6 +55,7 @@ en:
       finished: Finished Election
     index:
       title: Elections
+      budget_investments: Candidates
       empty_budgets: There are no elections.
       section_header:
         icon_alt: Elections icon
@@ -235,3 +236,278 @@ en:
         dates_range_invalid: "Start date can't be equal or later than End date"
         prev_phase_dates_invalid: "Start date must be later than the start date of the previous enabled phase (%{phase_name})"
         next_phase_dates_invalid: "End date must be earlier than the end date of the next enabled phase (%{phase_name})"
+  admin:
+    budgets:
+      actions:
+        ballots: "Create booths"
+        confirm:
+          ballots: "Are you sure? This action is only necessary if you're going to use physical booths during the final voting phase. Citizens will still be able to vote via web with or without physical booths."
+          destroy: "Are you sure? This will delete the budget and all its associated groups and headings. This action cannot be undone."
+        descriptions:
+          ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
+          calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
+          destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
+          questions: "Create form fields to be displayed on budget investments" 
+        edit: "Edit budget"
+        preview: "Preview"
+        preview_results: "Preview results"
+        questions: "Manage Questions"
+      index:
+        title: Participatory budgets
+        new_link: Create new budget
+        filter: Filter
+        filters:
+          all: All
+          open: Open
+          finished: Finished
+        budget_investments: Election Candidates
+        table_budget_type: "Type"
+        table_completed: Completed
+        table_draft: "Draft"
+        table_duration: "Duration"
+        table_name: Name
+        table_phase: Phase
+        table_phase_progress: "(%{current_phase_number}/%{total_phases})"
+        type_multiple: "Multiple headings"
+        type_pending: "Pending: No headings yet"
+        type_single: "Single heading"
+        admin_ballots: Ballots
+        no_budgets: "There are no budgets."
+      create:
+        notice: New participatory budget created successfully!
+      update:
+        notice: Participatory budget updated successfully
+      publish:
+        notice: "Participatory budget published successfully"
+      edit:
+        title: Edit Election
+        drafting: "This participatory budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
+        publish: "Publish election"
+        delete: Delete budget
+        phase: Phase
+        phases_caption: "Phases"
+        phases_table_help_text: "The configuration of these phases is used for information purposes only. Its function is to define the phases information displayed on the public page of the participatory budget."
+        duration: "Duration"
+        enabled: Enabled
+        actions: Actions
+        enable_phase: "Enable %{phase} phase"
+        active: Active
+        blank_dates: Dates are blank
+        administrators:
+          zero: "Select administrators"
+          one: "1 administrator selected"
+          other: "%{count} administrators selected"
+        valuators:
+          zero: "Select valuators"
+          one: "1 valuator selected"
+          other: "%{count} valuators selected"
+        empty_administrators: "There are no administrators"
+        empty_valuators: "There are no valuators"
+        name_description: "This is the name of the participatory budget used on the header and cards whenever it is active"
+        image_description: "If an image is uploaded it will be used as the banner on top of this participatory budget, otherwise the default color for budgets will be used."
+        main_call_to_action: "Main call to action (optional)"
+        main_call_to_action_description: "This link will appear on main banner of this participatory budget and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
+        info:
+          budget_settings: "General participatory budget settings"
+          staff_settings: "Administrators and Valuators assigned to the budget"
+        hide_money: "Hide money"
+        hide_money_help_text: "If this option is checked, all fields showing the amount of money will be hidden throughout the process."
+        part_fund: "Part Fund Winners"
+        part_fund_help_text: "If this option is checked, if there is insufficient budget left, the next most voted for investment will be offered part funding"
+        stv_dynamic_quota: "Dynamic Quota"
+        stv_dynamic_quota_help_text: "Recalculate the quota after each round based on remaining valid votes and seats."
+        stv: "Use Single Transferable Vote"
+        stv_help_text: "To be use with Elections and using approval voting"
+        stv_winners: "Number of seats"
+        stv_winners_help_text: "This is the total number of seats being elected in this election"
+      destroy:
+        success_notice: Budget deleted successfully
+        unable_notice: You cannot delete a budget that has associated investments
+        unable_notice_polls: You cannot delete a budget that has an associated poll
+      new:
+        title_multiple: New multiple headings budget
+        title_single: New single heading budget
+      help:
+        budgets: "Participatory budgets allow citizens to propose and decide directly how to spend part of the budget, with monitoring and rigorous evaluation of proposals by the institution."
+        budget_questions: "Here you can create, edit, and manage the questions that will be presented as part of the application form for this budget."
+        groups:
+          multiple: "Groups are meant to organize headings. After a group is created and it contains headings, it's possible to determine in how many headings a user can vote per group."
+          single: "Groups are meant to organize headings, since this budget will only contain one heading, the same name can be used because it will not appear anywhere. You can just continue with the next step."
+        headings:
+          multiple: "Headings are meant to divide the money of the participatory budget. Here you can add headings for this group and assign the amount of money that will be used for each heading."
+          single: "Headings are meant to divide the money of the participatory budget. Since this budget will only contain one heading, this is the place where you stablish the money that will be spent in this participaroty budget."
+        phases: "Participatory budgets have different phases. Here you can enable or disable phases and also customize each individual phase. The configuration of these phases is used for information purposes only and will be displayed on the public page of the participatory budget."
+      show:
+        add_group: "Add group"
+        add_heading: "Add heading"
+        groups_and_headings: "Heading groups"
+        headings_caption: "Headings in %{group}"
+      winners:
+        calculate: Calculate Winner Investments
+        calculated: Winners being calculated, it may take a minute.
+        recalculate: Recalculate Winner Investments
+      ballots:
+        feature_disabled: 'The feature <strong>Polls</strong> must be enabled to create booths. You can enable it from the <a href="%{link}">settings configuration</a> page.'
+    budget_groups:
+      name: "Name"
+      headings_name: "Headings"
+      headings_manage: "Headings"
+      no_groups: "There are no groups."
+      amount:
+        one: "There is 1 group"
+        other: "There are %{count} groups"
+      create:
+        notice: "Group created successfully!"
+      update:
+        notice: "Group updated successfully"
+      destroy:
+        success_notice: "Group deleted successfully"
+        unable_notice: "You cannot delete a Group that has associated headings"
+      form:
+        create: "Create new group"
+        edit: "Edit group"
+        max_votable_headings_info: "Only applies to the selecting projects phase. During the voting projects phase users can only vote in one heading per group."
+        submit: "Save group"
+      index:
+        new_button: "Add new group"
+    budget_headings:
+      no_headings: "There are no headings in the <strong>%{group}</strong> group."
+      create:
+        notice: "Heading created successfully!"
+      update:
+        notice: "Heading updated successfully"
+      destroy:
+        success_notice: "Heading deleted successfully"
+        unable_notice: "You cannot delete a Heading that has associated investments"
+      form:
+        geozone_info: "When a heading is associated with a geozone, the geozone will appear on this budget's map if the geozone includes GeoJSON data."
+        max_ballot_lines_info: 'Maximum number of projects a user can vote on this heading during the "Voting projects" phase. Only for budgets using approval voting.'
+        population_info: "Budget Heading population field is used for Statistic purposes at the end of the Budget to show for each Heading that represents an area with population what percentage voted. The field is optional so you can leave it empty if it doesn't apply."
+        coordinates_info: "If latitude and longitude are provided, the investments page for this heading will include a map. This map will be centered using those coordinates."
+        content_blocks_info: "If allow content block is checked, you will be able to create custom content related to this heading from the section Site content > Custom content blocks. This content will appear on the investments page for this heading."
+        create: "Create new heading"
+        edit: "Edit heading"
+        submit: "Save heading"
+      group_switcher:
+        currently_showing: "Showing headings from the <strong>%{group}</strong> group."
+        the_other_group: "Manage headings from the %{group} group."
+      index:
+        back: "Go back to groups"
+        new_button: "Add new heading"
+        title: "%{budget} / %{group} headings"
+    budget_phases:
+      edit:
+        title: "Edit phase"
+        dates_help_text: "For information purposes only"
+        description_help_text: This text will appear in the header when the phase is active
+        duration: "Phase's duration"
+        duration_description: "These fields are used for information purposes only and <strong>do not trigger an automatic update of the active phase.</strong> In order to update it, edit the budget and select the active phase."
+        enabled_help_text: "This phase will be public in the budget's phases timeline"
+        image_description: "If an image is uploaded it will be displayed next to the description of this phase."
+        main_call_to_action: "Main call to action (optional)"
+        main_call_to_action_description: "This link will appear on main banner of this participatory budget when this phase is enabled and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
+        name_help_text: "This is the title of the phase users will read on the header whenever this phase is active."
+        save_changes: Save changes
+      index:
+        title: "%{budget} phases"
+    budget_investments:
+      index:
+        basic_filters:
+          valuator_or_group: Valuator or group
+          title_or_id: Title or ID
+        heading_filter_all: All headings
+        administrator_filter_all: All administrators
+        valuator_filter_all: All valuators
+        tags_filter_all: All tags
+        advanced_filters: Advanced filters
+        filters:
+          all: All
+          without_admin: Without assigned admin
+          without_valuator: Without assigned valuator
+          under_valuation: Under valuation
+          valuation_finished: Valuation finished
+          feasible: Feasible
+          selected: Selected
+          undecided: Undecided
+          unfeasible: Unfeasible
+          min_total_supports: Minimum supports
+          max_total_supports: Maximum supports
+          winners: Winners
+          one_filter: "Current applied filters: <b><em>%{filter}</em></b>"
+          two_filters: "Current applied filters: <b><em>%{filter}, %{advanced_filters}</em></b>"
+        buttons:
+          filter: Filter
+        download_current_selection: "Download current selection"
+        no_budget_investments: "There are no investment projects."
+        title: Investment projects
+        columns: Columns
+        assigned_admin: Assigned administrator
+        no_admin_assigned: No admin assigned
+        no_valuators_assigned: No valuators assigned
+        feasibility:
+          feasible: "Feasible"
+          unfeasible: "Unfeasible"
+          undecided: "Undecided"
+        selected: "Selected"
+        list:
+          id: ID
+          title: Title
+          summary: Summary
+          description: Description
+          supports: Supports
+          admin: Administrator
+          valuator: Valuator
+          valuation_group: Valuation Group
+          geozone: Scope of operation
+          feasibility: Feasibility
+          valuation_finished: Val. Fin.
+          selected: Selected
+          visible_to_valuators: Show to valuators
+          author_username: Author username
+          incompatible: Incompatible
+          price: Price
+          author: Author
+          author_email: Email
+          ballot_lines_count: Votes
+          winner: Winner
+        cannot_calculate_winners: The budget has to stay on phase "%{phase}" in order to calculate winners projects
+        see_results: "See results"
+        milestone_tags_filter_all: "All milestone tags"
+      show:
+        assigned_admin: Assigned administrator
+        assigned_valuators: Assigned valuators
+        classification: Classification
+        info: "%{budget_name} - Group: %{group_name} - Investment project %{id}"
+        edit: Edit
+        edit_classification: Edit classification
+        by: By
+        sent: Sent
+        group: Group
+        heading: Heading
+        dossier: Dossier
+        edit_dossier: Edit dossier
+        tags: Tags
+        undefined: Undefined
+        compatibility:
+          title: Compatibility
+          "true": Incompatible
+          "false": Compatible
+        selection:
+          title: Selection
+        winner:
+          title: Winner
+          "true": "Yes"
+          "false": "No"
+        valuator_groups: "Valuator Groups"
+        preview: Investment preview
+      edit:
+        classification: Classification
+        compatibility: Compatibility
+        selection: Selection
+        assigned_valuators: Valuators
+        select_heading: Select heading
+        submit_button: Update
+        user_tags: User assigned tags
+        tags_placeholder: "Write the tags you want separated by commas (,)"
+        undefined: Undefined
+      search_unfeasible: Search unfeasible
