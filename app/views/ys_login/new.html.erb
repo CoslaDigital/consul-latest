@@ -1,11 +1,13 @@
-<h2>Sign in with your YS Number</h2>
+<h2>Sign in with your Young Scot Number</h2>
 <p>Please enter your 16-digit number to sign in or create an account.</p>
 
 <%= form_with url: ys_login_path, scope: :user, local: true do |f| %>
   <div class="row">
     <div class="small-12 column">
-      <%= f.label :username, "16-Digit Number" %>
-      <%= f.text_field :username, autofocus: true, required: true %>
+       <%= f.text_field :username, 
+                   autofocus: true, 
+                   required: true, 
+                   label: t('ys_login.form.username_label') %>
     </div>
 
     <div class="small-12 medium-6 column">
