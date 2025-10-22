@@ -8,7 +8,7 @@
 
     <% unless budget.single_heading? %>
       <div>
-          <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: t("budgets.investments.form.heading_note"), class: "html-area" } %>
+          <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: custom_t("budgets.investments.form.heading_note"), class: "html-area" } %>
       </div>
     <% end %>
 
@@ -19,29 +19,33 @@
     <%= f.translatable_fields do |translations_form| %>
       <div>
         <%= translations_form.text_field :title,
-                                         hint: t("budgets.investments.form.subtitle_note"),
+                                         label: custom_t("budgets.investments.form.form_title"),
+                                         hint: custom_t("budgets.investments.form.subtitle_note"),
                                          maxlength: Budget::Investment.title_max_length,
                                          data: suggest_data(investment) %>
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
       <div>
       <%= f.text_area :summary,
-                      label: t("budgets.investments.form.summary"),
+                      label: custom_t("budgets.investments.form.summary"),
                       rows: 4, maxlength: 500,
-                      hint: t("budgets.investments.form.summary_note") %>
+                      hint: custom_t("budgets.investments.form.summary_note") %>
       </div>
 
       <div>
         <%= translations_form.text_area :description,
-                                        hint: t("budgets.investments.form.description_note"),
+                                        label: custom_t("budgets.investments.form.description"),
+                                        hint: custom_t("budgets.investments.form.description_note"),
                                         maxlength: Budget::Investment.description_max_length,
                                         class: "html-area" %>
       </div>
-      <div>
-          <h2> Estimated Cost of Project </h2>
-          <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
-       </div>
 
+      <% unless budget.hide_money %>
+        <div>
+          <h2>Estimated Cost of Project</h2>
+          <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
+        </div>
+      <% end %>
   <% end %>
   <%= f.fields_for :answers do |builder| %>
   <%# Get the corresponding question for this answer %>
@@ -69,7 +73,6 @@
   <% end %>
 <% end %>
   </fieldset>
-
   <%= f.invisible_captcha :subtitle %>
 
   <fieldset>
@@ -98,7 +101,7 @@
                    i18n_namespace: "budgets.investments" %>
       </div>
     <% end %>
-
+    <% unless budget.hide_money %>
     <div id="location">
       <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
@@ -106,7 +109,7 @@
     <div id="org_name">
       <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
     </div>
-
+    <% end %>
     <div id="tags">
       <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
       <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
@@ -117,7 +120,7 @@
           <a class="js-add-tag-link"><%= tag.name %></a>
         <% end %>
       </div>
-
+      
       <br>
       <%= f.text_field :tag_list, value: investment.tag_list.to_s,
                                   label: false,
