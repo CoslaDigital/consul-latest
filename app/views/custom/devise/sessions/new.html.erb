@@ -4,13 +4,29 @@
 <%= render "devise/omniauth_form", action: "sign_in" %>
 
 <div class="small-12 column">
-        <%# This block will only render if your secrets are configured %>
-        <% if ys_configured? %>
-          <p>
-            <%= link_to "Sign in with your YS Number", new_ys_login_path, class: "button hollow" %>
-         </p>
-        <% end %>
-      </div>
+<style>
+  .image-background-box {
+    /* Use the asset_path helper to correctly reference the image */
+    background-image: url(<%= asset_path 'saltire.jpg' %>);
+    background-size: cover; /* This makes the image cover the whole div */
+    background-position: center; /* This centers the image in the div */
+    padding: 40px 20px; /* Adds some space so the content doesn't touch the edges */
+    border-radius: 8px; /* Optional: adds rounded corners */
+  }
+</style>
+
+<%# Wrap the original div with our new background div %>
+<div class="image-background-box">
+  <div class="small-12 column">
+    <%# This block will only render if your secrets are configured %>
+    <% if ys_configured? %>
+      <p>
+        <%= link_to "Sign in with your Young Scot Number", new_ys_login_path, class: "button" %>
+      </p>
+    <% end %>
+  </div>
+</div>
+</div>
 
 
 <p>
