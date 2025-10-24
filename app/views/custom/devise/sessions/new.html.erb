@@ -14,18 +14,19 @@
     border-radius: 8px; /* Optional: adds rounded corners */
   }
 </style>
-
+    <% if ys_configured? %>
 <%# Wrap the original div with our new background div %>
 <div class="image-background-box">
   <div class="small-12 column">
     <%# This block will only render if your secrets are configured %>
-    <% if ys_configured? %>
+
       <p>
         <%= link_to "Sign in with your Young Scot Number", new_ys_login_path, class: "button" %>
       </p>
-    <% end %>
+
   </div>
 </div>
+    <% end %>
 </div>
 
 
