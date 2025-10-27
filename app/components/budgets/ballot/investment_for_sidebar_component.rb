@@ -1,10 +1,11 @@
 class Budgets::Ballot::InvestmentForSidebarComponent < Budgets::Ballot::InvestmentComponent
   with_collection_parameter :investment
-  attr_reader :investment_ids
+  attr_reader :investment, :investment_ids, :preference_number
 
-  def initialize(investment:, investment_ids:)
+  def initialize(investment:, investment_ids:,investment_iteration: nil)
     super(investment: investment)
     @investment_ids = investment_ids
+    @preference_number = investment_iteration&.index&.+(1)
   end
 
   private

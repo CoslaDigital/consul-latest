@@ -20,6 +20,10 @@ class Budgets::Investments::MyBallotComponent < ApplicationComponent
     end
 
     def investments
-      ballot.investments.by_heading(heading.id).sort_by_ballot_lines
+#      ballot.investments.by_heading(heading.id).sort_by_ballot_lines
+       ballot.investments
+            .where(budget_ballot_lines: { heading_id: heading.id })
+            .order("budget_ballot_lines.position ASC")
+ 
     end
 end
