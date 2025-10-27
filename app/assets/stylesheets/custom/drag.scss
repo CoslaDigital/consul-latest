@@ -1,0 +1,26 @@
+.drag-handle {
+  cursor: grab;
+  margin-right: 10px;
+  color: #777;
+  display: inline-block;
+  vertical-align: middle;
+  
+  // This is vital for mobile: it prevents the page from
+  // scrolling when the user tries to drag an item.
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// This is the placeholder style for jQuery UI Sortable
+.sortable-placeholder {
+  // You should adjust this height to match your list item height
+  height: 50px; 
+  background: #f0f0f0;
+  border: 2px dashed #ccc;
+  
+  // This ensures the placeholder is visible
+  visibility: visible !important;
+}
