@@ -18,6 +18,8 @@ resources :budgets, only: [:show, :index] do
 
   resource :ballot, only: :show, controller: "budgets/ballots" do
     resources :lines, controller: "budgets/ballot/lines", only: [:create, :destroy]
+    
+    patch :reorder, on: :member
   end
 
   resource :results, only: :show, controller: "budgets/results"
