@@ -35,7 +35,9 @@
           </p>
         <% end %>
 
-        <ul class="ballot-list">
+        <ul class="ballot-list"
+            data-controller="reorder"
+            data-reorder-url="<%= reorder_budget_ballot_path(ballot.budget, group_id: group.id) %>">
           <%= render Budgets::Ballot::InvestmentComponent.with_collection(group_investments(group)) %>
         </ul>
       </div>
