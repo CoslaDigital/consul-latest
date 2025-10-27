@@ -1,8 +1,9 @@
 class Budgets::Ballot::InvestmentComponent < ApplicationComponent
-  attr_reader :investment
+  attr_reader :investment, :preference_number
 
-  def initialize(investment:)
+  def initialize(investment:, investment_iteration: nil)
     @investment = investment
+    @preference_number = investment_iteration&.index&.+(1)
   end
 
   private

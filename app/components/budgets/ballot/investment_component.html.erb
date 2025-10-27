@@ -1,14 +1,31 @@
 <li id="<%= list_item_id %>">
+
+  <%# This wrapper div floats the whole action-block to the right %>
+  <%# 'text-right' ensures the button and text inside it are right-aligned %>
+  <div class="float-right text-right">
+
+    <%# 1. The Delete Button %>
+    <% if budget.balloting? %>
+      <%= button_to delete_path,
+                    title: t("budgets.ballots.show.remove"),
+                    class: "remove-budget-investment",
+                    method: :delete,
+                    remote: true do %>
+        <span class="show-for-sr"><%= t("budgets.ballots.show.remove") %></span>
+      <% end %>
+    <% end %>
+
+    <%# 2. The Preference Number (as a div, it will go under the button) %>
+    <% if preference_number %>
+      <div class="preference-order">
+        (<%= t("budgets.ballots.show.preference", default: "Preference") %> <%= preference_number %>)
+      </div>
+    <% end %>
+
+  </div>
+
+  <%# This content will now wrap around the floated div on the left %>
   <%= investment_title %>
   <%= investment_price %>
 
-  <% if budget.balloting? %>
-    <%= button_to delete_path,
-                  title: t("budgets.ballots.show.remove"),
-                  class: "remove-budget-investment",
-                  method: :delete,
-                  remote: true do %>
-      <span class="show-for-sr"><%= t("budgets.ballots.show.remove") %></span>
-    <% end %>
-  <% end %>
 </li>
