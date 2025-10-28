@@ -1,0 +1,44 @@
+<%# --- Pre-calculate all values needed for translation --- %>
+<% voting_style_name = ballot.voting_style.name %>
+<% percentage = ballot.percentage_spent(heading) %>
+
+<%# 1. Translate the inner 'amount_spent' string %>
+<% spent_info = custom_t(
+     "budgets.ballots.show.amount_spent.#{voting_style_name}",
+     count: ballot.formatted_amount_spent(heading)
+   ) %>
+
+<%# 2. Translate the inner 'amount_limit' string %>
+<% limit_info = custom_t(
+     "budgets.ballots.show.amount_limit.#{voting_style_name}",
+     count: ballot.formatted_amount_limit(heading)
+   ) %>
+
+<%# 3. Translate the 'amount_available' string %>
+<% available_info = custom_t(
+     "budgets.ballots.show.amount_available.#{voting_style_name}",
+     count: ballot.formatted_amount_available(heading)
+   ) %>
+
+<%# --- Render the HTML --- %>
+
+<p id="total_amount" class="total-amount">
+  <%# 4. Use the inner strings to build the final 'amount_progress' string %>
+  <%= sanitize(custom_t(
+        "budgets.ballots.show.amount_progress",
+        amount_spent: spent_info,
+        amount_limit: limit_info
+      )) %>
+</p>
+
+<div class="progress" role="progressbar" tabindex="0" aria-labelledby="total_amount"
+     aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+  <div class="progress-meter"
+       style="width: <%= percentage %>%">
+  </div>
+</div>
+
+<p id="amount_available" class="amount-available" style="width: <%= percentage %>%">
+  <%# 5. Use the pre-translated 'amount_available' string %>
+  <%= sanitize(available_info) %>
+</p>
