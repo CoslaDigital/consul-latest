@@ -72,6 +72,8 @@ en:
         title: Help with elections
         description: With the participatory budgets the citizens decide to which projects is destined a part of the budget.
       milestones: Milestones
+      geozone_info: Only residents in the following areas can participate
+      ys_name: Young Scot Card Holders
     investments:
       form:
         title: "Submit a nomination"
