@@ -109,6 +109,7 @@ class I18nContent < ApplicationRecord
     elections.investments.form.map_location_instructions
     elections.investments.form.location_note
     elections.investments.form.organization_name_note
+    elections.investments.form.description
     elections.investments.form.description_note
     elections.investments.form.estimated_price
     elections.investments.form.estimated_price_note
@@ -137,11 +138,8 @@ class I18nContent < ApplicationRecord
     elections.investments.show.votes
     elections.investments.show.comments_tab
     elections.investments.show.author
-    elections.investments.show.project_unfeasible
-    elections.investments.show.project_selected
     elections.investments.show.project_winner
     elections.investments.show.project_not_selected
-    elections.investments.show.see_price_explanation
     elections.investments.investment.add
     elections.investments.investment.add_label
     elections.investments.investment.already_added
@@ -174,45 +172,6 @@ class I18nContent < ApplicationRecord
     elections.executions.filters.status.all
     elections.executions.filters.milestone_tag.label
     elections.executions.filters.milestone_tag.all
-    admin.budgets.index.title
-    admin.budgets.index.new_link
-    admin.budgets.index.filter
-    admin.budgets.index.filters.all
-    admin.budgets.index.filters.open
-    admin.budgets.index.filters.finished
-    admin.budgets.index.budget_investments
-    admin.budgets.edit.drafting
-    admin.budgets.edit.publish
-    admin.budgets.edit.delete
-    admin.budgets.edit.phase
-    admin.budgets.edit.phases_caption
-    admin.budgets.edit.phases_table_help_text
-    admin.budgets.edit.duration
-    admin.budgets.edit.enabled
-    admin.budgets.edit.actions
-    admin.budgets.edit.enable_phase
-    admin.budgets.edit.active
-    admin.budgets.edit.blank_dates
-    admin.budgets.edit.administrators.zero
-    admin.budgets.edit.administrators.one
-    admin.budgets.edit.administrators.other
-    admin.budgets.edit.valuators.zero
-    admin.budgets.edit.valuators.one
-    admin.budgets.edit.valuators.other
-    admin.budgets.edit.empty_administrators
-    admin.budgets.edit.empty_valuators
-    admin.budgets.edit.name_description
-    admin.budgets.edit.image_description
-    admin.budgets.edit.main_call_to_action
-    admin.budgets.edit.main_call_to_action_description
-    admin.budgets.edit.info.budget_settings
-    admin.budgets.edit.info.staff_settings
-    admin.budgets.edit.stv_dynamic_quota
-    admin.budgets.edit.stv_dynamic_quota_help_text
-    admin.budgets.edit.stv
-    admin.budgets.edit.stv_help_text
-    admin.budgets.edit.stv_winners
-    admin.budgets.edit.stv_winners_help_text
   ]
 end
 
