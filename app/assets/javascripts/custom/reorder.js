@@ -15,7 +15,7 @@ var initializeSortable = function() {
 
     $list.sortable({
       // 1. The element to click and drag
-      handle: '.drag-handle',
+      handle: '.ballot-item__handle, .drag-handle',
       
       // 2. The items inside the list to be sorted
       items: 'li[data-reorder-target="item"]',

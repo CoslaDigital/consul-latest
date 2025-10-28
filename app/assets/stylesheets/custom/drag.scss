@@ -23,3 +23,85 @@
   // This ensures the placeholder is visible
   visibility: visible !important;
 }
+
+
+/* The main list item, styled as a "card" */
+.ballot-item {
+  display: flex;            // Use Flexbox
+  align-items: center;      // Vertically center all content
+  background: #f5f5f5;      // The "shaded background"
+  border-radius: 8px;       // Rounded corners for a button/card feel
+  padding: 12px 16px;       // Consistent internal spacing
+  margin-bottom: 8px;       // Space between items
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); // Subtle lift
+  transition: box-shadow 0.2s ease;
+
+  // Make it look like it's being "picked up"
+  &.sortable-ghost {
+    background: #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+}
+
+/* 1. The Drag Handle */
+.ballot-item__handle {
+  cursor: grab;
+  color: #777;
+  font-size: 1.5rem;    // Make the icon a bit larger
+  padding-right: 16px;  // Space between handle and text
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* 2. The Title/Price Content Block */
+.ballot-item__content {
+  flex-grow: 1;           // CRITICAL: This makes it take all available middle space
+  flex-shrink: 1;         // Allow it to shrink if needed
+  min-width: 0;           // Prevents long titles from breaking the layout
+  
+  // Stacks the title and price vertically
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ballot-item__title {
+  a { // Assuming investment_title returns a link
+    font-weight: bold;
+    color: #222;
+    text-decoration: none;
+
+    // Handle very long titles gracefully
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Style for the price (assuming helper creates .ballot-list-price) */
+.ballot-list-price {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* 3. The Actions Block (Delete/Preference) */
+.ballot-item__actions {
+  flex-shrink: 0;         // Don't let this block shrink
+  text-align: right;
+  padding-left: 16px;     // Space from the content
+
+  .remove-budget-investment {
+    // Your existing styles for the delete button
+    // You may want to ensure it's small and clean
+    margin-bottom: 4px;
+  }
+
+  .preference-order {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #007bff; // Make the preference stand out
+  }
+}
