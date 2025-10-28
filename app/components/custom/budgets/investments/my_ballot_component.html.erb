@@ -1,0 +1,64 @@
+<div class="my-ballot">
+  <h2 class="sidebar-title">
+    <%= t("budgets.investments.index.sidebar.my_ballot") %>
+  </h2>
+
+  <% if investments.count > 0 %>
+    <p>
+      <em><%= sanitize(custom_t(
+        "budgets.investments.index.sidebar.voted_info.#{voting_style_name}",
+        count: investments.count,
+        amount_spent: voted_info_amount_spent
+      )) %> </em>
+    </p>
+  <% elsif assigned_heading.present? %>
+    <p>
+      <%= sanitize(custom_t("budgets.investments.index.sidebar.different_heading_assigned",
+                     heading_link: heading_link(assigned_heading, budget))) %>
+      <br>
+      <small>
+        <%= sanitize(custom_t("budgets.investments.index.sidebar.change_ballot",
+                       check_ballot: link_to(t("budgets.investments.index.sidebar.check_ballot_link"),
+                                             budget_ballot_path(budget)))) %>
+      </small>
+    </p>
+  <% else %>
+    <p><strong><%= custom_t("budgets.investments.index.sidebar.zero") %></strong></p>
+  <% end %>
+
+  <p>
+    <%# 1. Create the link using custom_t %>
+  <% change_vote_link = link_to(
+       custom_t("budgets.investments.index.sidebar.change_vote_link"),
+       budget_ballot_path(budget)
+     ) %>
+
+  <%# 2. Get the phase end date %>
+  <% phase_end_date = I18n.l(budget.current_phase.ends_at.to_date, format: :long) %>
+
+  <%# 3. Call custom_t for the main string %>
+  <%= sanitize(custom_t(
+        "budgets.investments.index.sidebar.change_vote_info.#{voting_style_name}",
+        link: change_vote_link,
+        phase_end_date: phase_end_date
+      )) %>
+
+
+  </p>
+
+  <ul class="ballot-list"
+      data-controller="reorder"
+      data-reorder-url="<%= reorder_budget_ballot_path(ballot.budget, group_id: heading.group_id) %>">
+
+    <% if heading %>
+      <%= render Budgets::Ballot::InvestmentForSidebarComponent.with_collection(
+        investments,
+        investment_ids: investment_ids
+      ) %>
+    <% end %>
+  </ul>
+
+  <%= link_to custom_t("budgets.investments.header.check_ballot"),
+              budget_ballot_path(budget),
+              class: "button hollow expanded" %>
+</div>
