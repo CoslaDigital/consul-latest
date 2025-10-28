@@ -25,17 +25,17 @@ en:
         remove: Remove vote
         remove_label: "Remove your vote for %{investment}"
         voted:
-          one: "You have voted <span>one</span> candidate."
-          other: "You have voted <span>%{count}</span> candidates."
+          one: "You have voted for<span>one</span> candidate."
+          other: "You have voted for<span>%{count}</span> candidates."
         voted_info: "Your ballot is confirmed!"
         voted_info_2: "But you can change your vote at any time until this phase is closed."
-        zero: You have not voted any candidate project.
+        zero: You have not voted for any candidate project.
       reasons_for_not_balloting:
         not_verified: Only verified users can vote on candidates; %{verify_account}.
         not_selected: Unselected candidate projects can not be supported
         not_enough_money: "You have already assigned the available budget.<br><small>Remember you can %{change_ballot} at any time</small>"
         no_ballots_allowed: Selecting phase is closed
-        different_heading_assigned: "You have already voted a different heading: %{heading_link}"
+        different_heading_assigned: "You have already voted in a different heading: %{heading_link}"
         not_enough_available_votes: "You have reached the maximum number of votes allowed"
         change_ballot: change your votes
         casted_offline: You have already participated offline
@@ -113,7 +113,7 @@ en:
               other: "<strong>You voted %{count} proposals with a cost of %{amount_spent}</strong>"
             approval:
               one: "<strong>You voted for one candidate</strong>"
-              other: "<strong>You voted %{count} candidates</strong>"
+              other: "<strong>You voted for %{count} candidates</strong>"
           change_vote_info:
             knapsack: "You can %{link} at any time until %{phase_end_date}. No need to spend all the money available."
             approval: "You can %{link} at any time until %{phase_end_date}."
@@ -121,7 +121,7 @@ en:
           different_heading_assigned: "You have active votes in another heading: %{heading_link}"
           change_ballot: "If you change your mind you can remove your votes in %{check_ballot} and start again."
           check_ballot_link: "check my votes"
-          zero: You have not voted any candidate in this group.
+          zero: You have not voted for any candidate in this group.
           verified_only: "To create a new candidate %{verify}."
           create: "Create a candidate"
           not_logged_in: "To create a new candidate you must %{sign_in} or %{sign_up}."
