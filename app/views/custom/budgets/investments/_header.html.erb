@@ -32,7 +32,7 @@
               </div>
             <% else %>
               <h2>
-                <%= t("budgets.investments.index.by_heading", heading: @heading.name) %>
+                <%= custom_t("budgets.investments.index.by_heading", heading: @heading.name) %>
               </h2>
               <div class="small-12 medium-9">
                 <div class="callout warning margin-top">
@@ -64,14 +64,15 @@
   </section>
   <% if @heading.geozone_restricted? %>
           <p>
-            <small><%= t("polls.index.geozone_info") %></small>
+            <small><%= custom_t("budgets.index.geozone_info") %></small>
           </p>
         <% end %>
         <ul class="tags">
   <% @heading.geozone_ids.each do |geozone_id| %>
     <% geozone = Geozone.find_by(id: geozone_id) %>
     <% if geozone %>
-      <li><span><%= geozone.name %></span></li>
+      <li><span><%= geozone.name == 'ys' ? custom_t('budgets.index.ys_name') : geozone.name %><span></li>
+      
     <% end %>
   <% end %>
 </ul>
@@ -83,7 +84,7 @@
         <%= back_link_to budget_path(@budget) %>
 
         <h2 class="margin-top">
-          <%= t("budgets.investments.index.title") %>
+          <%= custom_t("budgets.investments.index.title") %>
         </h2>
       </div>
     </div>
