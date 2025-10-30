@@ -3,7 +3,7 @@ en:
 
     ballots:
       reasons_for_not_balloting:
-        invalid_geozone: Your do not live in the required area to take part in this process
+        invalid_geozone: "You cannot vote on this project because your location is not valid. Your geozone is %{user_geozone}, but this project requires one of the following: %{required_geozones}."
 
     index:
       milestones: Progress Updates
