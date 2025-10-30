@@ -136,7 +136,8 @@ class Budget
     before_validation :set_denormalized_ids
     before_save :calculate_confidence_score
     before_create :set_original_heading_id
-    after_save :recalculate_heading_winners
+    after_save :recalculate_heading_winners, unless: -> { budget.stv? }
+
 
     def comments_count
       comments.count
@@ -308,17 +309,33 @@ class Budget
     end
     
     def valid_geozone?(user)
-  Rails.logger.info "Heading geozone_restricted: #{heading.geozone_restricted}"
-  Rails.logger.info "Heading geozone_id: #{heading.geozone_id}"
-  Rails.logger.info "Heading geozone_ids: #{heading.geozone_ids.inspect}"
-  Rails.logger.info "User geozone_id: #{user.geozone_id}"
+  # --- Log Inputs ---
+  # Logs the username and their geozone ID
+  Rails.logger.info "Geozone Check - User: #{user.username} (User Geozone ID: #{user.geozone_id})"
+  
+  # Logs the heading's restriction status and its list of geozones
+  Rails.logger.info "Geozone Check - Heading Restricted: #{heading.geozone_restricted}"
+  Rails.logger.info "Geozone Check - Heading Geozone IDs: #{heading.geozone_ids.inspect}"
 
-  valid = !heading.geozone_restricted || heading.geozone_ids.include?(user.geozone_id)
-  Rails.logger.info "Is valid geozone? #{valid}"
+  # --- Log Logic Checks ---
+  # 1. Check if the heading is restricted at all
+  is_restricted = heading.geozone_restricted
+  
+  # 2. Check if the user's geozone ID is in the heading's list
+  is_match = heading.geozone_ids.include?(user.geozone_id)
+  Rails.logger.info "Geozone Check - Does user geozone match heading list? #{is_match}"
+
+  # --- Calculate and Log Final Result ---
+  # The user is valid if:
+  # 1. The heading is NOT restricted (valid = true)
+  # OR
+  # 2. The user's geozone ID is a match (valid = true)
+  valid = !is_restricted || is_match
+  
+  Rails.logger.info "Geozone Check - Final Result (Not Restricted OR Match): #{valid}"
 
   valid
-end
-
+   end
     
     def permission_problem?(user)
       permission_problem(user).present?
@@ -349,6 +366,7 @@ end
     end
 
     def recalculate_heading_winners
+      Rails.logger.warn "--- [DEBUG] CALLBACK TRIGGERED: recalculate_heading_winners for Investment ##{self.id} ---"
       Budget::Result.new(budget, heading).calculate_winners if saved_change_to_incompatible?
     end
 
