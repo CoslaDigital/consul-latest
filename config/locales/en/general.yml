@@ -320,6 +320,10 @@ en:
       geozone: Geographic Area
       geozone_help: "This is the area in which your reside"
       proposal_responsible_name_note: "(individually or as representative of a collective; will not be displayed publically)"
+      proposal_title: "Name"
+      proposal_summary: "Summary"
+      proposal_description: "Description"
+      proposal_video_url_note: You may add a link to YouTube or Vimeo
       proposal_title_note: "Give a suitable name to your proposal"
       proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
       proposal_description_note: "Provide a detailed description of your project"
