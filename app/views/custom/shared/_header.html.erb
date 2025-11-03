@@ -2,15 +2,23 @@
 <% if header.present? %>
 
 <% if header.image.present? %>
-        <div class="budget-header with-background-image"
-	style="background-image: url(<%= polymorphic_path(header.image.variant(:larger)) %>);">
+   
+   <div class="hero-header with-background-image">
+    <picture class="full-width-media-container">
+        <source media="(min-width: 1024px)" srcset="<%= url_for(header.image.variant(:hero_large)) %>">
+        <source media="(min-width: 640px)" srcset="<%= url_for(header.image.variant(:hero_medium)) %>">
+        <source media="(min-width: 480px)" srcset="<%= url_for(header.image.variant(:hero_small)) %>">
+        <%# The <img> tag is required as a fallback and for the browser to render the image %>
+        <%= image_tag header.image.variant(:hero), class: "hero-image", alt: "Hero image" %>
+      </picture>    
+
 <% else %>
-  <div class="budget-header">
+  <div class="hero-header">
 <!--  <div class="header-card jumbo highlight">  -->
 <% end %>
-    <div class="row">
-      <div class="small-12 medium-6 column text-center">
-        <span class="homepage-title"><%= header.label %></span>
+ <div class="row">
+    <div class="small-12 text-center">
+      <span class="homepage-title"><%= header.label %></span>
         <h1><%= header.title %></h1>
 
         <p class="homepage-lead"><%= header.description %></p>
