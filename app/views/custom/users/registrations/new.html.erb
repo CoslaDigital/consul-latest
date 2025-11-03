@@ -1,33 +1,34 @@
-<% provide :title do %><%= t("devise_views.users.registrations.new.title") %><% end %>
+<% provide :title, t("devise_views.users.registrations.new.title") %>
 <h2><%= t("devise_views.users.registrations.new.title") %></h2>
 
 <p><em><%= t("omniauth.info.sign_in_help") %></em></p>
 
 <div class="accordion-item">
-  <%= link_to "Sign up as an organisation", 
+  <%= link_to t("devise_views.organizations.registrations.new.title"), 
               new_organization_registration_path, 
               class: "button expanded" %>
 </div>
 
-<div class="accordion-container">
+<div class="accordion-container" >
   <div class="accordion-item">
 
-    <button type="button" class="accordion-trigger button expanded" aria-expanded="true" aria-controls="individual-panel">
-      Sign up as an individual 
+    <button type="button"
+            class="accordion-trigger button expanded"
+            aria-expanded="false"
+            aria-controls="individual-panel"
+            <%# 2. This is the "event listener" %>
+            <%# "On CLICK, call the TOGGLE method on the ACCORDION controller" %>
+            data-action="click->accordion#toggle"
+            <%# 3. This gives the JavaScript a "target" to find the button %>
+            data-accordion-target="trigger">
+      <%= t("devise_views.users.registrations.new.individual_signup") %> <%# Using I18n helper %>
     </button>
 
-    <div id="individual-panel" class="accordion-panel" role="region">
+
+    <div id="individual-panel" class="accordion-panel" role="region" >
 
       <%= render "devise/omniauth_form", action: "sign_up" %>
 
-      <p>Creating your account is easy – all you need is an email address:</p>
-
-      <ol>
-        <li>Create account</li>
-        <li>Activate account (via email)</li>
-        <li>Login</li>
-        <li>Get Started</li>
-      </ol>
 
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
         <%= render "shared/errors", resource: resource %>
@@ -65,25 +66,7 @@
 
       <%= render "devise/shared/links" %>
       
-    </div> </div> 
-     </div> </div> <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const triggers = document.querySelectorAll(".accordion-trigger");
-    triggers.forEach(function(trigger) {
-      trigger.addEventListener("click", function() {
-        const controlledPanelId = this.getAttribute("aria-controls");
-        const panel = document.getElementById(controlledPanelId);
-        if (panel) {
-          const isHidden = panel.hasAttribute("hidden");
-          if (isHidden) {
-            panel.removeAttribute("hidden");
-            this.setAttribute("aria-expanded", "true");
-          } else {
-            panel.setAttribute("hidden", "");
-            this.setAttribute("aria-expanded", "false");
-          }
-        }
-      });
-    });
-  });
-</script>
+    </div>
+ </div> 
+     </div> 
+</div>
