@@ -328,6 +328,8 @@ en:
       proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
       proposal_description_note: "Provide a detailed description of your project"
       proposal_video_url_note: You may add a link to YouTube or Vimeo
+      proposal_estimated_price: Estimated Cost
+      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it 
       tag_category_label: "Categories"
       tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
       tags_label: Tags
