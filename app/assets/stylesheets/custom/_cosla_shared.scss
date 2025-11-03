@@ -2,132 +2,21 @@
 
 @mixin shared-styles {
 
-.hero-header {
-    @include full-width-background;
-    @extend %budget-header;
-    margin-top: -$line-height;
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 4rem 2rem;
-    background-color: var(--brand-secondary);
-    text-align: center;
-    color: #fff;
-  }
-
-
-.hero-header.with-background-image {
   
-  --hero-aspect-ratio-height: 5;
-  position: relative;
-  overflow: hidden;
-  padding: 0; // Padding is often removed when using aspect-ratio
-  aspect-ratio: 16 /  var(--hero-aspect-ratio-height);
-  min-height: 400px;
-  max-height: 900px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
-  padding-top: clamp(1rem, 5vh, 6rem);
-  padding-bottom: clamp(1rem, 5vh, 6rem);
-  
-  padding-left: clamp(1rem, 5vw, 3rem);
-  padding-right: clamp(1rem, 5vw, 3rem);
- 
-  // This ensures the padding is calculated inside the element's height.
-  // Most modern setups have this globally, but it's good to be explicit.
-  box-sizing: border-box;
-}
-
-.hero-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This remains very important */
-}
-
-.hero-header .homepage-title {
-  display: block;
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: 600;
-  margin-bottom: 0;
-  color: #ffffffcc;
-}
-
-.hero-header h1 {
-  font-size: clamp(1rem, 5vw, 2.75rem);
-  font-weight: bold;
-  color: #fff;
-  margin-top: 1.25rem;
-//  margin-bottom: 0.5rem;
-}
-
-.hero-header .homepage-lead {
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  margin-bottom: 2rem;
-  color: #ffffffcc;
-}
-
-.hero-header .homepage-link {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #0078d4;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.hero-header .homepage-link:hover {
-  background-color: #005fa3;
-}
-
-.hero-header .row {
-  padding: clamp(1.0rem, 4vw, 1.5rem);
-  display: flex;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 30px;
-  // Set a maximum width for readability on large screens
-  max-width: 900px; 
-  // Allow the box to fill the available space up to its max-width
-  width: 100%;
-  position: relative; 
-
-  z-index: 1; 
-}
-
-.hero-header .row::before {
+  .hero-header .row::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%);
+  background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%); 
   opacity: 0.7;
   border-radius: inherit;
   z-index: -1; // This is correct
 }
 
-
-.hero-header .row .medium-6 {
-  width: unset;
-  }
-
-
-
-.full-width-media-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0; /* Puts it behind the text content */
-}
 
   .admin-sidebar {
     background: linear-gradient(to bottom, var(--brand) 0%,var(--brand-secondary) 100%);
