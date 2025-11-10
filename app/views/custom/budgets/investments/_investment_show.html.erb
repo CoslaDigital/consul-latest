@@ -59,25 +59,25 @@
 
       <% if investment.unfeasible? && investment.valuation_finished? %>
         <div class="callout warning">
-          <%= sanitize(t("budgets.investments.show.project_unfeasible")) %>
+          <%= sanitize(custom_t("budgets.investments.show.project_unfeasible")) %>
         </div>
       <% elsif investment.winner? && @budget.finished? %>
         <div class="callout success">
-          <strong><%= t("budgets.investments.show.project_winner") %></strong>
+          <strong><%= custom_t("budgets.investments.show.project_winner") %></strong>
         </div>
       <% elsif investment.selected? %>
         <div class="callout success">
-          <%= sanitize(t("budgets.investments.show.project_selected")) %>
+          <%= sanitize(custom_t("budgets.investments.show.project_selected")) %>
         </div>
       <% elsif @budget.balloting_or_later? %>
         <div class="callout warning">
-          <%= sanitize(t("budgets.investments.show.project_not_selected")) %>
+          <%= sanitize(custom_t("budgets.investments.show.project_not_selected")) %>
         </div>
       <% else %>
         <br>
         <div class="float-right">
           <span class="label-budget-investment float-left">
-            <%= t("budgets.investments.show.title") %>
+            <%= custom_t("budgets.investments.show.title") %>
           </span>
           <span class="icon-budget"></span>
         </div>
@@ -126,22 +126,22 @@
                  title: investment.title,
                  image_url: image_absolute_url(investment.image, :thumb),
                  url: budget_investment_url(investment.budget, investment),
-                 description: t("budgets.investments.share.message",
+                 description: custom_t("budgets.investments.share.message",
                                 title: investment.title,
                                 handle: setting["org_name"]),
-                 mobile: t("budgets.investments.share.message",
+                 mobile: custom_t("budgets.investments.share.message",
                            title: investment.title,
                            handle: setting["twitter_handle"]) %>
-
+      <% if @budget&.kind != "election" %>
       <% if current_user %>
+        
         <div class="sidebar-divider"></div>
-        <p class="sidebar-title"><%= t("shared.follow") %></p>
-
+        <p class="sidebar-title"><%= custom_t("shared.follow") %></p>
         <%= render "follows/follow_button", follow: find_or_build_follow(current_user, investment) %>
       <% end %>
 
       <%= render "communities/access_button", community: investment.community %>
-
+      <% end %>
      </aside>
   </div>
 </section>
