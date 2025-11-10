@@ -1,5 +1,6 @@
 <%= render Shared::GlobalizeLocalesComponent.new %>
 
+<h2>debugging got to this form</h2>
 <%# 1. Loop over the groups *outside* of the form tag. %>
 <% contents.each do |group| %>
 
@@ -7,6 +8,7 @@
   <%# This title is now outside the form, which is correct %>
   <h3>Editing Group: <%= group.first.key.split('.').first %></h3>
 
+  <h3>Editing Group: <%= group.first.key.split('.').first %> (Items: <%= group.size %>)</h3>
   <%# 2. Start the form *inside* the loop. %>
   <%#    Note the added method: :post %>
   <%= form_tag admin_site_customization_information_texts_path, method: :post do %>
