@@ -102,21 +102,21 @@ module Consul
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = :en
     available_locales = [
-      "ar",
+      #      "ar",
 #      "bg",
 #      "bs",
 #      "ca",
 #      "cs",
 #      "da",
-      "de",
+      #      "de",
 #      "el",
       "en",
-      "es",
+      #      "es",
 #      "es-PE",
 #      "eu",
 #      "fa",
-      "fr",
-      "gd",
+      #      "fr",
+      "gd"
 #      "gl",
 #      "he",
 #      "hr",
@@ -130,17 +130,17 @@ module Consul
 #      "pt",
 #      "pt-BR",
 #      "ro",
-      "ru",
+      #      "ru",
 #      "sl",
 #      "sq",
 #      "so",
 #      "sr",
 #      "sv",
 #      "tr",
-      "uk-UA",
+      #      "uk-UA",
 #      "val",
-      "zh-CN",
-      "zh-TW"
+      #      "zh-CN",
+      #      "zh-TW"
     ]
     config.i18n.available_locales = available_locales
     config.i18n.fallbacks = [I18n.default_locale, {
