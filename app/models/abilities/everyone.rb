@@ -21,6 +21,8 @@ module Abilities
       end
       can :read_stats, Budget, id: Budget.valuating_or_later.stats_enabled.ids
       can :read_executions, Budget, phase: "finished"
+      can :read, Budget::Investment::Answer, budget_question: { is_private: false }
+      can [:read, :debate, :draft_publication, :allegations, :result_publication,
       can [:index, :read, :debate, :draft_publication, :allegations, :result_publication,
            :proposals, :milestones], Legislation::Process, published: true
 
