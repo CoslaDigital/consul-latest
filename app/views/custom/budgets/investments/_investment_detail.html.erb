@@ -43,23 +43,43 @@
 </div>
 <hr>
 
-<%# 1. First, fetch ONLY questions where `enabled` is true. %>
+<%# 1. Get all enabled questions from the @budget %>
 <% @budget.questions.where(enabled: true).order(:id).each do |question| %>
 
-  <h4><%= question.text.html_safe %></h4>
-  <p>
-    <% investment.answers.where(budget_question_id: question.id).find_each do |answer| %>
+  <%#
+    2. LEVEL 1 CHECK: Can the current user read this question at all?
+       - A guest CANNOT read a private question.
+       - An admin CAN.
+  %>
+  <% if can? :read, question %>
 
-      <%# 2. Then, use CanCanCan to check if the user can read this specific answer. %>
-      <% if can? :read, answer %>
+    <%# 3. If YES, render the question title. %>
+    <h4><%= question.text.html_safe %></h4>
+
+    <p>
+      <%#
+        4. LEVEL 2 CHECK: Now, get the answers for this question
+           from the @investment, and use .accessible_by to
+           filter them using the :read, Budget::Investment::Answer rules.
+      %>
+      <% visible_answers = @investment.answers
+                                      .where(budget_question_id: question.id)
+                                      .accessible_by(current_ability) %>
+
+      <%#
+        5. Loop through ONLY the answers the user is allowed to see.
+           If `visible_answers` is empty (no answer submitted OR
+           answer is private), this loop is skipped and nothing
+           is shown, which is the correct behavior.
+      %>
+      <% visible_answers.find_each do |answer| %>
         <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
-      <% else %>
-        <%# Optional: Show a placeholder if the user is not authorized. %>
-        <em><small><%= custom_t("custom.answers.private_answer_placeholder", default: "The answer to this question is private.") %></small></em>
       <% end %>
+    </p>
 
-    <% end %>
-  </p>
+  <% end %>
+  <%# If `can? :read, question` is false, the question is private
+      and the user is not an admin, so nothing is rendered. %>
 <% end %>
 
 <%= render Shared::EmbeddedVideoComponent.new(@investment) %>

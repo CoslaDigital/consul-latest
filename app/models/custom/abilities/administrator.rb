@@ -162,6 +162,9 @@ module Abilities
 
       can :manage, Milestone
 
+      can :read, Budget::Question
+      can :read, Budget::Investment::Answer
+
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant
       end
