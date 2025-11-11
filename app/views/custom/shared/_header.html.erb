@@ -1,37 +1,38 @@
-
 <% if header.present? %>
-
-<% if header.image.present? %>
-   
-   <div class="hero-header with-background-image">
-    <picture class="full-width-media-container">
+  <% if header.image.present? %>
+    
+    <%# 1. The main hero container %>
+    <div class="hero-header with-background-image">
+      
+      <%# 2. The background image, which will be positioned behind everything %>
+      <picture class="hero-background-image">
         <source media="(min-width: 1024px)" srcset="<%= url_for(header.image.variant(:hero_large)) %>">
         <source media="(min-width: 640px)" srcset="<%= url_for(header.image.variant(:hero_medium)) %>">
         <source media="(min-width: 480px)" srcset="<%= url_for(header.image.variant(:hero_small)) %>">
-        <%# The <img> tag is required as a fallback and for the browser to render the image %>
         <%= image_tag header.image.variant(:hero), class: "hero-image", alt: "Hero image" %>
-      </picture>    
-
-<% else %>
-  <div class="hero-header">
-<!--  <div class="header-card jumbo highlight">  -->
-<% end %>
- <div class="row">
-    <div class="small-12 text-center">
-      <span class="homepage-title"><%= header.label %></span>
-        <h1><%= header.title %></h1>
-
-        <p class="homepage-lead"><%= header.description %></p>
-
-        <% if header.link_text.present? && header.link_url.present? %>
-       
-            <%= link_to header.link_text, header.link_url, class: "homepage-link" %>
-        
-        <% end %>
-      </div>
-
+      </picture>
       
-   </div>
-</div>
+      <%# 3. A new wrapper for your text content. This is now the flex-item. %>
+      <div class="hero-content">
+        <div class="row">
+          <div class="small-12 text-center">
+            <span class="homepage-title"><%= header.label %></span>
+            <h1><%= header.title %></h1>
+            <p class="homepage-lead"><%= header.description %></p>
+            <% if header.link_text.present? && header.link_url.present? %>
+              <%= link_to header.link_text, header.link_url, class: "homepage-link" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+    </div> <%# End .hero-header %>
 
+  <% else %>
+    <%# Your non-image hero header %>
+    <div class="hero-header">
+      <div class="row">
+        </div>
+    </div>
+  <% end %>
 <% end %>
