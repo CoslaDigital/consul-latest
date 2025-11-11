@@ -104,6 +104,8 @@ class Admin::ProposalsController < Admin::BaseController
       Proposal.human_attribute_name(:description),
       t("admin.proposals.index.author"),
       Proposal.human_attribute_name(:responsible_name),
+      t("attributes.email"),
+      Proposal.human_attribute_name(:price),
       t("admin.proposals.index.milestones"),
       t("admin.proposals.index.selected")
     ]
@@ -121,8 +123,10 @@ class Admin::ProposalsController < Admin::BaseController
           strip_tags(proposal.description),
           proposal.author.username,
           proposal.responsible_name,
+          proposal.author.email,
+          proposal.price,
           proposal.milestones.count,
-          proposal.selected? # Assuming `selected?` returns true/false
+          proposal.selected? 
         ]
       end
     end
