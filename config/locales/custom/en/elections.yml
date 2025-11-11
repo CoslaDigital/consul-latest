@@ -158,9 +158,9 @@ en:
         milestones_tab: Milestones
         author: Author
         project_unfeasible: "This candidate <strong>has been marked as not feasible</strong> and will not go to balloting phase."
-        project_selected: "This investment project <strong>has been selected</strong> for balloting phase."
+        project_selected: "This candidate <strong>has been selected</strong> for balloting phase."
         project_winner: "Winning candidate"
-        project_not_selected: "This investment project <strong>has not been selected</strong> for balloting phase."
+        project_not_selected: "This candidate <strong>has not been selected</strong> for balloting phase."
         see_price_explanation: See price explanation
       wrong_price_format: Only integer numbers
       investment:
@@ -218,12 +218,12 @@ en:
       price: Price
       amount_available: Available budget
       accepted: "Accepted candidate: "
-      discarded: "Discarded investment: "
+      discarded: "Discarded candidate: "
       incompatibles: Incompatibles
       investment_title: Candidate name
-      investment_proyects: List of all candidates
-      unfeasible_investment_proyects: List of all unfeasible candidates
-      not_selected_investment_proyects: List of all candidates not selected for balloting
+      investment_projects: List of all candidates
+      unfeasible_investment_projects: List of all unfeasible candidates
+      not_selected_investment_projects: List of all candidates not selected for balloting
     executions:
       link: "Milestones"
       page_title: "%{budget} - Milestones"
