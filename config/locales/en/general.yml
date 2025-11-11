@@ -319,7 +319,7 @@ en:
     form:
       geozone: Geographic Area
       geozone_help: "This is the area in which your reside"
-      proposal_responsible_name_note: "(individually or as representative of a collective; will not be displayed publically)"
+      proposal_responsible_name_note: "(individually or as representative of an organisation; will not be displayed publically)"
       proposal_title: "Name"
       proposal_summary: "Summary"
       proposal_description: "Description"
@@ -384,7 +384,7 @@ en:
         help: Help with proposals
       section_footer:
         title: Help with proposals
-        description: Citizens' proposals are an opportunity for neighbours and collectives to decide directly how they want their city to be, after getting sufficient support and submitting to a citizens' vote.
+        description: Citizens' proposals are an opportunity for neighbours and organisations to decide directly how they want their city to be, after getting sufficient support and submitting to a citizens' vote.
     new:
       form:
         submit_button: Create proposal
@@ -695,7 +695,7 @@ en:
     back: Go back
     check_all: Select all
     check_none: Select none
-    collective: Collective
+    collective: organisation
     flag: Flag as inappropriate
     follow: "Follow"
     following: "Following"
