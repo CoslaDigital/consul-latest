@@ -30,7 +30,27 @@ module Budgets
     end
     end
     end
+    
+    def edit
 
+    # Eager load all enabled questions for this budget
+    budget_questions = @investment.budget.questions.where(enabled: true).order(:id)
+    
+    # Pre-load existing answers into memory to avoid N+1 queries
+    @investment.answers.load
+
+    # Now, loop through the questions and build any *missing* answers
+    budget_questions.each do |question|
+      
+      # This finds the existing answer or builds a new one IN MEMORY
+      @investment.answers.find_or_initialize_by(budget_question_id: question.id) do |answer|
+        # This block only runs if the answer is new
+        answer.budget_id = @investment.budget_id
+      end
+    
+    end
+    end
+    
     def show
       @commentable = @investment
       @comment_tree = CommentTree.new(@commentable, params[:page], @current_order)
