@@ -3,25 +3,24 @@
 
 <p><em><%= t("omniauth.info.sign_in_help") %></em></p>
 
-<div class="accordion-item">
+
+<div class="accordion-container" >
+   
+  <div class="accordion-item">
   <%= link_to t("devise_views.organizations.registrations.new.title"), 
               new_organization_registration_path, 
               class: "button expanded" %>
 </div>
 
-<div class="accordion-container" >
   <div class="accordion-item">
 
     <button type="button"
             class="accordion-trigger button expanded"
             aria-expanded="false"
             aria-controls="individual-panel"
-            <%# 2. This is the "event listener" %>
-            <%# "On CLICK, call the TOGGLE method on the ACCORDION controller" %>
             data-action="click->accordion#toggle"
-            <%# 3. This gives the JavaScript a "target" to find the button %>
             data-accordion-target="trigger">
-      <%= t("devise_views.users.registrations.new.individual_signup") %> <%# Using I18n helper %>
+      <%= t("devise_views.users.registrations.new.individual_signup") %> 
     </button>
 
 
