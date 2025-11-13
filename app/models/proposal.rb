@@ -269,6 +269,21 @@ class Proposal < ApplicationRecord
     end
   end
 
+  def formatted_amount(amount)
+    ActionController::Base.helpers.number_to_currency(amount,
+                                                      precision: 0,
+                                                      locale: I18n.locale,
+                                                      unit: "£")
+  end
+  
+  def formatted_price
+      formatted_amount(price)
+    end
+
+    def formatted_estimated_price
+      formatted_amount(estimated_price)
+    end
+
   protected
 
     def set_responsible_name
