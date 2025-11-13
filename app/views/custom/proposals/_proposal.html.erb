@@ -14,7 +14,7 @@
     <% if proposal.image.present? %>
       <div class="panel-image">
         <% if is_hero_layout %>
-          <%= image_tag proposal.image.variant(:feed_thumb),
+          <%= image_tag proposal.image.variant(:hero_card),
                           alt: proposal.image.title.unicode_normalize %>
         <% else %>
           <%= image_tag proposal.image.variant(:medium),
@@ -72,7 +72,7 @@
         </div>
         <h4><%= t("budgets.investments.show.estimated_price") %></h4>
              <p class="investment-project-amount">
-             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.price %>
+             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.formatted_price %>
             </p>
 
         <%= render "shared/tags", taggable: proposal, limit: 5 %>
