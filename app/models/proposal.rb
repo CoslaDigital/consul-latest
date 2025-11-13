@@ -280,9 +280,6 @@ class Proposal < ApplicationRecord
       formatted_amount(price)
     end
 
-    def formatted_estimated_price
-      formatted_amount(estimated_price)
-    end
 
   protected
 
