@@ -1,8 +1,7 @@
-
 <div id="<%= dom_id(proposal) %>"
      class="proposal clear <%= ("successful" if proposal.successful?) %>"
      data-type="proposal">
-    <div class="panel <%= "with-image" if proposal.image.present? %>">
+  <div class="panel <%= "with-image" if proposal.image.present? %>">
     <% if proposal.successful? %>
       <div class="icon-successful"></div>
     <% end %>
@@ -64,7 +63,7 @@
         </div>
         <h4><%= t("budgets.investments.show.estimated_price") %></h4>
              <p class="investment-project-amount">
-             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.formatted_price %>
+             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.price %>
             </p>
 
         <%= render "shared/tags", taggable: proposal, limit: 5 %>
