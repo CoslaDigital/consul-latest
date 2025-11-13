@@ -392,7 +392,8 @@
 .proposals-list,
 .budget-investments-list,
 .legislation-proposals {
-.panel {
+
+  .panel {
     column-gap: calc(rem-calc(map-get($grid-column-gutter, medium)) * 3 / 4);
     display: flex;
     flex-wrap: wrap;
@@ -401,7 +402,6 @@
       flex-grow: 1;
     }
 
-    // --- THIS IS YOUR DEFAULT STYLE (Side-by-Side) ---
     &.with-image {
       padding-bottom: 0;
       padding-top: 0;
@@ -409,9 +409,10 @@
       .panel-image {
         margin-#{$global-left}: rem-calc(-12);
         text-align: center;
-        flex-basis: 25%; // The 25% width we added
-        flex-shrink: 0;   // Don't let it be squished
 
+        flex-basis: 25%;  // Give it a 25% width
+        flex-shrink: 0;   // Don't let it be squished
+  
         ~ * {
           padding-top: calc($line-height / 2);
         }
@@ -419,145 +420,23 @@
 
       img {
         height: 100%;
-        width: 100%;
-        object-fit: cover;
-        object-position: center;
+        width: 100%;         // Make the image as wide as its container
+        object-fit: cover;   // The magic: Fill the space, crop, DON'T distort.
+        object-position: center; // Crop from the center
       }
-      
-      
-      // --- ADD THIS NEW BLOCK FOR THE HERO STYLE ---
-      
-      &.panel--hero {
-        // 1. Set up the grid
-        display: grid;
-        padding: 0;
-        min-height: rem-calc(192);
-        // Create 2 columns: a flexible one for text, an auto-sized one for votes
-        grid-template-columns: 1fr auto; 
-        position: relative; // Needed for the overlay
-        border-radius: 0; // Ensure sharp corners for the image
+    }
 
-        // 2. NEW: Add a gradient overlay
-        // This sits on top of the image, but behind the text
-        &::before {
-          content: "";
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          // Gradient fades from black at the bottom to clear at the top
-          background: linear-gradient(to top, 
-            rgba(0,0,0,0.85) 0%,  // 85% black at the bottom
-            rgba(0,0,0,0.4) 40%,  // Fades to 40% black
-            transparent 75%      // Fades to clear at the top
-          );
-          z-index: 1; // Sit *above* the image
-          border-radius: 0; // Match panel corners
-        }
+    .debate-content,
+    .budget-investment-content,
+    .proposal-content {
+      flex-basis: calc((35rem - 100%) * 999);
+      flex-grow: 1000;
+      max-width: 50rem;
 
-        // 3. The image (the "background" layer)
-        .panel-image {
-          margin: 0;
-          flex-basis: auto; 
-          flex-shrink: 1;
-          // Make the image span all rows and columns
-          grid-area: 1 / 1 / -1 / -1;
-          z-index: 0; // Sit at the very back
-
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; // This is still perfect
-          }
-        }
-
-        // 4. The text (the "content" layer)
-        .proposal-content {
-          position: relative; 
-          grid-column: 1; // Stay in column 1
-          z-index: 2; // Sit *above* the gradient
-          color: #FFFFFF; // Make text white
-          padding: 1rem;
-          background: none; // Remove the old block-level background
-          align-self: end; // Align to the bottom (looks best with the gradient)
-          
-          // Remove all margins/widths
-          width: auto; 
-          margin-left: 0;
-
-          // We hide this for a cleaner look
-          .proposal-description {
-            display: none;
-          }
-        }
-
-        // 5. The votes (the "votes" layer)
-        .supports-container {
-          display: block; // Re-enable it
-          position: relative;
-          grid-column: 2; // Go to column 2
-          z-index: 2; // Sit *above* the gradient
-          padding: 1rem;
-          background: none; // No background
-          align-self: end; // Align to the bottom
-          
-          // --- ADD THIS ---
-          // Force all text inside the votes block to be white
-          color: #FFFFFF;
-          * {
-            color: #FFFFFF; 
-          }
-          strong {
-             color: #FFFFFF;
-          }
-        }
-      }
-      // --- ADD THIS NEW BLOCK FOR THE HERO STYLE ---
-      // This is our "Hero Overlay" modifier
-      // These rules will *only* apply if you add the .panel--hero class
-      &.oldpanel--hero {
-        // 1. Override the 'flex' layout with 'grid'
-        display: grid;
-        padding: 0;
-        min-height: rem-calc(192);
-
-        // 2. Make all children stack in the same grid cell
-        .panel-image,
-        .proposal-content,
-        .supports-container { // We include the votes container too
-          grid-area: 1 / 1;
-          position: relative; // Needed for stacking
-        }
-
-        // 3. Style the image (the "background" layer)
-        .panel-image {
-          margin: 0;
-          // unset the flex rules from the default style
-          flex-basis: auto; 
-          flex-shrink: 1;
-
-          img {
-            // 'object-fit' will still work perfectly
-          }
-        }
-
-        // 4. Style the text (the "overlay" layer)
-        .proposal-content {
-          align-self: center; // Vertically centers the text block
-
-          // Your "2/3 from the end" request
-          width: 66.667%;
-          margin-left: 33.333%;
-
-          // Readable background!
-          background: rgba(0, 0, 0, 0.65); // 65% black background
-          color: #FFFFFF;
-          padding: 1rem;
-          border-radius: rem-calc(4);
-        }
-
-        // 5. Hide the votes container in this view (or style it)
-        .supports-container {
-          display: none; // It's too busy to overlay the votes
-        }
+      + * {
+        flex-basis: 22.5%;
+        flex-shrink: 0;
+        text-align: center;
       }
     }
   }
