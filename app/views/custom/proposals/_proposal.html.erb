@@ -8,8 +8,9 @@
 
     <% if proposal.image.present? %>
       <div class="panel-image">
-        <%= image_tag proposal.image.variant(:medium),
-                      alt: proposal.image.title.unicode_normalize %>
+        
+          <%= image_tag proposal.image.variant(:medium),
+                          alt: proposal.image.title.unicode_normalize %>
       </div>
     <% end %>
 
