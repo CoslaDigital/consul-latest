@@ -410,6 +410,9 @@
         margin-#{$global-left}: rem-calc(-12);
         text-align: center;
 
+        flex-basis: 25%;  // Give it a 25% width
+        flex-shrink: 0;   // Don't let it be squished
+  
         ~ * {
           padding-top: calc($line-height / 2);
         }
@@ -417,6 +420,9 @@
 
       img {
         height: 100%;
+        width: 100%;         // Make the image as wide as its container
+        object-fit: cover;   // The magic: Fill the space, crop, DON'T distort.
+        object-position: center; // Crop from the center
       }
     }
 
