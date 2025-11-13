@@ -2,7 +2,7 @@
 <div id="<%= dom_id(proposal) %>"
      class="proposal clear <%= ("successful" if proposal.successful?) %>"
      data-type="proposal">
-   <div class="panel <%= "with-image #{'panel--hero' if is_hero_layout}" if proposal.image.present? %>">  
+   <div class="panel <%=  if proposal.image.present? %>">  
     <% if proposal.successful? %>
       <div class="icon-successful"></div>
     <% end %>
