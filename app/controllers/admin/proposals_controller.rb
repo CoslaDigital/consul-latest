@@ -12,32 +12,20 @@ class Admin::ProposalsController < Admin::BaseController
   
   
   def index
-    # 1. FIND PROPOSALS (This was missing)
-    # This logic finds, filters, and orders your proposals.
-    # Your search/filter logic might be different, but this is the idea.
-    @proposals = Proposal.all # Or whatever your base scope is
+    @proposals = Proposal.all 
     
-    # Example: Apply search if you have it
     if params[:search].present?
       @proposals = @proposals.where("title ILIKE ?", "%#{params[:search]}%")
     end
     
-    # Apply ordering from your HasOrders module
-#    @proposals = @proposals.order(order_options)
-    
-    # 2. CREATE PAGINATED VERSION FOR HTML
-    # The view uses @proposals, so we must set it for the HTML case
     @paginated_proposals = @proposals.page(params[:page])
 
-    # 3. RESPOND (This now includes HTML)
     respond_to do |format|
       format.html do
-        # Pass the paginated list to the view
         @proposals = @paginated_proposals
         render :index
       end
       format.csv do
-        # Pass the FULL, unpaginated list to the CSV generator
         csv_data = generate_csv(@proposals)
         send_data csv_data, filename: "proposals-#{Date.today}.csv"
       end
@@ -96,16 +84,16 @@ class Admin::ProposalsController < Admin::BaseController
     end
     
     def generate_csv(proposals)
-    # Define headers using your I18n translations
     headers = [
       t("admin.proposals.index.id"),
       Proposal.human_attribute_name(:title),
       t("proposals.form.proposal_summary"),
       Proposal.human_attribute_name(:description),
+      Proposal.human_attribute_name(:price),
       t("admin.proposals.index.author"),
       Proposal.human_attribute_name(:responsible_name),
       t("attributes.email"),
-      Proposal.human_attribute_name(:price),
+      t("proposals.form.geozone"),
       t("admin.proposals.index.milestones"),
       t("admin.proposals.index.selected")
     ]
@@ -121,10 +109,11 @@ class Admin::ProposalsController < Admin::BaseController
           proposal.title,
           strip_tags(proposal.summary),
           strip_tags(proposal.description),
+          proposal.price,
           proposal.author.username,
           proposal.responsible_name,
           proposal.author.email,
-          proposal.price,
+          proposal.geozone&.name,
           proposal.milestones.count,
           proposal.selected? 
         ]
