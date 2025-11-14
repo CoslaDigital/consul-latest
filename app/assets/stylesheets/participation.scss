@@ -412,6 +412,12 @@
       flex-shrink: 0;   // "Don't shrink"
       flex-basis: 22.5%;
     }
+    
+    .sdg-target-tag-list {
+       flex-grow: 0 !important;   // Do not grow
+       flex-shrink: 0 !important; // Do not shrink
+       align-self: flex-start;   // Don't stretch, align to the top
+     }
         
     &.with-image {
       padding-bottom: 0;
