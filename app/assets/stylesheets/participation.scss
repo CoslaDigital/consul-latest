@@ -406,14 +406,24 @@
       flex: 1;      // "Grow to fill remaining space"
       min-width: 0; // "It's OK to wrap your text"
     }
-    
+
     .proposal-content .sdg-goal-tag-list {
-      max-height: 2.5rem; 
-  
-      overflow: hidden;
-  
-      margin-bottom: 0; 
-     }
+  // 1. Fixes the wrapping
+  flex-wrap: nowrap;
+  overflow: hidden;
+  margin: 0 0 1rem 0;
+  width: auto;
+
+  // 2. Fixes the large icon size
+  .sdg-goal-icon {
+    // Set a fixed, small size for the icons
+    // You can adjust this value to match your design.
+    width: 2rem;  
+    height: 2rem;
+    object-fit: contain; // Ensures the icon scales nicely
+  }
+}
+    
     
     .supports-container {
       flex-grow: 0;     // "Don't grow"
