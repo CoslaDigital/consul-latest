@@ -451,7 +451,9 @@
     }
 
     // --- 4. CORRECT SDG ICON RULES ---
-    .proposal-content .sdg-goal-tag-list {
+    .proposal-content .sdg-goal-tag-list,
+    .budget-investment-content .sdg-goal-tag-list,
+    .debate-content .sdg-goal-tag-list {
       // Fixes the wrapping
       flex-wrap: nowrap;
       overflow: hidden;
