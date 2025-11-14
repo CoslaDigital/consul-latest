@@ -21,6 +21,15 @@
                           alt: proposal.image.title.unicode_normalize %>
         <% end %>
       </div>
+    <% else %>
+      <div class="panel-image">
+        <% if is_hero_layout %>
+          <%= image_tag proposal.image.variant(:feed_thumb),
+                          alt: proposal.image.title.unicode_normalize %>
+        <% else %>
+           <%= image_tag(image_path_for("proposal_background_no_image.png"), alt: proposal.title) %>
+        <% end %>
+      </div>
     <% end %>
 
     <div class="proposal-content">
