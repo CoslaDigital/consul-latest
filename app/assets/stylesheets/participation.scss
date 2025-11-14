@@ -402,10 +402,15 @@
       flex-grow: 1;
     }
     
+    .proposal-content {
+      flex: 1;      // "Grow to fill remaining space"
+      min-width: 0; // "It's OK to wrap your text"
+    }
+    
     .supports-container {
       flex-grow: 0;     // "Don't grow"
       flex-shrink: 0;   // "Don't shrink"
-      flex-basis: auto; // "Be as wide as your content"
+      flex-basis: 22.5%;
     }
         
     &.with-image {
