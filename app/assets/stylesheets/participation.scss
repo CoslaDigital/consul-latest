@@ -417,7 +417,8 @@
       min-width: 0; // "It's OK to wrap your text"
     }
 
-    .supports-container {
+    .supports-container,
+    .supports {
       flex-grow: 0;
       flex-shrink: 0;
       flex-basis: 22.5%;
