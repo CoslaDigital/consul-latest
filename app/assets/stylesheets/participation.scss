@@ -402,6 +402,12 @@
       flex-grow: 1;
     }
     
+    .supports-container {
+      flex-grow: 0;     // "Don't grow"
+      flex-shrink: 0;   // "Don't shrink"
+      flex-basis: auto; // "Be as wide as your content"
+    }
+        
     &.with-image {
       padding-bottom: 0;
       padding-top: 0;
