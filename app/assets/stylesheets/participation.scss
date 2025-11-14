@@ -506,7 +506,9 @@
         }
 
         // 4. The text (DEFAULT = MOBILE)
-        .proposal-content {
+        .proposal-content,
+        .budget-investment-content,
+        .debate-content {
           position: relative; 
           grid-row: 1;      // Sits in row 1
           grid-column: 1;   // Sits in column 1 (the only column)
