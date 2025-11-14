@@ -407,6 +407,14 @@
       min-width: 0; // "It's OK to wrap your text"
     }
     
+    .proposal-content .sdg-goal-tag-list {
+      max-height: 2.5rem; 
+  
+      overflow: hidden;
+  
+      margin-bottom: 0; 
+     }
+    
     .supports-container {
       flex-grow: 0;     // "Don't grow"
       flex-shrink: 0;   // "Don't shrink"
