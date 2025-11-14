@@ -417,12 +417,18 @@
       min-width: 0; // "It's OK to wrap your text"
     }
 
-    .supports-container,
-    .supports {
+    .supports-container {
       flex-grow: 0;
       flex-shrink: 0;
       flex-basis: 22.5%;
       text-align: center; // This was in your old code
+    }
+    
+    .supports {
+      flex-grow: 0;
+      flex-shrink: 0;
+      flex-basis: auto; // "auto" makes it as wide as its content
+      text-align: center;
     }
 
     // --- 3. CORRECT IMAGE BOX (for all panels) ---
