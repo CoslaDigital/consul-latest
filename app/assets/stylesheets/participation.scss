@@ -402,14 +402,12 @@
     > * {
       flex-grow: 1;
     }
-
-    // --- 1. CORRECT TEXT RULE (for all panels) ---
+    .budget-investments-content,
     .proposal-content {
       flex: 1;      // "Grow to fill remaining space"
       min-width: 0; // "It's OK to wrap your text"
     }
 
-    // --- 2. CORRECT VOTES RULE (for all panels) ---
     .supports-container {
       flex-grow: 0;
       flex-shrink: 0;
