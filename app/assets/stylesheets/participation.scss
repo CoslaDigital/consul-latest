@@ -401,12 +401,14 @@
     flex-wrap: wrap;
 
     flex-direction: column;
-    align-items: stretch; // Let items be full-width on mobile
+    align-items: stretch; 
 
     // 2. DESKTOP: Switch to side-by-side
     @include breakpoint(medium) {
       flex-direction: row;
-      align-items: flex-start; // Restore our top-alignment
+ //     height: 18rem;
+ //     overflow: hidden;
+ //     align-items: stretch; 
     }
 
     > * {
@@ -418,6 +420,7 @@
     .proposal-content {
       flex: 1;      // "Grow to fill remaining space"
       min-width: 0; // "It's OK to wrap your text"
+      align-self: flex-start;     
     }
     
     .debate-content + div,
@@ -426,33 +429,37 @@
       flex-grow: 0;
       flex-shrink: 0;
       flex-basis: 22.5%;
-      text-align: center; // This was in your old code
+      text-align: center;
+      align-self: flex-start;
     }
     
     .supports {
       flex-grow: 0;
       flex-shrink: 0;
-      flex-basis: auto; // "auto" makes it as wide as its content
+      flex-basis: auto;
       text-align: center;
     }
 
-    // --- 3. CORRECT IMAGE BOX (for all panels) ---
-    //    (This fixes the placeholder image bug)
+    // IMAGE BOX (for all panels) ---
     .panel-image {
       margin-#{$global-left}: rem-calc(-12);
       aspect-ratio: 1/1;
       align-self: stretch;
-      flex-basis: 12rem;
+      flex-basis: 12rem ;
       text-align: center;
       flex-shrink: 0;
       flex-grow: 0;
       margin-right: rem-calc(12);
+      width: 12rem;             // Explicit width
+      height: auto;             // Let height be determined by content
+      min-height: 8rem;         // Optional: set a minimum height
+//      max-height: 16rem;        // Optional: set a maximum height
+      overflow: hidden;    
 
       ~ * {
         padding-top: calc($line-height / 2);
       }
 
-      // Correctly nested img rule
       img {
         height: 100%;
         width: 100%;
@@ -461,11 +468,10 @@
       }
     }
 
-    // --- 4. CORRECT SDG ICON RULES --
+    // SDG ICON RULES --
     .proposal-content .sdg-goal-tag-list,
     .budget-investment-content .sdg-goal-tag-list,
     .debate-content .sdg-goal-tag-list {
-      // Fixes the wrapping
       flex-wrap: nowrap;
       overflow: hidden;
       margin: 0 0 1rem 0;
@@ -479,11 +485,10 @@
       }
     }
 
-    // --- 5. CLEANED .with-image BLOCK ---
+    // --- .with-image BLOCK ---
     &.with-image {
       padding-bottom: 0;
       padding-top: 0;
-      // All the old, broken rules are now GONE from here
     } 
      
       // --- This is the new, RESPONSIVE .panel--hero block ---
