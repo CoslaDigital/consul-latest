@@ -447,18 +447,20 @@
       text-align: center;
       flex-shrink: 0;
       flex-grow: 0;
-      width: 12rem;          // Fixed width
-      height: auto;
+      width: 100%;          // Fixed width
+      height: 12 rem;
       min-height: 8rem;
       overflow: hidden;
 
       // --- MOBILE STYLES (Center the image) ---
-      margin: 0 auto;        // Center horizontally
-      margin-bottom: 1rem;   // Add space between image and text
+      margin: 0 auto 1rem auto;;        
       align-self: center;    // Center within the flex column
 
       // --- DESKTOP STYLES (Restore Side-by-Side layout) ---
       @include breakpoint(medium) {
+        width: 12rem;
+        height: auto;
+        flex-basis: 12rem;
         margin: 0;             // Reset margins
         margin-#{$global-left}: rem-calc(-12); // Pull to the left edge
         margin-right: rem-calc(12); // Add gap between image and text
