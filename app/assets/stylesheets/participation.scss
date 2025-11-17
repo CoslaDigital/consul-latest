@@ -643,17 +643,10 @@
           border-radius: rem-calc(4);
         }
 
-    .debate-content,
-    .budget-investment-content,
-    .proposal-content {
-      flex-basis: calc((35rem - 100%) * 999);
-      flex-grow: 1000;
-      max-width: 50rem;
-
-      + * {
-        flex-basis: 22.5%;
-        flex-shrink: 0;
-        text-align: center;
+        // 5. Hide the votes container in this view (or style it)
+        .supports-container {
+          display: none; // It's too busy to overlay the votes
+        }
       }
     }
   }
