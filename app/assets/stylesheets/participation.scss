@@ -380,6 +380,7 @@
   }
 }
 
+.debates-list,
 .proposals-list,
 .budget-investments-list {
 
@@ -390,6 +391,7 @@
 
 .debates-list,
 .proposals-list,
+#proposals-list,
 .budget-investments-list,
 .legislation-proposals {
 
@@ -398,33 +400,248 @@
     display: flex;
     flex-wrap: wrap;
 
+    flex-direction: column;
+    align-items: stretch; 
+
+    // 2. DESKTOP: Switch to side-by-side
+    @include breakpoint(medium) {
+      flex-direction: row;
+ //     height: 18rem;
+ //     overflow: hidden;
+ //     align-items: stretch; 
+    }
+
     > * {
       flex-grow: 1;
     }
 
+    .debate-content,
+    .budget-investment-content,
+    .proposal-content {
+      flex: 1;      // "Grow to fill remaining space"
+      min-width: 0; // "It's OK to wrap your text"
+      align-self: flex-start;     
+    }
+    
+    .debate-content + div,
+    .supports-container,
+    .budget-investment-content + div {
+      flex-grow: 0;
+      flex-shrink: 0;
+      flex-basis: 22.5%;
+      text-align: center;
+      align-self: flex-start;
+    }
+    
+    .supports {
+      flex-grow: 0;
+      flex-shrink: 0;
+      flex-basis: auto;
+      text-align: center;
+    }
+
+    // IMAGE BOX (for all panels) ---
+    .panel-image {
+      // --- COMMON STYLES ---
+      aspect-ratio: 1/1;
+      text-align: center;
+      flex-shrink: 0;
+      flex-grow: 0;
+      width: 100%;          // Fixed width
+      height: 12 rem;
+      min-height: 8rem;
+      overflow: hidden;
+
+      // --- MOBILE STYLES (Center the image) ---
+      margin: 0 auto 1rem auto;;        
+      align-self: center;    // Center within the flex column
+
+      // --- DESKTOP STYLES (Restore Side-by-Side layout) ---
+      @include breakpoint(medium) {
+        width: 12rem;
+        height: auto;
+        flex-basis: 12rem;
+        margin: 0;             // Reset margins
+        margin-#{$global-left}: rem-calc(-12); // Pull to the left edge
+        margin-right: rem-calc(12); // Add gap between image and text
+        margin-bottom: 0;      // Remove the bottom space
+        align-self: stretch;   // Stretch to match panel height
+      }
+
+      ~ * {
+        padding-top: calc($line-height / 2);
+      }
+
+      // Correctly nested img rule
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+    // SDG ICON RULES --
+    .proposal-content .sdg-goal-tag-list,
+    .budget-investment-content .sdg-goal-tag-list,
+    .debate-content .sdg-goal-tag-list {
+      flex-wrap: nowrap;
+      overflow: hidden;
+      margin: 0 0 1rem 0;
+      width: auto;
+
+      // Fixes the large icon size
+      .sdg-goal-icon {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+      }
+    }
+
+    // --- .with-image BLOCK ---
     &.with-image {
       padding-bottom: 0;
       padding-top: 0;
+    } 
+     
+      // --- This is the new, RESPONSIVE .panel--hero block ---
+      &.panel--hero {
+        // 1. Set up the grid (DEFAULT = MOBILE = 1 COLUMN)
+        display: grid;
+        padding: 0;
+        // grid-template-columns: 1fr auto; // <-- REMOVED from here
+        position: relative; 
+        border-radius: 0; 
+        overflow: hidden; 
 
-      .panel-image {
-        margin-#{$global-left}: rem-calc(-12);
-        text-align: center;
+        // 2. The gradient (no change)
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(to right,
+            rgba($brand-secondary,0.95) 0%,
+            rgba($brand,0.7) 50%,
+            transparent 75%
+          );
+          z-index: 1;
+          border-radius: 0;
+        }
 
-        flex-basis: 25%;  // Give it a 25% width
-        flex-shrink: 0;   // Don't let it be squished
-  
-        ~ * {
-          padding-top: calc($line-height / 2);
+        // 3. The image (no change)
+        .panel-image {
+          position: absolute; 
+          top: 0; left: 0;
+          width: 100%; 
+          height: 100%; 
+          z-index: 0;
+          margin: 0;
+          flex-basis: auto; 
+          flex-shrink: 1;
+          grid-area: auto; 
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+          }
+        }
+
+        // 4. The text (DEFAULT = MOBILE)
+        .proposal-content,
+        .budget-investment-content,
+        .debate-content {
+          position: relative; 
+          grid-row: 1;      // Sits in row 1
+          grid-column: 1;   // Sits in column 1 (the only column)
+          z-index: 2; 
+          color: #FFFFFF; 
+          padding: 1rem;
+          background: none; 
+          align-self: end; // At the bottom of its cell
+          width: auto; 
+          margin-left: 0;
+        }
+
+        // 5. The votes (DEFAULT = MOBILE)
+        .supports-container {
+          display: block; 
+          position: relative;
+          grid-row: 2;      // <-- Sits in ROW 2
+          grid-column: 1;   // Sits in column 1 (the only column)
+          z-index: 2; 
+          padding: 1rem;
+          // Add a slight bg to separate it from the text row
+          background: rgba(0,0,0,0.2); 
+          align-self: start; // At the top of its cell
+          color: #FFFFFF;
+          
+          * { color: #FFFFFF; }
+          strong { color: #FFFFFF; }
+        }
+
+        // 6. --- ADD THIS FOR WIDE SCREENS ---
+        @include breakpoint(medium) {
+          // On medium screens+, switch to a 2-column layout
+          grid-template-columns: 1fr auto;
+          grid-template-rows: 1fr; // Everything is on one row
+
+          .proposal-content {
+            grid-row: 1;    // Back to row 1
+            grid-column: 1; // In column 1
+            align-self: end;
+          }
+
+          .supports-container {
+            grid-row: 1;    // Back to row 1
+            grid-column: 2; // In column 2
+            align-self: end;
+            background: none; // Remove the mobile-only background
+          }
         }
       }
 
-      img {
-        height: 100%;
-        width: 100%;         // Make the image as wide as its container
-        object-fit: cover;   // The magic: Fill the space, crop, DON'T distort.
-        object-position: center; // Crop from the center
-      }
-    }
+      // --- ADD THIS NEW BLOCK FOR THE HERO STYLE ---
+      // This is our "Hero Overlay" modifier
+      // These rules will *only* apply if you add the .panel--hero class
+      &.oldpanel--hero {
+        // 1. Override the 'flex' layout with 'grid'
+        display: grid;
+        padding: 0;
+        min-height: rem-calc(192);
+
+        // 2. Make all children stack in the same grid cell
+        .panel-image,
+        .proposal-content,
+        .supports-container { // We include the votes container too
+          grid-area: 1 / 1;
+          position: relative; // Needed for stacking
+        }
+
+        // 3. Style the image (the "background" layer)
+        .panel-image {
+          margin: 0;
+          // unset the flex rules from the default style
+          flex-basis: auto; 
+          flex-shrink: 1;
+
+          img {
+            // 'object-fit' will still work perfectly
+          }
+        }
+
+        // 4. Style the text (the "overlay" layer)
+        .proposal-content {
+          align-self: center; // Vertically centers the text block
+
+          // Your "2/3 from the end" request
+          width: 66.667%;
+          margin-left: 33.333%;
+
+          // Readable background!
+          background: rgba(0, 0, 0, 0.65); // 65% black background
+          color: #FFFFFF;
+          padding: 1rem;
+          border-radius: rem-calc(4);
+        }
 
     .debate-content,
     .budget-investment-content,
@@ -440,7 +657,7 @@
       }
     }
   }
-}
+
 
 %panel {
   border: 1px solid;
