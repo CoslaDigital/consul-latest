@@ -114,11 +114,11 @@ class I18nContent < ApplicationRecord
       dashboard.poster.index.proposal_code
       dashboard.poster.index.support
       dashboard.poster.index.footer
-      dashboard.mailer.forward.hi
-      dashboard.mailer.forward.introduction
-      dashboard.mailer.forward.support
-      dashboard.mailer.forward.support_button
-      dashboard.mailer.forward.share
+      mailers.proposal_published.title
+      mailers.proposal_published.intro
+      mailers.proposal_published.text
+      mailers.proposal_published.sincerely
+      mailers.proposal_published.share
     ]
   end
   
