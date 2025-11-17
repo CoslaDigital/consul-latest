@@ -340,7 +340,6 @@ en:
     index:
       featured_proposals: Featured
       orders:
-        alphabetical: alphabetical
         confidence_score: highest rated
         created_at: newest
         hot_score: most active
