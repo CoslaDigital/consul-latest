@@ -58,20 +58,33 @@ class MapLocation < ApplicationRecord
 
   def self.proposals_json_data(proposals)
     return [] if proposals.none?
-    Rails.logger.info "Inside proposals_json_data #{proposals.inspect}"
+    
+    scope = proposals.joins(:map_location)
+                     .includes(:map_location)
+                     .where.not(map_locations: { latitude: nil })
 
-    data = proposals.joins(:map_location)
-                    .with_fallback_translation 
-                    .pluck(:id, :title, :latitude, :longitude) 
-        
-    data.map do |values|
+    # 2. Map the Objects
+    scope.map do |proposal|
       {
-        title: values[1],
-        link: "/proposals/#{values[0]}", 
-        lat: values[2],
-        long: values[3]
+        title: proposal.title,
+        link: "/proposals/#{proposal.id}",
+        lat: proposal.map_location.latitude,
+        long: proposal.map_location.longitude,
+        # 3. Call the separate method
+        icon_class: icon_class_for(proposal) 
       }
     end
+
+  end
+  
+  def self.icon_class_for(proposal)
+    # Extract logic here so it's easy to change later
+    # Example: You could add logic to check if proposal.successful? 
+    # to return a gold marker, etc.
+    
+    slug = proposal.tag_list&.first || 'default'
+    
+    "marker-category-#{slug}"
   end
 
 end

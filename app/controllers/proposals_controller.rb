@@ -94,6 +94,7 @@ class ProposalsController < ApplicationController
   def map
     @proposal = Proposal.new
     @tag_cloud = tag_cloud
+    @proposals_with_location = Proposal.published.joins(:map_location)
   end
 
   def disable_recommendations

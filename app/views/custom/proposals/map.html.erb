@@ -1,4 +1,4 @@
-<%# Row for Title and Administrative Geozones (displayed horizontally) %>
+ <% proposal_markers = MapLocation.proposals_json_data(@proposals_with_location) %>
 <div class="row">
   <div class="small-12 column">
     <h1><%= t("map.title") %></h1>
@@ -21,7 +21,7 @@
 <div class="row">
   <div class="small-12 column"> <%# Ensures the map container takes full available width %>
     <div class="budget-investments-map">
-      <%= render Shared::MapLocationComponent.new(nil, geozones_data: geozones_data) %>
+      <%= render Shared::MapLocationComponent.new(nil, investments_coordinates: proposal_markers,geozones_data: geozones_data) %>
     </div>
   </div>
 </div>
