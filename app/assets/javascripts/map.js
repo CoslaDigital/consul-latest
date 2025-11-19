@@ -36,11 +36,27 @@
         html: '<div class="map-icon"></div>'
       });
 
-      createMarker = function(latitude, longitude) {
-        var newMarker, markerLatLng;
+      createMarker = function(latitude, longitude, data) {
+        var newMarker, markerLatLng, dynamicIcon, customClass;
         markerLatLng = new L.LatLng(latitude, longitude);
+        if (data && data.icon_class) {
+        customClass = data.icon_class; 
+    } else {
+        customClass = "marker-default";
+    }
+
+    // 2. BUILD THE ICON
+    dynamicIcon = L.divIcon({
+        // We append our custom class to the base "map-marker" class
+        className: "map-marker " + customClass, 
+        
+        iconSize: [30, 30],
+        iconAnchor: [15, 40],
+        html: '<div class="map-icon"></div>'
+    });
+        
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon,
+          icon: dynamicIcon,
           draggable: editable
         });
         if (editable) {
@@ -200,7 +216,7 @@
           var marker;
 
           if (App.Map.validCoordinates(coordinates)) {
-            marker = createMarker(coordinates.lat, coordinates.long);
+            marker = createMarker(coordinates.lat, coordinates.long,coordinates);
             marker.options.id = coordinates.investment_id;
             marker.bindPopup(App.Map.getPopupContent(coordinates));
           }

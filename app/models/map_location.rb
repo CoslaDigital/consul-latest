@@ -77,14 +77,17 @@ class MapLocation < ApplicationRecord
 
   end
   
-  def self.icon_class_for(proposal)
+  def self.icon_class_for(resource)
     # Extract logic here so it's easy to change later
     # Example: You could add logic to check if proposal.successful? 
     # to return a gold marker, etc.
-    
-    slug = proposal.tag_list&.first || 'default'
-    
-    "marker-category-#{slug}"
+    if resource.is_a?(Budget::Investment)
+      "marker-type-investment"
+    else
+      # Default to proposal logic (checking category, etc.)
+      slug = resource.respond_to?(:category) && resource.category.present? ? resource.category.slug : 'default'
+      "marker-type-proposal marker-category-#{slug}"
+    end    
   end
 
 end

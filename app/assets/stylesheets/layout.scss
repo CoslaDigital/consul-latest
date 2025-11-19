@@ -1249,8 +1249,172 @@ form {
 
 // 09. Map
 // -------
-
 .map {
+  height: 350px;
+  width: 100%;
+
+  .map-marker {
+    // Center the marker div over the coordinate
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    visibility: visible;
+    z-index: 1000;
+
+    // We shift it up so the "tip" of the icon lands on the location
+    // Adjust this pixel value based on your font-size
+    margin-top: -40px; 
+    margin-left: -12px; // Center horizontally (half of width)
+
+    .map-icon {
+      // 1. Remove all the complex shape styles
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      transform: none; // No rotation needed
+
+      // 2. Set up the Font Awesome text style
+      display: block;
+      text-align: center;
+      width: 24px; 
+      line-height: 1; // Tight line height
+    }
+
+    // 3. Define the Icon Appearance
+    .map-icon::before {
+      font-family: "Font Awesome 5 Free"; 
+      font-weight: 900;
+      
+      // Make it big so it acts like a pin
+      font-size: 40px; 
+      
+      // Add a drop shadow so it stands out against map streets
+      text-shadow: 0px 2px 4px rgba(0,0,0,0.5); 
+      
+      // Default Icon: The standard "Teardrop" map marker
+      // You can change this to "\f08d" for a push-pin style
+      content: "\f3c5"; 
+    }
+    
+    // Remove the old white dot
+    .map-icon::after {
+      content: none;
+    }
+  }
+}
+
+// --- MODIFIER CLASSES (Just change the Color) ---
+
+// 1. PROPOSALS
+.marker-type-proposal {
+  .map-icon {
+    color: #3ba5db; // Blue Icon
+  }
+}
+
+// 2. INVESTMENTS
+.marker-type-investment {
+  .map-icon {
+    color: #8e44ad; // Purple Icon
+  }
+  // Optional: Change the shape for investments?
+  // .map-icon::before { content: "\f0d6"; } // e.g., Money bill icon
+}
+
+// Base visibility
+.map-marker {
+  visibility: hidden;
+}
+
+
+.amendedmap {
+  height: 350px;
+  width: 100%;
+
+  .map-marker {
+    left: 50%;
+    margin-top: -5px;
+    position: absolute;
+    top: 50%;
+    visibility: visible;
+    
+    // Optional: Add z-index to make sure it sits on top of map tiles
+    z-index: 1000;
+
+    .map-icon {
+      // 1. The Teardrop Shape
+      border-radius: 50% 50% 50% 0;
+      height: 30px;
+      width: 30px;
+      transform: rotate(-45deg); // This creates the point at the bottom
+      
+      // 2. Flexbox to center the icon content
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      // 3. Shadow (Optional - helps visibility)
+      box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
+      
+      // 4. Default Background (Fallback)
+      background: #00cae9;
+      border: 2px solid white; // Optional: White border looks nice on maps
+    }
+
+    // --- THE ICON INSIDE ---
+    // We use ::before for the FontAwesome icon
+    .map-icon::before {
+      font-family: "Font Awesome 5 Free"; // Must match your icons.scss
+      font-weight: 900;
+      font-size: 14px;
+      color: white;
+      
+      // CRITICAL: We must rotate the icon +45deg to counteract
+      // the -45deg rotation of the parent teardrop.
+      transform: rotate(45deg); 
+    }
+
+    // --- REMOVE THE OLD WHITE DOT ---
+    .map-icon::after {
+      content: none; // We don't want the white dot anymore
+    }
+  }
+}
+
+// --- MODIFIER CLASSES (Colors & Specific Icons) ---
+// These match the classes we generated in your Rails model
+
+// 1. PROPOSALS (Lightbulb)
+.marker-type-proposal {
+  .map-icon {
+    background: #3ba5db; // Blue
+  }
+  .map-icon::before {
+    content: "\f0eb"; // fa-lightbulb
+  }
+}
+
+// 2. INVESTMENTS (Budget/Money)
+.marker-type-investment {
+  .map-icon {
+    background: #8e44ad; // Purple
+  }
+  .map-icon::before {
+    content: "\f200"; // fa-file-invoice-dollar (icon-budget)
+  }
+}
+
+// 3. CATEGORY OVERRIDES (Optional)
+.marker-category-health .map-icon         { background: #e74c3c; }
+.marker-category-environment .map-icon    { background: #2ecc71; }
+
+// Base visibility rule
+.map-marker {
+  visibility: hidden;
+}
+
+.goodmap {
   height: 350px;
   width: 100%;
 
