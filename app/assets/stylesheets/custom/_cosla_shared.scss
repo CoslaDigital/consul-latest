@@ -268,7 +268,7 @@ padding-bottom: 5rem;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.map {
+.coslamap {
   --map-height: 650px;
   --marker-size: 30px;
   --marker-color: #00cae9;
@@ -319,6 +319,25 @@ padding-bottom: 5rem;
         background-size: 26px 26px;
   }
 }
+
+// 1. PROPOSALS
+.map .marker-type-proposal {
+  .map-icon {
+    color: var(--brand-secondary); // Use COLOR (text), not background
+  }
+  // Optional: Change icon?
+  // .map-icon::before { content: "\f0eb"; } // Lightbulb
+}
+
+// 2. INVESTMENTS
+.map .marker-type-investment {
+  .map-icon {
+    color: #fc0390; // Use COLOR (text), not background
+  }
+  // Optional: Change icon?
+  //.map-icon::before { content: "\f0d6"; } // Money
+}
+
 
 /* For debugging the hero-header background issue */
 body .site-dev .hero-header.hero-header .row::before {

@@ -78,9 +78,6 @@ class MapLocation < ApplicationRecord
   end
   
   def self.icon_class_for(resource)
-    # Extract logic here so it's easy to change later
-    # Example: You could add logic to check if proposal.successful? 
-    # to return a gold marker, etc.
     if resource.is_a?(Budget::Investment)
       "marker-type-investment"
     else
