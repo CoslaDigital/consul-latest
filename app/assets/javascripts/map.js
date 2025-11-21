@@ -15,14 +15,15 @@
       App.Map.maps = [];
     },
     initializeMap: function(element) {
-      var createMarker, editable, investmentsMarkers, map, marker, markerClustering,
+      var createMarker, editable, investmentsMarkers, proposalsMarkers, map, marker, markerClustering,
         markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector,
         geozoneLayers = {}, // Object to hold geozone layers
         layerControl = {}; // Object to hold control layers
-
+      
       App.Map.cleanInvestmentCoordinates(element);
       removeMarkerSelector = $(element).data('marker-remove-selector');
       investmentsMarkers = $(element).data("marker-investments-coordinates");
+      proposalsMarkers = $(element).data("marker-proposals-coordinates");
       editable = $(element).data("marker-editable");
       markerClustering = $(element).data("marker-clustering");
 
@@ -105,6 +106,7 @@
       }
 
       App.Map.addInvestmentsMarkers(investmentsMarkers, createMarker);
+      App.Map.addProposalsMarkers(proposalsMarkers, createMarker);
       App.Map.addGeozones(map, geozoneLayers); // Pass the geozoneLayers object
 
       // Add markers layer
@@ -135,7 +137,7 @@
     },
     attributionPrefix: function() {
       return '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>';
-    },
+    }, 
     markerData: function(element) {
       var dataCoordinates, formCoordinates, inputs, latitude, longitude;
       inputs = App.Map.coordinatesInputs(element);
@@ -223,6 +225,19 @@
         });
       }
     },
+    addProposalsMarkers: function(markers, createMarker) {
+  if (markers) {
+    markers.forEach(function(coordinates) {
+      var marker;
+
+      if (App.Map.validCoordinates(coordinates)) {
+        marker = createMarker(coordinates.lat, coordinates.long, coordinates);
+        marker.options.id = coordinates.proposal_id;
+        marker.bindPopup(App.Map.getPopupContent(coordinates));
+      }
+    });
+  }
+},
     cleanInvestmentCoordinates: function(element) {
       var clean_markers, markers;
       markers = $(element).attr("data-marker-investments-coordinates");
