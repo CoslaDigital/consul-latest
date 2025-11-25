@@ -1,99 +1,189 @@
-// Overrides styles of jquery-ui/datepicker
-//
+// ---------------------------------------------------------
+// Shared Styles (jQuery UI + Simple Calendar)
+// ---------------------------------------------------------
 
-.ui-datepicker-header {
-  @extend %brand-background;
-  font-weight: bold;
-}
-
-.ui-datepicker-calendar {
-
-  .ui-state-hover,
-  .ui-state-active {
-    @extend %brand-background;
-
-    .ui-state-default:not(&) {
-      background: $highlight;
-    }
-  }
-
-  thead {
-
-    tr th {
-      @include brand-border;
-    }
-  }
-}
-
-.ui-datepicker {
+// 1. The Container
+.ui-datepicker,
+.simple-calendar {
   padding: 0;
   z-index: 4 !important;
+  font-family: inherit;
 
-  .ui-datepicker-prev,
-  .ui-datepicker-next {
-    color: inherit;
-    cursor: pointer;
-    font-family: "icons" !important;
-    font-size: rem-calc(24);
-    font-weight: normal;
-    height: rem-calc(30);
-    line-height: $line-height;
-    position: absolute;
-    top: 4px;
-    width: rem-calc(30);
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
-
-  .ui-datepicker-prev::after {
-    content: "\62";
-  }
-
-  .ui-datepicker-next::after {
-    content: "\63";
-  }
+  // FIX 1: Set a dark default text color for the grid.
+  // This prevents the calendar numbers from disappearing if they inherit 'white'.
+  color: #333333;
 
   table {
     border: 1px solid $border;
     border-top: 0;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
   }
 
   tr {
     border-bottom: 1px solid $border;
-
-    &:last-child {
-      border-bottom: 0;
-    }
-
-    &:nth-child(odd) {
-      background: none;
-    }
+    &:last-child { border-bottom: 0; }
+    &:nth-child(odd) { background: none; }
   }
 
-  td {
+  td, th {
     border-right: 1px solid $border;
     padding: 0;
+    &:last-child { border-right: 0; }
+  }
 
-    &:last-child {
-      border-right: 0;
-    }
+  // 3. The Cells (Days)
+  td {
+    vertical-align: top;
 
-    span,
-    a {
-      color: inherit;
+    span, a, .day-number {
+      display: block;
+      color: inherit; // Inherits the #333333 defined above
       line-height: $line-height;
       text-align: center;
+      text-decoration: none;
+    }
+
+    &.day {
+      height: rem-calc(100);
+      padding: 4px;
     }
   }
 }
 
-.ui-datepicker-unselectable.ui-state-disabled {
-  background: #fff;
+// ---------------------------------------------------------
+// The Header (Month Title & Navigation)
+// ---------------------------------------------------------
 
-  .ui-state-default {
-    background: #f8f8f8;
-    color: $text-medium;
+.ui-datepicker-header,
+.calendar-heading {
+  // FIX 2: Use the correct variable here
+  background-color: $brand;
+
+  font-weight: bold;
+  position: relative;
+  padding: rem-calc(10) 0;
+  text-align: center;
+
+  // FIX 3: Force white text on the header.
+  // Since background is $brand, we need to ensure text is visible.
+  color: white;
+
+  .calendar-title {
+    font-size: rem-calc(16);
+    color: white;
   }
 }
+
+// ---------------------------------------------------------
+// Navigation Buttons (Arrows)
+// ---------------------------------------------------------
+
+.ui-datepicker {
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    @extend %datepicker-nav-shared;
+  }
+}
+
+.simple-calendar .calendar-heading {
+  a {
+    @extend %datepicker-nav-shared;
+    color: transparent !important;
+    overflow: hidden;
+
+    &:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+  }
+
+  a:first-child {
+    left: 4px;
+    &::after {
+      content: "\62";
+      color: white; // Icon color
+    }
+  }
+
+  a:last-child {
+    right: 4px;
+    &::after {
+      content: "\63";
+      color: white; // Icon color
+    }
+  }
+}
+
+%datepicker-nav-shared {
+  cursor: pointer;
+  font-family: "icons" !important;
+  font-size: rem-calc(24);
+  font-weight: normal;
+  height: rem-calc(30);
+  line-height: $line-height;
+  position: absolute;
+  top: 4px;
+  width: rem-calc(30);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover { text-decoration: none; }
+}
+
+// ---------------------------------------------------------
+// Active / Today States
+// ---------------------------------------------------------
+
+.ui-datepicker-calendar,
+.simple-calendar {
+
+  thead tr th {
+    @include brand-border;
+    padding: rem-calc(10) 0;
+    color: #333; // Ensure "Mon", "Tue" are dark
+  }
+
+  .ui-state-hover,
+  .ui-state-active,
+  .today .day-number {
+    // FIX 4: Use the variable here for the active day circle
+    background-color: $brand;
+
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    margin: 0 auto;
+  }
+}
+
+// ---------------------------------------------------------
+// Event Bars
+// ---------------------------------------------------------
+
+.simple-calendar .event-bar {
+  margin-top: 4px;
+  padding: 2px 4px;
+  font-size: rem-calc(12);
+  border-radius: 2px;
+  text-align: left;
+
+  // FIX 5: Fallback background.
+  // If your phase classes don't load, this makes the white text visible.
+  background-color: #666;
+  color: white;
+
+  a {
+    text-align: left;
+    color: white;
+    padding: 0;
+  }
+}
+
+// Optional: Phase colors (Ensure these are defined!)
+.phase-drafting   { background-color: #90a4ae; }
+.phase-balloting  { background-color: #ef5350; }
+.phase-finished   { background-color: #546e7a; }
