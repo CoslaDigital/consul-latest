@@ -83,6 +83,14 @@ class Budget < ApplicationRecord
     phases.published.last&.ends_at
   end
 
+  def phase_name_on(date)
+    active_phase = published_phases.find do |p|
+      # Ensure dates exist to avoid errors, then check range
+      p.starts_at && p.ends_at && (p.starts_at..p.ends_at).cover?(date)
+    end
+    active_phase ? active_phase.name : "unknown"
+  end
+
   def description
     description_for_phase(phase)
   end
