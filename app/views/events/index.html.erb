@@ -1,0 +1,25 @@
+<div>
+  <div class="calendar-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Events Calendar</h1>
+
+
+    </div>
+
+    <%# We explicitly tell simple_calendar to use the Budget's starts_at/ends_at methods %>
+    <%= month_calendar(events: @events, attribute: :starts_at, end_attribute: :ends_at) do |date, budgets| %>
+
+      <div class="day-label text-muted"><%= date.day %></div>
+
+      <% budgets.each do |budget| %>
+        <% phase_name = budget.phase_name_on(date) %>
+        <div class="event-bar phase-<%= phase_name %>" title="<%= budget.name %>: <%= phase_name.humanize %>">
+          <%= link_to budget_path(budget), class: "event-link" do %>
+            <span class="event-title"><%= budget.name %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+    <% end %>
+  </div>
+</div>
