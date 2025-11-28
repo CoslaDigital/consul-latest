@@ -1,0 +1,40 @@
+<%= form_with(model: event, local: true, class: "event-form") do |form| %>
+
+  <% if event.errors.any? %>
+    <div class="callout alert">
+      <h4><%= pluralize(event.errors.count, "error") %> prohibited this event from being saved:</h4>
+      <ul>
+        <% event.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="margin-bottom">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: "input-group-field" %>
+  </div>
+
+  <div class="margin-bottom">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 4, class: "input-group-field" %>
+  </div>
+
+  <div class="grid-x grid-margin-x">
+    <div class="cell medium-6 margin-bottom">
+      <%= form.label :starts_at %>
+      <%= form.datetime_field :starts_at, class: "input-group-field" %>
+    </div>
+
+    <div class="cell medium-6 margin-bottom">
+      <%= form.label :ends_at %>
+      <%= form.datetime_field :ends_at, class: "input-group-field" %>
+    </div>
+  </div>
+
+  <div class="actions margin-top">
+    <%= form.submit class: "button success" %>
+    <%= link_to "Cancel", events_path, class: "button secondary hollow" %>
+  </div>
+<% end %>

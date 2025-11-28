@@ -7,6 +7,7 @@ class Poll < ApplicationRecord
   include Sluggable
   include Reportable
   include SDG::Relatable
+  include CalendarItem
 
   translates :name,        touch: true
   translates :summary,     touch: true

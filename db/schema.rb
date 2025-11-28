@@ -628,6 +628,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "failed_census_calls", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.string "document_number"
