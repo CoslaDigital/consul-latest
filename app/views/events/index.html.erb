@@ -1,25 +1,33 @@
-<div>
-  <div class="calendar-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Events Calendar</h1>
+<div class="calendar-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Events Calendar</h1>
 
-
-    </div>
-
-    <%# We explicitly tell simple_calendar to use the Budget's starts_at/ends_at methods %>
-    <%= month_calendar(events: @events, attribute: :starts_at, end_attribute: :ends_at) do |date, budgets| %>
-
-      <div class="day-label text-muted"><%= date.day %></div>
-
-      <% budgets.each do |budget| %>
-        <% phase_name = budget.phase_name_on(date) %>
-        <div class="event-bar phase-<%= phase_name %>" title="<%= budget.name %>: <%= phase_name.humanize %>">
-          <%= link_to budget_path(budget), class: "event-link" do %>
-            <span class="event-title"><%= budget.name %></span>
-          <% end %>
-        </div>
-      <% end %>
-
+    <%= link_to new_event_path, class: "button button-primary" do %>
+      Create Event
     <% end %>
   </div>
+
+  <%= month_calendar(events: @calendar_items, attribute: :calendar_start) do |date, items| %>
+
+    <div class="day-number"><%= date.day %></div>
+
+    <% items.each do |item| %>
+      <div class="event-bar <%= item.calendar_class %>">
+
+        <%= link_to item.calendar_title, item.calendar_link_url, class: "event-link text-white" %>
+
+        <% if item.is_a?(Event) %>
+          <div class="event-actions float-end">
+            <%= link_to "Edit", edit_event_path(item), class: "text-white small me-1" %>
+
+            <%= link_to "x", event_path(item),
+                        data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                        class: "text-white small" %>
+          </div>
+        <% end %>
+
+      </div>
+    <% end %>
+
+  <% end %>
 </div>

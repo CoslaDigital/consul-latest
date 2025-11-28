@@ -13,6 +13,7 @@ class Budget
     include Globalizable
     include Sanitizable
     include Imageable
+    include CalendarItem
 
     belongs_to :budget, touch: true
     belongs_to :next_phase, class_name: name, inverse_of: :prev_phase
@@ -31,6 +32,18 @@ class Budget
 
     scope :enabled,           -> { where(enabled: true) }
     scope :published,         -> { enabled.where.not(kind: "drafting") }
+
+    # Override the default link behavior
+    def calendar_link_url
+      # Construct the anchor string: phase-ID-slugified-name
+      anchor_string = "phase-#{id}-#{name.parameterize}"
+      Rails.application.routes.url_helpers.budget_path(budget, anchor: anchor_string)
+    end
+
+    # Override the title just for Phases
+    def calendar_title
+      "#{budget.name}: #{name}"
+    end
 
     PHASE_KINDS.each do |phase|
       define_singleton_method(phase) { find_by(kind: phase) }

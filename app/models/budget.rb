@@ -3,6 +3,7 @@ class Budget < ApplicationRecord
   include Sluggable
   include Reportable
   include Imageable
+  include CalendarItem
 
   translates :name, :main_link_text, :main_link_url, touch: true
   include Globalizable

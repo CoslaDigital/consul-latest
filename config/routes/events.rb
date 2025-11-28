@@ -1,2 +1,2 @@
 # events routes
-resources :events, only: [:index]
+resources :events
