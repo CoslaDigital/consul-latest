@@ -148,7 +148,6 @@
   .ui-state-hover,
   .ui-state-active,
   .today .day-number {
-    // FIX 4: Use the variable here for the active day circle
     background-color: $brand;
 
     color: white;
@@ -171,8 +170,6 @@
   border-radius: 2px;
   text-align: left;
 
-  // FIX 5: Fallback background.
-  // If your phase classes don't load, this makes the white text visible.
   background-color: #666;
   color: white;
 
@@ -181,9 +178,48 @@
     color: white;
     padding: 0;
   }
-}
+  // 1. Manual Events (The ones you create via the button) -> PURPLE
+  &.type-event {
+    background-color: #9c27b0;
+    border-left: 3px solid #7b1fa2;
+  }
 
-// Optional: Phase colors (Ensure these are defined!)
-.phase-drafting   { background-color: #90a4ae; }
-.phase-balloting  { background-color: #ef5350; }
-.phase-finished   { background-color: #546e7a; }
+  // 2. Legislation Processes -> BLUE
+  &.type-process {
+    background-color: #0288d1;
+    border-left: 3px solid #01579b;
+  }
+
+  // 3. Budgets (The main container) -> TEAL
+  &.type-budget {
+    background-color: #009688;
+    border-left: 3px solid #004d40;
+  }
+
+  // 4. Polls -> ORANGE
+  &.type-poll {
+    background-color: #ff9800;
+    border-left: 3px solid #e65100;
+  }
+
+  // 5. Budget Phases (Specific stages)
+  // These override the generic types because of the .phase-X class
+  .phase-drafting { background-color: #78909c; } /* Blue Grey */
+  .phase-informing { background-color: #42a5f5; } /* Blue */
+  .phase-accepting { background-color: #66bb6a; } /* Green */
+  .phase-reviewing { background-color: #ffa726; } /* Orange */
+  .phase-selecting { background-color: #ab47bc; } /* Purple */
+  .phase-valuating { background-color: #ec407a; } /* Pink */
+  .phase-publishing_prices { background-color: #8d6e63; } /* Brown */
+  .phase-balloting { background-color: #ef5350; } /* Red (Action required!) */
+  .phase-reviewing_ballots { background-color: #ff7043; } /* Deep Orange */
+  .phase-finished {
+    background-color: #b0bec5;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+// Optional: Phase colors
+&.phase-Information  { background-color: #90a4ae; }
+&.phase-Balloting  { background-color: #ef5350; }
+&.phase-finished   { background-color: #546e7a; }
+}
