@@ -3,7 +3,7 @@
 class Budget
   class Stvresult
     attr_accessor :budget, :heading, :current_investment
-
+    
     def initialize(budget, heading, user:)
       @budget = budget
       @heading = heading
@@ -26,8 +26,8 @@ class Budget
       # ----------------------------------------------------------------
       reset_winners
 
-      summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
-      detail_slug  = "stv_details_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
+      summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".parameterize
+      detail_slug  = "stv_details_#{@budget.name}_#{@heading.name}".parameterize
       summary_title = "Election Results: #{@budget.name}"
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
@@ -369,10 +369,9 @@ end
       votes_data
     end
 
-
     def update_custom_page(html_content, page_title, page_slug)
       file_name_for_slug = "stv_voting_#{@budget.name}_#{@heading.name}"
-      slug = file_name_for_slug.downcase.tr(' ', '-')
+      slug = file_name_for_slug.parameterize
   
       page = SiteCustomization::Page.find_or_initialize_by(slug: page_slug)
 
@@ -382,23 +381,6 @@ end
        Rails.logger.error "Failed to update page '#{page_title}': #{page.errors.full_messages.join(", ")}"
      end
    end
-
-    def old_update_custom_page(filename, page_title)
-      file_path = Rails.root.join('log', filename)
-      if File.exist?(file_path)
-        file_content = File.read(file_path)
-        html_content = parse_log_to_html(file_content)
-        file_name = File.basename(file_path, '.*')
-        page = SiteCustomization::Page.find_or_initialize_by(slug: file_name.downcase.tr(' ', '-'))
-        if page.update(status: 'published', updated_at: Time.now, title: file_name, content: html_content)
-          Rails.logger.info "Page '#{file_name}' updated successfully."
-        else
-          Rails.logger.error "Failed to update page '#{file_name}': #{page.errors.full_messages.join(", ")}"
-        end
-      else
-        puts "Log file '#{file_path}' does not exist."
-      end
-    end
 
     def candidates
       heading.investments.selected.sort_by_votes
