@@ -1,22 +1,22 @@
 <h2 class="inline-block">Manage Events</h2>
 <%= link_to "New Event", new_admin_event_path, class: "button float-right success" %>
-
 <table>
   <thead>
   <tr>
-    <th>Name</th>
-    <th>Start Date</th>
-    <th>Actions</th>
+    <th><%= t("admin.events.event.name") %></th>
+    <th><%= t("admin.events.event.start_date") %></th>
+    <th><%= t("admin.events.event.description") %></th>
+    <th><%= t("admin.actions.actions") %></th>
   </tr>
   </thead>
   <tbody>
   <% @events.each do |event| %>
     <tr>
       <td><%= event.name %></td>
-      <td><%= l event.starts_at, format: :short %></td>
+      <td><%= event.starts_at %></td>
+      <td><%= truncate(strip_tags(event.description), length: 100) %></td>
       <td>
-        <%= link_to "Edit", edit_admin_event_path(event) %> |
-        <%= link_to "Delete", admin_event_path(event), method: :delete, data: { confirm: "Are you sure?" } %>
+        <%= render Admin::TableActionsComponent.new(event) %>
       </td>
     </tr>
   <% end %>
