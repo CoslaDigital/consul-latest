@@ -1,7 +1,14 @@
 <div class="row margin">
   <div class="small-12 medium-8 column">
 
-    <header class="margin-bottom">
+    <%= back_link_to events_path %>
+
+    <header class="margin-bottom clearfix">
+      <%# --- EDIT BUTTON (Admin Only) --- %>
+      <% if current_user&.administrator? %>
+        <%= link_to "Edit Event", edit_admin_event_path(@event), class: "button hollow float-right" %>
+      <% end %>
+
       <h1 class="h2"><%= @event.name %></h1>
       <span class="label secondary">Manual Event</span>
     </header>
