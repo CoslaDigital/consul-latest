@@ -1,45 +1,36 @@
-<%# Matches Poll Form Structure %>
-<%= form_with model: [:admin, @event], local: true do |f| %>
+<%= form_with model: [:admin, @event], builder: ConsulFormBuilder, local: true do |f| %>
 
   <%= render "shared/errors", resource: @event %>
 
   <div class="row">
-    <div class="clear">
-      <div class="small-12 medium-6 column">
-        <%= f.datetime_field :starts_at %>
-      </div>
+    <div class="small-12 medium-6 column">
+      <%= f.datetime_field :starts_at, class: "input-group-field" %>
+    </div>
 
-      <div class="small-12 medium-6 column">
-        <%= f.datetime_field :ends_at %>
-      </div>
+    <div class="small-12 medium-6 column">
+      <%= f.datetime_field :ends_at, class: "input-group-field" %>
     </div>
   </div>
 
   <div class="row">
-    <div class="small-12 medium-6 column">
-      <%= f.label :name %>
+    <div class="small-12 column">
       <%= f.text_field :name %>
     </div>
+  </div>
 
+  <div class="row">
     <div class="small-12 column">
-      <%= f.label :description %>
       <%= f.text_area :description, rows: 8, class: "html-area" %>
     </div>
   </div>
 
-  <div class="row">
-    <div class="small-12 column">
-      <%# This works because we added 'include Imageable' to the Event model %>
-      <%#= render Images::NestedComponent.new(f) %>
-    </div>
-  </div>
 
+
+  <%# SUBMIT BUTTON ROW %>
   <div class="row">
-    <div class="clear">
-      <div class="small-12 medium-4 large-2 column">
-        <%= f.submit t("events.#{action_name}.submit_button", default: "Save Event"),
-                     class: "button success expanded margin-top" %>
-      </div>
+    <div class="small-12 medium-6 column end">
+      <%= f.submit t("events.#{action_name}.submit_button", default: "Save Event"),
+                   class: "button success" %>
     </div>
   </div>
 
