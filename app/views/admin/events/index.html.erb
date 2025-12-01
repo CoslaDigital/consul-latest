@@ -1,5 +1,13 @@
 <h2 class="inline-block">Manage Events</h2>
-<%= link_to "New Event", new_admin_event_path, class: "button float-right success" %>
+
+<div class="float-right">
+  <%# Secondary Action: Jump to Public Calendar %>
+  <%= link_to "View Calendar", events_path, class: "button secondary hollow", style: "margin-right: 0.5rem;" %>
+
+  <%# Primary Action: Create New %>
+  <%= link_to "New Event", new_admin_event_path, class: "button success" %>
+</div>
+
 <table>
   <thead>
   <tr>
@@ -13,7 +21,8 @@
   <% @events.each do |event| %>
     <tr>
       <td><%= event.name %></td>
-      <td><%= event.starts_at %></td>
+      <%# Use l (localize) for nicer date formatting %>
+      <td><%= l event.starts_at, format: :short %></td>
       <td><%= truncate(strip_tags(event.description), length: 100) %></td>
       <td>
         <%= render Admin::TableActionsComponent.new(event) %>
