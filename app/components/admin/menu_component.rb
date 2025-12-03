@@ -263,6 +263,13 @@ class Admin::MenuComponent < ApplicationComponent
       ]
     end
 
+  def events_link
+    [
+      "Events",
+      admin_events_path,
+      controller_name == "events"
+    ]
+  end
     def site_customization_links
       section(t("admin.menu.title_site_customization"),
               active: customization?, class: "site-customization-link") do
@@ -273,7 +280,8 @@ class Admin::MenuComponent < ApplicationComponent
           information_texts_link,
           documents_link,
           images_link,
-          content_blocks_link
+          content_blocks_link,
+          events_link
         )
       end
     end
