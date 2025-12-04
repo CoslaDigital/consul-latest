@@ -1,9 +1,10 @@
 class Event < ApplicationRecord
-  # 1. Capabilities
   include CalendarItem
   include Imageable
 
-  # 2. Validations
+  TYPES = %w[meeting workshop debate gathering protest hearing].freeze
+
+  validates :event_type, inclusion: { in: TYPES }, allow_blank: true
   validates :name, :starts_at, presence: true
   validates :ends_at, presence: true
 
@@ -25,7 +26,7 @@ class Event < ApplicationRecord
 
   # 3. Calendar Logic (The Aggregator)
   def self.all_in_range(start_date, end_date)
-    # FIX: Use full day range to capture events happening late in the day
+    # Use full day range to capture events happening late in the day
     range = start_date.beginning_of_day..end_date.end_of_day
 
     # A. Manual Events
@@ -51,9 +52,13 @@ class Event < ApplicationRecord
     (events + budgets + budget_phases + processes + polls).sort_by(&:calendar_start)
   end
 
-  # 4. Interface
+
   def kind
     "generic_event"
+  end
+
+  def human_type
+    event_type.present? ? I18n.t("events.types.#{event_type}", default: event_type.humanize) : "Manual Event"
   end
 
   # We define this clearly so the Calendar knows exactly what to use

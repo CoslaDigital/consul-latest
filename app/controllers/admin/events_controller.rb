@@ -48,7 +48,9 @@ class Admin::EventsController < Admin::BaseController
       :description,
       :image,
       :starts_at,
-      :ends_at
+      :ends_at,
+      :location,
+      :event_type
     )
   end
 end
