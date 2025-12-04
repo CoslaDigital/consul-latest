@@ -1,39 +1,45 @@
 <div class="feed-item event-item">
-  <div class="event-date">
-    <%# 1. DATE LOGIC %>
-    <% date = @event.respond_to?(:calendar_start) ? @event.calendar_start : @event.starts_at %>
 
-    <% if date.present? %>
-      <span class="day"><%= date.day %></span>
-      <span class="month"><%= t("date.abbr_month_names")[date.month] %></span>
+  <%# 1. DATE SECTION %>
+  <div class="event-date">
+    <% if date_object.present? %>
+      <span class="day"><%= date_object.day %></span>
+      <span class="month"><%= t("date.abbr_month_names")[date_object.month] %></span>
     <% end %>
   </div>
 
+  <%# 2. DETAILS SECTION %>
   <div class="event-details">
-    <%# 2. TITLE & URL LOGIC %>
-    <%# We check if the object has our custom calendar methods. %>
-    <%# If yes, use them (fixes Budget::Phase). If no, fall back to standard Rails defaults. %>
 
-    <% url = @event.respond_to?(:calendar_link_url) ? @event.calendar_link_url : @event %>
-    <% title = @event.respond_to?(:calendar_title) ? @event.calendar_title : @event.name %>
-
+    <%# FIX: Now we simply call 'title' and 'url' which are defined in the component class %>
     <h3><%= link_to title, url %></h3>
 
     <div class="event-meta">
       <span class="label secondary">
-        <% if @event.is_a?(Budget) %>
-          <%= t("budgets.name") %>
-        <% elsif @event.class.name == "Budget::Phase" %>
-          <%# Handle Phase label explicitly %>
-          <%= t("budgets.name") %>
+        <% if @event.is_a?(Budget) || @event.is_a?(Budget::Phase) %>
+          <%= Budget.model_name.human %>
+
         <% elsif @event.is_a?(Legislation::Process) %>
-          <%= t("legislation.name") %>
-        <% elsif @event.respond_to?(:kind) && @event.kind == "generic_event" %>
-          Manual Event
+          <%= Legislation::Process.model_name.human %>
+
+        <% elsif @event.is_a?(Event) %>
+          <%# Use custom type (Workshop, Meeting) or fallback %>
+          <%= @event.respond_to?(:human_type) ? @event.human_type : "Manual Event" %>
+
+        <% elsif defined?(Poll) && @event.is_a?(Poll) %>
+          <%= Poll.model_name.human %>
+
         <% else %>
           <%= @event.class.model_name.human %>
         <% end %>
       </span>
+
+      <%# Location Display (Only for Manual Events) %>
+      <% if @event.respond_to?(:location) && @event.location.present? %>
+        <span class="text-muted small" style="margin-left: 5px;">
+          &bull; <%= @event.location %>
+        </span>
+      <% end %>
     </div>
   </div>
 </div>
