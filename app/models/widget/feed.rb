@@ -1,7 +1,9 @@
 class Widget::Feed < ApplicationRecord
-  KINDS = %w[proposals debates processes].freeze
+  KINDS = %w[proposals debates processes upcoming].freeze
 
   def active?
+    # Return true if this is the "upcoming" feed (Events)
+    return true if kind == "upcoming"
     setting.value.present?
   end
 
@@ -26,6 +28,17 @@ class Widget::Feed < ApplicationRecord
 
   def debates
     Debate.sort_by_hot_score.limit(limit)
+  end
+
+  def upcoming
+    #    This returns a sorted mix of Budgets, Polls, Processes, and Events.
+    limit_num = limit || 5
+
+    # Fetch everything for the next 3 months
+    items = Event.all_in_range(Date.current, 3.months.from_now)
+
+    # Slice the top X items
+    items.first(limit_num)
   end
 
   def processes
