@@ -1,0 +1,39 @@
+<div class="feed-item event-item">
+  <div class="event-date">
+    <%# 1. DATE LOGIC %>
+    <% date = @event.respond_to?(:calendar_start) ? @event.calendar_start : @event.starts_at %>
+
+    <% if date.present? %>
+      <span class="day"><%= date.day %></span>
+      <span class="month"><%= t("date.abbr_month_names")[date.month] %></span>
+    <% end %>
+  </div>
+
+  <div class="event-details">
+    <%# 2. TITLE & URL LOGIC %>
+    <%# We check if the object has our custom calendar methods. %>
+    <%# If yes, use them (fixes Budget::Phase). If no, fall back to standard Rails defaults. %>
+
+    <% url = @event.respond_to?(:calendar_link_url) ? @event.calendar_link_url : @event %>
+    <% title = @event.respond_to?(:calendar_title) ? @event.calendar_title : @event.name %>
+
+    <h3><%= link_to title, url %></h3>
+
+    <div class="event-meta">
+      <span class="label secondary">
+        <% if @event.is_a?(Budget) %>
+          <%= t("budgets.name") %>
+        <% elsif @event.class.name == "Budget::Phase" %>
+          <%# Handle Phase label explicitly %>
+          <%= t("budgets.name") %>
+        <% elsif @event.is_a?(Legislation::Process) %>
+          <%= t("legislation.name") %>
+        <% elsif @event.respond_to?(:kind) && @event.kind == "generic_event" %>
+          Manual Event
+        <% else %>
+          <%= @event.class.model_name.human %>
+        <% end %>
+      </span>
+    </div>
+  </div>
+</div>
