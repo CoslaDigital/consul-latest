@@ -28,6 +28,7 @@ class Admin::MenuComponent < ApplicationComponent
         profiles_links,
         stats_link,
         settings_links,
+        events_link,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?)
       ]
@@ -279,8 +280,7 @@ class Admin::MenuComponent < ApplicationComponent
           information_texts_link,
           documents_link,
           images_link,
-          content_blocks_link,
-          events_link
+          content_blocks_link
         )
       end
     end
