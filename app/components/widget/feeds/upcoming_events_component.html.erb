@@ -31,8 +31,8 @@
 
       <%# Optional: Location Text %>
       <% if @event.respond_to?(:location) && @event.location.present? %>
-        <span class="text-muted small" style="margin-left: 5px;">
-          &bull; <%= @event.location %>
+        <span class="label secondary" style="margin-left: 5px;">
+           <%= @event.location %>
         </span>
       <% end %>
 
