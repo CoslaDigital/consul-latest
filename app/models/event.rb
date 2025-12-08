@@ -16,15 +16,7 @@ class Event < ApplicationRecord
             allow_blank: true,
             if: -> { ends_at }
 
-  validates :starts_at,
-            comparison: {
-              greater_than_or_equal_to: ->(*) { Time.current },
-              message: ->(*) { I18n.t("errors.messages.past_date") }
-            },
-            allow_blank: true,
-            on: :create
 
-  # 3. Calendar Logic (The Aggregator)
   def self.all_in_range(start_date, end_date)
     # Use full day range to capture events happening late in the day
     range = start_date.beginning_of_day..end_date.end_of_day
