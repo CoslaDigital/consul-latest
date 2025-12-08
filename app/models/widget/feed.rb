@@ -2,8 +2,6 @@ class Widget::Feed < ApplicationRecord
   KINDS = %w[proposals debates processes upcoming].freeze
 
   def active?
-    # Return true if this is the "upcoming" feed (Events)
-    return true if kind == "upcoming"
     setting.value.present?
   end
 
