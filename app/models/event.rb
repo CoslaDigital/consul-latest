@@ -2,7 +2,7 @@ class Event < ApplicationRecord
   include CalendarItem
   include Imageable
 
-  TYPES = %w[public meeting, workshop, consultation,training, community event].freeze
+  TYPES = %w["public meeting" workshop consultation training "community event"].freeze
 
   validates :event_type, inclusion: { in: TYPES }, allow_blank: true
   validates :name, :starts_at, presence: true
