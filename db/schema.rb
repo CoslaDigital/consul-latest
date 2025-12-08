@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
+ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -479,8 +479,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.integer "confidence_score", default: 0, null: false
     t.boolean "valuation", default: false
     t.tsvector "tsv"
-    t.datetime "moderated_at"
-    t.string "moderation_reason"
     t.index ["ancestry"], name: "index_comments_on_ancestry"
     t.index ["cached_votes_down"], name: "index_comments_on_cached_votes_down"
     t.index ["cached_votes_total"], name: "index_comments_on_cached_votes_total"
@@ -626,6 +624,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.index ["documentable_type", "documentable_id"], name: "index_documents_on_documentable_type_and_documentable_id"
     t.index ["user_id", "documentable_type", "documentable_id"], name: "access_documents"
     t.index ["user_id"], name: "index_documents_on_user_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "failed_census_calls", id: :serial, force: :cascade do |t|
@@ -924,17 +931,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["linkable_type", "linkable_id"], name: "index_links_on_linkable_type_and_linkable_id"
-  end
-
-  create_table "llm_vendors", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "api_key"
-    t.text "script"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "model_endpoint"
-    t.index ["api_key"], name: "index_llm_vendors_on_api_key"
   end
 
   create_table "local_census_records", id: :serial, force: :cascade do |t|
@@ -1698,10 +1694,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_14_114732) do
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at", precision: nil
     t.string "unlock_token"
-    t.string "otp_secret"
-    t.integer "consumed_timestep"
-    t.boolean "otp_required_for_login"
-    t.text "otp_backup_codes"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true
