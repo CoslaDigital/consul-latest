@@ -633,6 +633,10 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
     t.datetime "ends_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "event_type"
+    t.string "location"
+    t.bigint "author_id"
+    t.index ["author_id"], name: "index_events_on_author_id"
   end
 
   create_table "failed_census_calls", id: :serial, force: :cascade do |t|
@@ -1843,6 +1847,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
   add_foreign_key "dashboard_executed_actions", "dashboard_actions", column: "action_id"
   add_foreign_key "dashboard_executed_actions", "proposals"
   add_foreign_key "documents", "users"
+  add_foreign_key "events", "users", column: "author_id"
   add_foreign_key "failed_census_calls", "poll_officers"
   add_foreign_key "failed_census_calls", "users"
   add_foreign_key "flags", "users"
