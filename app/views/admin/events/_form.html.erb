@@ -38,6 +38,10 @@
     </div>
   </div>
 
+  <% if feature?(:allow_attached_documents) %>
+    <%= render Documents::NestedComponent.new(f) %>
+  <% end %>
+
 
 
   <%# SUBMIT BUTTON ROW %>
