@@ -303,6 +303,7 @@ class User < ApplicationRecord
         # 3. If the only issues were password-related, force save
         if user.save(validate: false)
           Rails.logger.info("Create YS - USER created (Password complexity bypassed)")
+          user.errors.clear
           return user
         else
           Rails.logger.info("Create YS - System Error during save")
