@@ -1,6 +1,7 @@
 class Event < ApplicationRecord
   include CalendarItem
   include Imageable
+  include Documentable
 
   TYPES = %w[public_meeting workshop consultation training community_event].freeze
 
