@@ -2,7 +2,12 @@
 <nav>
   <ul>
     <%= raw content_block("subnavigation_left") %>
-
+    <li>
+        <%= layout_menu_link_to t("layouts.header.events"),
+                                events_path,
+                                controller_name == "events",
+                                accesskey: "0" %>
+      </li>     
     <% if feature?(:debates) %>
       <li>
         <%= layout_menu_link_to t("layouts.header.debates"),
