@@ -3,8 +3,7 @@ load Rails.root.join("app", "models", "user.rb")
 class User < ApplicationRecord
   DOCUMENT_ID_STRATEGIES = [
     :valid_ys_document?,   # original young scot logic
-    /\A[A-Z]{2}\d{6}\z/,   # Example: 2 letters + 6 numbers (e.g., AB123456)
-    /\A\d{9}\z/            # Example: Simple 9-digit SSN or ID
+    /\A[Pp]0\d{10}[a-zA-Z0-9]{1,2}\z/ # NA Library card
   ].freeze
 
   has_one :process_manager
@@ -184,22 +183,6 @@ class User < ApplicationRecord
     )
   end
 
-  # overwriting of Devise method to allow login using email OR username
-  def self.find_for_database_authentication(warden_conditions)
-    conditions = warden_conditions.dup
-    login = conditions.delete(:login)
-    user = where(conditions.to_hash).find_by(["lower(email) = ?", login.downcase]) ||
-           where(conditions.to_hash).find_by(["username = ?", login]) ||
-           where(conditions.to_hash).find_by(["confirmed_phone = ?", login]) ||
-           where(conditions.to_hash).find_by(["document_number = ?", login])
-
-    if user.nil? && validate_document_number(login)
-    # If no user is found and the login is a valid document, create a new user
-      user = log_in_or_create_ys_user(login)
-    end
-    user
-  end
-
   # Method to update user attributes based on SAML data
   def update_user_details_from_saml(auth)
     extracted_values = self.class.extract_saml_attributes(auth)
@@ -263,11 +246,27 @@ class User < ApplicationRecord
     Rails.logger.error e.backtrace.join("\n")
   end
 
+  # overwriting of Devise method to allow login using email OR username
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    login = conditions.delete(:login)
+    user = where(conditions.to_hash).find_by(["lower(email) = ?", login.downcase]) ||
+           where(conditions.to_hash).find_by(["username = ?", login]) ||
+           where(conditions.to_hash).find_by(["confirmed_phone = ?", login]) ||
+           where(conditions.to_hash).find_by(["document_number = ?", login])
+
+    if user.nil? && validate_document_number(login)
+      # If no user is found and the login is a valid document, create a new user
+      user = log_in_or_create_ys_user(login)
+    end
+    user
+  end
+
  private
 
    def self.log_in_or_create_ys_user(username)
      Rails.logger.info("YS inside log in or create")
-     if existing_user = User.find_by(username: username)
+     if (existing_user = User.find_by(username: username))
        Rails.logger.info("YS Existing user")
        # Log in the existing user
        return existing_user # Assuming successful login
