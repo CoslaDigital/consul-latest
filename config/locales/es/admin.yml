@@ -18,7 +18,6 @@ es:
       configure: Configurar
       select: Seleccionar
       show_to_valuators: "Mostrar %{name} a evaluadores"
-      mark_as_winner: Marcar como ganador
     officing_booth:
       title: "Estás ahora mismo en la mesa ubicada en %{booth}. Si esto no es correcto no sigas adelante y llama al teléfono de incidencias. Gracias."
     banners:
@@ -63,6 +62,7 @@ es:
         filter: Mostrar
         filters:
           all: Todos
+          on_budget_investments: Proyectos de gasto
           on_comments: Comentarios
           on_debates: Debates
           on_proposals: Propuestas
@@ -81,11 +81,9 @@ es:
           ballots: "Esta acción te permitirá gestionar las urnas de votación. Usa esta opción solamente si vas a utilizar urnas físicas para recoger votos durante la votación final."
           calculate_winners: 'Tras calcular los resultados, solamente los administradores tendrán acceso a los mismos. Se harán públicos cuando el presupuesto llegue a la fase "%{phase}" <strong>si se habilita la opción "Mostrar resultados"</strong> al editar el presupuesto.'
           destroy: "Esta acción borrará el presupuesto y todos sus grupos y partidas. Esta acción no se puede deshacer."
-          questions: "Crear campos del formulario para inversiones presupuestarias" 
         edit: "Editar presupuesto"
         preview: "Previsualizar"
         preview_results: "Previsualizar resultados"
-        questions: "Organizar preguntas"
       index:
         title: Presupuestos participativos
         new_link: Crear nuevo presupuesto
@@ -290,8 +288,6 @@ es:
           incompatible: Incompatible
           price: Precio
           author: Autor
-          ballot_lines_count: Votos
-          winner: Ganadores
         cannot_calculate_winners: El presupuesto debe estar en la fase "%{phase}" para poder calcular las propuestas ganadoras
         see_results: "Ver resultados"
         milestone_tags_filter_all: "Todas las etiquetas de seguimiento"
@@ -333,17 +329,6 @@ es:
         tags_placeholder: "Escribe las etiquetas que desees separadas por comas (,)"
         undefined: Sin definir
       search_unfeasible: Buscar inviables
-    budget_questions:
-      add_new_question: "Crear una pregunta"
-      add_new_question_description: "Añade una pregunta para el formulario de inversión del presupuesto."
-      no_questions: "No hay preguntas para mostrar"
-      title: "Gestionar preguntas para este presupuesto"  
-      new:
-        options_heading: "Opciones"
-        enabled: "Habilitado"
-        is_private: "Esta es una pregunta privada"
-        is_mandatory: "Esta es una pregunta obligatoria"
-        title: "Crear una pregunta de presupuesto"
     budgets_wizard:
       creation_timeline:
         budget: Presupuesto
@@ -562,6 +547,18 @@ es:
         unable_notice: "Documento inválido"
       destroy:
         success_notice: "Documento borrado correctamente"
+    events:
+      event:
+        name: "Nombre"
+        description: "Descripción"
+        start_date: "Fecha de Inicio"
+        event_type: "Tipo de Evento"
+        location: "Lugar"
+      index:
+        title: "Gestionar Eventos"
+        new_event: "Nuevo Evento"
+        view_calendar: "Ver Calendario"
+        no_events: "No hay eventos creados todavía."
     hidden_users:
       index:
         filter: Filtro
@@ -1147,6 +1144,7 @@ es:
         title: "Tipo de votación"
         unique_description: "Solo se puede responder a la pregunta con una única respuesta."
         multiple_description: "Permite elegir más de una respuesta. Se puede elegir el número máximo de respuestas."
+        open_description: "Pregunta abierta que permite al usuario dar una única respuesta con sus propias palabras."
     questions:
       index:
         create: "Crear pregunta ciudadana"
@@ -1341,6 +1339,7 @@ es:
         participation_processes: "Procesos de participación"
         images_and_documents: "Imágenes y documentos"
         feature_flags: Funcionalidades
+        blank_option: "Ninguno"
         features:
           enabled: "Activada"
         map:
@@ -1363,6 +1362,8 @@ es:
           title: Consentimiento de cookies
         cookies_consent_banner:
           title: Banner de consentimiento de cookies
+        llm:
+          title: Configuración LLM
       remote_census_general_name: Datos Generales
       remote_census_request_name: Datos Petición
       remote_census_response_name: Datos Respuesta
