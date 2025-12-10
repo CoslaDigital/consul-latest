@@ -15,7 +15,7 @@ class Mailer < ApplicationMailer
         "mailers.comment.subject",
         commentable: t("activerecord.models.#{@commentable.class.name.underscore}", count: 1).downcase
       )
-      mail(to: @email_to, bcc: Setting["admin_email", subject: subject) if @commentable.present? && @commentable.author.present?
+      mail(to: @email_to, bcc: Setting["admin_email"], subject: subject) if @commentable.present? && @commentable.author.present?
     end
   end
 
