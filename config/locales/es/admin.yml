@@ -547,6 +547,13 @@ es:
         unable_notice: "Documento inválido"
       destroy:
         success_notice: "Documento borrado correctamente"
+    events:
+      event:
+        name: "Nombre"
+        description: "Descripción"
+        start_date: "Fecha de Inicio"
+        event_type: "Tipo de Evento"
+        location: "Lugar"
     hidden_users:
       index:
         filter: Filtro
