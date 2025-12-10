@@ -26,23 +26,25 @@
 
   <div class="row">
     <div class="small-12 medium-6 column">
+      <%# The label is handled by the builder; the options are translated here %>
       <%= f.select :event_type,
                    Event::TYPES.map { |type| [I18n.t("events.event_types.#{type}"), type] },
                    include_blank: t('events.prompts.select_type') %>
     </div>
 
     <div class="small-12 medium-6 column">
-      <%# Text field for Location %>
       <%= f.text_field :location %>
     </div>
   </div>
 
-
+  <% if feature?(:allow_attached_documents) %>
+    <%= render Documents::NestedComponent.new(f) %>
+  <% end %>
 
   <%# SUBMIT BUTTON ROW %>
   <div class="row">
     <div class="small-12 medium-6 column end">
-      <%= f.submit t("events.#{action_name}.submit_button", default: "Save Event"),
+      <%= f.submit t("events.#{action_name}.submit_button", default: t("events.submit.default")),
                    class: "button success" %>
     </div>
   </div>
