@@ -3,7 +3,7 @@ load Rails.root.join("app", "models", "user.rb")
 class User < ApplicationRecord
   DOCUMENT_ID_STRATEGIES = [
     :valid_ys_document?, # original young scot logic
-    /\A[Pp]0\d{10}[a-zA-Z0-9]{1,2}\z/ # NA Library card
+    /\A[Pp0]\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
   ].freeze
 
   has_one :process_manager
@@ -21,9 +21,6 @@ class User < ApplicationRecord
     security = Tenant.current_secrets[:security]
     lockable = security[:lockable] if security
     unlock_in_value = lockable[:unlock_in] if lockable
-    #     Rails.logger.info "Retrieved security: #{security.inspect}"
-    #     Rails.logger.info "Retrieved lockable: #{lockable.inspect}"
-    #     Rails.logger.info "Retrieved unlock_in: #{unlock_in_value.inspect}"
     (unlock_in_value || 10).to_f.minutes
   end
 
