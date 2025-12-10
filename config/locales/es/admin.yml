@@ -554,6 +554,11 @@ es:
         start_date: "Fecha de Inicio"
         event_type: "Tipo de Evento"
         location: "Lugar"
+      index:
+        title: "Gestionar Eventos"
+        new_event: "Nuevo Evento"
+        view_calendar: "Ver Calendario"
+        no_events: "No hay eventos creados todavía."
     hidden_users:
       index:
         filter: Filtro
