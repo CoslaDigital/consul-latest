@@ -1,0 +1,10 @@
+en:
+  events:
+    event_types:
+      public_meeting: "Public Meeting"
+      workshop: "Workshop"
+      consultation: "Consultation"
+      training: "Training"
+      community_event: "Community Council"
+    prompts:
+      select_type: "Select an Event Type"

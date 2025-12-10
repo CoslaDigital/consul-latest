@@ -26,10 +26,9 @@
 
   <div class="row">
     <div class="small-12 medium-6 column">
-      <%# Select Dropdown for Type %>
       <%= f.select :event_type,
-                   Event::TYPES.map { |t| [t("events.types.#{t}", default: t.humanize), t] },
-                   include_blank: "Select an Event Type" %>
+                   Event::TYPES.map { |type| [I18n.t("events.event_types.#{type}"), type] },
+                   include_blank: t('events.prompts.select_type') %>
     </div>
 
     <div class="small-12 medium-6 column">
