@@ -187,7 +187,8 @@ class Setting < ApplicationRecord
         "sdg.process.proposals": true,
         "sdg.process.polls": true,
         "sdg.process.budgets": true,
-        "sdg.process.legislation": true
+        "sdg.process.legislation": true,
+        "admin_email": ""
       }
     end
 

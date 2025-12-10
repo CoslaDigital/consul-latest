@@ -15,7 +15,7 @@ class Mailer < ApplicationMailer
         "mailers.comment.subject",
         commentable: t("activerecord.models.#{@commentable.class.name.underscore}", count: 1).downcase
       )
-      mail(to: @email_to, subject: subject) if @commentable.present? && @commentable.author.present?
+      mail(to: @email_to, bcc: Setting["admin_email", subject: subject) if @commentable.present? && @commentable.author.present?
     end
   end
 
@@ -98,7 +98,7 @@ class Mailer < ApplicationMailer
       mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
     end
   end
-  
+
   def budget_investment_unfeasible(investment)
     @investment = investment
     @author = investment.author
