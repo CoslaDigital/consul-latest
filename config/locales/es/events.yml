@@ -6,11 +6,5 @@ es:
       consultation: "Consulta"
       training: "Capacitación"
       community_event: "Consejo Comunitario"
-    new:
-      title: "Nuevo Evento"
-      submit_button: "Crear Evento"
-    edit:
-      title: "Editar Evento"
-      submit_button: "Actualizar Evento"
     prompts:
       select_type: "Seleccione un tipo de evento"
