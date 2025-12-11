@@ -93,9 +93,9 @@ class Mailer < ApplicationMailer
   def proposal_published(proposal)
     @proposal = proposal
     @email_to = @proposal.author.email
-
+    @bcc_to = Settings["admin_email"]
     with_user(@proposal.author) do
-      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
+      mail(to: @email_to, bcc: @bcc_to, subject: t("mailers.proposal_published.subject"))
     end
   end
 
