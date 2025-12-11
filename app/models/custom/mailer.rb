@@ -30,7 +30,7 @@ class Mailer < ApplicationMailer
     with_user(@proposal.author) do
 
     mail(
-      to: @admin_email,
+      to: [@proposal.author.email, @admin_email],
       subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
     )
     end
