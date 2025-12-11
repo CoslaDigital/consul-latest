@@ -21,7 +21,7 @@ class Mailer < ApplicationMailer
 
     mail(
       to: @admin_email,
-      subject: "Admin Alert: Proposal Published - #{@proposal.title}"
+      subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
     )
   end
 end
