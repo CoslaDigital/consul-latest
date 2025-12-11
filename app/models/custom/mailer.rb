@@ -16,12 +16,23 @@ class Mailer < ApplicationMailer
     @proposal = proposal
     @admin_email = ::Setting["admin_email"]
 
+    # LOGGING 1: Check if the method was called and what the Setting returned
+    Rails.logger.info "--- [Mailer Debug] Preparing Admin Email ---"
+    Rails.logger.info "--- [Mailer Debug] Proposal ID: #{@proposal.id}"
+    Rails.logger.info "--- [Mailer Debug] Target Admin Email: '#{@admin_email}'"
+
     # Stop if no admin email is configured
-    return unless @admin_email.present?
+    if @admin_email.blank?
+      Rails.logger.warn "--- [Mailer Debug] ABORTED: Admin email setting is blank or nil ---"
+      return
+    end
 
     mail(
       to: @admin_email,
-      subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
+      subject: "Admin Alert: Proposal Published - #{@proposal.title}"
     )
+
+    # LOGGING 2: Confirm the mail object was created
+    Rails.logger.info "--- [Mailer Debug] Admin email object created successfully ---"
   end
 end
