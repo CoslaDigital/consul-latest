@@ -64,7 +64,7 @@ class Proposal < ApplicationRecord
   before_save :calculate_hot_score, :calculate_confidence_score
 
   after_create :send_new_actions_notification_on_create
-  
+
   scope :for_render,               -> { includes(:tags) }
   scope :sort_by_hot_score,        -> { reorder(hot_score: :desc) }
   scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc) }
@@ -94,6 +94,7 @@ class Proposal < ApplicationRecord
   def publish
     update!(published_at: Time.current)
     Mailer.proposal_published(self).deliver_later unless Setting["feature.dashboard.notification_emails"]
+    Mailer.proposal_published_admin(self).deliver_later
     send_new_actions_notification_on_published
   end
 
@@ -275,7 +276,7 @@ class Proposal < ApplicationRecord
                                                       locale: I18n.locale,
                                                       unit: "£")
   end
-  
+
   def formatted_price
       formatted_amount(price)
   end

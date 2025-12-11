@@ -1,0 +1,22 @@
+<td style="<%= css_for_mailer_content %>">
+  <h1 style="<%= css_for_mailer_heading %>">
+    Admin Alert: New Proposal Published
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    <strong>Author:</strong> <%= @proposal.author.name %> (<%= @proposal.author.email %>)<br>
+    <strong>Title:</strong> <%= @proposal.title %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= @proposal.summary %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to "View Public Proposal", proposal_url(@proposal), style: css_for_mailer_link %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to "Moderate this Proposal", admin_proposal_url(@proposal), style: css_for_mailer_link %>
+  </p>
+</td>
