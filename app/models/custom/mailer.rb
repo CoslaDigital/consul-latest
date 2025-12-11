@@ -28,6 +28,7 @@ class Mailer < ApplicationMailer
     end
 
     with_user(@proposal.author) do
+
     mail(
       to: @admin_email,
       subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
