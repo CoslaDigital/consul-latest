@@ -95,7 +95,25 @@ class Mailer < ApplicationMailer
     @email_to = @proposal.author.email
     @bcc_to = ::Setting["admin_email"]
     with_user(@proposal.author) do
-      mail(to: @email_to, bcc: @bcc_to, subject: t("mailers.proposal_published.subject"))
+      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
+    end
+  end
+
+  def proposal_published_admin(proposal)
+    @proposal = proposal
+    @admin_email = ::Setting["admin_email"]
+
+    if @admin_email.blank?
+      Rails.logger.warn "--- [Mailer Debug] ABORTED: Admin email setting is blank or nil ---"
+      return
+    end
+
+    with_user(@proposal.author) do
+
+      mail(
+        to: [@proposal.author.email, @admin_email],
+        subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
+      )
     end
   end
 
