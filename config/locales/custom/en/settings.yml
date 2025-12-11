@@ -1,5 +1,7 @@
 en:
   settings:
+    admin_email: "Administrator email address"
+    admin_email_description: "If a valid email address is entered, this address will be cc'ed when a new proposal is published"
     comments_body_max_length: "Comments body max length"
     comments_body_max_length_description: "In number of characters"
     official_level_1_name: "Level 1 public official"
