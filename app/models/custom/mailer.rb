@@ -5,9 +5,9 @@ class Mailer < ApplicationMailer
   def proposal_published(proposal)
     @proposal = proposal
     @email_to = @proposal.author.email
-
+    @admin_email = ::Setting["admin_email"]
     with_user(@proposal.author) do
-      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
+      mail(to: @email_to, cc: @admin_email, subject: t("mailers.proposal_published.subject"))
     end
   end
 
@@ -29,7 +29,7 @@ class Mailer < ApplicationMailer
 
     mail(
       to: @admin_email,
-      subject: "Admin Alert: Proposal Published - #{@proposal.title}"
+      subject: "Consul Democracy: New Proposal Published - #{@proposal.title}"
     )
 
     # LOGGING 2: Confirm the mail object was created
