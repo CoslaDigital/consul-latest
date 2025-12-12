@@ -94,7 +94,6 @@ class Proposal < ApplicationRecord
   def publish
     update!(published_at: Time.current)
     Mailer.proposal_published(self).deliver_later unless Setting["feature.dashboard.notification_emails"]
-    Mailer.proposal_published_admin(self).deliver_later
     send_new_actions_notification_on_published
   end
 
