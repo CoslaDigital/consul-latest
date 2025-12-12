@@ -98,6 +98,10 @@ class Proposal < ApplicationRecord
     send_new_actions_notification_on_published
   end
 
+  def notify_admin
+    Mailer.proposal_published_admin(self).deliver_later
+  end
+
   def published?
     !published_at.nil?
   end

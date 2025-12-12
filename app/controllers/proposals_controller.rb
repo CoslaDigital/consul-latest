@@ -14,9 +14,9 @@ class ProposalsController < ApplicationController
   before_action :proposals_recommendations, only: :index, if: :current_user
 
   feature_flag :proposals
-  
+
   helper_method :geozones_data
-  
+
   invisible_captcha only: [:create, :update], honeypot: :subtitle
 
   has_orders ->(c) { Proposal.proposals_orders(c.current_user) }, only: :index
@@ -79,7 +79,7 @@ class ProposalsController < ApplicationController
     @proposals = Proposal.for_summary
     @tag_cloud = tag_cloud
   end
-  
+
   def geozones_data
       @geozones.map do |geozone|
         {
@@ -90,7 +90,6 @@ class ProposalsController < ApplicationController
       end
     end
 
-  
   def map
     @proposal = Proposal.new
     @tag_cloud = tag_cloud
@@ -106,6 +105,7 @@ class ProposalsController < ApplicationController
 
   def publish
     @proposal.publish
+    @proposal.notify_admin
     redirect_to share_proposal_path(@proposal), notice: t("proposals.notice.published")
   end
 
