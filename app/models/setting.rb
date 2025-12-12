@@ -170,6 +170,7 @@ class Setting < ApplicationRecord
         "machine_learning.related_content": false,
         "machine_learning.tags": false,
         "postal_codes": "",
+        "admin_email": "",
         "remote_census.general.endpoint": "",
         "remote_census.request.method_name": "",
         "remote_census.request.structure": "",
