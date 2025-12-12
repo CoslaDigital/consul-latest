@@ -95,7 +95,7 @@ class Mailer < ApplicationMailer
     @email_to = @proposal.author.email
 
     with_user(@proposal.author) do
-      mail(to: @email_to, subject: t("mailers.proposal_published.subject")
+      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
     end
   end
 
@@ -106,7 +106,7 @@ class Mailer < ApplicationMailer
       if @email_to.blank?
         return
       end
-      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published"
+      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published")
     end
   end
 
