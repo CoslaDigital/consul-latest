@@ -103,10 +103,7 @@ class Mailer < ApplicationMailer
     @proposal = proposal
     with_user(@proposal.author) do
       @email_to = ::Setting["admin_email"]
-      if @email_to.blank?
-        return
-      end
-      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published")
+      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published") if @email_to.present?
     end
   end
 
