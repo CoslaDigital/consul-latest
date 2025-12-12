@@ -3,7 +3,7 @@ load Rails.root.join("app", "models", "user.rb")
 class User < ApplicationRecord
   DOCUMENT_ID_STRATEGIES = [
     :valid_ys_document?, # original young scot logic
-    /\A[Pp0]\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
+    :valid_na_document?
   ].freeze
 
   has_one :process_manager
@@ -347,5 +347,16 @@ class User < ApplicationRecord
     return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
 
     true
+  end
+
+  def self.valid_na_document?(document_number)
+    # Define the allowed formats
+    allowed_formats = [
+      /\AON0\d{4,14}\z/, # NA digital
+      /\A[Pp]0\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
+    ]
+
+    # Check if the document number matches ANY of the formats
+    allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
   end
 end
