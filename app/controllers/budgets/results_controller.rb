@@ -10,8 +10,8 @@ module Budgets
       @investments = Budget::Result.new(@budget, @heading).investments
       @headings = @budget.headings.sort_by_name
       if @budget.stv?
-       @summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
-       @detail_slug  = "stv_details_#{@budget.name}_#{@heading.name}".downcase.tr(' ', '-')
+       @summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".parameterize
+       @detail_slug  = "stv_details_#{@budget.name}_#{@heading.name}".parameterize
       end
     end
 
