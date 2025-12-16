@@ -6,6 +6,12 @@ class User < ApplicationRecord
     :valid_na_document?
   ].freeze
 
+  STRATEGY_MAP = {
+    "young_scot" => :valid_ys_document?,
+    "na_cards" => :valid_na_document?,
+    "legacy" => :valid_old_format?
+  }.freeze
+
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
@@ -244,7 +250,7 @@ class User < ApplicationRecord
   end
 
   # overwriting of Devise method to allow login using email OR username
-  def self.find_for_database_authentication(warden_conditions)
+  def self.goodfind_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
     user = where(conditions.to_hash).find_by(["lower(email) = ?", login.downcase]) ||
@@ -256,6 +262,44 @@ class User < ApplicationRecord
       # If no user is found and the login is a valid document, create a new user
       user = log_in_or_create_ys_user(login)
     end
+    user
+  end
+
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    login = conditions.delete(:login)
+
+    # 1. Safe Lookup (Email & Phone are always allowed)
+    user = where(conditions.to_hash).find_by(["lower(email) = ?", login.downcase]) ||
+           where(conditions.to_hash).find_by(["confirmed_phone = ?", login])
+
+    # 2. Dangerous Lookup (Username)
+    # If we haven't found a user yet, try username.
+    unless user
+      user_by_username = where(conditions.to_hash).find_by(["username = ?", login])
+
+      if user_by_username
+        # DETECT THE TRAP:
+        # If the username is the same as the document number, this is a "Strategy User".
+        # We must verify their strategy is currently ENABLED in secrets.
+        is_document_user = user_by_username.document_number == login
+
+        if is_document_user
+          # Only allow login if the strategy is enabled
+          user = user_by_username if validate_document_number(login)
+        else
+          # Regular user (username is "john_doe", not a document number)
+          user = user_by_username
+        end
+      end
+    end
+
+    # 3. New/Unknown User Lookup (The original Block 2)
+    # If still no user, check if it's a valid document number for a NEW user
+    if user.nil? && validate_document_number(login)
+      user = log_in_or_create_ys_user(login)
+    end
+
     user
   end
 
@@ -315,6 +359,33 @@ class User < ApplicationRecord
   end
 
   def self.validate_document_number(document_number)
+    return false if document_number.blank?
+
+    # 1. Get the comma-separated string from secrets
+    # Example string: "young_scot, na_cards"
+    enabled_strategies_string = Rails.application.secrets.enabled_document_strategies.to_s
+
+    # 2. Parse into an array of clean keys
+    # This handles spaces, newlines, and empty items gracefully
+    enabled_keys = enabled_strategies_string.split(/[\r\n,]+/).map(&:strip)
+
+    # 3. Check against the whitelist and execute
+    enabled_keys.any? do |key|
+      # Look up the method name in our whitelist
+      method_name = STRATEGY_MAP[key]
+
+      if method_name && respond_to?(method_name)
+        # Execute the strategy
+        send(method_name, document_number)
+      else
+        # Optional: Log a warning if secrets contains a typo/invalid key
+        Rails.logger.warn("Unknown validation strategy key in secrets: '#{key}'") unless key.blank?
+        false
+      end
+    end
+  end
+
+  def self.old_validate_document_number(document_number)
     return false if document_number.blank?
 
     DOCUMENT_ID_STRATEGIES.any? do |strategy|
