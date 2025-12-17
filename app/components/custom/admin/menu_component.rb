@@ -29,7 +29,7 @@ class Admin::MenuComponent < ApplicationComponent
         moderated_content_links,
         profiles_links,
         stats_link,
-        events_link,
+       (events_link if feature?(:events)),
         settings_links,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?)
