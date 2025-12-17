@@ -91,6 +91,8 @@ class Setting < ApplicationRecord
         "feature.machine_learning": false,
         "feature.remove_investments_supports": true,
         "feature.cookies_consent": false,
+        "feature.gdpr.require_consent_for_notifications": false,
+        "feature.events": true,
         "homepage.widgets.feeds.debates": true,
         "homepage.widgets.feeds.processes": true,
         "homepage.widgets.feeds.proposals": true,
@@ -189,7 +191,10 @@ class Setting < ApplicationRecord
         "sdg.process.proposals": true,
         "sdg.process.polls": true,
         "sdg.process.budgets": true,
-        "sdg.process.legislation": true
+        "sdg.process.legislation": true,
+        "llm.provider": nil,
+        "llm.model": nil,
+        "llm.use_llm_for_translations": false
       }
     end
 

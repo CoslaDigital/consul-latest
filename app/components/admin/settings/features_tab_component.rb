@@ -27,6 +27,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.machine_learning
       feature.remove_investments_supports
       feature.dashboard.notification_emails
+      feature.events
     ]
   end
 end
