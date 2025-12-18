@@ -9,15 +9,14 @@ class Admin::ProposalsController < Admin::BaseController
   has_orders %w[created_at]
 
   before_action :load_proposal, except: [:index, :successful]
-  
-  
+
   def index
-    @proposals = Proposal.all 
-    
+    @proposals = Proposal.all
+
     if params[:search].present?
       @proposals = @proposals.where("title ILIKE ?", "%#{params[:search]}%")
     end
-    
+
     @paginated_proposals = @proposals.page(params[:page])
 
     respond_to do |format|
@@ -26,12 +25,11 @@ class Admin::ProposalsController < Admin::BaseController
         render :index
       end
       format.csv do
-        csv_data = generate_csv(@proposals)
-        send_data csv_data, filename: "proposals-#{Date.today}.csv"
+        send_data @proposals.to_csv, filename: "proposals-#{Date.today}.csv"
       end
     end
   end
-    
+
   def successful
     @proposals = Proposal.successful.sort_by_confidence_score
   end
@@ -67,57 +65,20 @@ class Admin::ProposalsController < Admin::BaseController
 
   private
 
-    def resource_model
-      Proposal
-    end
-
-    def load_proposal
-      @proposal = Proposal.find(params[:id])
-    end
-
-    def proposal_params
-      params.require(:proposal).permit(allowed_params)
-    end
-
-    def allowed_params
-      [:selected]
-    end
-    
-    def generate_csv(proposals)
-    headers = [
-      t("admin.proposals.index.id"),
-      Proposal.human_attribute_name(:title),
-      t("proposals.form.proposal_summary"),
-      Proposal.human_attribute_name(:description),
-      Proposal.human_attribute_name(:price),
-      t("admin.proposals.index.author"),
-      Proposal.human_attribute_name(:responsible_name),
-      t("attributes.email"),
-      t("proposals.form.geozone"),
-      t("admin.proposals.index.milestones"),
-      t("admin.proposals.index.selected")
-    ]
-
-    CSV.generate(headers: true) do |csv|
-     csv << headers
-
-      proposals.each do |proposal|
-        clean_summary = strip_tags(proposal.summary).gsub(/\s+/, ' ').strip
-        clean_description = strip_tags(proposal.description).gsub(/\s+/, ' ').strip
-        csv << [
-          proposal.id,
-          proposal.title,
-          strip_tags(proposal.summary),
-          strip_tags(proposal.description),
-          proposal.price,
-          proposal.author.username,
-          proposal.responsible_name,
-          proposal.author.email,
-          proposal.geozone&.name,
-          proposal.milestones.count,
-          proposal.selected? 
-        ]
-      end
-    end
+  def resource_model
+    Proposal
   end
+
+  def load_proposal
+    @proposal = Proposal.find(params[:id])
+  end
+
+  def proposal_params
+    params.require(:proposal).permit(allowed_params)
+  end
+
+  def allowed_params
+    [:selected]
+  end
+
 end

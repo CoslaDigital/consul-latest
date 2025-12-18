@@ -55,7 +55,7 @@ class Proposal < ApplicationRecord
             unless: :skip_user_verification?
   validates :retired_reason,
             presence: true,
-            inclusion: { in: ->(*) { RETIRE_OPTIONS }}, unless: -> { retired_at.blank? }
+            inclusion: { in: ->(*) { RETIRE_OPTIONS } }, unless: -> { retired_at.blank? }
 
   validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
 
@@ -65,31 +65,31 @@ class Proposal < ApplicationRecord
 
   after_create :send_new_actions_notification_on_create
 
-  scope :for_render,               -> { includes(:tags) }
-  scope :sort_by_hot_score,        -> { reorder(hot_score: :desc) }
+  scope :for_render, -> { includes(:tags) }
+  scope :sort_by_hot_score, -> { reorder(hot_score: :desc) }
   scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc) }
-  scope :sort_by_created_at,       -> { reorder(created_at: :desc) }
-  scope :sort_by_most_commented,   -> { reorder(comments_count: :desc) }
-  scope :sort_by_relevance,        -> { all }
-  scope :sort_by_flags,            -> { order(flags_count: :desc, updated_at: :desc) }
-  scope :sort_by_archival_date,    -> { archived.sort_by_confidence_score }
-  scope :sort_by_recommendations,  -> { order(cached_votes_up: :desc) }
+  scope :sort_by_created_at, -> { reorder(created_at: :desc) }
+  scope :sort_by_most_commented, -> { reorder(comments_count: :desc) }
+  scope :sort_by_relevance, -> { all }
+  scope :sort_by_flags, -> { order(flags_count: :desc, updated_at: :desc) }
+  scope :sort_by_archival_date, -> { archived.sort_by_confidence_score }
+  scope :sort_by_recommendations, -> { order(cached_votes_up: :desc) }
 
-  scope :archived,       -> { where(created_at: ...Setting.archived_proposals_date_limit) }
-  scope :not_archived,   -> { where(created_at: Setting.archived_proposals_date_limit..) }
-  scope :last_week,      -> { where(created_at: 7.days.ago..) }
-  scope :retired,        -> { where.not(retired_at: nil) }
-  scope :not_retired,    -> { excluding(retired) }
-  scope :successful,     -> { where(cached_votes_up: Proposal.votes_needed_for_success..) }
-  scope :unsuccessful,   -> { where(cached_votes_up: ...Proposal.votes_needed_for_success) }
+  scope :archived, -> { where(created_at: ...Setting.archived_proposals_date_limit) }
+  scope :not_archived, -> { where(created_at: Setting.archived_proposals_date_limit..) }
+  scope :last_week, -> { where(created_at: 7.days.ago..) }
+  scope :retired, -> { where.not(retired_at: nil) }
+  scope :not_retired, -> { excluding(retired) }
+  scope :successful, -> { where(cached_votes_up: Proposal.votes_needed_for_success..) }
+  scope :unsuccessful, -> { where(cached_votes_up: ...Proposal.votes_needed_for_success) }
   scope :public_for_api, -> { all }
-  scope :selected,       -> { where(selected: true) }
-  scope :not_selected,   -> { where(selected: false) }
-  scope :published,      -> { where.not(published_at: nil) }
-  scope :draft,          -> { excluding(published) }
+  scope :selected, -> { where(selected: true) }
+  scope :not_selected, -> { where(selected: false) }
+  scope :published, -> { where.not(published_at: nil) }
+  scope :draft, -> { excluding(published) }
 
   scope :not_supported_by_user, ->(user) { where.not(id: user.find_voted_items(votable_type: "Proposal")) }
-  scope :created_by,            ->(author) { where(author: author) }
+  scope :created_by, ->(author) { where(author: author) }
 
   def publish
     update!(published_at: Time.current)
@@ -107,6 +107,59 @@ class Proposal < ApplicationRecord
 
   def draft?
     published_at.nil?
+  end
+
+  def status
+    if retired?
+      "retired"
+    elsif published?
+      "published"
+    else
+      "draft"
+    end
+  end
+
+  def self.to_csv
+    require "csv"
+    sanitizer = Rails::Html::FullSanitizer.new
+    headers = [
+      I18n.t("admin.proposals.index.id", default: "ID"),
+      I18n.t("activerecord.attributes.proposal.title", default: "Title"),
+      I18n.t("proposals.form.proposal_summary", default: "Summary"),
+      I18n.t("activerecord.attributes.proposal.description", default: "Description"),
+      I18n.t("activerecord.attributes.proposal.price", default: "Price"),
+      I18n.t("admin.proposals.index.author", default: "Author"),
+      I18n.t("activerecord.attributes.proposal.responsible_name", default: "Responsible Name"),
+      I18n.t("attributes.email", default: "Email"),
+      I18n.t("proposals.form.geozone", default: "Geozone"),
+      I18n.t("admin.proposals.index.milestones", default: "Milestones"),
+      I18n.t("admin.proposals.index.selected", default: "Selected"),
+      I18n.t("admin.proposals.index.status", default: "Status")
+    ]
+
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+
+      all.find_each do |proposal|
+        clean_summary = sanitizer.sanitize(proposal.summary)&.squish
+        clean_description = sanitizer.sanitize(proposal.description)&.squish
+
+        csv << [
+          proposal.id,
+          proposal.title,
+          clean_summary,
+          clean_description,
+          proposal.price,
+          proposal.author.try(:username),
+          proposal.responsible_name,
+          proposal.author.try(:email),
+          proposal.geozone&.name,
+          proposal.milestones.count,
+          proposal.selected?,
+          proposal.status # <--- The new status field
+        ]
+      end
+    end
   end
 
   def self.recommendations(user)
@@ -154,7 +207,7 @@ class Proposal < ApplicationRecord
   def self.for_summary
     summary = {}
     categories = Tag.category_names.sort
-    geozones   = Geozone.names.sort
+    geozones = Geozone.names.sort
 
     groups = categories + geozones
     groups.each do |group|
@@ -281,14 +334,14 @@ class Proposal < ApplicationRecord
   end
 
   def formatted_price
-      formatted_amount(price)
+    formatted_amount(price)
   end
 
   protected
 
-    def set_responsible_name
-      if author&.document_number?
-        self.responsible_name = author.document_number
-      end
+  def set_responsible_name
+    if author&.document_number?
+      self.responsible_name = author.document_number
     end
+  end
 end
