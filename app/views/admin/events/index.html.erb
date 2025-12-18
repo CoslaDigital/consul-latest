@@ -2,18 +2,21 @@
   <%= t("admin.header.title") %> - <%= t("admin.events.index.title") %>
 <% end %>
 
-<%# 1. Buttons floated right (Must come BEFORE the H2 to share the same vertical space) %>
 <div class="float-right">
-  <%= link_to t("admin.events.index.view_calendar"), events_path, class: "button secondary hollow", style: "margin-right: 0.5rem;" %>
-  <%= link_to t("admin.events.index.new_event"), new_admin_event_path, class: "button success" %>
+  <%= link_to t("admin.events.index.view_calendar"),
+              events_path,
+              class: "button secondary hollow",
+              style: "margin-right: 0.5rem;" %>
+
+  <%= link_to t("admin.events.index.new_event"),
+              new_admin_event_path,
+              class: "button success" %>
 </div>
 
-<%# 2. Title as a Block Element (Removed 'inline-block' to force the line break after it) %>
 <h2><%= t("admin.events.index.title") %></h2>
 
 <% if @events.any? %>
 
-  <%# 3. Count Info (This will now appear on the line BELOW the title) %>
   <h3 class="inline-block"><%= page_entries_info @events %></h3>
 
   <table>
@@ -32,7 +35,13 @@
         <td><%= l event.starts_at, format: :short %></td>
         <td><%= truncate(strip_tags(event.description), length: 100) %></td>
         <td>
-          <%= render Admin::TableActionsComponent.new(event) %>
+          <%= render Admin::TableActionsComponent.new(event) do |actions| %>
+
+            <%= actions.action(:show,
+                               text: t("admin.actions.view", default: "View"),
+                               path: event_path(event),
+                               target: "_blank") %>
+          <% end %>
         </td>
       </tr>
     <% end %>
