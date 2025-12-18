@@ -1,5 +1,7 @@
 en:
   events:
+    calendar:
+      title: Calendar of Events
     event_types:
       public_meeting: "Public Meeting"
       workshop: "Workshop"
