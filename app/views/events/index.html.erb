@@ -1,13 +1,11 @@
 <% provide(:title) do %>
-  <%= t("admin.header.title") %> - <%= t("admin.events.index.calendar_title", default: "Events Calendar") %>
+  <%= t("events.calendar.title", default: "Events Calendar") %>
 <% end %>
 
 <div class="calendar-container">
 
-  <%# --- HEADER SECTION --- %>
   <div class="clearfix mb-4">
 
-    <%# 1. Admin Header Buttons (Floated Right) %>
     <% if current_user&.administrator? %>
       <div class="float-right">
         <%= link_to t("admin.events.index.view_list", default: "View List"),
@@ -20,14 +18,11 @@
                     class: "button success" %>
       </div>
     <% end %>
-
-    <%# 2. Page Title %>
-    <h2 class="h3"><%= t("admin.events.index.calendar_title", default: "Events Calendar") %></h2>
+    <h2 class="h3"><%= t("events.calendar.title", default: "Events Calendar") %></h2>
   </div>
 
-  <%# --- CALENDAR GRID --- %>
-  <%= month_calendar(events: @calendar_items, attribute: :calendar_start, start_date: @start_date) do |date, items| %>
-
+  <%#= month_calendar(events: @calendar_items, attribute: :calendar_start, start_date: @start_date) do |date, items| %>
+  <%= month_calendar(events: @calendar_items, attribute: :calendar_start, end_attribute: :calendar_end, start_date: @start_date) do |date, items| %>
     <div class="day-number"><%= date.day %></div>
 
     <% items.each do |item| %>
