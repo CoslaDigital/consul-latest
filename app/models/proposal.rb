@@ -124,6 +124,7 @@ class Proposal < ApplicationRecord
     sanitizer = Rails::Html::FullSanitizer.new
     headers = [
       I18n.t("admin.proposals.index.id", default: "ID"),
+      I18n.t("admin.proposals.index.code", default: "Code"),
       I18n.t("activerecord.attributes.proposal.title", default: "Title"),
       I18n.t("proposals.form.proposal_summary", default: "Summary"),
       I18n.t("activerecord.attributes.proposal.description", default: "Description"),
@@ -146,6 +147,7 @@ class Proposal < ApplicationRecord
 
         csv << [
           proposal.id,
+          proposal.code,
           proposal.title,
           clean_summary,
           clean_description,
