@@ -1,18 +1,14 @@
 <div id="<%= dom_id(feed) %>" class="small-12 medium-6 large-4 column end">
   <div class="callout">
 
-    <%# FIX 1: Only generate a DOM ID for the title if a setting record exists. %>
-    <%# Otherwise, we just render the title without the specific setting ID. %>
     <h3 <%= "id='#{dom_id(feed.setting, :title)}'".html_safe if feed.setting %>>
       <%= t("admin.homepage.feeds.#{feed.kind}") %>
     </h3>
 
-    <%# FIX 2: Don't try to render the setting partial if there is no setting object %>
     <% if feed.setting.present? %>
       <%= render "setting", setting: feed.setting %>
     <% end %>
 
-    <%# The 'limit' is usually on the feed object itself, so this form is safe to keep %>
     <%= form_for [:admin, feed], remote: true do |f| %>
       <%= f.select :limit, (1..10), {}, class: "js-submit-on-change" %>
     <% end %>

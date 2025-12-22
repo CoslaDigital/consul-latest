@@ -1711,6 +1711,7 @@ es:
         proposals: Propuestas
         debates: Debates
         processes: Procesos
+        upcoming: Próximos eventos
       new:
         header_title: Nuevo encabezado
         submit_header: Crear encabezado

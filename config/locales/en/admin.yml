@@ -1710,6 +1710,7 @@ en:
         proposals: Proposals
         debates: Debates
         processes: Processes
+        upcoming: Upcoming events
       new:
         header_title: New header
         submit_header: Create header
