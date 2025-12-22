@@ -31,6 +31,7 @@ class Proposal < ApplicationRecord
   translates :summary, touch: true
   translates :retired_explanation, touch: true
   include Globalizable
+
   translation_class_delegate :retired_at
 
   belongs_to :author, -> { with_hidden }, class_name: "User", inverse_of: :proposals
@@ -55,7 +56,7 @@ class Proposal < ApplicationRecord
             unless: :skip_user_verification?
   validates :retired_reason,
             presence: true,
-            inclusion: { in: ->(*) { RETIRE_OPTIONS } }, unless: -> { retired_at.blank? }
+            inclusion: { in: ->(*) { RETIRE_OPTIONS }}, unless: -> { retired_at.blank? }
 
   validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
 
@@ -65,28 +66,28 @@ class Proposal < ApplicationRecord
 
   after_create :send_new_actions_notification_on_create
 
-  scope :for_render, -> { includes(:tags) }
-  scope :sort_by_hot_score, -> { reorder(hot_score: :desc) }
+  scope :for_render,               -> { includes(:tags) }
+  scope :sort_by_hot_score,        -> { reorder(hot_score: :desc) }
   scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc) }
-  scope :sort_by_created_at, -> { reorder(created_at: :desc) }
-  scope :sort_by_most_commented, -> { reorder(comments_count: :desc) }
-  scope :sort_by_relevance, -> { all }
-  scope :sort_by_flags, -> { order(flags_count: :desc, updated_at: :desc) }
-  scope :sort_by_archival_date, -> { archived.sort_by_confidence_score }
-  scope :sort_by_recommendations, -> { order(cached_votes_up: :desc) }
+  scope :sort_by_created_at,       -> { reorder(created_at: :desc) }
+  scope :sort_by_most_commented,   -> { reorder(comments_count: :desc) }
+  scope :sort_by_relevance,        -> { all }
+  scope :sort_by_flags,            -> { order(flags_count: :desc, updated_at: :desc) }
+  scope :sort_by_archival_date,    -> { archived.sort_by_confidence_score }
+  scope :sort_by_recommendations,  -> { order(cached_votes_up: :desc) }
 
-  scope :archived, -> { where(created_at: ...Setting.archived_proposals_date_limit) }
-  scope :not_archived, -> { where(created_at: Setting.archived_proposals_date_limit..) }
-  scope :last_week, -> { where(created_at: 7.days.ago..) }
-  scope :retired, -> { where.not(retired_at: nil) }
-  scope :not_retired, -> { excluding(retired) }
-  scope :successful, -> { where(cached_votes_up: Proposal.votes_needed_for_success..) }
-  scope :unsuccessful, -> { where(cached_votes_up: ...Proposal.votes_needed_for_success) }
+  scope :archived,       -> { where(created_at: ...Setting.archived_proposals_date_limit) }
+  scope :not_archived,   -> { where(created_at: Setting.archived_proposals_date_limit..) }
+  scope :last_week,      -> { where(created_at: 7.days.ago..) }
+  scope :retired,        -> { where.not(retired_at: nil) }
+  scope :not_retired,    -> { excluding(retired) }
+  scope :successful,     -> { where(cached_votes_up: Proposal.votes_needed_for_success..) }
+  scope :unsuccessful,   -> { where(cached_votes_up: ...Proposal.votes_needed_for_success) }
   scope :public_for_api, -> { all }
-  scope :selected, -> { where(selected: true) }
-  scope :not_selected, -> { where(selected: false) }
-  scope :published, -> { where.not(published_at: nil) }
-  scope :draft, -> { excluding(published) }
+  scope :selected,       -> { where(selected: true) }
+  scope :not_selected,   -> { where(selected: false) }
+  scope :published,      -> { where.not(published_at: nil) }
+  scope :draft,          -> { excluding(published) }
 
   scope :not_supported_by_user, ->(user) { where.not(id: user.find_voted_items(votable_type: "Proposal")) }
   scope :created_by, ->(author) { where(author: author) }
@@ -322,7 +323,7 @@ class Proposal < ApplicationRecord
 
   def send_new_actions_notification_on_published
     new_actions_ids = Dashboard::Action.detect_new_actions_since(Date.yesterday, self)
-    puts "inside publishing. New actions ids are #{new_actions_ids}"
+
     if new_actions_ids.present?
       Dashboard::Mailer.delay.new_actions_notification_on_published(self, new_actions_ids)
     end
@@ -341,9 +342,9 @@ class Proposal < ApplicationRecord
 
   protected
 
-  def set_responsible_name
-    if author&.document_number?
-      self.responsible_name = author.document_number
+    def set_responsible_name
+      if author&.document_number?
+        self.responsible_name = author.document_number
+      end
     end
-  end
 end

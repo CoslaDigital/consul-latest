@@ -81,7 +81,7 @@ en:
         subtitle_without_price_note: "subtitle help text"
         tag_category_label: "Categories"
         tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
-        tags_label: Tagssubmit_button
+        tags_label: Tags
         tags_placeholder: "Enter the tags you would like to use, separated by commas (',')"
         map_location: "Map location"
         map_location_instructions: "Navigate the map to the location and place the marker."

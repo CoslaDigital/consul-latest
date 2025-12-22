@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
+ActiveRecord::Schema[7.1].define(version: 2025_10_09_085528) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1141,9 +1141,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
     t.text "amount_log", default: ""
     t.text "officer_assignment_id_log", default: ""
     t.text "author_id_log", default: ""
+    t.bigint "option_id"
     t.index ["answer"], name: "index_poll_partial_results_on_answer"
     t.index ["author_id"], name: "index_poll_partial_results_on_author_id"
+    t.index ["booth_assignment_id", "date", "option_id"], name: "idx_on_booth_assignment_id_date_option_id_2ffcf6ea3b", unique: true
     t.index ["booth_assignment_id", "date"], name: "index_poll_partial_results_on_booth_assignment_id_and_date"
+    t.index ["option_id"], name: "index_poll_partial_results_on_option_id"
     t.index ["origin"], name: "index_poll_partial_results_on_origin"
     t.index ["question_id"], name: "index_poll_partial_results_on_question_id"
   end
@@ -1266,6 +1269,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
     t.index ["officer_assignment_id"], name: "index_poll_voters_on_officer_assignment_id"
     t.index ["poll_id", "document_number", "document_type"], name: "doc_by_poll"
     t.index ["poll_id"], name: "index_poll_voters_on_poll_id"
+    t.index ["user_id", "poll_id"], name: "index_poll_voters_on_user_id_and_poll_id", unique: true
     t.index ["user_id"], name: "index_poll_voters_on_user_id"
   end
 
@@ -1675,8 +1679,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
     t.datetime "level_two_verified_at", precision: nil
     t.string "erase_reason"
     t.datetime "erased_at", precision: nil
-    t.boolean "public_activity", default: true
-    t.boolean "newsletter", default: true
+    t.boolean "public_activity"
+    t.boolean "newsletter"
     t.integer "notifications_count", default: 0
     t.boolean "registering_with_oauth", default: false
     t.string "locale"
@@ -1684,16 +1688,16 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
     t.integer "geozone_id"
     t.string "gender", limit: 10
     t.datetime "date_of_birth", precision: nil
-    t.boolean "email_digest", default: true
-    t.boolean "email_on_direct_message", default: true
+    t.boolean "email_digest"
+    t.boolean "email_on_direct_message"
     t.boolean "official_position_badge", default: false
     t.datetime "password_changed_at", precision: nil, default: "2015-01-01 01:01:01", null: false
     t.boolean "created_from_signature", default: false
     t.integer "failed_email_digests_count", default: 0
     t.text "former_users_data_log", default: ""
     t.boolean "public_interests", default: false
-    t.boolean "recommended_debates", default: true
-    t.boolean "recommended_proposals", default: true
+    t.boolean "recommended_debates"
+    t.boolean "recommended_proposals"
     t.string "subscriptions_token"
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_at", precision: nil
@@ -1870,6 +1874,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_27_164431) do
   add_foreign_key "poll_officer_assignments", "poll_booth_assignments", column: "booth_assignment_id"
   add_foreign_key "poll_partial_results", "poll_booth_assignments", column: "booth_assignment_id"
   add_foreign_key "poll_partial_results", "poll_officer_assignments", column: "officer_assignment_id"
+  add_foreign_key "poll_partial_results", "poll_question_answers", column: "option_id"
   add_foreign_key "poll_partial_results", "poll_questions", column: "question_id"
   add_foreign_key "poll_partial_results", "users", column: "author_id"
   add_foreign_key "poll_question_answer_videos", "poll_question_answers", column: "answer_id"
