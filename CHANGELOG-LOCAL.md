@@ -2,6 +2,35 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## What's Changed
+
+## [2.4.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.1) (2025-12-23)
+
+### Added
+
+* Feature: make it possible to move cards between pages
+* Feature: add events calendar
+* Feature: add homepage upcoming events widget
+* Feature: add ability to login using an ID card number
+* Feature:add csv download to proposals
+
+### Changed
+
+* Refactor: Update layout of Sign in and Registration pages to improve messaging for myaccount and young scot
+* Feature: Send notification to admin address when proposal published
+* Refactor: proposals form
+* update registration page to break organisation out from individual sign up
+* Refactor: changed to size and rendering of the homepage header image
+
+### Fixed
+
+* Add correct currency to proposals
+* Display correct currency symbol for budget in dossier
+* Improve image rendering on proposals and investments
+* Improved mobile layout for proposals
+
+**Full Changelog**: https://github.com/CoslaDigital/consul-latest/compare/v2.3.1-local.4...v2.4.1-local.1
+
 ## [2.3.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.4) (2025-08-01)
 
 ### Added
