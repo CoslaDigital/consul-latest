@@ -886,7 +886,6 @@ en:
       not_supported_on_current_budget: "Users that haven't supported investments in PB: %{budget_name}"
       invalid_recipients_segment: "Recipients user segment is invalid"
       geozone: "Geozone"
-      invalid_recipients_segment: "Recipients user segment is invalid"
     newsletters:
       create_success: Newsletter created successfully
       update_success: Newsletter updated successfully
