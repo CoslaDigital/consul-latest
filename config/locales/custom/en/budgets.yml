@@ -24,6 +24,7 @@ en:
       select_budget: "Select Budget"
       choose_budget: "Choose a budget"
       next: "Next"
+      no_budgets: "No budgets are currently accepting new projects"
     select_headings:
       title: "Select Budget Heading"
       proposal_name: "Proposal Name"
