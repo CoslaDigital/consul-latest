@@ -229,6 +229,7 @@ en:
         notifications: Notifications
       sdg: "SDG"
       events: "Events"
+      process_admin: "Manage Processes"
     skip_to_main_content: "Skip to main content"
   notifications:
     index:
@@ -337,7 +338,7 @@ en:
       proposal_description_note: "Provide a detailed description of your project"
       proposal_video_url_note: You may add a link to YouTube or Vimeo
       proposal_estimated_price: Estimated Cost
-      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it 
+      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it
       tag_category_label: "Categories"
       tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
       tags_label: Tags
@@ -435,7 +436,7 @@ en:
       code: "Proposal code:"
       comments_tab: Comments
       dashboard_proposal_link: Dashboard
-      budget_investment_link: Create Budget Proposal 
+      budget_investment_link: Create Budget Proposal
       flag: This proposal has been flagged as inappropriate by several users.
       notifications_tab: Notifications
       milestones_tab: Milestones
