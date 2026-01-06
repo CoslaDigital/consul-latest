@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 * Improve image rendering on proposals and investments
 * Improved mobile layout for proposals
 
-**Full Changelog**: https://github.com/CoslaDigital/consul-latest/compare/v2.3.1-local.4...v2.4.1-local.1
+## Full Changelog: https://github.com/CoslaDigital/consul-latest/compare/v2.3.1-local.4...v2.4.1-local.1
 
 ## [2.3.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.3.1-local.4) (2025-08-01)
 
