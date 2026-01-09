@@ -107,6 +107,7 @@ en:
           username_is_available: Username available
           username_is_not_available: Username already in use
           username_note: Name that appears next to your posts
+          terms_title: "Terms of Service"
         success:
           back_to_index: I understand; go back to main page
           instructions_1: Please <b>check your email</b> - we have sent you a <b>link to confirm your account</b>.

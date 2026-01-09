@@ -51,9 +51,9 @@
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .tenant-flotta {
@@ -67,23 +67,23 @@
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .tenant-test {
-   --anchor-color: #008585;
-   --anchor-color-hover: #74a892;
-   --brand: #c7522a;
-   --brand-secondary: #e5c185;
-   --button-background-hover: #fbf2c4;
-   --button-background-hover-contrast: #{$black};
-   --footer: #e6e6e6;
-   --main-header: #74a892;
-   --top-links: var(--main-header);
-   --subnavigation: #c7522a;
- }
+  --anchor-color: #008585;
+  --anchor-color-hover: #74a892;
+  --brand: #c7522a;
+  --brand-secondary: #e5c185;
+  --button-background-hover: #fbf2c4;
+  --button-background-hover-contrast: #{$black};
+  --footer: #e6e6e6;
+  --main-header: #74a892;
+  --top-links: var(--main-header);
+  --subnavigation: #c7522a;
+}
 
 .tenant-arb {
   --brand: #10069F;
@@ -92,56 +92,56 @@
   --footer: #023C19;
   --footer-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
- .tenant-inverc {
+.tenant-inverc {
   --brand: #36808c;
   --brand-secondary: #75a5ad;
   --brand-contrast: #FFFFFF;
   --footer: #d7e5e7;
   --main-header-contrast: #FFFFFF;
-   --top-links: #75a5ad ;
+  --top-links: #75a5ad;
   --top-links-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .tenant-edi {
-  --brand:     #6D3465;
+  --brand: #6D3465;
   --brand-secondary: #492445;
   --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 .tenant-aberdeen {
-    --main-header: #EF5D9E;
-    --brand: #45D3A1;
-    --brand-secondary: #6CBEEC;
-    --brand-contrast: #FF;
-    --footer: #eee6db;
-    --main-header-contrast: #FFFFFF;
-    --top-links: #eee6db;
-    --top-links-contrast: #FF;
+  --main-header: #EF5D9E;
+  --brand: #45D3A1;
+  --brand-secondary: #6CBEEC;
+  --brand-contrast: #FF;
+  --footer: #eee6db;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #eee6db;
+  --top-links-contrast: #FF;
 }
 
 .tenant-sac {
-  --brand:     #005293;
+  --brand: #005293;
   --brand-secondary: #002F59;
   --footer: #CEDBEA;
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared"; 
+  @import "cosla_shared";
   @include shared-styles;
 }
 
@@ -152,10 +152,10 @@
   --footer: #023C19;
   --footer-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 .tenant-highland {
@@ -169,9 +169,9 @@
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .tenant-hlc {
@@ -185,7 +185,7 @@
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }

@@ -12,12 +12,12 @@
     </div>
 
     <div class="small-12 medium-6 large-4 column end">
-      <%= f.collection_select :geozone_id, Geozone.all, :id, :name, prompt:true, hint: t("admin.postcodes.postcode.geozone_help") %>
+      <%= f.collection_select :geozone_id, Geozone.all, :id, :name, prompt: true, hint: t("admin.postcodes.postcode.geozone_help") %>
     </div>
   </div>
 
   <div class="small-12 column">
     <%= f.submit(value: t("admin.postcodes.edit.form.submit_button"),
-                class: "button success") %>
+                 class: "button success") %>
   </div>
 <% end %>

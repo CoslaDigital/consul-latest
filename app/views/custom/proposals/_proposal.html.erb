@@ -4,31 +4,31 @@
   is_hero_layout = local_assigns.fetch(:layout_style, :default) == :hero
 %>
 <div id="<%= dom_id(proposal) %>"
-     class="proposal clear <%= ("successful" if proposal.successful?) %>"  data-type="proposal">
-   <div class="panel with-image <%= 'panel--hero' if is_hero_layout %>">  
+     class="proposal clear <%= ("successful" if proposal.successful?) %>" data-type="proposal">
+  <div class="panel with-image <%= 'panel--hero' if is_hero_layout %>">
     <% if proposal.successful? %>
       <div class="icon-successful"></div>
     <% end %>
-    
-   <div class="panel-image">
-    <% if proposal.image.present? %>
+
+    <div class="panel-image">
+      <% if proposal.image.present? %>
         <% if is_hero_layout %>
           <%= image_tag proposal.image.variant(:feed_thumb),
-                          alt: proposal.image.title.unicode_normalize %>
+                        alt: proposal.image.title.unicode_normalize %>
         <% else %>
           <%= image_tag proposal.image.variant(:medium),
-                          alt: proposal.image.title.unicode_normalize %>
+                        alt: proposal.image.title.unicode_normalize %>
         <% end %>
-    <% else %>
+      <% else %>
         <% if is_hero_layout %>
           <%= image_tag proposal.image.variant(:feed_thumb),
-                          alt: proposal.image.title.unicode_normalize %>
+                        alt: proposal.image.title.unicode_normalize %>
         <% else %>
-           <%= image_tag(image_path_for("proposal_background_no_image.png"), alt: proposal.title) %>
+          <%= image_tag(image_path_for("proposal_background_no_image.png"), alt: proposal.title) %>
         <% end %>
 
-    <% end %>
-  </div>
+      <% end %>
+    </div>
 
     <div class="proposal-content">
       <% cache [locale_and_user_status(proposal), "index", proposal, proposal.author] do %>
@@ -78,9 +78,9 @@
           <div class="truncate"></div>
         </div>
         <h4><%= t("budgets.investments.show.estimated_price") %></h4>
-             <p class="investment-project-amount">
-             <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.formatted_price %>
-            </p>
+        <p class="investment-project-amount">
+          <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.formatted_price %>
+        </p>
 
         <%= render "shared/tags", taggable: proposal, limit: 5 %>
       <% end %>

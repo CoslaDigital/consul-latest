@@ -24,22 +24,22 @@
   <%= sanitize(t("budgets.investments.show.code", code: investment.id)) %>
 </p>
 
- <div>
-<% if investment.should_show_estimated_price? %>
-  <h3><%= t("budgets.investments.show.estimated_price") %></h3>
-  <p class="investment-project-amount">
-    <%= investment.formatted_estimated_price %>
-  </p>
-  <hr>
-<% end %>
+<div>
+  <% if investment.should_show_estimated_price? %>
+    <h3><%= t("budgets.investments.show.estimated_price") %></h3>
+    <p class="investment-project-amount">
+      <%= investment.formatted_estimated_price %>
+    </p>
+    <hr>
+  <% end %>
 </div>
 <div>
 
-<h3><%= t("budgets.investments.show.summary") %></h3>
-<%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
-<hr>
-<h3><%= t("budgets.investments.show.description") %></h3>
-<%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
+  <h3><%= t("budgets.investments.show.summary") %></h3>
+  <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
+  <hr>
+  <h3><%= t("budgets.investments.show.description") %></h3>
+  <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
 </div>
 <hr>
 
