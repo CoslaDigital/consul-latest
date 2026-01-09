@@ -10,17 +10,16 @@
     <% end %>
   </p>
 
-<p id="estimated_price">
+  <p id="estimated_price">
     <strong>
       <%= t("valuation.budget_investments.show.estimated_price") %>:
     </strong>
     <% if @investment.estimated_price.present? %>
       <%= @investment.formatted_estimated_price %>
     <% else %>
-     <%= t("valuation.budget_investments.show.undefined") %>
+      <%= t("valuation.budget_investments.show.undefined") %>
     <% end %>
   </p>
-
 
   <p id="price_first_year">
     <strong>

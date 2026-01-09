@@ -1,8 +1,4 @@
-<%
-  # 1. Set a flag based on the variable passed to the partial
-  #    We default to 'false' (the side-by-side style)
-  is_hero_layout = local_assigns.fetch(:layout_style, :default) == :hero
-%>
+<% is_hero_layout = local_assigns.fetch(:layout_style, :default) == :hero %>
 <div id="<%= dom_id(proposal) %>"
      class="proposal clear <%= ("successful" if proposal.successful?) %>" data-type="proposal">
   <div class="panel with-image <%= 'panel--hero' if is_hero_layout %>">
