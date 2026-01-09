@@ -10,6 +10,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_local_login
                           feature.hide_comments
                           feature.hide_votes
+                          feature.restrict_debate_creation
                         ]
     original_settings + custom_settings
   end

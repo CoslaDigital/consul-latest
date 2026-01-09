@@ -142,6 +142,8 @@ en:
       sdg_description: Enable Sustainable Development Goals sections in the administration menu and in the Global Settings.
       demographics: "Demographics"
       demographics_description: "Enable users to manage gender DOB and Geozone"
+      restrict_debate_creation: "Restrict Debate Questions"
+      restrict_debate_creation_description: "Debate questions can only be created by admins when this setting is enabled"
     remote_census:
       general:
         endpoint: "Endpoint"
