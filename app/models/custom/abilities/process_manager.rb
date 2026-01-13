@@ -5,13 +5,14 @@ module Abilities
     def initialize(user)
 
       can :read, Budget::Investment::Answer
-      
+
       cannot :edit, Administrator
        can :index, Administrator
-      
+
       can :restore, Comment
       cannot :restore, Comment, hidden_at: nil
 
+      can :create, Debate
       can :restore, Debate
       cannot :restore, Debate, hidden_at: nil
 
@@ -22,7 +23,7 @@ module Abilities
       can :show, Legislation::Proposal
       can :proposals, ::Legislation::Process
       can :summary, ::Legislation::Process
-      
+
       can :restore, Legislation::Proposal
       cannot :restore, Legislation::Proposal, hidden_at: nil
 

@@ -12,6 +12,7 @@ module Abilities
 
       can :restore, Debate
       cannot :restore, Debate, hidden_at: nil
+      can [:create, :update, :destroy], Debate
 
       can :restore, Proposal
       cannot :restore, Proposal, hidden_at: nil
@@ -20,7 +21,7 @@ module Abilities
       can :show, Legislation::Proposal
       can :proposals, ::Legislation::Process
       can :summary, ::Legislation::Process
-      
+
       can :restore, Legislation::Proposal
       cannot :restore, Legislation::Proposal, hidden_at: nil
 
