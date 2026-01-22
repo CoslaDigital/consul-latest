@@ -1,7 +1,7 @@
 class Document < ApplicationRecord
   include Attachable
 
-  enum visibility: { restricted: 0, public: 1 }, _default: :public
+  enum visibility: { restricted: 0, unrestricted: 1 }, _default: :unrestricted
 
   belongs_to :user
   belongs_to :documentable, polymorphic: true, touch: true
@@ -14,8 +14,8 @@ class Document < ApplicationRecord
   before_save :remove_metadata
 
   scope :admin, -> { where(admin: true) }
-  scope :publicly_visible, -> { where(visibility: :public) }
-  scope :visibility_admin, -> { where(visibility: :restricted) }
+  scope :unrestricted_visibility, -> { where(visibility: :unrestricted) }
+  scope :restricted_visibility, -> { where(visibility: :restricted) }
 
   def self.humanized_accepted_content_types
     Setting.accepted_content_types_for("documents").join(", ")
