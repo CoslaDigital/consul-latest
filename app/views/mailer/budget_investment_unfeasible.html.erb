@@ -5,7 +5,9 @@
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= t("mailers.budget_investment_unfeasible.hi") %>
+    <%= t("mailers.budget_investment_unfeasible.hi", author: @investment.author.username) %>
+    <br><br>
+    <%= t("mailers.budget_investment_unfeasible.intro") %>
   </p>
 
   <p style="<%= css_for_mailer_text + css_for_mailer_quote %>">

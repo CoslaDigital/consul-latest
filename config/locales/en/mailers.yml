@@ -69,11 +69,12 @@ en:
       share: "Share your project"
     budget_investment_unfeasible:
       title: "Your investment project has been marked as unfeasible"
-      hi: "Dear user,"
-      new: "For all these, we invite you to elaborate a <strong>new investment</strong> that adjusts to the conditions of this process. You can do it following this link: %{url}."
+      hi: "Dear %{author},"
+      intro: "Following a review of your application, we are sorry to inform you that your application will not be proceeding to the next phase this time because it does not meet the criteria for the fund"
+      new: "Please do consider submitting a new application to future opportunities"
       new_href: "new investment project"
       sincerely: "Sincerely"
-      sorry: "Sorry for the inconvenience and we again thank you for your invaluable participation."
+      sorry: "Sorry for any disappointment this causes and we again thank you for your invaluable participation."
       subject: "Your investment project '%{code}' has been marked as unfeasible"
     budget_investment_selected:
       subject: "Your investment project '%{code}' has been selected"
