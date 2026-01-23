@@ -20,7 +20,7 @@ module Abilities
       can :show, Legislation::Proposal
       can :proposals, ::Legislation::Process
       can :summary, ::Legislation::Process
-      
+
       can :restore, Legislation::Proposal
       cannot :restore, Legislation::Proposal, hidden_at: nil
 
@@ -136,11 +136,11 @@ module Abilities
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
 
-      can [:create], Document
+      can [:manage, :create, :update], Document
       can [:destroy], Document do |document|
         document.documentable_type == "Poll::Question::Option" && can?(:update, document.documentable)
       end
-      can [:create, :destroy], DirectUpload
+      can [:create, :destroy, :manage], DirectUpload
 
       can [:deliver], Newsletter, hidden_at: nil
       can [:manage], Dashboard::AdministratorTask
@@ -151,6 +151,7 @@ module Abilities
       can [:create, :read], LocalCensusRecords::Import
 
       can :manage, Cookies::Vendor
+      can [:manage, :create, :update], Document
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant
