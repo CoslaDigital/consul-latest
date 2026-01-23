@@ -70,7 +70,7 @@ en:
     budget_investment_unfeasible:
       title: "Your investment project has been marked as unfeasible"
       hi: "Dear %{author},"
-      intro: "Following a review of your application, we are sorry to inform you that your application will not be proceeding to the next phase this time because it does not meet the criteria for the fund"
+      intro: "Following a review of your application, we are sorry to inform you that your application %{investment} for budget %{budget} will not be proceeding to the next phase this time because it does not meet the criteria for the fund"
       new: "Please do consider submitting a new application to future opportunities"
       new_href: "new investment project"
       sincerely: "Sincerely"

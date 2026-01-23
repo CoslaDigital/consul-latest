@@ -7,7 +7,9 @@
   <p style="<%= css_for_mailer_text %>">
     <%= t("mailers.budget_investment_unfeasible.hi", author: @investment.author.username) %>
     <br><br>
-    <%= t("mailers.budget_investment_unfeasible.intro") %>
+    <%= t("mailers.budget_investment_unfeasible.intro",
+          investment: @investment.title,
+          budget: @investment.budget.name) %>
   </p>
 
   <p style="<%= css_for_mailer_text + css_for_mailer_quote %>">
@@ -19,7 +21,7 @@
       t(
         "mailers.budget_investment_unfeasible.new",
         url: link_to(t("mailers.budget_investment_unfeasible.new_href"),
-                     new_budget_investment_url(@investment.budget),
+                     budget_url(@investment.budget),
                      style: css_for_mailer_link)
       ),
       attributes: %w[href style]
