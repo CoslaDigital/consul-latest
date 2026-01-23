@@ -136,7 +136,7 @@ module Abilities
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
 
-      can [:create], Document
+      can [:manage], Document
       can [:destroy], Document do |document|
         document.documentable_type == "Poll::Question::Option" && can?(:update, document.documentable)
       end
