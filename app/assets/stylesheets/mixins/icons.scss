@@ -1603,6 +1603,10 @@ $font-awesome-icons: (
     @include has-fa-icon(tools, solid);
   }
 
+  .copy-link {
+    @include has-fa-icon(copy, regular)
+  }
+
   .download-link {
     @include has-fa-icon(download, solid);
   }
