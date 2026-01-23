@@ -20,7 +20,7 @@ module Abilities
       can :show, Legislation::Proposal
       can :proposals, ::Legislation::Process
       can :summary, ::Legislation::Process
-      
+
       can :restore, Legislation::Proposal
       cannot :restore, Legislation::Proposal, hidden_at: nil
 
@@ -135,7 +135,7 @@ module Abilities
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
 
-      can [:create], Document
+      can [:manage], Document
       can [:destroy], Document do |document|
         document.documentable_type == "Poll::Question::Option" && can?(:update, document.documentable)
       end
