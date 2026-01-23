@@ -1,14 +1,28 @@
 <div id="<%= dom_id(document) %>" class="document">
-  <%= link_to document.attachment, rel: "nofollow" do %>
-    <strong class="document-title"><%= document.title %></strong>
-    <small class="document-metadata">
-      <span class="document-content-type"><%= document.humanized_content_type %></span>
-      <span class="document-size"><%= number_to_human_size(document.attachment_file_size, precision: 2) %></span>
 
-      <span class="document-visibility <%= visibility_class %>">
-        <%= visibility_text %>
-      </span>
-    </small>
+  <% if linkable? %>
+    <%= link_to document.attachment, rel: "nofollow", class: "document-link" do %>
+      <strong class="document-title"><%= document.title %></strong>
+      <small class="document-metadata">
+        <span class="document-content-type"><%= document.humanized_content_type %></span>
+        <span class="document-size"><%= number_to_human_size(document.attachment_file_size, precision: 2) %></span>
+        <span class="document-visibility <%= visibility_class %>">
+          <%= visibility_text %>
+        </span>
+      </small>
+    <% end %>
+
+  <% else %>
+    <div class="document-static">
+      <strong class="document-title"><%= document.title %></strong>
+      <small class="document-metadata">
+        <span class="document-content-type"><%= document.humanized_content_type %></span>
+        <span class="document-size"><%= number_to_human_size(document.attachment_file_size, precision: 2) %></span>
+        <span class="document-visibility <%= visibility_class %>">
+          <%= visibility_text %>
+        </span>
+      </small>
+    </div>
   <% end %>
 
   <% if show_destroy_link? && can?(:destroy, document) %>
@@ -18,4 +32,5 @@
                   data: { confirm: t("documents.actions.destroy.confirm") },
                   class: "delete" %>
   <% end %>
+
 </div>
