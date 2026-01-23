@@ -7,4 +7,17 @@ class Documents::DocumentComponent < ApplicationComponent
     @document = document
     @show_destroy_link = show_destroy_link
   end
+
+  # Helper to determine if we consider the doc "visible" (Public)
+  def visible?
+    document.unrestricted?
+  end
+
+  def visibility_text
+    visible? ? "Public" : "Private"
+  end
+
+  def visibility_class
+    visible? ? "visibility-public" : "visibility-restricted"
+  end
 end
