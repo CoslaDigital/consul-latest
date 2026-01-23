@@ -4,37 +4,31 @@
   resource_id: document.documentable_id,
   relation_name: "documents"
 ) %>
-<div style="background: yellow; padding: 5px; border: 1px solid red;">
-  DEBUG INFO:<br>
-  Current User: <%= current_user %><br>
-  Is Admin?: <%= current_user.administrator? %><br>
-  Can Update?: <%= can?(:update, document) %><br>
-  Document ID: <%= document.id || "New Record" %><br>
-  Document User ID: <%= document.user_id.inspect %>
-</div>
+
 <p class="current-visibility-status">
   Current status:
   <strong>
     <%= document.unrestricted? ? "Public" : "Private" %>
-    <%= show_visibility_toggle? ? "Yes" : "No" %>
   </strong>
 </p>
+
 <% if show_visibility_toggle? %>
   <div class="field document-visibility-toggle">
     <strong>Visibility</strong>
 
+    <div class="radio-option">
+      <label>
+        <%= f.radio_button :visibility, 'unrestricted', checked: document.unrestricted? %>
+        Public
+      </label>
+    </div>
 
+    <div class="radio-option">
+      <label>
+        <%= f.radio_button :visibility, 'restricted', checked: !document.unrestricted? %>
+        Private
+      </label>
+    </div>
 
-    <%= f.collection_radio_buttons :visibility,
-                                   [['unrestricted', 'Public'], ['restricted', 'Private']],
-                                   :first,
-                                   :last do |b| %>
-
-      <div class="radio-option">
-        <%= b.radio_button %>
-        <%= b.label %>
-      </div>
-
-    <% end %>
   </div>
 <% end %>
