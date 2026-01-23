@@ -28,9 +28,15 @@
               actions: [:destroy],
               destroy_path: admin_site_customization_document_path(document)
             ) do |actions| %>
+
+
               <%= actions.action(:download,
                                  text: t("documents.buttons.download_document"),
-                                 path: document.attachment,
+                                 path: short_doc_url(document),
+                                 rel: "nofollow") %>
+              <%= actions.action(:copy,
+                                 text: t("documents.buttons.copy_link"),
+                                 path: short_doc_url(document),
                                  rel: "nofollow") %>
             <% end %>
           </td>

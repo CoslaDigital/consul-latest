@@ -185,6 +185,7 @@ var initialize_modules = function() {
   App.AccountMenu.initialize();
   App.AuthenticityTokenRefresh.initialize();
   App.CookiesConsent.initialize();
+  App.Accordion.initialize();
 };
 
 var destroy_non_idempotent_modules = function() {

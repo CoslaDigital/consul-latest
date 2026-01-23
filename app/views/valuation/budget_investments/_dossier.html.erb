@@ -1,24 +1,34 @@
 <% if @budget.show_money? %>
   <p id="price">
     <strong>
-      <%= t("valuation.budget_investments.show.price") %>
-      (<%= t("valuation.budget_investments.show.currency") %>):
+      <%= t("valuation.budget_investments.show.price") %>:
     </strong>
     <% if @investment.price.present? %>
-      <%= @investment.price %>
+      <%= @investment.formatted_price %>
     <% else %>
       <%= t("valuation.budget_investments.show.undefined") %>
     <% end %>
   </p>
 
+<p id="estimated_price">
+    <strong>
+      <%= t("valuation.budget_investments.show.estimated_price") %>:
+    </strong>
+    <% if @investment.estimated_price.present? %>
+      <%= @investment.formatted_estimated_price %>
+    <% else %>
+     <%= t("valuation.budget_investments.show.undefined") %>
+    <% end %>
+  </p>
+
+
   <p id="price_first_year">
     <strong>
-      <%= t("valuation.budget_investments.show.price_first_year") %>
-      (<%= t("valuation.budget_investments.show.currency") %>):
+      <%= t("valuation.budget_investments.show.price_first_year") %>:
     </strong>
 
     <% if @investment.price_first_year.present? %>
-      <%= @investment.price_first_year %>
+      <%= @investment.formatted_price_first_year %>
     <% else %>
       <%= t("valuation.budget_investments.show.undefined") %>
     <% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_04_115158) do
+ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -621,9 +621,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_04_115158) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.boolean "admin", default: false
+    t.integer "visibility", default: 0
     t.index ["documentable_type", "documentable_id"], name: "index_documents_on_documentable_type_and_documentable_id"
     t.index ["user_id", "documentable_type", "documentable_id"], name: "access_documents"
     t.index ["user_id"], name: "index_documents_on_user_id"
+    t.index ["visibility"], name: "index_documents_on_visibility"
   end
 
   create_table "events", force: :cascade do |t|
@@ -635,6 +637,21 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_04_115158) do
     t.datetime "updated_at", null: false
     t.string "event_type"
     t.string "location"
+    t.bigint "author_id"
+    t.index ["author_id"], name: "index_events_on_author_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "event_type"
+    t.string "location"
+    t.bigint "author_id"
+    t.index ["author_id"], name: "index_events_on_author_id"
   end
 
   create_table "failed_census_calls", id: :serial, force: :cascade do |t|
@@ -1849,6 +1866,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_04_115158) do
   add_foreign_key "dashboard_executed_actions", "dashboard_actions", column: "action_id"
   add_foreign_key "dashboard_executed_actions", "proposals"
   add_foreign_key "documents", "users"
+  add_foreign_key "events", "users", column: "author_id"
   add_foreign_key "failed_census_calls", "poll_officers"
   add_foreign_key "failed_census_calls", "users"
   add_foreign_key "flags", "users"

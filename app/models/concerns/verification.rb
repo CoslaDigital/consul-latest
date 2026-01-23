@@ -64,7 +64,7 @@ module Verification
 
   def level_three_verified?
     return true if skip_verification?
-
+    return true if organization&.verified?
     verified_at.present?
   end
 

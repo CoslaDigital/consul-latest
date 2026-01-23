@@ -2,6 +2,14 @@ class GeojsonFormatValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     if value.present?
       geojson = parse_json(value)
+      unless valid_geojson?(geojson)
+        record.errors.add(
+          attribute,
+          :invalid,
+          message: I18n.t("errors.geozone.attributes.geojson.invalid")
+        )
+        return
+      end
 
       unless valid_geojson?(geojson)
         record.errors.add(attribute, :invalid)
@@ -36,6 +44,7 @@ class GeojsonFormatValidator < ActiveModel::EachValidator
 
     def valid_feature_collection?(geojson)
       return false unless geojson["features"].is_a?(Array)
+
 
       geojson["features"].all? { |feature| valid_feature?(feature) }
     end

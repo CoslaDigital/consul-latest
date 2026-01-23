@@ -6,7 +6,11 @@
 
 <% if proposals.any? %>
   <%= render Admin::SearchComponent.new(label: t("admin.shared.search.label.proposals")) %>
-
+  <div class="page-actions" style="margin-bottom: 1rem;">
+    <%= link_to t("admin.proposals.index.download_csv"), 
+                url_for(params.permit!.merge(format: :csv)), 
+                class: "button" %>
+  </div>
   <h3><%= page_entries_info proposals %></h3>
 
   <table>

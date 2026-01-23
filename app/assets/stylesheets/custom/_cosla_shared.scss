@@ -1,0 +1,328 @@
+// _cosla_shared.scss
+
+@mixin shared-styles {
+
+  
+
+  .hero-header .row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%); 
+  opacity: 0.7;
+  border-radius: inherit;
+  z-index: -1; // This is correct
+}
+
+
+  .admin-sidebar {
+    background: linear-gradient(to bottom, var(--brand) 0%,var(--brand-secondary) 100%);
+  }
+
+  .budget-header .row {
+    padding: 1rem;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    margin-right: unset;
+    margin-left: 10%;
+    position: relative; // For positioning ::before
+  }
+
+  .budget-header .row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%);
+    opacity: 0.7;
+    border-radius: inherit;
+    z-index: -1;
+  }
+  
+.budget-header .row .medium-6 {
+  width: unset;
+  }
+
+.hero-header .homepage-lead,
+.budget-header .homepage-lead {
+  max-width: 80%;
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  margin-left: 10%;
+  margin-right: 10%;
+  text-align: center;
+}
+
+.budget-header .homepage-link {
+    display: inline-block;
+    margin: 0.5rem 0;
+    margin-top: 1.0rem;
+    margin-bottom: 1.0rem;
+    justify-content: center;
+    background-color: var(--brand-secondary);
+    color: white; /* Text color */
+    padding: 0.75rem 1.5rem; /* Add padding to make it look like a button */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline for links */
+    border-radius: 5px; /* Rounded corners for button effect */
+    font-size: 1.2rem; /* Adjust font size */
+    font-weight: bold; /* Make text bold */
+    cursor: pointer; /* Show pointer on hover */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* Add hover and focus styles to make it interactive */
+.budget-header .homepage-link:hover,
+.budget-header .homepage-link:focus {
+    background-color: var(--brand); /* Change background on hover */
+    color: white; /* Ensure text remains visible */
+}
+
+.budget-header.with-background-image {
+padding-bottom: 5rem;
+}
+
+.budget-header h1 {
+  padding: 1.5rem 0 .5rem;
+  text-shadow: 1px 1px 2px $black;
+}  
+
+    .no-items {
+    background-color: var(--brand-secondary);
+    border-color: #bce8f1;
+    color: var(--brand-contrast);
+}
+
+.debate-questions .control {
+    background: #f9f9f9; /* Slightly lighter background */
+    border: 1px solid #ccc; /* Softer border color */
+    border-radius: .5rem; /* Larger border radius for a more modern feel */
+    color: #333; /* Darker text color for better contrast */
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 1rem; /* Increased margin for better spacing */
+    margin-right: 1rem; /* Reduced right margin for better alignment */
+    padding: 1rem 2rem; /* Adjusted padding for better proportions */
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+.debate-questions .control:hover {
+    background: #e6e6e6; /* Slightly darker background on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.debate-list {
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.debate-block {
+    background: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd; /* Soft border */
+    border-radius: .5rem; /* Rounded corners */
+    padding: 1rem; /* Padding for spacing */
+    margin-bottom: 1.5rem; /* Space between blocks */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+.debate-block:hover {
+    background: #e6e6e6; /* Slightly darker background on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.debate-type {
+    font-weight: bold;
+    color: #333; /* Darker text color */
+    margin-bottom: .5rem; /* Space below type */
+}
+
+.debate-title h4 {
+    font-size: 1.25rem; /* Larger font size */
+    margin: 0; /* Remove default margin */
+}
+
+.debate-title a {
+    color: #007acc; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.debate-title a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.debate-meta {
+    font-size: .875rem; /* Smaller font size */
+    color: #777; /* Lighter text color */
+    margin-top: .5rem; /* Space above meta */
+}
+
+.comments-count a {
+    color: #007acc; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.comments-count a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.debate-date {
+    color: #555; /* Slightly darker text color */
+}
+
+.comment {
+    background: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd; /* Soft border */
+    border-radius: .5rem; /* Rounded corners */
+    padding: 1rem; /* Padding for spacing */
+    margin-bottom: 1rem; /* Space between comments */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+.comment:hover {
+    background: #e6e6e6; /* Slightly darker background on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.comment-avatar {
+    display: inline-block;
+    margin-right: .5rem; /* Space between avatar and info */
+    vertical-align: top;
+}
+
+.comment-info {
+    display: inline-block;
+    vertical-align: top;
+    max-width: calc(100% - 40px); /* Adjust width to fit with avatar */
+}
+
+.user-name a {
+    color: #007acc; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.user-name a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.label.round.level-1 {
+    background: #007acc; /* Background color for label */
+    color: #fff; /* Text color for label */
+    padding: .25rem .5rem; /* Padding for label */
+    border-radius: 1rem; /* Rounded label */
+    font-size: .875rem; /* Smaller font size */
+}
+
+.comment-user p {
+    margin: .5rem 0; /* Space above and below comment text */
+    color: #333; /* Darker text color */
+}
+
+.comment-votes {
+    margin-top: .5rem; /* Space above votes */
+}
+
+.comment-votes .votes {
+    display: flex;
+    align-items: center;
+}
+
+.comment-votes .in-favor, .comment-votes .against {
+    margin-left: .5rem; /* Space between vote buttons */
+}
+
+.comment-votes button {
+    background: none;
+    border: none;
+    color: #007acc; /* Button color */
+    cursor: pointer;
+    padding: 0;
+}
+
+.comment-votes button:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+:root {
+    --background-color: #d9edf7; /* Default background color */
+    --text-color: #31708f; /* Default text color */
+}
+
+.callout.primary {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-radius: .5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.map {
+  --map-height: 650px;
+  --marker-size: 30px;
+  --marker-color: #00cae9;
+  --marker-inner-size: 14px;
+  --marker-inner-color: #fff;
+
+  position: relative;
+  width: 100%;
+  height: var(--map-height);
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+   .map-marker {
+    left: 50%;
+    margin-top: -5px;
+    position: absolute;
+    top: 50%;
+    visibility: visible;
+
+    .map-icon {
+      background: #00cae9;
+      border-radius: 50% 50% 50% 0;
+      height: 30px;
+      transform: rotate(-45deg);
+      width: 30px;
+    }
+
+    .map-icon::after {
+      background: #fff;
+      border-radius: 50%;
+      content: "";
+      height: 14px;
+      margin: 8px 0 0 8px;
+      position: absolute;
+      width: 14px;
+    }
+  }
+  }
+.leaflet-control-layers-toggle {
+        background-image: image-url("leaflet/layers.png");
+        width: 36px;
+        height: 36px;
+        }
+.leaflet-retina .leaflet-control-layers-toggle {
+        background-image: image-url("leaflet/layers-2x.png");
+        background-size: 26px 26px;
+  }
+}
+
+/* For debugging the hero-header background issue */
+body .site-dev .hero-header.hero-header .row::before {
+  background: linear-gradient(to top, red, blue) !important;
+  opacity: 0.7 !important;
+  display: block !important; /* Ensures it's not hidden */
+}

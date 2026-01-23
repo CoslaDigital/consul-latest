@@ -6,6 +6,10 @@
   <td data-field="title">
     <%= link_to investment.title, investment_path, target: "_blank" %>
   </td>
+  
+  <td data-field="summary">
+    <%= investment.summary %>
+  </td>
 
   <td data-field="supports">
     <%= investment.total_votes %>
@@ -17,6 +21,10 @@
 
   <td data-field="author">
     <%= investment.author.name %>
+  </td>
+  
+   <td data-field="email">
+    <%= investment.author.email %>
   </td>
 
   <td data-field="valuator">
@@ -54,4 +62,12 @@
       <%= investment.incompatible? ? t("shared.yes") : t("shared.no") %>
     </td>
   <% end %>
+
+  <td data-field="ballot_lines_count">
+    <%= investment.ballot_lines_count %>
+  </td>
+
+  <td data-field="winner">
+    <%= render Admin::BudgetInvestments::ToggleWinnerComponent.new(investment) %>
+  </td>
 </tr>
