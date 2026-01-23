@@ -1,5 +1,6 @@
 class Admin::MenuComponent < ApplicationComponent
   include LinkListHelper
+
   use_helpers :can?
 
   def links
@@ -28,6 +29,7 @@ class Admin::MenuComponent < ApplicationComponent
         profiles_links,
         stats_link,
         settings_links,
+        (events_link if feature?(:events)),
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?)
       ]
@@ -262,6 +264,14 @@ class Admin::MenuComponent < ApplicationComponent
       ]
     end
 
+  def events_link
+    [
+      t("admin.menu.events"),
+      admin_events_path,
+      controller_name == "events",
+      class: "events-link"      
+    ]
+  end
     def site_customization_links
       section(t("admin.menu.title_site_customization"),
               active: customization?, class: "site-customization-link") do

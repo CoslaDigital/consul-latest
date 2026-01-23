@@ -63,6 +63,7 @@ en:
         filter: Show
         filters:
           all: All
+          on_budget_investments: Investment projects
           on_comments: Comments
           on_debates: Debates
           on_proposals: Proposals
@@ -81,7 +82,7 @@ en:
           ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
-          questions: "Create form fields to be displayed on budget investments" 
+          questions: "Create form fields to be displayed on budget investments"
         edit: "Edit budget"
         preview: "Preview"
         preview_results: "Preview results"
@@ -312,8 +313,8 @@ en:
         sent: Sent
         group: Group
         heading: Heading
-        dossier: Dossier
-        edit_dossier: Edit dossier
+        dossier: Project Evaluation
+        edit_dossier: Edit Project Evaluation
         tags: Tags
         undefined: Undefined
         compatibility:
@@ -351,7 +352,7 @@ en:
       new:
         options_heading: "Options"
         enabled: "Enabled"
-        enabled_instructions: "tick this box to enable this question on this budget" 
+        enabled_instructions: "tick this box to enable this question on this budget"
         is_private: "This is a private question"
         is_private_instructions: "tick this box to make the answer to this question only visible to administrators"
         is_mandatory: "This is a mandatory question"
@@ -575,6 +576,17 @@ en:
         unable_notice: "Invalid document"
       destroy:
         success_notice: "Document deleted successfully"
+    events:
+      event:
+        name: Event Name
+        description: Description
+        start_date: Start Date
+        event_type: Type of Event
+        location: Place
+      index:
+        new_event: "New event"
+        title: "Manage Events"
+        view_calendar: "View Calendar"
     hidden_users:
       index:
         filter: Filter
@@ -624,7 +636,7 @@ en:
           summary_phase_description: This phase will show a summary of proposals which have been selected and the best comments from the most recent draft.
           draft_publication: Draft Publication
           draft_publication_description: In draft state, registered users can comment on your document
-          final_publication_description: This publishes your final version of the legislation or outcome of this process. Users cannot comment on this version. 
+          final_publication_description: This publishes your final version of the legislation or outcome of this process. Users cannot comment on this version.
           final_publication: Final Result Publication
           use_markdown: Use Markdown to format the text
           homepage_description: Here you can explain the content of the process
@@ -874,7 +886,6 @@ en:
       not_supported_on_current_budget: "Users that haven't supported investments in PB: %{budget_name}"
       invalid_recipients_segment: "Recipients user segment is invalid"
       geozone: "Geozone"
-      invalid_recipients_segment: "Recipients user segment is invalid"
     newsletters:
       create_success: Newsletter created successfully
       update_success: Newsletter updated successfully
@@ -1169,6 +1180,7 @@ en:
         title: "Votation type"
         unique_description: "It's only possible to answer one time to the question."
         multiple_description: "Allows to choose multiple answers. It's possible to set the maximum number of answers."
+        open_description: "Open-ended question that allows users to provide a single answer in their own words."
     questions:
       index:
         create: "Create question"

@@ -3,10 +3,16 @@ load Rails.root.join("app","components","admin","menu_component.rb")
 class Admin::MenuComponent < ApplicationComponent
   include LinkListHelper
   use_helpers :can?
-
+  delegate :current_user, :session, to: :helpers
   def links
     if Rails.application.multitenancy_management_mode?
       multitenancy_management_links
+      # If they are an admin, show everything (default_links)
+    elsif current_user.administrator?
+      default_links
+      # If they are NOT an admin but ARE a process manager, show the limited menu
+    elsif current_user.process_manager?
+      process_manager_links
     else
       default_links
     end
@@ -29,11 +35,28 @@ class Admin::MenuComponent < ApplicationComponent
         moderated_content_links,
         profiles_links,
         stats_link,
+       (events_link if feature?(:events)),
         settings_links,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?)
       ]
     end
+
+  def process_manager_links
+    [
+      (proposals_link if feature?(:proposals)),
+      (debates_link if feature?(:debates)),
+      comments_link,
+      (polls_link if feature?(:polls)),
+      (legislation_link if feature?(:legislation)),
+      (budgets_link if feature?(:budgets)),
+      booths_links,
+      stats_link,
+      (events_link if feature?(:events)),
+      dashboard_links,
+      (machine_learning_link if ::MachineLearning.enabled?)
+    ]
+  end
 
     def multitenancy_management_links
       [tenants_link, administrators_link]
@@ -405,10 +428,8 @@ class Admin::MenuComponent < ApplicationComponent
         )
       end
     end
-    
-    
 
-   def process_managers_link
+  def process_managers_link
       [
         t("admin.menu.process_managers"),
         admin_process_managers_path,
@@ -542,8 +563,8 @@ class Admin::MenuComponent < ApplicationComponent
         controller_name == "geozones"
       ]
     end
-    
-    def postcodes_link
+
+  def postcodes_link
       [
         t("admin.menu.postcodes"),
         admin_postcodes_path,

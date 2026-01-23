@@ -1,5 +1,7 @@
 en:
   settings:
+    admin_email: "Administrator email address"
+    admin_email_description: "If a valid email address is entered, this address will be cc'ed when a new proposal is published"
     comments_body_max_length: "Comments body max length"
     comments_body_max_length_description: "In number of characters"
     official_level_1_name: "Level 1 public official"
@@ -140,6 +142,8 @@ en:
       sdg_description: Enable Sustainable Development Goals sections in the administration menu and in the Global Settings.
       demographics: "Demographics"
       demographics_description: "Enable users to manage gender DOB and Geozone"
+      restrict_debate_creation: "Restrict Debate Questions"
+      restrict_debate_creation_description: "Debate questions can only be created by admins when this setting is enabled"
     remote_census:
       general:
         endpoint: "Endpoint"

@@ -3,6 +3,8 @@ class Admin::BudgetHeadings::FormComponent < ApplicationComponent
   include GlobalizeHelper
   attr_reader :heading, :path, :action, :geozones
 
+  attr_reader :heading, :path, :action
+
   def initialize(heading, path:, action:, geozones: [])
     @heading = heading
     @path = path

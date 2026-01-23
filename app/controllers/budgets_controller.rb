@@ -1,6 +1,7 @@
 class BudgetsController < ApplicationController
   include FeatureFlags
   include BudgetsHelper
+
   feature_flag :budgets
 
   before_action :load_budget, only: :show
@@ -16,10 +17,10 @@ class BudgetsController < ApplicationController
   def index
     @finished_budgets = @budgets.finished.order(created_at: :desc)
   end
-  
+
   def select
     @proposal = Proposal.find(params[:proposal_id])
-    @budgets = Budget.where(phase: "accepting")
+    @budgets = Budget.accepting
   end
 
   def select_headings
@@ -34,9 +35,8 @@ class BudgetsController < ApplicationController
     respond_to do |format|
       format.json { render json: @headings }
     end
-
   end
-    
+
   private
 
     def load_budget

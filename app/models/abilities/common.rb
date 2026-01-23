@@ -94,16 +94,16 @@ module Abilities
 
         can :create, Legislation::Answer
 
-        can :create, Budget::Investment,  budget: { phase: "accepting" }
-        can :update, Budget::Investment,  budget: { phase: "accepting" }, author_id: user.id
+        can :create, Budget::Investment, budget: { phase: "accepting" }
+        can :update, Budget::Investment, budget: { phase: "accepting" }, author_id: user.id
         can :suggest, Budget::Investment, budget: { phase: "accepting" }
         can :destroy, Budget::Investment, budget: { phase: ["accepting", "reviewing"] }, author_id: user.id
         can [:create, :destroy], ActsAsVotable::Vote,
             voter_id: user.id,
             votable_type: "Budget::Investment",
-            votable: { budget: { phase: "selecting" }}
+            votable: { budget: { phase: "selecting" } }
 
-        can [:show, :create], Budget::Ballot,          budget: { phase: "balloting" }
+        can [:show, :create], Budget::Ballot, budget: { phase: "balloting" }
         can [:create, :destroy], Budget::Ballot::Line, budget: { phase: "balloting" }
 
         can :create, DirectMessage
@@ -111,12 +111,6 @@ module Abilities
 
         can :answer, Poll do |poll|
           poll.answerable_by?(user)
-        end
-        can :answer, Poll::Question do |question|
-          question.answerable_by?(user)
-        end
-        can :destroy, Poll::Answer do |answer|
-          answer.author == user && answer.question.answerable_by?(user)
         end
       end
 

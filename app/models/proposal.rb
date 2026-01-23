@@ -31,6 +31,7 @@ class Proposal < ApplicationRecord
   translates :summary, touch: true
   translates :retired_explanation, touch: true
   include Globalizable
+
   translation_class_delegate :retired_at
 
   belongs_to :author, -> { with_hidden }, class_name: "User", inverse_of: :proposals
@@ -64,7 +65,7 @@ class Proposal < ApplicationRecord
   before_save :calculate_hot_score, :calculate_confidence_score
 
   after_create :send_new_actions_notification_on_create
-  
+
   scope :for_render,               -> { includes(:tags) }
   scope :sort_by_hot_score,        -> { reorder(hot_score: :desc) }
   scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc) }
@@ -89,12 +90,16 @@ class Proposal < ApplicationRecord
   scope :draft,          -> { excluding(published) }
 
   scope :not_supported_by_user, ->(user) { where.not(id: user.find_voted_items(votable_type: "Proposal")) }
-  scope :created_by,            ->(author) { where(author: author) }
+  scope :created_by, ->(author) { where(author: author) }
 
   def publish
     update!(published_at: Time.current)
     Mailer.proposal_published(self).deliver_later unless Setting["feature.dashboard.notification_emails"]
     send_new_actions_notification_on_published
+  end
+
+  def notify_admin
+    Mailer.proposal_published_admin(self).deliver_later
   end
 
   def published?
@@ -103,6 +108,61 @@ class Proposal < ApplicationRecord
 
   def draft?
     published_at.nil?
+  end
+
+  def status
+    if retired?
+      "retired"
+    elsif published?
+      "published"
+    else
+      "draft"
+    end
+  end
+
+  def self.to_csv
+    require "csv"
+    sanitizer = Rails::Html::FullSanitizer.new
+    headers = [
+      I18n.t("admin.proposals.index.id", default: "ID"),
+      I18n.t("admin.proposals.index.code", default: "Code"),
+      I18n.t("activerecord.attributes.proposal.title", default: "Title"),
+      I18n.t("proposals.form.proposal_summary", default: "Summary"),
+      I18n.t("activerecord.attributes.proposal.description", default: "Description"),
+      I18n.t("activerecord.attributes.proposal.price", default: "Price"),
+      I18n.t("admin.proposals.index.author", default: "Author"),
+      I18n.t("activerecord.attributes.proposal.responsible_name", default: "Responsible Name"),
+      I18n.t("attributes.email", default: "Email"),
+      I18n.t("proposals.form.geozone", default: "Geozone"),
+      I18n.t("admin.proposals.index.milestones", default: "Milestones"),
+      I18n.t("admin.proposals.index.selected", default: "Selected"),
+      I18n.t("admin.proposals.index.status", default: "Status")
+    ]
+
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+
+      all.find_each do |proposal|
+        clean_summary = sanitizer.sanitize(proposal.summary)&.squish
+        clean_description = sanitizer.sanitize(proposal.description)&.squish
+
+        csv << [
+          proposal.id,
+          proposal.code,
+          proposal.title,
+          clean_summary,
+          clean_description,
+          proposal.price,
+          proposal.author.try(:username),
+          proposal.responsible_name,
+          proposal.author.try(:email),
+          proposal.geozone&.name,
+          proposal.milestones.count,
+          proposal.selected?,
+          proposal.status # <--- The new status field
+        ]
+      end
+    end
   end
 
   def self.recommendations(user)
@@ -150,7 +210,7 @@ class Proposal < ApplicationRecord
   def self.for_summary
     summary = {}
     categories = Tag.category_names.sort
-    geozones   = Geozone.names.sort
+    geozones = Geozone.names.sort
 
     groups = categories + geozones
     groups.each do |group|
@@ -263,7 +323,7 @@ class Proposal < ApplicationRecord
 
   def send_new_actions_notification_on_published
     new_actions_ids = Dashboard::Action.detect_new_actions_since(Date.yesterday, self)
-    puts "inside publishing. New actions ids are #{new_actions_ids}"
+
     if new_actions_ids.present?
       Dashboard::Mailer.delay.new_actions_notification_on_published(self, new_actions_ids)
     end
@@ -275,9 +335,9 @@ class Proposal < ApplicationRecord
                                                       locale: I18n.locale,
                                                       unit: "£")
   end
-  
+
   def formatted_price
-      formatted_amount(price)
+    formatted_amount(price)
   end
 
   protected

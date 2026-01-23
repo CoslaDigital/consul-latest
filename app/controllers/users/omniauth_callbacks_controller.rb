@@ -1,5 +1,5 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_before_action :verify_authenticity_token
+  skip_before_action :verify_authenticity_token, only: :saml
   skip_authorization_check
 
   def twitter
@@ -19,8 +19,11 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def saml
-    Rails.logger.info("about to log in with saml")
     sign_in_with :saml_login, :saml
+  end
+
+  def oidc
+    sign_in_with :oidc_login, :oidc
   end
 
   def after_sign_in_path_for(resource)
@@ -39,14 +42,13 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       auth = request.env["omniauth.auth"]
 
       identity = Identity.first_or_create_from_oauth(auth)
-
       @user = current_user || identity.user || initialize_user_for_provider(provider, auth)
       # Update user attributes if it's an existing user found via identity
-      Rails.logger.info("about to test for existomh user")
+      Rails.logger.info("about to test for existing user")
       if identity.user
         Rails.logger.info("about to try to update for existing user")
         @user.update_user_details_from_saml(auth)  if provider == :saml
-      end      
+      end
       if save_user
         identity.update!(user: @user)
         sign_in_and_redirect @user, event: :authentication

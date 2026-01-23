@@ -52,13 +52,20 @@
   <% end %>
 <% end %>
 
-
+    <% if feature?(:events) %>
+      <li>
+        <%= layout_menu_link_to t("layouts.header.events"),
+                                events_path,
+                                controller_name == "events",
+                                accesskey: "6" %>
+      </li>
+    <% end %>
     <% if feature?(:sdg) %>
       <li>
         <%= layout_menu_link_to t("layouts.header.sdg"),
                                 sdg_goals_path,
                                 controller_path == "sdg/goals" && action_name != "help",
-                                accesskey: "6" %>
+                                accesskey: "7" %>
       </li>
     <% end %>
     <% if feature?(:help_page) %>

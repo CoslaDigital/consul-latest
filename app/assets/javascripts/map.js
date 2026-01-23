@@ -1,5 +1,5 @@
 (function() {
-  "use strict";  
+  "use strict";
   App.Map = {
     maps: [],
     initialize: function() {
@@ -257,8 +257,8 @@
       });
 
       // Use geozone headings as the name for the layer, fallback to a default name
-      var layerName = (geozone.headings && geozone.headings.length > 0) 
-        ? geozone.headings.join(", ") 
+      var layerName = (geozone.headings && geozone.headings.length > 0)
+        ? geozone.headings.join(", ")
         : `Geozone ${Object.keys(geozoneLayers).length + 1}`;
 
       // Store the GeoJSON layer in the geozoneLayers object with the actual name

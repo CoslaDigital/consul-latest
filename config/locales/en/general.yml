@@ -88,7 +88,6 @@ en:
         confidence_score: highest rated
         created_at: newest
         hot_score: most active
-        most_commented: most commented
         relevance: relevance
         recommendations: recommendations
       recommendations:
@@ -229,6 +228,8 @@ en:
           zero: "You don't have new notifications"
         notifications: Notifications
       sdg: "SDG"
+      events: "Events"
+      process_admin: "Manage Processes"
     skip_to_main_content: "Skip to main content"
   notifications:
     index:
@@ -283,6 +284,14 @@ en:
       sign_in: "You can sign in with any of the methods on this page"
       sign_in_help: ""
       sign_up: "Sign up with:"
+    saml:
+      sign_in: Sign in with SAML
+      sign_up: Sign up with SAML
+      name: SAML
+    oidc:
+      sign_in: Sign in with OIDC
+      sign_up: Sign up with OIDC
+      name: OIDC
     or_fill: "Or fill the following form:"
   proposals:
     create:
@@ -329,13 +338,14 @@ en:
       proposal_description_note: "Provide a detailed description of your project"
       proposal_video_url_note: You may add a link to YouTube or Vimeo
       proposal_estimated_price: Estimated Cost
-      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it 
+      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it
       tag_category_label: "Categories"
       tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
       tags_label: Tags
       tags_placeholder: "Enter the tags you would like to use, separated by commas (',')"
       map_location: "Map location"
       map_location_instructions: "Navigate the map to the location and place the marker."
+      map_marker_coordinates: "Latitude: %{latitude}. Longitude: %{longitude}"
       map_remove_marker: "Remove map marker"
     index:
       featured_proposals: Featured
@@ -426,7 +436,7 @@ en:
       code: "Proposal code:"
       comments_tab: Comments
       dashboard_proposal_link: Dashboard
-      budget_investment_link: Create Budget Proposal 
+      budget_investment_link: Create Budget Proposal
       flag: This proposal has been flagged as inappropriate by several users.
       notifications_tab: Notifications
       milestones_tab: Milestones
@@ -589,6 +599,9 @@ en:
   polls:
     dates: "From %{open_at} to %{closed_at}"
     final_date: "Final recounts/Results"
+    form:
+      vote: "Vote"
+      maximum_exceeded: "you've selected %{given} answers, but the maximum you can select is %{maximum}"
     index:
       filters:
         current: "Open"
@@ -614,6 +627,7 @@ en:
     show:
       already_voted_in_booth: "You have already participated in a physical booth. You can not participate again."
       already_voted_in_web: "You have already participated in this poll. If you vote again it will be overwritten."
+      already_voted_blank_in_web: "You have already participated in this poll by casting a blank vote. If you vote again it will be overwritten."
       back: Back to voting
       cant_answer_not_logged_in: "You must %{signin} or %{signup} to participate."
       comments_tab: Comments
@@ -643,14 +657,13 @@ en:
       results:
         title: "Questions"
         most_voted_answer: "Most voted answer: "
+        open_ended:
+          valid: Valid
+          blank: Blank
     poll_header:
       back_to_proposal: Back to proposal
   poll_questions:
-    show:
-      vote_answer: "Vote %{answer}"
-      voted: "You have voted %{answer}"
     description:
-      unique: "You can select a maximum of 1 answer."
       multiple: "You can select a maximum of %{maximum} answers."
     read_more_about: "Read more about:"
   proposal_notifications:
@@ -861,14 +874,17 @@ en:
         debates: "Most active debates"
         proposals: "Most active proposals"
         processes: "Open processes"
+        upcoming: "Upcoming Events"
       see_all:
         debates: See all debates
         proposals: See all proposals
         processes: See all processes
+        upcoming: "See all events"
       no_items:
         debates: There are no debates right now
         proposals: There are no proposals right now
         processes: There are no open processes right now
+        upcoming: There are no events right now
       process_label: Process
       see_process: See process
     cards:

@@ -641,6 +641,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.index ["author_id"], name: "index_events_on_author_id"
   end
 
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "event_type"
+    t.string "location"
+    t.bigint "author_id"
+    t.index ["author_id"], name: "index_events_on_author_id"
+  end
+
   create_table "failed_census_calls", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.string "document_number"

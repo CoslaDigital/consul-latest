@@ -63,12 +63,7 @@
 
     <% if feature?(:map) %>
       <div>
-        <%= render "map_locations/form_fields",
-                   form: f,
-                   map_location: proposal.map_location || MapLocation.new,
-                   label: t("proposals.form.map_location"),
-                   help: t("proposals.form.map_location_instructions"),
-                   i18n_namespace: "proposals" %>
+        <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
       </div>
     <% end %>
 
@@ -92,8 +87,8 @@
                                   data: { js_url: suggest_tags_path } %>
     </div>
 
-    
-      <div>
+
+    <div>
         <%= f.text_field :responsible_name,
                          hint: t("proposals.form.proposal_responsible_name_note") %>
       </div>

@@ -87,13 +87,18 @@ class Setting < ApplicationRecord
         "feature.remote_census": nil,
         "feature.valuation_comment_notification": true,
         "feature.graphql_api": true,
+        "feature.oidc_login": false,
+        "feature.saml_login": false,
         "feature.sdg": true,
         "feature.machine_learning": false,
         "feature.remove_investments_supports": true,
         "feature.cookies_consent": false,
+        "feature.gdpr.require_consent_for_notifications": false,
+        "feature.events": true,
         "homepage.widgets.feeds.debates": true,
         "homepage.widgets.feeds.processes": true,
         "homepage.widgets.feeds.proposals": true,
+        "homepage.widgets.feeds.upcoming": true,
         # Code to be included at the top (inside <body>) of every page
         "html.per_page_code_body": "",
         # Code to be included at the top (inside <head>) of every page (useful for tracking)
@@ -169,6 +174,7 @@ class Setting < ApplicationRecord
         "machine_learning.related_content": false,
         "machine_learning.tags": false,
         "postal_codes": "",
+        "admin_email": "",
         "remote_census.general.endpoint": "",
         "remote_census.request.method_name": "",
         "remote_census.request.structure": "",
@@ -187,7 +193,10 @@ class Setting < ApplicationRecord
         "sdg.process.proposals": true,
         "sdg.process.polls": true,
         "sdg.process.budgets": true,
-        "sdg.process.legislation": true
+        "sdg.process.legislation": true,
+        "llm.provider": nil,
+        "llm.model": nil,
+        "llm.use_llm_for_translations": false
       }
     end
 
