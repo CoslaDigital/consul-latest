@@ -452,59 +452,7 @@
   @include custom-callout-variant(#cff4fc, #0dcaf0, #055160);
 }
 
-// ==========================================================================
-// MIXINS FOR REUSABLE COMPONENTS
-// ==========================================================================
 
-// Mixin for creating badge variants
-custom-badge-variant($background, $color, $border) {
-  background-color: $background;
-  color: $color;
-  border-color: $border;
-}
-
-// Mixin for table rows
-custom-table-row-variant($state, $background, $border) {
-  .custom-table-#{$state} {
-    &,
-    > th,
-    > td {
-      background-color: $background;
-    }
-    
-    th,
-    td,
-    thead th,
-    tbody + tbody {
-      border-color: $border;
-    }
-  }
-}
-
-// Mixin for status indicators
-custom-status-indicator($color) {
-  color: $color;
-  font-weight: 600;
-  
-  &::before {
-    content: "●";
-    margin-right: 0.5rem;
-    font-size: 0.8em;
-  }
-}
-
-// Apply status mixins
-.custom-status-success {
-  @include custom-status-indicator(var(--custom-success-color, #198754));
-}
-
-.custom-status-error {
-  @include custom-status-indicator(var(--custom-error-color, #dc3545));
-}
-
-.custom-status-warning {
-  @include custom-status-indicator(var(--custom-warning-color, #ffc107));
-}
 
 // ==========================================================================
 // RESPONSIVE BREAKPOINTS
@@ -548,52 +496,7 @@ custom-status-indicator($color) {
   }
 }
 
-@media (max-width: 576px) {
-  .custom-table {
-    font-size: 0.85rem;
-    
-    th,
-    td {
-      padding: 0.5rem 0.25rem;
-    }
-  }
-  
-  .custom-table-section {
-    font-size: 0.8em;
-    padding: 0.5rem;
-  }
-  
-  .custom-flow-list {
-    li,
-    > div {
-      padding: 0.5rem;
-      font-size: 0.9em;
-    }
-  }
-  
-  .custom-highlight {
-    padding: 0.75rem;
-  }
-}
 
-// Print styles
-@media print {
-  .custom-table-responsive {
-    border: 1px solid #000;
-    box-shadow: none;
-  }
-  
-  .custom-table {
-    th {
-      background-color: #fff !important;
-      color: #000 !important;
-      border-bottom: 2px solid #000;
-    }
-    
-    td {
-      color: #000 !important;
-    }
-  }
   
   .custom-badge {
     background-color: #fff !important;
