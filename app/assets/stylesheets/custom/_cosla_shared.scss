@@ -457,14 +457,14 @@
 // ==========================================================================
 
 // Mixin for creating badge variants
-@mixin custom-badge-variant($background, $color, $border) {
+custom-badge-variant($background, $color, $border) {
   background-color: $background;
   color: $color;
   border-color: $border;
 }
 
 // Mixin for table rows
-@mixin custom-table-row-variant($state, $background, $border) {
+custom-table-row-variant($state, $background, $border) {
   .custom-table-#{$state} {
     &,
     > th,
@@ -482,7 +482,7 @@
 }
 
 // Mixin for status indicators
-@mixin custom-status-indicator($color) {
+custom-status-indicator($color) {
   color: $color;
   font-weight: 600;
   
