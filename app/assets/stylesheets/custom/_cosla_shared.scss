@@ -291,6 +291,324 @@
   border-radius: 0 4px 4px 0;
 }
 
+  // Table variants
+.custom-table {
+  &-compact {
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9em;
+    }
+  }
+
+  &-bordered {
+    border: 1px solid var(--custom-border-color);
+
+    th,
+    td {
+      border: 1px solid var(--custom-border-color);
+    }
+  }
+
+  &-striped {
+    tbody tr:nth-child(odd) {
+      background-color: var(--custom-tr-striped, #f8f9fa);
+    }
+  }
+}
+
+// ==========================================================================
+// COLOR VARIABLES FOR THEME CUSTOMIZATION
+// ==========================================================================
+
+:root {
+  // Base colors
+  --custom-border-color: #e6e6e6;
+  --custom-th-bg: #f8f9fa;
+  --custom-th-color: #333;
+  --custom-td-color: #555;
+  --custom-tr-hover: #f9f9f9;
+  --custom-tr-striped: #f8f9fa;
+  
+  // Section colors
+  --custom-section-bg: #e9ecef;
+  --custom-section-color: #495057;
+  
+  // Badge colors
+  --custom-badge-bg: #e7f1ff;
+  --custom-badge-color: #0066cc;
+  --custom-badge-border: #cfe2ff;
+  --custom-badge-secondary-bg: #f8f9fa;
+  --custom-badge-secondary-color: #6c757d;
+  --custom-badge-secondary-border: #e9ecef;
+  
+  // Code colors
+  --custom-code-bg: #f1f1f1;
+  --custom-code-color: #d63384;
+  --custom-code-block-bg: #f8f9fa;
+  --custom-code-block-accent: #0066cc;
+  
+  // Comparison table colors
+  --custom-comparison-th-bg: #f8f9fa;
+  --custom-comparison-even-bg: #f9f9f9;
+  
+  // Status colors
+  --custom-success-color: #198754;
+  --custom-error-color: #dc3545;
+  --custom-warning-color: #ffc107;
+  
+  // Text colors
+  --custom-muted-color: #6c757d;
+  --custom-list-marker: #666;
+  
+  // Flow colors
+  --custom-flow-bg: white;
+  --custom-flow-accent: #0066cc;
+  
+  // Highlight colors
+  --custom-highlight-bg: #fff3cd;
+  --custom-highlight-border: #ffc107;
+}
+
+// Dark theme variant
+[data-theme="dark"] {
+  --custom-border-color: #444;
+  --custom-th-bg: #2d2d2d;
+  --custom-th-color: #f0f0f0;
+  --custom-td-color: #ccc;
+  --custom-tr-hover: #3a3a3a;
+  --custom-tr-striped: #2d2d2d;
+  --custom-section-bg: #363636;
+  --custom-section-color: #ddd;
+  --custom-badge-bg: #2c3e50;
+  --custom-badge-color: #3498db;
+  --custom-badge-border: #34495e;
+  --custom-badge-secondary-bg: #363636;
+  --custom-badge-secondary-color: #aaa;
+  --custom-badge-secondary-border: #444;
+  --custom-code-bg: #2d2d2d;
+  --custom-code-color: #f8c555;
+  --custom-code-block-bg: #2d2d2d;
+  --custom-code-block-accent: #3498db;
+  --custom-comparison-th-bg: #2d2d2d;
+  --custom-comparison-even-bg: #363636;
+  --custom-flow-bg: #2d2d2d;
+  --custom-flow-accent: #3498db;
+  --custom-highlight-bg: #444;
+  --custom-highlight-border: #f39c12;
+}
+
+// Light theme variant
+[data-theme="light"] {
+  --custom-border-color: #e0e0e0;
+  --custom-th-bg: #f5f5f5;
+  --custom-th-color: #222;
+  --custom-td-color: #444;
+  --custom-tr-hover: #f0f0f0;
+  --custom-section-bg: #e8e8e8;
+  --custom-section-color: #333;
+  --custom-badge-bg: #e3f2fd;
+  --custom-badge-color: #1565c0;
+  --custom-badge-border: #bbdefb;
+}
+
+// Blue theme variant
+[data-theme="blue"] {
+  --custom-border-color: #c5d9f1;
+  --custom-th-bg: #e3f2fd;
+  --custom-th-color: #0d47a1;
+  --custom-td-color: #1a237e;
+  --custom-tr-hover: #e8eaf6;
+  --custom-section-bg: #bbdefb;
+  --custom-section-color: #0d47a1;
+  --custom-badge-bg: #e8eaf6;
+  --custom-badge-color: #283593;
+  --custom-badge-border: #c5cae9;
+  --custom-flow-accent: #283593;
+  --custom-code-block-accent: #283593;
+}
+
+// Callout integration (since you mentioned callout is good as-is)
+// These are mixins if you want to extend callout styles
+@mixin custom-callout-variant($background, $border, $color) {
+  background-color: $background;
+  border-left-color: $border;
+  color: $color;
+}
+
+.custom-callout-success {
+  @include custom-callout-variant(#d1e7dd, #198754, #0f5132);
+}
+
+.custom-callout-warning {
+  @include custom-callout-variant(#fff3cd, #ffc107, #856404);
+}
+
+.custom-callout-danger {
+  @include custom-callout-variant(#f8d7da, #dc3545, #721c24);
+}
+
+.custom-callout-info {
+  @include custom-callout-variant(#cff4fc, #0dcaf0, #055160);
+}
+
+// ==========================================================================
+// MIXINS FOR REUSABLE COMPONENTS
+// ==========================================================================
+
+// Mixin for creating badge variants
+@mixin custom-badge-variant($background, $color, $border) {
+  background-color: $background;
+  color: $color;
+  border-color: $border;
+}
+
+// Mixin for table rows
+@mixin custom-table-row-variant($state, $background, $border) {
+  .custom-table-#{$state} {
+    &,
+    > th,
+    > td {
+      background-color: $background;
+    }
+    
+    th,
+    td,
+    thead th,
+    tbody + tbody {
+      border-color: $border;
+    }
+  }
+}
+
+// Mixin for status indicators
+@mixin custom-status-indicator($color) {
+  color: $color;
+  font-weight: 600;
+  
+  &::before {
+    content: "●";
+    margin-right: 0.5rem;
+    font-size: 0.8em;
+  }
+}
+
+// Apply status mixins
+.custom-status-success {
+  @include custom-status-indicator(var(--custom-success-color, #198754));
+}
+
+.custom-status-error {
+  @include custom-status-indicator(var(--custom-error-color, #dc3545));
+}
+
+.custom-status-warning {
+  @include custom-status-indicator(var(--custom-warning-color, #ffc107));
+}
+
+// ==========================================================================
+// RESPONSIVE BREAKPOINTS
+// ==========================================================================
+
+@media (max-width: 768px) {
+  .custom-table-responsive {
+    margin: 1rem 0;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .custom-table {
+    font-size: 0.9rem;
+    
+    th,
+    td {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+  
+  .custom-comparison-table {
+    display: block;
+    overflow-x: auto;
+    
+    th,
+    td {
+      white-space: nowrap;
+      min-width: 120px;
+    }
+  }
+  
+  .custom-badge {
+    font-size: 0.8em;
+    padding: 0.2rem 0.4rem;
+    
+    &.sm {
+      font-size: 0.7em;
+      padding: 0.1rem 0.3rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-table {
+    font-size: 0.85rem;
+    
+    th,
+    td {
+      padding: 0.5rem 0.25rem;
+    }
+  }
+  
+  .custom-table-section {
+    font-size: 0.8em;
+    padding: 0.5rem;
+  }
+  
+  .custom-flow-list {
+    li,
+    > div {
+      padding: 0.5rem;
+      font-size: 0.9em;
+    }
+  }
+  
+  .custom-highlight {
+    padding: 0.75rem;
+  }
+}
+
+// Print styles
+@media print {
+  .custom-table-responsive {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+  
+  .custom-table {
+    th {
+      background-color: #fff !important;
+      color: #000 !important;
+      border-bottom: 2px solid #000;
+    }
+    
+    td {
+      color: #000 !important;
+    }
+  }
+  
+  .custom-badge {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+  
+  .custom-code {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ccc;
+  }
+}
+
+
   .hero-header .row::before {
   content: '';
   position: absolute;
