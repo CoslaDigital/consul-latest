@@ -51,6 +51,77 @@
   color: var(--custom-section-color, #495057);
 }
 
+  // Variable/Code badges
+.custom-badge {
+  display: inline-block;
+  background-color: var(--custom-badge-bg, #e7f1ff);
+  color: var(--custom-badge-color, #0066cc);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85em;
+  margin: 0.1rem;
+  border: 1px solid var(--custom-badge-border, #cfe2ff);
+  line-height: 1.2;
+
+  &.sm {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.75em;
+    margin: 0.05rem;
+  }
+
+  &.lg {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.95em;
+  }
+
+  &.rounded {
+    border-radius: 50px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.custom-badge-secondary {
+  @extend .custom-badge;
+  background-color: var(--custom-badge-secondary-bg, #f8f9fa);
+  color: var(--custom-badge-secondary-color, #6c757d);
+  border-color: var(--custom-badge-secondary-border, #e9ecef);
+}
+
+// Code snippets
+.custom-code {
+  background-color: var(--custom-code-bg, #f1f1f1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  color: var(--custom-code-color, #d63384);
+  word-break: break-word;
+
+  &-block {
+    display: block;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: var(--custom-code-block-bg, #f8f9fa);
+    border-radius: 4px;
+    border-left: 3px solid var(--custom-code-block-accent, #0066cc);
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+}
+
   .hero-header .row::before {
   content: '';
   position: absolute;
