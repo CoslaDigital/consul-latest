@@ -122,6 +122,49 @@
   }
 }
 
+  // Comparison/Feature tables
+.custom-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+
+  th {
+    background-color: var(--custom-comparison-th-bg, #f8f9fa);
+    padding: 0.75rem;
+    border: 1px solid var(--custom-border-color, #dee2e6);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  td {
+    padding: 0.75rem;
+    border: 1px solid var(--custom-border-color, #dee2e6);
+    text-align: center;
+  }
+
+  tr:nth-child(even) {
+    background-color: var(--custom-comparison-even-bg, #f9f9f9);
+  }
+}
+
+// Status indicators
+.custom-status {
+  &-success {
+    color: var(--custom-success-color, #198754);
+    font-weight: 600;
+  }
+
+  &-error {
+    color: var(--custom-error-color, #dc3545);
+    font-weight: 600;
+  }
+
+  &-warning {
+    color: var(--custom-warning-color, #ffc107);
+    font-weight: 600;
+  }
+}
+
   .hero-header .row::before {
   content: '';
   position: absolute;
