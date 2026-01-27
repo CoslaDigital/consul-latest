@@ -2,7 +2,54 @@
 
 @mixin shared-styles {
 
-  
+  // Table container for responsive behavior
+.custom-table-responsive {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border: 1px solid var(--custom-border-color, #e6e6e6);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+// Base table styling
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  th {
+    background-color: var(--custom-th-bg, #f8f9fa);
+    padding: 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--custom-border-color, #dee2e6);
+    text-align: left;
+    color: var(--custom-th-color, #333);
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--custom-border-color, #e6e6e6);
+    vertical-align: top;
+    color: var(--custom-td-color, #555);
+  }
+
+  tr:hover {
+    background-color: var(--custom-tr-hover, #f9f9f9);
+  }
+}
+
+// Table section headers
+.custom-table-section {
+  background-color: var(--custom-section-bg, #e9ecef);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+  padding: 0.75rem 1rem;
+  border-top: 2px solid var(--custom-border-color, #dee2e6);
+  color: var(--custom-section-color, #495057);
+}
 
   .hero-header .row::before {
   content: '';
