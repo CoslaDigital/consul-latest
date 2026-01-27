@@ -3,11 +3,12 @@
 //
 // To override existing variables, use the file named
 // `_consul_custom_overrides.scss` instead
-/* ==========================================================================
-   GENERIC DOCUMENTATION STYLES
-   ========================================================================== */
 
-/* Table container for responsive behavior */
+// ==========================================================================
+// GENERIC DOCUMENTATION STYLES
+// ==========================================================================
+
+// Table container for responsive behavior
 .custom-table-responsive {
   overflow-x: auto;
   margin: 2rem 0;
@@ -16,35 +17,35 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Base table styling */
+// Base table styling
 .custom-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
   line-height: 1.4;
+
+  th {
+    background-color: var(--custom-th-bg, #f8f9fa);
+    padding: 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--custom-border-color, #dee2e6);
+    text-align: left;
+    color: var(--custom-th-color, #333);
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--custom-border-color, #e6e6e6);
+    vertical-align: top;
+    color: var(--custom-td-color, #555);
+  }
+
+  tr:hover {
+    background-color: var(--custom-tr-hover, #f9f9f9);
+  }
 }
 
-.custom-table th {
-  background-color: var(--custom-th-bg, #f8f9fa);
-  padding: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid var(--custom-border-color, #dee2e6);
-  text-align: left;
-  color: var(--custom-th-color, #333);
-}
-
-.custom-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--custom-border-color, #e6e6e6);
-  vertical-align: top;
-  color: var(--custom-td-color, #555);
-}
-
-.custom-table tr:hover {
-  background-color: var(--custom-tr-hover, #f9f9f9);
-}
-
-/* Table section headers */
+// Table section headers
 .custom-table-section {
   background-color: var(--custom-section-bg, #e9ecef);
   font-weight: 600;
@@ -56,7 +57,7 @@
   color: var(--custom-section-color, #495057);
 }
 
-/* Variable/Code badges */
+// Variable/Code badges
 .custom-badge {
   display: inline-block;
   background-color: var(--custom-badge-bg, #e7f1ff);
@@ -68,15 +69,42 @@
   margin: 0.1rem;
   border: 1px solid var(--custom-badge-border, #cfe2ff);
   line-height: 1.2;
+
+  &.sm {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.75em;
+    margin: 0.05rem;
+  }
+
+  &.lg {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.95em;
+  }
+
+  &.rounded {
+    border-radius: 50px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
 }
 
 .custom-badge-secondary {
+  @extend .custom-badge;
   background-color: var(--custom-badge-secondary-bg, #f8f9fa);
   color: var(--custom-badge-secondary-color, #6c757d);
   border-color: var(--custom-badge-secondary-border, #e9ecef);
 }
 
-/* Code snippets */
+// Code snippets
 .custom-code {
   background-color: var(--custom-code-bg, #f1f1f1);
   padding: 0.2rem 0.4rem;
@@ -85,110 +113,148 @@
   font-size: 0.9em;
   color: var(--custom-code-color, #d63384);
   word-break: break-word;
+
+  &-block {
+    display: block;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: var(--custom-code-block-bg, #f8f9fa);
+    border-radius: 4px;
+    border-left: 3px solid var(--custom-code-block-accent, #0066cc);
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
 }
 
-/* Comparison/Feature tables */
+// Comparison/Feature tables
 .custom-comparison-table {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
+
+  th {
+    background-color: var(--custom-comparison-th-bg, #f8f9fa);
+    padding: 0.75rem;
+    border: 1px solid var(--custom-border-color, #dee2e6);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  td {
+    padding: 0.75rem;
+    border: 1px solid var(--custom-border-color, #dee2e6);
+    text-align: center;
+  }
+
+  tr:nth-child(even) {
+    background-color: var(--custom-comparison-even-bg, #f9f9f9);
+  }
 }
 
-.custom-comparison-table th {
-  background-color: var(--custom-comparison-th-bg, #f8f9fa);
-  padding: 0.75rem;
-  border: 1px solid var(--custom-border-color, #dee2e6);
-  font-weight: 600;
-  text-align: center;
+// Status indicators
+.custom-status {
+  &-success {
+    color: var(--custom-success-color, #198754);
+    font-weight: 600;
+  }
+
+  &-error {
+    color: var(--custom-error-color, #dc3545);
+    font-weight: 600;
+  }
+
+  &-warning {
+    color: var(--custom-warning-color, #ffc107);
+    font-weight: 600;
+  }
 }
 
-.custom-comparison-table td {
-  padding: 0.75rem;
-  border: 1px solid var(--custom-border-color, #dee2e6);
-  text-align: center;
+// Text utilities
+.custom-text {
+  &-center {
+    text-align: center;
+  }
+
+  &-right {
+    text-align: right;
+  }
+
+  &-muted {
+    color: var(--custom-muted-color, #6c757d);
+    font-style: italic;
+  }
 }
 
-.custom-comparison-table tr:nth-child(even) {
-  background-color: var(--custom-comparison-even-bg, #f9f9f9);
+// List styling
+.custom-list {
+  &-unstyled {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0;
+
+    li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.2em;
+      position: relative;
+
+      &:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--custom-list-marker, #666);
+      }
+    }
+  }
+
+  &-inline {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0;
+
+    li {
+      display: inline-block;
+      margin-right: 1rem;
+    }
+  }
 }
 
-/* Status indicators */
-.custom-status-success {
-  color: var(--custom-success-color, #198754);
-  font-weight: 600;
+// Spacing utilities
+.custom-mt {
+  &-1 { margin-top: 0.5rem !important; }
+  &-2 { margin-top: 1rem !important; }
+  &-3 { margin-top: 1.5rem !important; }
 }
 
-.custom-status-error {
-  color: var(--custom-error-color, #dc3545);
-  font-weight: 600;
+.custom-mb {
+  &-1 { margin-bottom: 0.5rem !important; }
+  &-2 { margin-bottom: 1rem !important; }
+  &-3 { margin-bottom: 1.5rem !important; }
 }
 
-.custom-status-warning {
-  color: var(--custom-warning-color, #ffc107);
-  font-weight: 600;
+.custom-my {
+  &-1 { 
+    margin-top: 0.5rem !important; 
+    margin-bottom: 0.5rem !important; 
+  }
+  &-2 { 
+    margin-top: 1rem !important; 
+    margin-bottom: 1rem !important; 
+  }
 }
 
-/* Text utilities */
-.custom-text-center {
-  text-align: center;
+.custom-pt {
+  &-1 { padding-top: 0.5rem !important; }
+  &-2 { padding-top: 1rem !important; }
 }
 
-.custom-text-right {
-  text-align: right;
+.custom-pb {
+  &-1 { padding-bottom: 0.5rem !important; }
+  &-2 { padding-bottom: 1rem !important; }
 }
 
-.custom-text-muted {
-  color: var(--custom-muted-color, #6c757d);
-  font-style: italic;
-}
-
-/* List styling */
-.custom-list-unstyled {
-  list-style: none;
-  padding-left: 0;
-  margin: 0.5rem 0;
-}
-
-.custom-list-unstyled li {
-  margin-bottom: 0.5rem;
-  padding-left: 1.2em;
-  position: relative;
-}
-
-.custom-list-unstyled li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--custom-list-marker, #666);
-}
-
-.custom-list-inline {
-  list-style: none;
-  padding-left: 0;
-  margin: 0.5rem 0;
-}
-
-.custom-list-inline li {
-  display: inline-block;
-  margin-right: 1rem;
-}
-
-/* Spacing utilities */
-.custom-mt-1 { margin-top: 0.5rem !important; }
-.custom-mt-2 { margin-top: 1rem !important; }
-.custom-mt-3 { margin-top: 1.5rem !important; }
-.custom-mb-1 { margin-bottom: 0.5rem !important; }
-.custom-mb-2 { margin-bottom: 1rem !important; }
-.custom-mb-3 { margin-bottom: 1.5rem !important; }
-.custom-my-1 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
-.custom-my-2 { margin-top: 1rem !important; margin-bottom: 1rem !important; }
-
-.custom-pt-1 { padding-top: 0.5rem !important; }
-.custom-pt-2 { padding-top: 1rem !important; }
-.custom-pb-1 { padding-bottom: 0.5rem !important; }
-.custom-pb-2 { padding-bottom: 1rem !important; }
-
-/* Layout helpers */
+// Layout helpers
 .custom-full-width {
   width: 100%;
 }
@@ -197,23 +263,32 @@
   width: auto;
 }
 
-/* Content flow visualization */
+// Content flow visualization
 .custom-flow-list {
   list-style: none;
   padding-left: 0;
   margin: 1rem 0;
+
+  li {
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    background: var(--custom-flow-bg, white);
+    border-radius: 4px;
+    border-left: 3px solid var(--custom-flow-accent, #0066cc);
+    font-weight: 500;
+  }
+
+  > div {
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    background: var(--custom-flow-bg, white);
+    border-radius: 4px;
+    border-left: 3px solid var(--custom-flow-accent, #0066cc);
+    font-weight: 500;
+  }
 }
 
-.custom-flow-list li {
-  margin-bottom: 0.5rem;
-  padding: 0.75rem;
-  background: var(--custom-flow-bg, white);
-  border-radius: 4px;
-  border-left: 3px solid var(--custom-flow-accent, #0066cc);
-  font-weight: 500;
-}
-
-/* Highlight boxes */
+// Highlight boxes
 .custom-highlight {
   background-color: var(--custom-highlight-bg, #fff3cd);
   border-left: 4px solid var(--custom-highlight-border, #ffc107);
@@ -222,119 +297,319 @@
   border-radius: 0 4px 4px 0;
 }
 
-/* ==========================================================================
-   VARIABLES FOR THEME CUSTOMIZATION
-   ========================================================================== */
+// Table variants
+.custom-table {
+  &-compact {
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9em;
+    }
+  }
+
+  &-bordered {
+    border: 1px solid var(--custom-border-color);
+
+    th,
+    td {
+      border: 1px solid var(--custom-border-color);
+    }
+  }
+
+  &-striped {
+    tbody tr:nth-child(odd) {
+      background-color: var(--custom-tr-striped, #f8f9fa);
+    }
+  }
+}
+
+// ==========================================================================
+// COLOR VARIABLES FOR THEME CUSTOMIZATION
+// ==========================================================================
 
 :root {
-  /* Color Variables */
+  // Base colors
   --custom-border-color: #e6e6e6;
   --custom-th-bg: #f8f9fa;
   --custom-th-color: #333;
   --custom-td-color: #555;
   --custom-tr-hover: #f9f9f9;
+  --custom-tr-striped: #f8f9fa;
+  
+  // Section colors
   --custom-section-bg: #e9ecef;
   --custom-section-color: #495057;
+  
+  // Badge colors
   --custom-badge-bg: #e7f1ff;
   --custom-badge-color: #0066cc;
   --custom-badge-border: #cfe2ff;
   --custom-badge-secondary-bg: #f8f9fa;
   --custom-badge-secondary-color: #6c757d;
   --custom-badge-secondary-border: #e9ecef;
+  
+  // Code colors
   --custom-code-bg: #f1f1f1;
   --custom-code-color: #d63384;
+  --custom-code-block-bg: #f8f9fa;
+  --custom-code-block-accent: #0066cc;
+  
+  // Comparison table colors
   --custom-comparison-th-bg: #f8f9fa;
   --custom-comparison-even-bg: #f9f9f9;
+  
+  // Status colors
   --custom-success-color: #198754;
   --custom-error-color: #dc3545;
   --custom-warning-color: #ffc107;
+  
+  // Text colors
   --custom-muted-color: #6c757d;
   --custom-list-marker: #666;
+  
+  // Flow colors
   --custom-flow-bg: white;
   --custom-flow-accent: #0066cc;
+  
+  // Highlight colors
   --custom-highlight-bg: #fff3cd;
   --custom-highlight-border: #ffc107;
 }
 
-/* Dark theme example (optional) */
+// Dark theme variant
 [data-theme="dark"] {
   --custom-border-color: #444;
   --custom-th-bg: #2d2d2d;
   --custom-th-color: #f0f0f0;
   --custom-td-color: #ccc;
   --custom-tr-hover: #3a3a3a;
+  --custom-tr-striped: #2d2d2d;
   --custom-section-bg: #363636;
   --custom-section-color: #ddd;
   --custom-badge-bg: #2c3e50;
   --custom-badge-color: #3498db;
   --custom-badge-border: #34495e;
+  --custom-badge-secondary-bg: #363636;
+  --custom-badge-secondary-color: #aaa;
+  --custom-badge-secondary-border: #444;
   --custom-code-bg: #2d2d2d;
   --custom-code-color: #f8c555;
+  --custom-code-block-bg: #2d2d2d;
+  --custom-code-block-accent: #3498db;
+  --custom-comparison-th-bg: #2d2d2d;
+  --custom-comparison-even-bg: #363636;
   --custom-flow-bg: #2d2d2d;
   --custom-flow-accent: #3498db;
+  --custom-highlight-bg: #444;
+  --custom-highlight-border: #f39c12;
 }
 
-/* ==========================================================================
-   SPECIFIC COMPONENT VARIANTS
-   ========================================================================== */
-
-/* Table variants */
-.custom-table-compact th,
-.custom-table-compact td {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9em;
+// Light theme variant
+[data-theme="light"] {
+  --custom-border-color: #e0e0e0;
+  --custom-th-bg: #f5f5f5;
+  --custom-th-color: #222;
+  --custom-td-color: #444;
+  --custom-tr-hover: #f0f0f0;
+  --custom-section-bg: #e8e8e8;
+  --custom-section-color: #333;
+  --custom-badge-bg: #e3f2fd;
+  --custom-badge-color: #1565c0;
+  --custom-badge-border: #bbdefb;
 }
 
-.custom-table-bordered {
-  border: 1px solid var(--custom-border-color);
+// Blue theme variant
+[data-theme="blue"] {
+  --custom-border-color: #c5d9f1;
+  --custom-th-bg: #e3f2fd;
+  --custom-th-color: #0d47a1;
+  --custom-td-color: #1a237e;
+  --custom-tr-hover: #e8eaf6;
+  --custom-section-bg: #bbdefb;
+  --custom-section-color: #0d47a1;
+  --custom-badge-bg: #e8eaf6;
+  --custom-badge-color: #283593;
+  --custom-badge-border: #c5cae9;
+  --custom-flow-accent: #283593;
+  --custom-code-block-accent: #283593;
 }
 
-.custom-table-bordered th,
-.custom-table-bordered td {
-  border: 1px solid var(--custom-border-color);
+// Callout integration (since you mentioned callout is good as-is)
+// These are mixins if you want to extend callout styles
+@mixin custom-callout-variant($background, $border, $color) {
+  background-color: $background;
+  border-left-color: $border;
+  color: $color;
 }
 
-.custom-table-striped tbody tr:nth-child(odd) {
-  background-color: var(--custom-tr-striped, #f8f9fa);
+.custom-callout-success {
+  @include custom-callout-variant(#d1e7dd, #198754, #0f5132);
 }
 
-/* Badge variants */
-.custom-badge-lg {
-  padding: 0.4rem 0.75rem;
-  font-size: 0.95em;
+.custom-callout-warning {
+  @include custom-callout-variant(#fff3cd, #ffc107, #856404);
 }
 
-.custom-badge-sm {
-  padding: 0.15rem 0.35rem;
-  font-size: 0.75em;
+.custom-callout-danger {
+  @include custom-callout-variant(#f8d7da, #dc3545, #721c24);
 }
 
-.custom-badge-rounded {
-  border-radius: 50px;
+.custom-callout-info {
+  @include custom-callout-variant(#cff4fc, #0dcaf0, #055160);
 }
 
-/* Interactive elements */
-.custom-badge-clickable {
-  cursor: pointer;
-  transition: all 0.2s ease;
+// ==========================================================================
+// MIXINS FOR REUSABLE COMPONENTS
+// ==========================================================================
+
+// Mixin for creating badge variants
+@mixin custom-badge-variant($background, $color, $border) {
+  background-color: $background;
+  color: $color;
+  border-color: $border;
 }
 
-.custom-badge-clickable:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+// Mixin for table rows
+@mixin custom-table-row-variant($state, $background, $border) {
+  .custom-table-#{$state} {
+    &,
+    > th,
+    > td {
+      background-color: $background;
+    }
+    
+    th,
+    td,
+    thead th,
+    tbody + tbody {
+      border-color: $border;
+    }
+  }
 }
 
-/* Code block styling */
-.custom-code-block {
-  display: block;
-  padding: 1rem;
-  margin: 1rem 0;
-  background-color: var(--custom-code-block-bg, #f8f9fa);
-  border-radius: 4px;
-  border-left: 3px solid var(--custom-code-block-accent, #0066cc);
-  overflow-x: auto;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.9em;
-  line-height: 1.4;
+// Mixin for status indicators
+@mixin custom-status-indicator($color) {
+  color: $color;
+  font-weight: 600;
+  
+  &::before {
+    content: "●";
+    margin-right: 0.5rem;
+    font-size: 0.8em;
+  }
+}
+
+// Apply status mixins
+.custom-status-success {
+  @include custom-status-indicator(var(--custom-success-color, #198754));
+}
+
+.custom-status-error {
+  @include custom-status-indicator(var(--custom-error-color, #dc3545));
+}
+
+.custom-status-warning {
+  @include custom-status-indicator(var(--custom-warning-color, #ffc107));
+}
+
+// ==========================================================================
+// RESPONSIVE BREAKPOINTS
+// ==========================================================================
+
+@media (max-width: 768px) {
+  .custom-table-responsive {
+    margin: 1rem 0;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .custom-table {
+    font-size: 0.9rem;
+    
+    th,
+    td {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+  
+  .custom-comparison-table {
+    display: block;
+    overflow-x: auto;
+    
+    th,
+    td {
+      white-space: nowrap;
+      min-width: 120px;
+    }
+  }
+  
+  .custom-badge {
+    font-size: 0.8em;
+    padding: 0.2rem 0.4rem;
+    
+    &.sm {
+      font-size: 0.7em;
+      padding: 0.1rem 0.3rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-table {
+    font-size: 0.85rem;
+    
+    th,
+    td {
+      padding: 0.5rem 0.25rem;
+    }
+  }
+  
+  .custom-table-section {
+    font-size: 0.8em;
+    padding: 0.5rem;
+  }
+  
+  .custom-flow-list {
+    li,
+    > div {
+      padding: 0.5rem;
+      font-size: 0.9em;
+    }
+  }
+  
+  .custom-highlight {
+    padding: 0.75rem;
+  }
+}
+
+// Print styles
+@media print {
+  .custom-table-responsive {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+  
+  .custom-table {
+    th {
+      background-color: #fff !important;
+      color: #000 !important;
+      border-bottom: 2px solid #000;
+    }
+    
+    td {
+      color: #000 !important;
+    }
+  }
+  
+  .custom-badge {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+  
+  .custom-code {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ccc;
+  }
 }
