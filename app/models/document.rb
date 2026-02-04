@@ -1,7 +1,7 @@
 class Document < ApplicationRecord
   include Attachable
 
-  enum visibility: { restricted: 0, unrestricted: 1 }, _default: :unrestricted
+  enum visibility: { unrestricted: 0, restricted: 1 }, _default: :unrestricted
 
   belongs_to :user
   belongs_to :documentable, polymorphic: true, touch: true
