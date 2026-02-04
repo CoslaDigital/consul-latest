@@ -30,7 +30,15 @@
               <span class="user-name"><%= t("comments.comment.user_deleted") %></span>
             <% else %>
               <span class="user-name">
-                 <% if current_user&.administrator? || (current_user&.id == comment.author) %>
+                 <% is_official_account = comment.user.administrator? || 
+                             comment.user.moderator? || 
+                             comment.user.official_level.to_i > 0 %>
+
+    <%# 2. Determine if the current viewer has permission to see the real name %>
+    <% can_view_real_name = current_user&.administrator? || 
+                            (current_user&.id == comment.user_id) %>
+
+    <% if is_official_account || can_view_real_name %>
                   <%= link_to comment.user.name, user_path(comment.user) %>
                 <% else %>
                   <%= comment.user.masked_username %>
