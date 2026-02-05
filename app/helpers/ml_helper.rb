@@ -5,11 +5,12 @@ module MlHelper
   # TAGGING (Robust & Noun-Constrained)
   # -------------------------------------------------------------------------
   def self.generate_tags(text, max_tags = 5, config: nil)
+    # 1. Configuration Guard: Prefer passed config to prevent DB lookups
     enabled = config ? config[:enabled] : Setting['feature.machine_learning']
-    return { "tags" => [], "usage" => nil } unless enabled && text.present?
+    return [] unless enabled && text.present?
 
     model_name = config ? config[:model] : Setting['llm.model']
-    return { "tags" => [], "usage" => nil } if model_name.blank?
+    return [] if model_name.blank?
 
     truncated_text = text.truncate(1500)
 
@@ -30,23 +31,21 @@ module MlHelper
     begin
       chat = Llm::Config.context.chat(model: model_name)
       chat.with_instructions(system_prompt)
+      response = chat.ask(user_prompt).content.strip
 
-      response = chat.ask(user_prompt)
-
-      clean_json = response.content.strip.gsub(/```json|```/, '').strip
+      # 2. Clean and Parse
+      clean_json = response.gsub(/```json|```/, '').strip
       tags = JSON.parse(clean_json)
 
-      filtered_tags = tags.select do |tag|
-        tag.is_a?(String) && tag.length > 2 && !tag.match?(/^(comment|question|feedback|suggestion|idea)$/i)
+      # 3. Final Ruby-side Filtering
+      tags.select do |tag|
+        tag.is_a?(String) &&
+          tag.length > 2 &&
+          !tag.match?(/^(comment|question|feedback|suggestion|idea)$/i)
       end.take(max_tags)
-
-      {
-        "tags" => filtered_tags,
-        "usage" => { "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0) }
-      }
     rescue => e
       Rails.logger.error "[MlHelper] generate_tags error: #{e.message}"
-      { "tags" => [], "usage" => nil }
+      []
     end
   end
 
@@ -68,36 +67,37 @@ module MlHelper
     end
 
     system_prompt = <<~PROMPT
-      You are a qualitative data analyst. Return ONLY valid JSON with this exact structure:
+  You are a qualitative data analyst. Return ONLY valid JSON with this exact structure:
+  {
+    "executive_summary": "One sentence summary.",
+    "themes": [
       {
-        "executive_summary": "One sentence summary.",
-        "themes": [
-          {
-            "name": "Theme Title",
-            "explanation": "Brief text.",
-            "quotes": ["Quote 1", "Quote 2"]
-          }
-        ],
-        "sentiment": {"positive": 0, "negative": 0, "neutral": 0}
+        "name": "Theme Title",
+        "explanation": "Brief text.",
+        "quotes": ["Quote 1", "Quote 2"]
       }
+    ],
+    "sentiment": {"positive": 0, "negative": 0, "neutral": 0}
+  }
 
-      OUTPUT RULES FOR MARKDOWN RENDERING:
-      1. The Executive Summary should be bolded: **Executive Summary**: [text]
-      2. Themes must be a top-level bullet point using '*': * **Theme Name**: [explanation]
-      3. Quotes must be nested bullet points. Indent them with TWO SPACES and a '*':
-         * **Theme Name**: explanation
-           * "Direct quote 1"
-           * "Direct quote 2"
-    PROMPT
+  OUTPUT RULES FOR MARKDOWN RENDERING:
+  When the backend processes this JSON into the final 'body' string, it must follow these Markdown rules:
+  1. The Executive Summary should be bolded: **Executive Summary**: [text]
+  2. Themes must be a top-level bullet point using '*': * **Theme Name**: [explanation]
+  3. Quotes must be nested bullet points. Indent them with TWO SPACES and a '*':
+     * **Theme Name**: explanation
+       * "Direct quote 1"
+       * "Direct quote 2"
+PROMPT
 
     user_prompt = "#{context ? "CONTEXT: #{context}\n\n" : ''}COMMENTS:\n#{combined_text}"
 
     begin
       chat = Llm::Config.context.chat(model: model_name)
       chat.with_instructions(system_prompt)
-      response = chat.ask(user_prompt)
+      response = chat.ask(user_prompt).content
 
-      data = JSON.parse(response.content.gsub(/```json|```/, '').strip)
+      data = JSON.parse(response.gsub(/```json|```/, '').strip)
 
       # 4. Construct Markdown Body
       markdown_parts = []
@@ -107,14 +107,13 @@ module MlHelper
         markdown_parts << "\n**Key Themes & Voices**:"
         data["themes"].each do |theme|
           markdown_parts << "* **#{theme['name']}**: #{theme['explanation']}"
-          theme["quotes"]&.each { |q| markdown_parts << "  * \"#{q}\"" }
+          theme["quotes"]&.each { |q| markdown_parts << "  > \"#{q}\"" }
         end
       end
 
       {
         "summary_markdown" => markdown_parts.join("\n"),
-        "sentiment" => data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 0 },
-        "usage" => { "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0) }
+        "sentiment" => data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 0 }
       }
     rescue => e
       Rails.logger.error "[MlHelper] summarize_comments error: #{e.message}"
@@ -127,7 +126,7 @@ module MlHelper
   # -------------------------------------------------------------------------
   def self.find_similar_content(source_text, candidate_texts, max_results = 3, config: nil)
     enabled = config ? config[:enabled] : Setting['feature.machine_learning']
-    return { "indices" => [], "usage" => nil } unless enabled && source_text.present? && candidate_texts.present?
+    return [] unless enabled && source_text.present? && candidate_texts.present?
 
     model_name = config ? config[:model] : Setting['llm.model']
 
@@ -144,15 +143,10 @@ module MlHelper
       response = chat.ask(user_prompt)
 
       selected_indices = parse_json_list(response.content)
-      valid_indices = selected_indices.select { |i| i.is_a?(Integer) && i >= 0 && i < candidate_texts.size }
-
-      {
-        "indices" => valid_indices,
-        "usage" => { "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0) }
-      }
+      selected_indices.select { |i| i.is_a?(Integer) && i >= 0 && i < candidate_texts.size }
     rescue => e
       Rails.logger.error "[MlHelper] find_similar_content error: #{e.message}"
-      { "indices" => (0...[candidate_texts.size, max_results].min).to_a, "usage" => nil }
+      (0...[candidate_texts.size, max_results].min).to_a
     end
   end
 
@@ -160,15 +154,27 @@ module MlHelper
 
   def self.parse_json_list(content)
     return [] if content.blank?
+
+    # 1. Try to extract just the part between brackets [ ] to ignore "Here is your JSON:" filler
     json_match = content.match(/\[.*\]/m)
     if json_match
-      json_str = json_match[0].gsub(/,\s*\]/, ']')
+      json_str = json_match[0]
+
+      # 2. Fix common LLM syntax errors: trailing commas or missing commas between quotes
+      json_str = json_str.gsub(/,\s*\]/, ']') # Fix ["A", "B", ]
+
       begin
         return JSON.parse(json_str)
       rescue JSON::ParserError
+        # If standard parsing fails, move to Regex recovery
       end
     end
+
+    # 3. REGEX RECOVERY: If JSON is malformed, just grab everything inside double quotes
+    # This recovers ["Tag 1" "Tag 2"] or other broken formats
     tags = content.scan(/"([^"\\]*(?:\\.[^"\\]*)*)"/).flatten
+
+    # Filter out common false positives from the system prompt if they got picked up
     tags.reject { |t| t.downcase.match?(/^(themes|executive_summary|sentiment|positive|negative|neutral)$/) }
   end
-end
+  end
