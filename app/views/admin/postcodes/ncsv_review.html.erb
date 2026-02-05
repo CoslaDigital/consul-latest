@@ -11,27 +11,27 @@
 <br>
 <table>
   <thead>
-    <tr>
-      <th><%= t("admin.postcodes.postcode.postcode") %></th>
-      <th><%= t("admin.postcodes.postcode.ward") %></th>
-      <th><%= t("admin.postcodes.postcode.geozone_id") %></th>
-    </tr>
+  <tr>
+    <th><%= t("admin.postcodes.postcode.postcode") %></th>
+    <th><%= t("admin.postcodes.postcode.ward") %></th>
+    <th><%= t("admin.postcodes.postcode.geozone_id") %></th>
+  </tr>
   </thead>
 
   <tbody>
-    <% if @rejected_entries.length == 0 %>
+  <% if @rejected_entries.length == 0 %>
+    <tr>
+      <td><%= t("admin.postcodes.index.no_record") %></td>
+    </tr>
+  <% else %>
+    <% @rejected_entries.each do |rejected_entry| %>
       <tr>
-        <td><%= t("admin.postcodes.index.no_record") %></td>
+        <% rejected_entry.each do |key, value| %>
+          <td><%= value %></td>
+        <% end %>
       </tr>
-    <% else %>
-      <% @rejected_entries.each do |rejected_entry| %>
-        <tr>
-          <% rejected_entry.each do |key, value| %>
-            <td><%= value %></td>
-          <% end %>
-        </tr>
-      <% end %>
     <% end %>
+  <% end %>
   </tbody>
 </table>
 
@@ -39,11 +39,11 @@
 
 <table>
   <thead>
-    <tr>
-      <th><%= t("admin.postcodes.postcode.postcode") %></th>
-      <th><%= t("admin.postcodes.postcode.ward") %></th>
-      <th><%= t("admin.postcodes.postcode.geozone_id") %></th>
-    </tr>
+  <tr>
+    <th><%= t("admin.postcodes.postcode.postcode") %></th>
+    <th><%= t("admin.postcodes.postcode.ward") %></th>
+    <th><%= t("admin.postcodes.postcode.geozone_id") %></th>
+  </tr>
   </thead>
 
   <tbody>

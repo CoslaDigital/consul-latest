@@ -26,6 +26,7 @@ fi:
         new:
           password_confirmation_label: Vahvista salasana
           submit: Rekisteröidy
+          title: "Register as an Organisation"
         success:
           back_to_index: Ymmärrän; Mene takaisin pääsivulle
     passwords:

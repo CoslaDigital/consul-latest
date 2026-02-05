@@ -4,7 +4,7 @@
 <p><%= t("budgets.select_headings.budget_name") %>: <%= @budget.name %></p>
 
 <%= form_with url: new_budget_investment_path(@budget.id, proposal_id: @proposal.id), method: :get, local: true do |form| %>
-  <div  class="small-12 medium-6 column">
+  <div class="small-12 medium-6 column">
     <%= form.label :group_id, t("budgets.select_headings.select_group") %>
     <%= form.collection_select :group_id, @groups, :id, :name, { prompt: t("budgets.select_headings.choose_group") }, { id: "group-select" } %>
 
@@ -15,14 +15,14 @@
   <%= form.hidden_field :proposal_id, value: @proposal.id %>
   <%= form.hidden_field :budget_id, value: @budget.id %>
   <div class="small-12 column">
-  <div class="button success">
-    <%= form.submit t("budgets.select_headings.submit") %>
-  </div>
+    <div class="button success">
+      <%= form.submit t("budgets.select_headings.submit") %>
+    </div>
   </div>
 <% end %>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const groupSelect = document.getElementById("group-select");
     const headingSelect = document.getElementById("heading-select");
 
@@ -31,7 +31,7 @@
       return;
     }
 
-    groupSelect.addEventListener("change", function() {
+    groupSelect.addEventListener("change", function () {
       const groupId = this.value;
 
       if (groupId) {

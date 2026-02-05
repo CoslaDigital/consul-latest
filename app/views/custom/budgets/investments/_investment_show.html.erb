@@ -1,10 +1,10 @@
 <% provide :social_media_meta_tags do %>
-<%= render "shared/social_media_meta_tags",
-           social_url: budget_investments_path(investment),
-           social_title: investment.title,
-           social_description: investment.description,
-           twitter_image_url: (investment.image.present? ? polymorphic_path(investment.image.variant(:thumb)) : nil),
-           og_image_url: (investment.image.present? ? polymorphic_path(investment.image.variant(:thumb)) : nil) %>
+  <%= render "shared/social_media_meta_tags",
+             social_url: budget_investments_path(investment),
+             social_title: investment.title,
+             social_description: investment.description,
+             twitter_image_url: (investment.image.present? ? polymorphic_path(investment.image.variant(:thumb)) : nil),
+             og_image_url: (investment.image.present? ? polymorphic_path(investment.image.variant(:thumb)) : nil) %>
 <% end %>
 
 <section class="budget-investment-show" id="<%= dom_id(investment) %>">
@@ -83,35 +83,35 @@
         </div>
       <% end %>
       <% if investment.should_show_estimated_price? %>
-         <h3><%= t("budgets.investments.show.estimated_price") %></h3>
+        <h3><%= t("budgets.investments.show.estimated_price") %></h3>
         <p class="investment-project-amount">
-        <%= investment.formatted_estimated_price %> 
-  </p>
-  <hr>
-<% end %>
-       
+          <%= investment.formatted_estimated_price %>
+        </p>
+        <hr>
+      <% end %>
+
 
       <% if investment.should_show_price? %>
         <div class="sidebar-divider"></div>
-          
-           <% if investment.formatted_price.nil? %>
-                <h2><%= t("budgets.investments.show.estimated_price") %></h2>
-               <div class="supports text-center">
-               <p class="investment-project-amount">
-               <%= investment.formatted_estimated_price unless investment.formatted_estimated_price.nil? %>
-               </p>
-               </div>
-           <% else %>
-               <h2><%= t("budgets.investments.show.price") %></h2>
-               <p class="investment-project-amount">
-                <div class="supports text-center">
 
-               <%= investment.formatted_price %>
-             </p>
-             </div>
-           <% end %>
-          
-        
+        <% if investment.formatted_price.nil? %>
+          <h2><%= t("budgets.investments.show.estimated_price") %></h2>
+          <div class="supports text-center">
+            <p class="investment-project-amount">
+              <%= investment.formatted_estimated_price unless investment.formatted_estimated_price.nil? %>
+            </p>
+          </div>
+        <% else %>
+          <h2><%= t("budgets.investments.show.price") %></h2>
+          <p class="investment-project-amount">
+          <div class="supports text-center">
+
+            <%= investment.formatted_price %>
+            </p>
+          </div>
+        <% end %>
+
+
         <% if investment.should_show_price_explanation? %>
           <div class="text-center" data-magellan>
             <%= link_to t("budgets.investments.show.see_price_explanation"),
@@ -142,6 +142,6 @@
 
       <%= render "communities/access_button", community: investment.community %>
 
-     </aside>
+    </aside>
   </div>
 </section>

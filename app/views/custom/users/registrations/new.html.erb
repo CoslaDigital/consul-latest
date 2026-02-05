@@ -4,13 +4,13 @@
 <p><em><%= t("omniauth.info.sign_in_help") %></em></p>
 
 
-<div class="accordion-container" >
-   
+<div class="accordion-container">
+
   <div class="accordion-item">
-  <%= link_to t("devise_views.organizations.registrations.new.title"), 
-              new_organization_registration_path, 
-              class: "button expanded" %>
-</div>
+    <%= link_to t("devise_views.organizations.registrations.new.title"),
+                new_organization_registration_path,
+                class: "button expanded" %>
+  </div>
 
   <div class="accordion-item">
 
@@ -20,11 +20,11 @@
             aria-controls="individual-panel"
             data-action="click->accordion#toggle"
             data-accordion-target="trigger">
-      <%= t("devise_views.users.registrations.new.individual_signup") %> 
+      <%= t("devise_views.users.registrations.new.individual_signup") %>
     </button>
 
 
-    <div id="individual-panel" class="accordion-panel" role="region" >
+    <div id="individual-panel" class="accordion-panel" role="region">
 
       <%= render "devise/omniauth_form", action: "sign_up" %>
 
@@ -37,8 +37,10 @@
 
             <%= f.hidden_field :locale, value: I18n.locale %>
 
-            <%= f.text_field :username,  autofocus: true, maxlength: User.username_max_length,
-                                        hint: t("devise_views.users.registrations.new.username_note") %>
+            <%= f.text_field :username,
+                             autofocus: true,
+                             maxlength: User.username_max_length,
+                             hint: t("devise_views.users.registrations.new.username_note") %>
 
             <%= f.invisible_captcha :address %>
 
@@ -47,14 +49,14 @@
             <%= f.password_field :password, autocomplete: "off" %>
 
             <%= f.password_field :password_confirmation, autocomplete: "off",
-                                        label: t("devise_views.users.registrations.new.password_confirmation_label") %>
+                                 label: t("devise_views.users.registrations.new.password_confirmation_label") %>
 
             <%= f.check_box :terms_of_service,
-                              title: t("devise_views.users.registrations.new.terms_title"),
-                              label: t("devise_views.users.registrations.new.terms",
-                                       terms: link_to(t("devise_views.users.registrations.new.terms_link"), "/conditions",
-                                                      title: t("shared.target_blank"),
-                                                      target: "_blank")) %>
+                            title: t("devise_views.users.registrations.new.terms_title"),
+                            label: t("devise_views.users.registrations.new.terms",
+                                     terms: link_to(t("devise_views.users.registrations.new.terms_link"), "/conditions",
+                                                    title: t("shared.target_blank"),
+                                                    target: "_blank")) %>
 
             <div class="small-12 medium-6 small-centered">
               <%= f.submit t("devise_views.users.registrations.new.submit"), class: "button expanded" %>
@@ -64,8 +66,7 @@
       <% end %>
 
       <%= render "devise/shared/links" %>
-      
+
     </div>
- </div> 
-     </div> 
+  </div>
 </div>
