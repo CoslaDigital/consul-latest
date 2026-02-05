@@ -1796,14 +1796,37 @@ en:
       related_content_description: "Adds automatically generated related content to proposals and participatory budget projects."
       script_info: "You will receive an email in %{email} when the script finishes running."
       script_name: "Script name:"
-      select_script: "Select python script to execute"
+      select_script: "Select machine learning script to execute"
       started_at: "Started at:"
       tab_help: "Help"
       tab_scripts: "Execute script"
       tab_settings: "Settings / Generated content"
       tags: "Tags"
       tags_description: "Generates automatic tags on all items that can be tagged on."
-      title: "AI / Machine learning"
+      title: "Machine learning"
+      scripts:
+        budget_comments:
+          label: "Budgets: Summarize Comments"
+          description: "Generates AI summaries for comments on Budget Investments."
+        proposal_comments:
+          label: "Proposals: Summarize Comments"
+          description: "Generates AI summaries for comments on Citizen Proposals."
+        legislation_summaries:
+          label: "Legislation: Summarize Questions"
+          description: "Generates summaries for comments on Legislation Questions."
+        budget_tags:
+          label: "Budgets: Generate Tags"
+          description: "Extracts tags from Budget Investments using AI."
+        proposal_tags:
+          label: "Proposals: Generate Tags"
+          description: "Extracts tags from Proposals using AI."
+        budget_related:
+          label: "Budgets: Related Content"
+          description: "Finds related content for Budget Investments."
+        proposal_related:
+          label: "Proposals: Related Content"
+          description: "Finds related content for Proposals."
+
     cookies:
       vendors:
         empty: No vendors found
