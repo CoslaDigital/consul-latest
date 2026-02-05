@@ -38,6 +38,13 @@
     max-width: calc($global-width * 3 / 4);
   }
 
+  .actions {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end; // Aligns buttons if one is slightly taller
+    margin-top: $line-height;
+  }
+
   select {
     max-width: 100%;
     width: auto;
@@ -45,9 +52,13 @@
 
   [type=submit] {
     @include regular-button;
-    display: block;
     margin-bottom: 0;
     margin-top: $line-height;
+
+    &.dry-run {
+      @include hollow-button($warning-color);
+      border-style: dashed; // Visual hint for simulation
+    }
 
     &.cancel {
       @include hollow-button($alert-color);
