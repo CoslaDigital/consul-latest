@@ -24,8 +24,8 @@ class MachineLearning
     end
 
     # Check if LLM is configured
-    unless Setting['llm.provider'].present?
-      job.update!(error: "LLM provider not configured in settings", finished_at: Time.current)
+    unless llm_configured?
+      job.update!(error: "LLM not properly configured. Please configure provider and model in settings.", finished_at: Time.current)
       Mailer.machine_learning_error(user).deliver_later
       return false
     end
@@ -67,7 +67,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting budget comments summarization"
+    Rails.logger.info "[MachineLearning] Starting budget comments summarization"
 
     # Clean up existing summaries
     cleanup_investments_comments_summary!
@@ -115,7 +115,7 @@ class MachineLearning
 
     update_machine_learning_info_for("comments_summary")
 
-    Rails.logger.info "Completed budget comments summarization. Processed #{processed} investments."
+    Rails.logger.info "[MachineLearning] Completed budget comments summarization. Processed #{processed} investments."
   end
 
   # Proposal Comments Summary (replaces proposals_summary_comments_textrank.py)
@@ -126,7 +126,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting proposal comments summarization"
+    Rails.logger.info "[MachineLearning] Starting proposal comments summarization"
 
     cleanup_proposals_comments_summary!
 
@@ -169,7 +169,7 @@ class MachineLearning
     save_comments_summary_results(results, MachineLearning.proposals_comments_summary_filename)
     update_machine_learning_info_for("comments_summary")
 
-    Rails.logger.info "Completed proposal comments summarization. Processed #{processed} proposals."
+    Rails.logger.info "[MachineLearning] Completed proposal comments summarization. Processed #{processed} proposals."
   end
 
   # Budget Tags (replaces budgets_tags_textrank.py)
@@ -180,7 +180,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting budget tags generation"
+    Rails.logger.info "[MachineLearning] Starting budget tags generation"
 
     cleanup_investments_tags!
 
@@ -219,7 +219,7 @@ class MachineLearning
     import_tags_from_arrays(tags, taggings, 'Budget::Investment')
     update_machine_learning_info_for("tags")
 
-    Rails.logger.info "Completed budget tags generation. Processed #{processed} investments."
+    Rails.logger.info "[MachineLearning] Completed budget tags generation. Processed #{processed} investments."
   end
 
   # Proposal Tags (replaces proposals_tags_textrank.py)
@@ -230,7 +230,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting proposal tags generation"
+    Rails.logger.info "[MachineLearning] Starting proposal tags generation"
 
     cleanup_proposals_tags!
 
@@ -267,7 +267,7 @@ class MachineLearning
     import_tags_from_arrays(tags, taggings, 'Proposal')
     update_machine_learning_info_for("tags")
 
-    Rails.logger.info "Completed proposal tags generation. Processed #{processed} proposals."
+    Rails.logger.info "[MachineLearning] Completed proposal tags generation. Processed #{processed} proposals."
   end
 
   # Budget Related Content (replaces budgets_related_content_textrank.py)
@@ -278,7 +278,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting budget related content generation"
+    Rails.logger.info "[MachineLearning] Starting budget related content generation"
 
     cleanup_investments_related_content!
 
@@ -312,7 +312,7 @@ class MachineLearning
     import_related_content_from_array(results, 'Budget::Investment')
     update_machine_learning_info_for("related_content")
 
-    Rails.logger.info "Completed budget related content generation. Processed #{processed} investments."
+    Rails.logger.info "[MachineLearning] Completed budget related content generation. Processed #{processed} investments."
   end
 
   # Proposal Related Content (replaces proposals_related_content_textrank.py)
@@ -323,7 +323,7 @@ class MachineLearning
       return
     end
 
-    Rails.logger.info "Starting proposal related content generation"
+    Rails.logger.info "[MachineLearning] Starting proposal related content generation"
 
     cleanup_proposals_related_content!
 
@@ -357,18 +357,171 @@ class MachineLearning
     import_related_content_from_array(results, 'Proposal')
     update_machine_learning_info_for("related_content")
 
-    Rails.logger.info "Completed proposal related content generation. Processed #{processed} proposals."
+    Rails.logger.info "[MachineLearning] Completed proposal related content generation. Processed #{processed} proposals."
   end
 
   class << self
-    # ... keep existing class methods exactly as they were ...
-    # No changes needed here
+    def enabled?
+      Setting["feature.machine_learning"].present?
+    end
+
+    def proposals_filename
+      "proposals.json"
+    end
+
+    def investments_filename
+      "budget_investments.json"
+    end
+
+    def comments_filename
+      "comments.json"
+    end
+
+    def data_folder
+      Rails.root.join("public", tenant_data_folder)
+    end
+
+    def tenant_data_folder
+      Tenant.path_with_subfolder("machine_learning/data")
+    end
+
+    def data_output_files
+      files = { tags: [], related_content: [], comments_summary: [] }
+
+      if File.exist?(data_folder.join(proposals_tags_filename))
+        files[:tags] << proposals_tags_filename
+      end
+      if File.exist?(data_folder.join(proposals_taggings_filename))
+        files[:tags] << proposals_taggings_filename
+      end
+      if File.exist?(data_folder.join(investments_tags_filename))
+        files[:tags] << investments_tags_filename
+      end
+      if File.exist?(data_folder.join(investments_taggings_filename))
+        files[:tags] << investments_taggings_filename
+      end
+
+      if File.exist?(data_folder.join(proposals_related_filename))
+        files[:related_content] << proposals_related_filename
+      end
+      if File.exist?(data_folder.join(investments_related_filename))
+        files[:related_content] << investments_related_filename
+      end
+
+      if File.exist?(data_folder.join(proposals_comments_summary_filename))
+        files[:comments_summary] << proposals_comments_summary_filename
+      end
+      if File.exist?(data_folder.join(investments_comments_summary_filename))
+        files[:comments_summary] << investments_comments_summary_filename
+      end
+
+      files
+    end
+
+    def data_intermediate_files
+      excluded = [
+        proposals_filename,
+        investments_filename,
+        comments_filename,
+        proposals_tags_filename,
+        proposals_taggings_filename,
+        investments_tags_filename,
+        investments_taggings_filename,
+        proposals_related_filename,
+        investments_related_filename,
+        proposals_comments_summary_filename,
+        investments_comments_summary_filename
+      ]
+      json = Dir[data_folder.join("*.json")].map do |full_path_filename|
+        full_path_filename.split("/").last
+      end
+      csv = Dir[data_folder.join("*.csv")].map do |full_path_filename|
+        full_path_filename.split("/").last
+      end
+      (json + csv - excluded).sort
+    end
+
+    def proposals_tags_filename
+      "ml_tags_proposals.json"
+    end
+
+    def proposals_taggings_filename
+      "ml_taggings_proposals.json"
+    end
+
+    def investments_tags_filename
+      "ml_tags_budgets.json"
+    end
+
+    def investments_taggings_filename
+      "ml_taggings_budgets.json"
+    end
+
+    def proposals_related_filename
+      "ml_related_content_proposals.json"
+    end
+
+    def investments_related_filename
+      "ml_related_content_budgets.json"
+    end
+
+    def proposals_comments_summary_filename
+      "ml_comments_summaries_proposals.json"
+    end
+
+    def investments_comments_summary_filename
+      "ml_comments_summaries_budgets.json"
+    end
+
+    def data_path(filename)
+      "/#{tenant_data_folder}/#{filename}"
+    end
+
+    def script_kinds
+      %w[tags related_content comments_summary]
+    end
+
+    def scripts_info
+      Dir[SCRIPTS_FOLDER.join("*.py")].map do |full_path_filename|
+        {
+          name: full_path_filename.split("/").last,
+          description: description_from(full_path_filename)
+        }
+      end.sort_by { |script_info| script_info[:name] }
+    end
+
+    def description_from(script_filename)
+      description = ""
+      delimiter = '"""'
+      break_line = "<br>"
+      comment_found = false
+      File.readlines(script_filename).each do |line|
+        if line.start_with?(delimiter) && !comment_found
+          comment_found = true
+          line.slice!(delimiter)
+          description << line.strip.concat(break_line) if line.present?
+        elsif line.include?(delimiter)
+          line.slice!(delimiter)
+          description << line.strip if line.present?
+          break
+        elsif comment_found
+          description << line.strip.concat(break_line)
+        end
+      end
+
+      description.delete_suffix(break_line)
+    end
+
+    def llm_configured?
+      Setting['feature.machine_learning'] &&
+        Setting['llm.provider'].present? &&
+        Setting['llm.model'].present?
+    end
   end
 
   private
 
-  # Core ML methods (these replace the Python logic)
-
+  # Core ML methods that use your existing LLM configuration
   def generate_comments_summary(comments, context = nil)
     MLHelper.summarize_comments(comments, context)
   end
@@ -379,6 +532,10 @@ class MachineLearning
 
   def find_similar_content(source_text, candidate_texts, max_results = 3)
     MLHelper.find_similar_content(source_text, candidate_texts, max_results)
+  end
+
+  def llm_configured?
+    self.class.llm_configured?
   end
 
   # Helper methods
@@ -398,7 +555,7 @@ class MachineLearning
 
   def log_progress(task_type, current, total, item_id)
     if current % 10 == 0 || current == total
-      Rails.logger.info "#{task_type}: #{current}/#{total} - ID: #{item_id}"
+      Rails.logger.info "[MachineLearning] #{task_type}: #{current}/#{total} - ID: #{item_id}"
     end
   end
 
@@ -420,7 +577,6 @@ class MachineLearning
   end
 
   # File export methods (for compatibility with existing system)
-
   def save_comments_summary_results(results, filename)
     data_folder = MachineLearning.data_folder
     FileUtils.mkdir_p(data_folder)
@@ -465,7 +621,6 @@ class MachineLearning
   end
 
   # Database import methods
-
   def import_tags_from_arrays(tags, taggings, taggable_type)
     ids = {}
 
@@ -520,8 +675,7 @@ class MachineLearning
     end
   end
 
-  # These methods remain EXACTLY as they were in your original code
-  # I'm including them here for completeness, but they should stay unchanged
+  # ORIGINAL METHODS - Keep these exactly as they were
 
   def create_data_folder
     FileUtils.mkdir_p data_folder
