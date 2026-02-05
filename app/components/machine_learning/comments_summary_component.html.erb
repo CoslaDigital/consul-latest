@@ -4,5 +4,5 @@
     <strong><%= t("machine_learning.comments_summary") %></strong>
   </p>
 
-  <p><%= simple_format(body) %></p>
+  <p><%= helpers.markdown(body) %></p>
 </div>
