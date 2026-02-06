@@ -30,6 +30,8 @@ class MachineLearning
       return false
     end
 
+    Llm::Config.context
+
     # Map Python scripts to Ruby methods
     case job.script
     when 'budgets_summary_comments_textrank.py'

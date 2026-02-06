@@ -1,5 +1,5 @@
 # app/helpers/ml_helper.rb
-module MLHelper
+module MlHelper
   class LLMError < StandardError; end
 
   # Use your existing Llm::Config instead of custom configuration
