@@ -51,7 +51,6 @@ class MachineLearning
     true
   rescue Exception => e
     handle_error(e)
-    raise e
   end
 
   # Budget Comments Summary (replaces budgets_summary_comments_textrank.py)
