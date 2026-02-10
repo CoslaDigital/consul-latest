@@ -87,23 +87,31 @@ class MachineLearning
 
         if comments.any?
           context = "Budget Investment: #{investment.title}"
-          summary = generate_comments_summary(comments, context)
 
-          # Save to database
-          ml_summary = MlSummaryComment.find_or_initialize_by(
-            commentable_id: investment.id,
-            commentable_type: 'Budget::Investment'
-          )
-          ml_summary.body = summary
-          ml_summary.save!
+          # CHANGED: 'result' is now a Hash { "summary_markdown" => "...", "sentiment" => {...} }
+          result = generate_comments_summary(comments, context)
 
-          # Add to results for file export
-          results << {
-            id: results.size,
-            commentable_id: investment.id,
-            commentable_type: 'Budget::Investment',
-            body: summary
-          }
+          if result.present? && result["summary_markdown"].present?
+            summary_text = result["summary_markdown"]
+            sentiment_data = result["sentiment"]
+
+            # Save to database
+            ml_summary = MlSummaryComment.find_or_initialize_by(
+              commentable_id: investment.id,
+              commentable_type: 'Budget::Investment'
+            )
+            ml_summary.body = summary_text
+            ml_summary.sentiment_analysis = sentiment_data # <--- Added Sentiment
+            ml_summary.save!
+
+            # Add to results for file export
+            results << {
+              id: results.size,
+              commentable_id: investment.id,
+              commentable_type: 'Budget::Investment',
+              body: summary_text # <--- Save only the text part to the CSV/JSON file
+            }
+          end
         end
 
         processed += 1
@@ -121,7 +129,6 @@ class MachineLearning
 
   # Proposal Comments Summary (replaces proposals_summary_comments_textrank.py)
   def generate_proposal_comments_summary
-
     Rails.logger.info "[MachineLearning] Starting proposal comments summarization"
     cleanup_proposals_comments_summary!
 
@@ -150,21 +157,29 @@ class MachineLearning
 
         if comments.any?
           context = "Proposal: #{proposal.title}"
-          summary = generate_comments_summary(comments, context)
 
-          ml_summary = MlSummaryComment.find_or_initialize_by(
-            commentable_id: proposal.id,
-            commentable_type: 'Proposal'
-          )
-          ml_summary.body = summary
-          ml_summary.save!
+          # CHANGED: 'result' is now a Hash { "summary_markdown" => "...", "sentiment" => {...} }
+          result = generate_comments_summary(comments, context)
 
-          results << {
-            id: results.size,
-            commentable_id: proposal.id,
-            commentable_type: 'Proposal',
-            body: summary
-          }
+          if result.present? && result["summary_markdown"].present?
+            summary_text = result["summary_markdown"]
+            sentiment_data = result["sentiment"]
+
+            ml_summary = MlSummaryComment.find_or_initialize_by(
+              commentable_id: proposal.id,
+              commentable_type: 'Proposal'
+            )
+            ml_summary.body = summary_text
+            ml_summary.sentiment_analysis = sentiment_data # <--- Added Sentiment
+            ml_summary.save!
+
+            results << {
+              id: results.size,
+              commentable_id: proposal.id,
+              commentable_type: 'Proposal',
+              body: summary_text # <--- Save only the text part to the CSV/JSON file
+            }
+          end
         end
 
         processed += 1
@@ -247,8 +262,11 @@ class MachineLearning
       context_string = context_parts.join("\n")
 
       # 3. Call the LLM Helper
-      summary_body = MlHelper.summarize_comments(comments, context_string)
-      next if summary_body.blank?
+      result = MlHelper.summarize_comments(comments, context_string)
+      next if result.blank?
+
+      summary_body = result["summary_markdown"]
+      sentiment_data = result["sentiment"]
 
       # 4. Save the Summary
       # We use the polymorphic association to save it safely
@@ -256,6 +274,7 @@ class MachineLearning
         commentable: question
       )
       summary.body = summary_body
+      summary.sentiment_analysis = sentiment_data
       summary.save!
 
       Rails.logger.info "[MachineLearning] Saved summary for Legislation::Question #{question.id}"
@@ -592,16 +611,26 @@ class MachineLearning
   # Helper methods
 
   def should_generate_summary_for?(record)
-    # Only regenerate if no summary exists or comments have been updated
+    # 1. Fetch the existing summary
     last_summary = MlSummaryComment.where(
       commentable_id: record.id,
       commentable_type: record.class.name
     ).order(created_at: :desc).first
 
+    # Case A: No summary exists? -> GENERATE
     return true if last_summary.blank?
 
-    latest_comment = record.comments.maximum(:updated_at)
-    latest_comment.present? && latest_comment > last_summary.updated_at
+    # Case B: Summary exists, but has no sentiment? -> REGENERATE
+    return true if last_summary.sentiment_analysis.blank? || last_summary.sentiment_analysis == {}
+
+    # Case C: Summary is perfect, but are there new comments? -> REGENERATE
+    latest_comment = record.comments.where(hidden_at: nil).maximum(:updated_at)
+
+    # If there are no visible comments, we don't need to do anything
+    return false unless latest_comment
+
+    # Only return true if the comments are newer than the summary
+    latest_comment > last_summary.updated_at
   end
 
   def log_progress(task_type, current, total, item_id)
