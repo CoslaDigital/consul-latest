@@ -971,6 +971,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_09_085528) do
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.jsonb "sentiment_analysis"
   end
 
   create_table "moderators", id: :serial, force: :cascade do |t|
