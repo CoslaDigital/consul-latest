@@ -11,7 +11,7 @@ class Admin::MachineLearningController < Admin::BaseController
                                   finished_at: nil,
                                   error: nil)
 
-    ::MachineLearning.new(@machine_learning_job).run
+    ::MachineLearning.new(@machine_learning_job).delay
 
     redirect_to admin_machine_learning_path,
                 notice: t("admin.machine_learning.script_info", email: current_user.email)
