@@ -9,34 +9,51 @@ module MlHelper
       Setting['llm.model'].present?
   end
 
+
   # -------------------------------------------------------------------------
-  # SUMMARIZATION
+  # SUMMARIZATION (Themes + Quotes + Sentiment)
   # -------------------------------------------------------------------------
   def self.summarize_comments(comments, context = nil)
-    return '' unless llm_enabled?
-    return '' if comments.blank?
+    return nil unless llm_enabled?
+    return nil if comments.blank?
 
     combined_text = comments.is_a?(Array) ? comments.join("\n") : comments
 
-    # Smart Truncation: Prioritize the END of the conversation
-    # (Approx 4 chars per token)
-    max_tokens = Setting['llm.max_tokens']&.to_i || 2000
+    # Smart Truncation
+    max_tokens = Setting['llm.max_tokens']&.to_i || 3000 # Bumped up slightly
     max_chars = max_tokens * 4
-
     if combined_text.length > max_chars
       combined_text = "...(previous comments truncated)...\n" + combined_text.last(max_chars)
     end
 
+    # 1. System Prompt: Ask for STRUCTURED DATA, not Markdown text
     system_prompt = <<~PROMPT
       You are a qualitative data analyst.
-      Your goal is to analyze public comments and identify the major recurring themes.
+      Analyze the public comments provided and extract key insights.
 
-      Instructions:
-      1. Identify 3-5 distinct Key Themes (e.g., "Safety Concerns", "Support for Green Space").
-      2. For EACH theme, select 1-2 DIRECT QUOTES from the text that perfectly represent that theme.
-      3. Do not rewrite or summarize the quotes; extract them verbatim.
-      4. Avoid "Suggestions" unless they are the dominant theme.
-      5. Output format: Markdown.
+      OUTPUT FORMAT:
+      Return ONLY valid JSON with this exact structure:
+      {
+        "executive_summary": "One sentence summary of the overall sentiment.",
+        "themes": [
+          {
+            "name": "Theme Title",
+            "explanation": "Brief explanation of this theme.",
+            "quotes": ["Direct Quote 1", "Direct Quote 2"]
+          }
+        ],
+        "sentiment": {
+          "positive": 0,
+          "negative": 0,
+          "neutral": 0
+        }
+      }
+
+      RULES:
+      1. 'sentiment' percentages must sum to 100.
+      2. Extract 3-5 distinct themes.
+      3. Quotes must be verbatim from the text.
+      4. Do NOT use Markdown formatting in the JSON values.
     PROMPT
 
     user_prompt = <<~PROMPT
@@ -44,29 +61,61 @@ module MlHelper
 
       COMMENTS TO ANALYZE:
       #{combined_text}
-
-      OUTPUT STRUCTURE:
-      **Executive Summary**: (1 sentence on overall sentiment: Positive/Negative/Mixed)
-
-      **Key Themes & Voices**:
-      * **[Theme Name]**: [Brief explanation]
-        > "[Insert direct quote 1]"
-        > "[Insert direct quote 2]"
-
-      * **[Theme Name]**: [Brief explanation]
-        > "[Insert direct quote 1]"
     PROMPT
 
     begin
-      # Use your custom config context
+      # 2. Call LLM
       chat = Llm::Config.context.chat(model: Setting['llm.model'])
-
       chat.with_instructions(system_prompt)
-      response = chat.ask(user_prompt)
-      response.content.strip
+      response = chat.ask(user_prompt).content
+
+      # 3. Clean & Parse JSON
+      json_str = response.gsub(/```json|```/, '').strip
+      data = JSON.parse(json_str)
+
+      # 4. Construct the Markdown Body manually (Ruby side)
+      # This ensures perfect formatting every time.
+      markdown_parts = []
+
+      # Part A: Executive Summary
+      if data["executive_summary"].present?
+        markdown_parts << "**Executive Summary**: #{data['executive_summary']}"
+      end
+
+      # Part B: Themes Loop
+      if data["themes"].is_a?(Array) && data["themes"].any?
+        markdown_parts << "\n**Key Themes & Voices**:"
+
+        data["themes"].each do |theme|
+          # Header: * **Theme Name**: Explanation
+          markdown_parts << "* **#{theme['name']}**: #{theme['explanation']}"
+
+          # Quotes: > "Quote"
+          if theme["quotes"].is_a?(Array)
+            theme["quotes"].each do |quote|
+              markdown_parts << "  > \"#{quote}\""
+            end
+          end
+          markdown_parts << "" # Empty line between themes
+        end
+      end
+
+      # 5. Return the compatible Hash structure
+      return {
+        "summary_markdown" => markdown_parts.join("\n"),
+        "sentiment" => data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 0 }
+      }
+
+    rescue JSON::ParserError => e
+      Rails.logger.warn "[MlHelper] JSON Parse Error: #{e.message}. Response: #{response}"
+      # Fallback: Return raw text if JSON fails entirely
+      return {
+        "summary_markdown" => response,
+        "sentiment" => { "positive" => 0, "negative" => 0, "neutral" => 0 }
+      }
     rescue => e
       Rails.logger.error "[MlHelper] summarize_comments error: #{e.message}"
-      create_fallback_summary(comments)
+      return nil
     end
   end
 
