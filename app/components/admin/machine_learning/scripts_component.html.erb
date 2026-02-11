@@ -39,7 +39,7 @@
     </div>
   <% end %>
 
-  <% if machine_learning_job.running_for_too_long? %>
+  <% if machine_learning_job.started? %>
     <%= button_to t("admin.machine_learning.cancel"),
                   cancel_admin_machine_learning_path,
                   method: :delete, class: "cancel",
