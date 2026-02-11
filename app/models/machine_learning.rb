@@ -9,6 +9,7 @@ class MachineLearning
     "proposal_comments"     => :generate_proposal_comments_summary,
     "legislation_summaries" => :generate_legislation_question_summaries,
     "budget_tags"           => :generate_budget_tags,
+    "debate_tags" => :generate_debate_tags,
     "proposal_tags"         => :generate_proposal_tags,
     "budget_related"        => :generate_budget_related_content,
     "proposal_related"      => :generate_proposal_related_content
@@ -33,6 +34,7 @@ class MachineLearning
       Mailer.machine_learning_error(user).deliver_later
       return false
     end
+
 
     # 2. Look up the method in our configuration
     method_name = AVAILABLE_SCRIPTS[job.script]
@@ -326,6 +328,56 @@ class MachineLearning
     Rails.logger.info "[MachineLearning] Completed proposal tags generation. Processed #{processed} proposals."
   end
 
+  # Debate Tags
+  def generate_debate_tags
+    Rails.logger.info "[MachineLearning] Starting debate tags generation"
+
+    cleanup_debate_tags!
+
+    tags = []
+    taggings = []
+
+    # OPTIMIZATION: Eager load translations if Debate supports Globalize, otherwise just use find_each
+    # debates = Debate.includes(:translations)
+    debates = Debate.all
+    total = debates.count
+    processed = 0
+
+    debates.find_each(batch_size: 5) do |debate|
+      # Combine Title and Description for the LLM
+      text = "#{debate.title}\n\n#{debate.description}"
+
+      # Generate 5 tags
+      generated_tags = generate_tags_from_text(text, 5)
+
+      generated_tags.each do |tag_name|
+        tag = find_or_create_tag(tags, tag_name)
+
+        taggings << {
+          tag_id: tag[:id],
+          taggable_id: debate.id,
+          taggable_type: 'Debate', # <--- Critical change
+          context: 'ml_tags',
+          created_at: Time.current.iso8601
+        }
+      end
+
+      processed += 1
+      log_progress("debate tags", processed, total, debate.id)
+    end
+
+    # Save to JSON files
+    save_tags_results(tags, taggings,
+                      MachineLearning.debates_tags_filename,
+                      MachineLearning.debates_taggings_filename)
+
+    # Import to Database
+    import_tags_from_arrays(tags, taggings, 'Debate')
+    update_machine_learning_info_for("tags")
+
+    Rails.logger.info "[MachineLearning] Completed debate tags generation. Processed #{processed} debates."
+  end
+
   # Budget Related Content
   def generate_budget_related_content
     # REMOVED: The check for Setting['machine_learning.related_content']
@@ -456,7 +508,12 @@ class MachineLearning
       if File.exist?(data_folder.join(investments_taggings_filename))
         files[:tags] << investments_taggings_filename
       end
-
+      if File.exist?(data_folder.join(debates_tags_filename))
+        files[:tags] << debates_tags_filename
+      end
+      if File.exist?(data_folder.join(debates_taggings_filename))
+        files[:tags] << debates_taggings_filename
+      end
       if File.exist?(data_folder.join(proposals_related_filename))
         files[:related_content] << proposals_related_filename
       end
@@ -503,6 +560,14 @@ class MachineLearning
 
     def proposals_taggings_filename
       "ml_taggings_proposals.json"
+    end
+
+    def debates_tags_filename
+      "ml_tags_debates.json"
+    end
+
+    def debates_taggings_filename
+      "ml_taggings_debates.json"
     end
 
     def investments_tags_filename
@@ -815,6 +880,11 @@ class MachineLearning
       result
     end
 
+    def cleanup_debate_tags!
+      Tagging.where(context: "ml_tags", taggable_type: "Debate").find_each(&:destroy!)
+      Tag.find_each { |tag| tag.destroy! if Tagging.where(tag: tag).empty? }
+    end
+
     def cleanup_proposals_tags!
       Tagging.where(context: "ml_tags", taggable_type: "Proposal").find_each(&:destroy!)
       Tag.find_each { |tag| tag.destroy! if Tagging.where(tag: tag).empty? }
@@ -992,6 +1062,8 @@ class MachineLearning
         MachineLearning.proposals_taggings_filename => last_modified_date_for(MachineLearning.proposals_taggings_filename),
         MachineLearning.investments_tags_filename => last_modified_date_for(MachineLearning.investments_tags_filename),
         MachineLearning.investments_taggings_filename => last_modified_date_for(MachineLearning.investments_taggings_filename),
+        MachineLearning.debates_tags_filename => last_modified_date_for(MachineLearning.debates_tags_filename),
+        MachineLearning.debates_taggings_filename => last_modified_date_for(MachineLearning.debates_taggings_filename),
         MachineLearning.proposals_related_filename => last_modified_date_for(MachineLearning.proposals_related_filename),
         MachineLearning.investments_related_filename => last_modified_date_for(MachineLearning.investments_related_filename),
         MachineLearning.proposals_comments_summary_filename => last_modified_date_for(MachineLearning.proposals_comments_summary_filename),
