@@ -1817,6 +1817,9 @@ en:
         budget_tags:
           label: "Budgets: Generate Tags"
           description: "Extracts tags from Budget Investments using AI."
+        debate_tags:
+          label: "Debate Tags"
+          description: "Generates tags for Debates using the LLM."
         proposal_tags:
           label: "Proposals: Generate Tags"
           description: "Extracts tags from Proposals using AI."
