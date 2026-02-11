@@ -3,6 +3,7 @@ module Abilities
     include CanCan::Ability
 
     def initialize(user)
+      merge Abilities::ProcessManager.new(user)
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
 
@@ -18,6 +19,7 @@ module Abilities
       can :create, Legislation::Proposal
       can :show, Legislation::Proposal
       can :proposals, ::Legislation::Process
+      can :summary, ::Legislation::Process
 
       can :restore, Legislation::Proposal
       cannot :restore, Legislation::Proposal, hidden_at: nil
@@ -62,7 +64,7 @@ module Abilities
 
       can :manage, Dashboard::Action
 
-      can [:index, :read, :create, :update, :destroy], Budget
+      can [:budget_headings, :select, :select_headings, :index, :read, :create, :update, :destroy], Budget
       can :publish, Budget, id: Budget.drafting.ids
       can :calculate_winners, Budget, &:reviewing_ballots?
       can :read_results, Budget do |budget|
@@ -71,12 +73,15 @@ module Abilities
 
       can [:read, :create, :update, :destroy], Budget::Group
       can [:read, :create, :update, :destroy], Budget::Heading
-      can [:hide, :admin_update], Budget::Investment
+      can [:hide, :admin_update, :update, :toggle_selection], Budget::Investment
       can [:valuate, :comment_valuation], Budget::Investment
       cannot [:admin_update, :valuate, :comment_valuation],
              Budget::Investment, budget: { phase: "finished" }
       can [:select, :deselect], Budget::Investment do |investment|
         investment.feasible? && investment.valuation_finished? && !investment.budget.finished?
+      end
+      can [:mark_as_winner, :unmark_as_winner], Budget::Investment do |investment|
+        investment.feasible? && investment.valuation_finished? && investment.budget.reviewing_ballots?
       end
 
       can :create, Budget::ValuatorAssignment
@@ -86,6 +91,8 @@ module Abilities
       can [:update, :create, :index, :destroy], Banner
 
       can [:index, :create, :update, :destroy], Geozone
+      can [:index, :create, :update, :destroy], Postcode
+      can [:ncsv, :process_csv, :ncsv_review], Postcode
 
       can [:read, :create, :update, :destroy, :booth_assignments], Poll
       can [:read, :create, :update, :destroy, :available], Poll::Booth
@@ -115,6 +122,7 @@ module Abilities
       can :manage, SiteCustomization::Image
       can :manage, SiteCustomization::ContentBlock
       can :manage, Widget::Card
+      can :index_all, Widget::Card
 
       can :access, :ckeditor
       can :manage, Ckeditor::Picture
@@ -128,11 +136,11 @@ module Abilities
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
 
-      can [:create], Document
+      can [:manage, :create, :update], Document
       can [:destroy], Document do |document|
         document.documentable_type == "Poll::Question::Option" && can?(:update, document.documentable)
       end
-      can [:create, :destroy], DirectUpload
+      can [:create, :destroy, :manage], DirectUpload
 
       can [:deliver], Newsletter, hidden_at: nil
       can [:manage], Dashboard::AdministratorTask
@@ -143,6 +151,7 @@ module Abilities
       can [:create, :read], LocalCensusRecords::Import
 
       can :manage, Cookies::Vendor
+      can [:manage, :create, :update], Document
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant

@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby file: ".ruby-version"
+#ruby file: ".ruby-version"
 
 gem "rails", "~> 7.1.6"
 
@@ -17,6 +17,7 @@ gem "caxlsx", "~> 4.2.0"
 gem "caxlsx_rails", "~> 0.6.4"
 gem "ckeditor", "~> 4.3.0"
 gem "cocoon", "~> 1.2.15"
+gem "connection_pool", "~> 2.2.3"
 gem "csv", "~> 3.3.5"
 gem "daemons", "~> 1.4.1"
 gem "dalli", "~> 3.2.8"
@@ -66,11 +67,17 @@ gem "view_component", "~> 3.23.2"
 gem "whenever", "~> 1.0.0", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
+gem "ed25519"
+gem  "bcrypt_pbkdf"
+gem "faker"
+source "https://rails-assets.org" do
+  gem "rails-assets-markdown-it", "~> 9.0.1"
+end
 
 group :development, :test do
   gem "debug", "~> 1.9.2"
   gem "factory_bot_rails", "~> 6.5.1"
-  gem "faker", "~> 3.5.2"
+  gem "faker"
   gem "i18n-tasks", "~> 0.9.37"
   gem "knapsack_pro", "~> 8.4.0"
   gem "launchy", "~> 3.1.1"

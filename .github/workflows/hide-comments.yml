@@ -1,0 +1,16 @@
+            - name: comment-hider
+  # You may pin to the exact commit or the version.
+  # uses: kanga333/comment-hider@c12bb20b48aeb8fc098e35967de8d4f8018fffdf
+  uses: kanga333/comment-hider@v0.4.0
+  with:
+    # The GitHub token used to create an authenticated client
+    github_token: 
+    # GitHub username to hide comments
+    hide_user_name: # optional, default is github-actions[bot]
+    # A value from https://docs.github.com/en/graphql/reference/enums#reportedcontentclassifiers
+    hide_reason: # optional, default is OUTDATED
+    # The number of most recent comments to leave untouched
+    leave_visible: # optional, default is 0
+    # Issue number, needed when running with workflow_run trigger
+    issue_number: # optional, default is 
+          

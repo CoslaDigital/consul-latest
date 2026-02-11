@@ -1,6 +1,8 @@
 class Budget
   class Investment < ApplicationRecord
-    SORTING_OPTIONS = { id: "id", supports: "cached_votes_up" }.freeze
+    SORTING_OPTIONS = { id: "id",
+                        supports: "cached_votes_up",
+                        ballot_lines_count: "ballot_lines_count" }.freeze
 
     include Measurable
     include Taggable
@@ -9,9 +11,11 @@ class Budget
     include Followable
     include Communitable
     include Imageable
+    include Videoable
     include Mappable
     include Documentable
     include SDG::Relatable
+    include Videoable
     include HasPublicAuthor
 
     acts_as_taggable_on :valuation_tags
@@ -65,6 +69,8 @@ class Budget
     validates :price, presence: { if: :price_required? }
     validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
 
+     validate :valid_video_url?
+
     scope :sort_by_confidence_score, -> { reorder(confidence_score: :desc, id: :desc) }
     scope :sort_by_ballots,          -> { reorder(ballot_lines_count: :desc, id: :desc) }
     scope :sort_by_price,            -> { reorder(price: :desc, confidence_score: :desc, id: :desc) }
@@ -90,11 +96,14 @@ class Budget
     scope :not_unfeasible,              -> { excluding(unfeasible) }
     scope :undecided,                   -> { where(feasibility: "undecided") }
 
-    scope :with_supports,      -> { where(cached_votes_up: 1..) }
+
+    scope :everything,         -> { all }
+    scope :with_supports,      -> { where("cached_votes_up > 0") }
     scope :selected,           -> { feasible.where(selected: true) }
     scope :compatible,         -> { where(incompatible: false) }
     scope :incompatible,       -> { where(incompatible: true) }
     scope :winners,            -> { selected.compatible.where(winner: true) }
+    scope :unsuccessful,          -> { selected.compatible.where(winner: false) }
     scope :unselected,         -> { not_unfeasible.where(selected: false) }
     scope :last_week,          -> { where(created_at: 7.days.ago..) }
     scope :sort_by_flags,      -> { order(flags_count: :desc, updated_at: :desc) }
@@ -126,7 +135,8 @@ class Budget
     before_validation :set_denormalized_ids
     before_save :calculate_confidence_score
     before_create :set_original_heading_id
-    after_save :recalculate_heading_winners
+    after_save :recalculate_heading_winners#, unless: -> { budget.stv? }
+
 
     def comments_count
       comments.count
@@ -289,10 +299,43 @@ class Budget
       return :not_logged_in unless user
       return :organization  if user.organization?
       return :not_verified  unless user.level_two_or_three_verified?
-
+      return :invalid_geozone unless valid_geozone?(user)
       nil
     end
+    
+    def goodvalid_geozone?(user)
+      heading.geozone_id.nil? || (heading.geozone_id == user.geozone_id)
+    end
+    
+    def valid_geozone?(user)
+  # --- Log Inputs ---
+  # Logs the username and their geozone ID
+  Rails.logger.info "Geozone Check - User: #{user.username} (User Geozone ID: #{user.geozone_id})"
+  
+  # Logs the heading's restriction status and its list of geozones
+  Rails.logger.info "Geozone Check - Heading Restricted: #{heading.geozone_restricted}"
+  Rails.logger.info "Geozone Check - Heading Geozone IDs: #{heading.geozone_ids.inspect}"
 
+  # --- Log Logic Checks ---
+  # 1. Check if the heading is restricted at all
+  is_restricted = heading.geozone_restricted
+  
+  # 2. Check if the user's geozone ID is in the heading's list
+  is_match = heading.geozone_ids.include?(user.geozone_id)
+  Rails.logger.info "Geozone Check - Does user geozone match heading list? #{is_match}"
+
+  # --- Calculate and Log Final Result ---
+  # The user is valid if:
+  # 1. The heading is NOT restricted (valid = true)
+  # OR
+  # 2. The user's geozone ID is a match (valid = true)
+  valid = !is_restricted || is_match
+  
+  Rails.logger.info "Geozone Check - Final Result (Not Restricted OR Match): #{valid}"
+
+  valid
+   end
+    
     def permission_problem?(user)
       permission_problem(user).present?
     end
@@ -322,6 +365,7 @@ class Budget
     end
 
     def recalculate_heading_winners
+      Rails.logger.warn "--- [DEBUG] CALLBACK TRIGGERED: recalculate_heading_winners for Investment ##{self.id} ---"
       Budget::Result.new(budget, heading).calculate_winners if saved_change_to_incompatible?
     end
 
@@ -354,6 +398,10 @@ class Budget
     def should_show_price_explanation?
       should_show_price? && price_explanation.present?
     end
+    
+    def should_show_estimated_price?
+      estimated_price.present? && budget.show_money?
+    end
 
     def should_show_unfeasibility_explanation?
       unfeasible? && valuation_finished? && unfeasibility_explanation.present?
@@ -362,6 +410,11 @@ class Budget
     def formatted_price
       budget.formatted_amount(price)
     end
+
+    def formatted_estimated_price
+      budget.formatted_amount(estimated_price)
+    end
+
 
     def self.apply_filters_and_search(_budget, params, current_filter = nil)
       investments = all
