@@ -38,4 +38,7 @@
   <%= render "summary_recommended_actions" %>
 <% end %>
 
-<%= render Dashboard::ResourcesComponent.new(proposal, @new_actions_since_last_login) %>
+<% if Setting["feature.resources"] %>
+  <%= render Dashboard::ResourcesComponent.new(proposal, @new_actions_since_last_login) %>
+<% end %>
+

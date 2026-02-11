@@ -1,4 +1,6 @@
 class Admin::ProposalsController < Admin::BaseController
+  require 'csv'
+  include ActionView::Helpers::SanitizeHelper
   include HasOrders
   include CommentableActions
   include FeatureFlags
@@ -8,6 +10,26 @@ class Admin::ProposalsController < Admin::BaseController
   has_orders %w[created_at]
 
   before_action :load_proposal, except: [:index, :successful]
+
+  def index
+    @proposals = Proposal.all
+
+    if params[:search].present?
+      @proposals = @proposals.where("title ILIKE ?", "%#{params[:search]}%")
+    end
+
+    @paginated_proposals = @proposals.page(params[:page])
+
+    respond_to do |format|
+      format.html do
+        @proposals = @paginated_proposals
+        render :index
+      end
+      format.csv do
+        send_data @proposals.to_csv, filename: "proposals-#{Date.today}.csv"
+      end
+    end
+  end
 
   def successful
     @proposals = Proposal.successful.sort_by_confidence_score
@@ -44,19 +66,20 @@ class Admin::ProposalsController < Admin::BaseController
 
   private
 
-    def resource_model
-      Proposal
-    end
+  def resource_model
+    Proposal
+  end
 
-    def load_proposal
-      @proposal = Proposal.find(params[:id])
-    end
+  def load_proposal
+    @proposal = Proposal.find(params[:id])
+  end
 
-    def proposal_params
-      params.require(:proposal).permit(allowed_params)
-    end
+  def proposal_params
+    params.require(:proposal).permit(allowed_params)
+  end
 
-    def allowed_params
-      [:selected]
-    end
+  def allowed_params
+    [:selected]
+  end
+
 end

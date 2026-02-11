@@ -33,6 +33,7 @@ class Admin::Settings::ConfigurationTabComponent < ApplicationComponent
       related_content_score_threshold
       featured_proposals_number
       postal_codes
+      admin_email
     ]
   end
 end

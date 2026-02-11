@@ -7,7 +7,7 @@
 
     <% unless budget.single_heading? %>
       <div>
-        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true } %>
+        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: t("budgets.investments.form.heading_note"), class: "html-area" } %>
       </div>
     <% end %>
 
@@ -18,16 +18,25 @@
     <%= f.translatable_fields do |translations_form| %>
       <div>
         <%= translations_form.text_field :title,
+                                         hint: t("budgets.investments.form.subtitle_note"),
                                          maxlength: Budget::Investment.title_max_length,
                                          data: suggest_data(investment) %>
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
 
+
       <div>
         <%= translations_form.text_area :description,
+                                        hint: t("budgets.investments.form.description_note"),
                                         maxlength: Budget::Investment.description_max_length,
                                         class: "html-area" %>
       </div>
+      <div>
+        <h2> Estimated Cost </h2>
+        <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
+      </div>
+
+
     <% end %>
   </fieldset>
 
@@ -35,6 +44,11 @@
 
   <fieldset>
     <legend><%= t("shared.optional") %></legend>
+
+    <div id="video_url">
+      <%= f.text_field :video_url, hint: t("proposals.form.proposal_video_url_note") %>
+    </div>
+
 
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) %>
@@ -46,15 +60,15 @@
 
     <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
 
-    <div>
-      <%= f.text_field :location %>
+    <div id="location">
+      <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
 
-    <div>
-      <%= f.text_field :organization_name %>
+    <div id="org_name">
+      <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
     </div>
 
-    <div>
+    <div id="tags">
       <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
       <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
 
@@ -67,11 +81,11 @@
 
       <br>
       <%= f.text_field :tag_list, value: investment.tag_list.to_s,
-                                  label: false,
-                                  placeholder: t("budgets.investments.form.tags_placeholder"),
-                                  aria: { describedby: "tags-list-help-text" },
-                                  class: "js-tag-list tag-autocomplete",
-                                  data: { js_url: suggest_tags_path } %>
+                       label: false,
+                       placeholder: t("budgets.investments.form.tags_placeholder"),
+                       aria: { describedby: "tags-list-help-text" },
+                       class: "js-tag-list tag-autocomplete",
+                       data: { js_url: suggest_tags_path } %>
     </div>
 
     <%= render SDG::RelatedListSelectorComponent.new(f) %>

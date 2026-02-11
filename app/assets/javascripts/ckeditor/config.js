@@ -12,7 +12,7 @@ CKEDITOR.editorConfig = function( config )
   config.filebrowserUploadMethod = "form";
 
   config.allowedContent = true;
-  config.format_tags = "p;h2;h3";
+  config.format_tags = "p;h2;h3;h4";
 
   config.removePlugins = "balloonpanel,balloontoolbar,copyformatting,scayt,wsc";
 
@@ -82,7 +82,7 @@ CKEDITOR.editorConfig = function( config )
     // { name: "editing", groups: [ "find", "selection", "spellchecker" ], items: [ "Find", "Replace", "-", "SelectAll", "-", "Scayt" ] },
     // { name: "forms", items: [ "Form", "Checkbox", "Radio", "TextField", "Textarea", "Select", "Button", "ImageButton", "HiddenField" ] },
     { name: "links", items: [ "Link", "Unlink", "Anchor" ] },
-    { name: "insert", items: [ "Image", "Flash", "Table", "HorizontalRule", "SpecialChar" ] },
+    {name: "insert", items: ["Image", "Table", "HorizontalRule", "SpecialChar"]},
     { name: "paragraph", groups: [ "list", "indent", "blocks", "align", "bidi" ], items: [ "NumberedList", "BulletedList", "-", "Outdent", "Indent", "-", "Blockquote", "CreateDiv", "-", "JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
     "/",
     { name: "styles", items: [ "Styles", "Format", "Font", "FontSize" ] },
@@ -97,7 +97,7 @@ CKEDITOR.editorConfig = function( config )
     { name: "basicstyles", groups: [ "basicstyles", "cleanup" ], items: [ "Bold", "Italic", "Underline", "Strike" ] }
   ];
 
-  config.toolbar_admin = config.toolbar_mini.concat([
+  config.toolbar_admin = config.toolbar.concat([
     { name: "insert", items: [ "Image", "Table" ] }
   ]);
 

@@ -17,6 +17,10 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
           hint: winners_hint,
           html: winners_action
         },
+        manage_questions: {
+          hint: manage_questions_hint,
+          html: manage_questions_action
+        },
         ballots: {
           hint: ballots_hint,
           html: ballots_action
@@ -34,6 +38,14 @@ class Admin::Budgets::ActionsComponent < ApplicationComponent
 
     def winners_hint
       t("admin.budgets.actions.descriptions.calculate_winners", phase: t("budgets.phase.finished"))
+    end
+    
+    def manage_questions_action
+      render Admin::Budgets::QuestionsComponent.new(budget)
+    end
+
+    def manage_questions_hint
+      t("admin.budgets.actions.descriptions.manage_questions")
     end
 
     def destroy_action

@@ -73,6 +73,12 @@ namespace :admin do
     end
 
     resources :budgets, except: [:create, :new] do
+      resources :budget_questions do
+        member do
+          patch :mark_as_enabled
+          patch :unmark_as_enabled
+        end
+      end
       member do
         patch :publish
         put :calculate_winners
@@ -88,6 +94,8 @@ namespace :admin do
           patch :deselect
           patch :show_to_valuators
           patch :hide_from_valuators
+          patch :mark_as_winner
+          patch :unmark_as_winner
         end
 
         resources :audits, only: :show, controller: "budget_investment_audits"
@@ -264,9 +272,20 @@ namespace :admin do
 
     resources :geozones, only: [:index, :new, :create, :edit, :update, :destroy]
     resource :locales, only: [:show, :update]
-
+    
+    resources :postcodes, only: [:index, :new, :create, :edit, :update, :destroy, :ncsv, :process_csv, :ncsv_review] do
+      collection do
+        get :ncsv
+        post :process_csv
+        get :ncsv_review
+      end
+    end
+    resources :cards, controller: "widget/cards", path: "widget/cards"
+    
     namespace :site_customization do
+      resources :cards, only: [:index]
       resources :pages, except: [:show] do
+      
         resources :cards, except: [:show], as: :widget_cards
       end
       resources :images, only: [:index, :update, :destroy]

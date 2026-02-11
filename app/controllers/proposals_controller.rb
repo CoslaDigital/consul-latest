@@ -8,12 +8,14 @@ class ProposalsController < ApplicationController
   include Translatable
 
   before_action :load_categories, only: [:index, :map, :summary]
-  before_action :load_geozones, only: [:edit, :map, :summary]
+  before_action :load_geozones #, only: [:edit, :map, :summary]
   before_action :authenticate_user!, except: [:index, :show, :map, :summary]
   before_action :set_view, only: :index
   before_action :proposals_recommendations, only: :index, if: :current_user
 
   feature_flag :proposals
+
+  helper_method :geozones_data
 
   invisible_captcha only: [:create, :update], honeypot: :subtitle
 
@@ -25,6 +27,7 @@ class ProposalsController < ApplicationController
 
   helper_method :resource_model, :resource_name
   respond_to :html, :js
+
 
   def show
     super
@@ -77,6 +80,16 @@ class ProposalsController < ApplicationController
     @tag_cloud = tag_cloud
   end
 
+  def geozones_data
+      @geozones.map do |geozone|
+        {
+          outline_points: geozone.outline_points,
+          color: geozone.color,
+          headings: [view_context.link_to(geozone.name, proposals_path(search: geozone.name))]
+        }
+      end
+    end
+
   def map
     @proposal = Proposal.new
     @tag_cloud = tag_cloud
@@ -92,6 +105,7 @@ class ProposalsController < ApplicationController
 
   def publish
     @proposal.publish
+    @proposal.notify_admin
     redirect_to share_proposal_path(@proposal), notice: t("proposals.notice.published")
   end
 
@@ -103,7 +117,7 @@ class ProposalsController < ApplicationController
 
     def allowed_params
       attributes = [:video_url, :responsible_name, :tag_list, :terms_of_service,
-                    :geozone_id, :related_sdg_list,
+                    :geozone_id, :related_sdg_list, :price,
                     image_attributes: image_attributes,
                     documents_attributes: document_attributes,
                     map_location_attributes: map_location_attributes]

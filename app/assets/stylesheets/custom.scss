@@ -1,4 +1,203 @@
 // Override and add customized styles in this file.
-//
-// You can also create SCSS files in the app/assets/stylesheets/custom/
-// folder and they will be loaded automatically.
+
+.button.button-saml {
+  // ... (Your button styles are fine and unchanged) ...
+  background-color: #dcdde3;
+  background-image: image-url("myaccount_signin.svg");
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-left: 3px solid #2f2f33;
+  overflow: hidden;
+  text-indent: -9999px;
+  width: 300px;
+
+  &::before {
+    color: #2f2f33;
+  }
+}
+
+/*
+ * ===================================================================
+ * Refactored Mobile-First Hero Styles
+ *
+ * This one block replaces all your other hero styles.
+ * =================================_=================================
+ */
+
+.hero-header {
+  // --- BASE STYLES ---
+  // These apply to the fallback hero (no image)
+  @include full-width-background;
+  @extend %budget-header;
+  margin-top: -$line-height;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4rem 2rem;
+  background-color: var(--brand-secondary);
+  text-align: center;
+  color: #fff;
+
+  // --- 1. STYLES FOR THE IMAGE HERO ---
+  // This applies to ".hero-header.with-background-image"
+  &.with-background-image {
+    //
+    // --- MOBILE-FIRST STYLES (Default) ---
+    //
+    // A smaller min-height for phones. This is now the
+    // *only* rule controlling the height.
+    min-height: 300px;
+
+    // --- Core Layout ---
+    position: relative; // CRITICAL: For positioning children
+    overflow: hidden;   // This is fine, it clips the background image
+    padding: 0;         // Padding will be on the content box
+
+    // These center the .hero-content box
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    
+    // !! REMOVED: aspect-ratio and max-height
+    // This allows the container to grow vertically
+    // based on its content.
+
+    // Responsive padding for the *container itself*
+    padding-top: clamp(1rem, 5vh, 6rem);
+    padding-bottom: clamp(1rem, 5vh, 6rem);
+    padding-left: clamp(1rem, 5vw, 3rem);
+    padding-right: clamp(1rem, 5vw, 3rem);
+
+    //
+    // --- DESKTOP OVERRIDES ---
+    //
+    @media (min-width: 768px) {
+      // When the screen is 768px or wider, switch to a larger min-height
+      min-height: 400px;
+    }
+  }
+
+  // --- NESTED CHILD STYLES ---
+  // These rules apply to children of ANY .hero-header
+
+  // The semi-transparent content box
+  .row {
+    padding: clamp(1.0rem, 4vw, 1.5rem);
+    display: flex;        // Use flex for the row's *children*
+    flex-direction: column; // Stack the text vertically
+    align-items: center;  // Center the text horizontally
+    justify-content: center; // Center the text vertically
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 30px;
+    max-width: 900px;
+    width: 100%;
+    position: relative; // For the z-index and ::before
+    z-index: 2; // Sits in front of the background image
+    text-align: center; // Ensure text inside is centered
+
+    // The background for the .row
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, $brand-secondary 0%, $brand 100%);
+      opacity: 0.7;
+      border-radius: inherit;
+      z-index: -1; // Sits behind the .row's text content
+    }
+  }
+
+  // --- Text styles (Unchanged) ---
+  .homepage-title {
+    display: block;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #ffffffcc;
+  }
+
+  h1 {
+    font-size: clamp(1rem, 5vw, 2.75rem);
+    font-weight: bold;
+    color: #fff;
+    margin-top: 1.25rem;
+  }
+
+  .homepage-lead {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    margin-bottom: 2rem;
+    color: #ffffffcc;
+  }
+
+  // --- Link (button) styles (Unchanged) ---
+  .homepage-link {
+    display: inline-block;
+    margin: 0.5rem 0;
+    margin-top: 1.0rem;
+    margin-bottom: 1.0rem;
+    justify-content: center;
+    background-color: var(--brand-secondary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+
+    &:hover {
+      background-color: #005fa3;
+    }
+  }
+} // --- End of .hero-header block ---
+
+
+/*
+ * ===================================================================
+ * 2. STYLES FOR THE BACKGROUND IMAGE (Unchanged)
+ *
+ * These rules are NOT nested and are still required.
+ * ===================================================================
+ */
+
+.hero-background-image {
+  position: absolute; // CRITICAL: Pulls it out of the layout flow
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;       // 100% height of the now-growing parent
+  z-index: 1;         // Puts it behind the .hero-content
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // CRITICAL: Makes the image fill and crop
+}
+
+/*
+ * ===================================================================
+ * 3. STYLES FOR THE CONTENT (Unchanged)
+ *
+ * This rule is NOT nested and is still required.
+ * ===================================================================
+ */
+
+.hero-content {
+  position: relative; // CRITICAL: Allows z-index to work
+  z-index: 2; // Pulls it in front of the background
+  width: 100%; // Ensure it takes up space
+  
+  // Optional: adds shadow for readability
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); 
+}
