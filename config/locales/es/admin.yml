@@ -1796,14 +1796,39 @@ es:
       related_content_description: "Añade contenido relacionado generado automáticamente a las propuestas y proyectos de presupuestos participativos."
       script_info: "Recibirás un email en %{email} cuando el script termine de ejecutarse."
       script_name: "Nombre del script:"
-      select_script: "Seleccione el script pyhton a ejecutar"
+      select_script: "Seleccione el script de machine learning a ejecutar"
       started_at: "Empezado a las:"
       tab_help: "Ayuda"
-      tab_settings: "Configuración / Contenido generado"
       tab_scripts: "Ejecutar script"
+      tab_settings: "Configuración / Contenido generado"
       tags: "Etiquetas"
       tags_description: "Genera etiquetas automáticas para todos los elementos que pueden ser etiquetados."
       title: "IA / Machine learning"
+      scripts:
+        budget_comments:
+          label: "Presupuestos: Resumir comentarios"
+          description: "Genera resúmenes mediante IA para los comentarios en las inversiones de los presupuestos."
+        proposal_comments:
+          label: "Propuestas: Resumir comentarios"
+          description: "Genera resúmenes mediante IA para los comentarios en las propuestas ciudadanas."
+        legislation_summaries:
+          label: "Legislación: Resumir preguntas"
+          description: "Genera resúmenes para los comentarios en las preguntas de legislación."
+        budget_tags:
+          label: "Presupuestos: Generar etiquetas"
+          description: "Extrae etiquetas de las inversiones de los presupuestos utilizando IA."
+        debate_tags:
+          label: "Debates: Generar etiquetas"
+          description: "Genera etiquetas para los debates utilizando el modelo de lenguaje (LLM)."
+        proposal_tags:
+          label: "Propuestas: Generar etiquetas"
+          description: "Extrae etiquetas de las propuestas utilizando IA."
+        budget_related:
+          label: "Presupuestos: Contenido relacionado"
+          description: "Encuentra contenido relacionado para las inversiones de los presupuestos."
+        proposal_related:
+          label: "Propuestas: Contenido relacionado"
+          description: "Encuentra contenido relacionado para las propuestas."
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros
