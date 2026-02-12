@@ -161,6 +161,26 @@ class MachineLearning
       end
     end
 
+    def data_intermediate_files
+      excluded = [
+        "proposals.json", "budget_investments.json", "comments.json",
+        proposals_tags_filename, proposals_taggings_filename,
+        investments_tags_filename, investments_taggings_filename,
+        debates_tags_filename, debates_taggings_filename,
+        proposals_related_filename, investments_related_filename,
+        proposals_comments_summary_filename, investments_comments_summary_filename,
+        "ml_comments_summaries_legislation.json"
+      ]
+
+      # Ensure the directory exists before globbing to prevent errors on new deploys
+      return [] unless File.exist?(data_folder)
+
+      json_files = Dir[data_folder.join("*.json")].map { |f| File.basename(f) }
+      csv_files = Dir[data_folder.join("*.csv")].map { |f| File.basename(f) }
+
+      (json_files + csv_files - excluded).sort
+    end
+
     def script_select_options
       AVAILABLE_SCRIPTS.keys.map do |key|
         [I18n.t("admin.machine_learning.scripts.#{key}.label"), key]
