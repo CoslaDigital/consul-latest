@@ -1754,86 +1754,81 @@ es:
           created: Registros creados
         local_census_records:
           no_records_found: No se han encontrado registros.
-    es:
-      machine_learning:
-        cancel: "Cancelar operación"
-        cancel_alert: "Esta acción cancelará el script actual y será necesario ejecutarlo de nuevo."
-        comments_summary: "Resumen de comentarios"
-        comments_summary_description: "Muestra un resumen de comentarios generado automáticamente en todos los elementos que pueden ser comentados."
-        data_folder_content: "Contenido de la carpeta de datos"
-        dry_run_button: "Ejecutar simulacro"
-        dry_run_label: "SIMULACRO (DRY RUN)"
-        error: "Error:"
-        execute_script: "Ejecutar script"
-        executed_by: "Ejecutado por:"
-        executed_script: "Script ejecutado:"
-        feature_disabled: "Esta función está desactivada. Para usar Machine Learning puedes activarlo desde la %{link}."
-        feature_disabled_link: "página de configuración"
-        help:
-          description_1: "El aprendizaje automático (Machine Learning) en esta plataforma se refiere al uso de Modelos de Lenguaje de Gran Escala (LLM) para automatizar tareas analíticas complejas. A diferencia del código tradicional que sigue reglas rígidas, estos modelos pueden entender matices, sentimientos y el contexto del lenguaje humano, permitiendo al sistema categorizar y resumir miles de contribuciones ciudadanas en segundos."
-          description_2: "Este módulo proporciona un conjunto de herramientas para ayudar a administradores y usuarios a navegar por grandes volúmenes de datos. Procesa Propuestas, Inversiones y Debates para generar resúmenes automáticos, identificar temas emergentes mediante etiquetas y descubrir conexiones ocultas entre diferentes contenidos. Esto reduce la 'sobrecarga de información' para los participantes y ayuda a los responsables a identificar las prioridades de la comunidad rápidamente."
-          description_3: "Una vez activado el módulo y configurado un proveedor de IA (como OpenAI), diríjase a la pestaña 'Ejecutar scripts'. Puede ejecutar scripts para tipos de contenido específicos. Recomendamos usar primero la función 'Simulacro' (Dry Run) para probar la lógica sin guardar datos. Tras la ejecución, podrá ver los resultados directamente en las páginas públicas o descargar los datos en formato JSON desde la pestaña 'Configuración'."
-          description_4: "El módulo admite actualmente tres tipos principales de análisis. Use estos consejos para decidir cuál ejecutar:"
-          description_4b: "<strong>1. Resumen de Comentarios y Sentimiento:</strong> Ideal cuando una propuesta tiene más de 20 comentarios. Genera un Resumen Ejecutivo e identifica 'Temas y Voces' clave. Consejo: Ejecútelo para ofrecer a los usuarios una versión resumida de debates extensos."
-          description_4c: "<strong>2. Etiquetado Inteligente:</strong> Analiza el título y la descripción para sugerir categorías relevantes. Consejo: Úselo si tiene muchas propuestas 'Sin categoría'; esto ayuda a mejorar las búsquedas y el filtrado para los usuarios."
-          description_4d: "<strong>3. Contenido Relacionado:</strong> Compara el texto de todos los elementos para encontrar similitudes. Consejo: Ejecútelo para evitar propuestas duplicadas; mostrará a los usuarios 'Propuestas relacionadas' que podrían tratar los mismos temas."
-          description_4e: "<strong>Lógica de Actualización:</strong> Los scripts son 'inteligentes': solo vuelven a procesar elementos que han cambiado o recibido nuevos comentarios desde la última ejecución. Puede forzar el procesamiento completo si ha actualizado las instrucciones de la IA."
-          description_5: "Los scripts se ejecutan como tareas en segundo plano para garantizar que la interfaz siga respondiendo. Para cada trabajo completado, el sistema registra la duración y el total de tokens consumidos. Esto le permite controlar los costes de la API y la eficiencia del procesamiento directamente desde la pestaña de ejecución."
-          title_1: "¿Qué es la Inteligencia Artificial / Machine Learning?"
-          title_2: "¿Qué hace el módulo de IA / Machine Learning en CONSUL DEMOCRACY?"
-          title_3: "Cómo usar este módulo"
-          title_4: "Tipos de Scripts y Consejos de Uso"
-          title_5: "Ejecución Técnica y Rendimiento"
-        help_text: "Esta funcionalidad es experimental."
-        last_execution: "Última ejecución"
-        no_content: "Aún no se ha generado contenido."
-        notice:
-          delete_generated_content: "El contenido generado se ha eliminado correctamente."
-          error: "Se ha producido un error. Puede ver los detalles a continuación."
-          success: "El script de machine learning ha finalizado correctamente."
-          working: "El script se está ejecutando en segundo plano. Recibirá un correo electrónico en %{email} cuando haya terminado."
-        output_files: "Archivos de salida:"
-        related_content: "Contenido relacionado"
-        related_content_description: "Añade contenido relacionado generado automáticamente a propuestas y proyectos de presupuestos participativos."
-        script_info: "Recibirá un correo electrónico en %{email} cuando el script termine de ejecutarse."
-        script_name: "Nombre del script:"
-        scripts:
-          budget_comments:
-            description: "Genera resúmenes por IA y análisis de sentimiento para los comentarios de Inversiones de Presupuestos."
-            label: "Presupuestos: Resumir comentarios"
-          budget_related:
-            description: "Identifica inversiones de presupuestos similares para evitar duplicidades."
-            label: "Presupuestos: Contenido relacionado"
-          budget_tags:
-            description: "Extrae etiquetas de temas específicos de las inversiones de presupuestos usando IA."
-            label: "Presupuestos: Generar etiquetas"
-          debate_tags:
-            description: "Genera etiquetas de temas para Debates para mejorar su descubrimiento."
-            label: "Debates: Generar etiquetas"
-          legislation_summaries:
-            description: "Genera resúmenes por IA para los comentarios de Preguntas Legislativas."
-            label: "Legislación: Resumir preguntas"
-          proposal_comments:
-            description: "Genera resúmenes por IA y análisis de sentimiento para los comentarios de Propuestas Ciudadanas."
-            label: "Propuestas: Resumir comentarios"
-          proposal_related:
-            description: "Identifica propuestas ciudadanas similares para agrupar ideas relacionadas."
-            label: "Propuestas: Contenido relacionado"
-          proposal_tags:
-            description: "Extrae etiquetas de temas específicos de las propuestas ciudadanas usando IA."
-            label: "Propuestas: Generar etiquetas"
-        select_script: "Selecciona el script de machine learning a ejecutar"
-        started_at: "Iniciado el:"
-        stats:
-          duration: "Tiempo de ejecución"
-          finished_at: "Completado el"
-          tokens: "Tokens consumidos"
-        tab_help: "Ayuda"
-        tab_scripts: "Ejecutar script"
-        tab_settings: "Configuración / Contenido generado"
-        tags: "Etiquetas"
-        tags_description: "Genera etiquetas automáticas en todos los elementos que pueden ser etiquetados."
-        title: "Machine learning"
+    machine_learning:
+      cancel: "Cancelar operación"
+      cancel_alert: "Esta acción cancelará el script actual y será necesario ejecutar el script de nuevo."
+      comments_summary: "Resumen de comentarios"
+      comments_summary_description: "Muestra un resumen de comentarios generado automáticamente en todos los elementos que pueden ser comentados."
+      data_folder_content: "Contenido carpeta data"
+      error: "Error:"
+      execute_script: "Ejecutar script"
+      executed_by: "Ejecutado por:"
+      executed_script: "Script ejecutado:"
+      feature_disabled: "Esta funcionalidad está deshabilitada. Para utilizar Machine Learning puedes habilitarla desde la %{link}."
+      feature_disabled_link: "página de configuración"
+      help:
+        title_1: "¿Qué es IA / Machine Learning?"
+        description_1: "Tradicionalmente, los programas informáticos se diseñan estableciendo reglas precisas sobre lo que debe hacer el programa en cada situación, y cómo procesar en cada momento la información disponible. Lo que se conoce comúnmente como IA / Machine Learning es un tipo de programas para los cuales lo que se establece de manera precisa es cuál es la tarea a realizar y cómo se valora el que la tarea esté mejor o peor realizada. Pero a diferencia de los otros, el sistema descubre o aprende cuál sería el método más adecuado para realizar dicha tarea."
+        title_2: "¿Qué hace el módulo de IA / Machine Learning en CONSUL DEMOCRACY?"
+        description_2: "Este módulo permite implementar en CONSUL DEMOCRACY cualquier tipo de programas de IA / Machine Learning. Los programas pueden procesar la información disponible en CONSUL DEMOCRACY y producir resultados que ayuden tanto a los usuarios como a los administradores a llevar a cabo una participación ciudadana más eficaz e inteligente. El módulo se ha desarrollado para que sea sencillo implementar y ejecutar nuevos programas, manteniendo por separado el código general de CONSUL DEMOCRACY y el código de estos nuevos programas."
+        title_3: "Cómo usar el módulo"
+        description_3: "Para usarlo por primera vez es necesario seguir las instrucciones disponibles en la documentación de CONSUL DEMOCRACY para activar correctamente este módulo. Una vez el módulo esté correctamente activado, los programas se ejecutan desde la pestaña \"Ejecutar scripts\". Antes de ejecutarlo podemos ver en esa misma pestaña una estimación del tiempo de ejecución y otras informaciones relevantes. Al terminar la ejecución podemos activar el contenido que se mostrará en CONSUL DEMOCRACY desde la pestaña de \"Configuración\", así como descargar otros archivos generados que nos puedan resultar útiles."
+        title_4: "Cómo implementar nuevos scripts de IA / Machine Learning."
+        description_4: "Utiliza los scripts existentes como ejemplo."
+        description_4b: "Los nuevos scripts deben estar ubicados en la carpeta <code>public/machine_learning/scripts</code>"
+        description_4c: "Los datos de entrada que utilizará el script se crearán como archivos JSON en la carpeta <code>../data</code>"
+        description_4d: "Cualquier salida generada debe crearse en la carpeta <code>../data</code>"
+        description_4e: "Se recomienda crear un archivo de texto <code>.ini</code> independiente con los parámetros de configuración del script, con el mismo nombre del script y legible mediante configparser. Este archivo facilitará cambios de configuración por parte de los administradores."
+        description_4f: "Se recomienda incluir como primera línea del script una cadena inicial de comillas triples con información breve sobre el mismo y enlaces a cualquier información relevante. Esta cadena se mostrará automáticamente en la interfaz de administración."
+        description_4g: "Se recomienda crear un log con la información relevante del script en un archivo de texto <code>.log</code>, con el mismo nombre del script."
+        title_5: "Para utilizar los scripts de IA / Machine Learning necesitas tener Python instalado en tu servidor"
+        description_5: "Aquí puedes ver las instrucciones de ejemplo para un servidor Ubuntu 18.04:"
+      help_text: "Esta funcionalidad es experimental."
+      last_execution: "Última ejecución"
+      no_content: "Todavía no se ha generado contenido."
+      notice:
+        success: "El último script se ha ejecutado correctamente."
+        error: "Se ha producido un error. Más información sobre el error a continuación."
+        working: "El script se está ejecutando. El administrador que lo ejecutó recibirá un email cuando termine."
+        delete_generated_content: "El contenido generado se ha borrado correctamente."
+      output_files: "Ficheros de salida:"
+      related_content: "Contenido relacionado"
+      related_content_description: "Añade contenido relacionado generado automáticamente a las propuestas y proyectos de presupuestos participativos."
+      script_info: "Recibirás un email en %{email} cuando el script termine de ejecutarse."
+      script_name: "Nombre del script:"
+      select_script: "Seleccione el script de machine learning a ejecutar"
+      started_at: "Empezado a las:"
+      tab_help: "Ayuda"
+      tab_scripts: "Ejecutar script"
+      tab_settings: "Configuración / Contenido generado"
+      tags: "Etiquetas"
+      tags_description: "Genera etiquetas automáticas para todos los elementos que pueden ser etiquetados."
+      title: "IA / Machine learning"
+      scripts:
+        budget_comments:
+          label: "Presupuestos: Resumir comentarios"
+          description: "Genera resúmenes mediante IA para los comentarios en las inversiones de los presupuestos."
+        proposal_comments:
+          label: "Propuestas: Resumir comentarios"
+          description: "Genera resúmenes mediante IA para los comentarios en las propuestas ciudadanas."
+        legislation_summaries:
+          label: "Legislación: Resumir preguntas"
+          description: "Genera resúmenes para los comentarios en las preguntas de legislación."
+        budget_tags:
+          label: "Presupuestos: Generar etiquetas"
+          description: "Extrae etiquetas de las inversiones de los presupuestos utilizando IA."
+        debate_tags:
+          label: "Debates: Generar etiquetas"
+          description: "Genera etiquetas para los debates utilizando el modelo de lenguaje (LLM)."
+        proposal_tags:
+          label: "Propuestas: Generar etiquetas"
+          description: "Extrae etiquetas de las propuestas utilizando IA."
+        budget_related:
+          label: "Presupuestos: Contenido relacionado"
+          description: "Encuentra contenido relacionado para las inversiones de los presupuestos."
+        proposal_related:
+          label: "Propuestas: Contenido relacionado"
+          description: "Encuentra contenido relacionado para las propuestas."
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros
