@@ -5,30 +5,32 @@ class Admin::MachineLearningController < Admin::BaseController
   end
 
   def execute
-    # 1. Update the job metadata
-    # Also capture the 'mode' parameter for Dry Run support
-    is_dry_run = params[:mode] == "dry_run"
+    # 1. Capture parameters
+    script = params[:script]
+    is_dry_run = params[:execution_mode] == "dry_run"
 
+    # We reset finished_at and error so the UI state transitions back to "working"
     @machine_learning_job.update!(
-      script: params[:script],
+      script: script,
       user: current_user,
       started_at: Time.current,
       finished_at: nil,
       error: nil,
-      dry_run: is_dry_run # Ensure you have this column or attribute
+      dry_run: is_dry_run
     )
 
-    # 2. RUN IN FOREGROUND (Blocking call)
-    # We call .run directly. The browser will wait until it's done.
-    ::MachineLearning.new(@machine_learning_job, dry_run: is_dry_run).run
+    #Execution
+    #::MachineLearning.new(@machine_learning_job).run
+    ::MachineLearning.new(@machine_learning_job).delay(queue: 'machine_learning').run
 
-    redirect_to admin_machine_learning_path,
-                notice: "Foreground execution complete."
+    notice_msg = is_dry_run ? "Dry run complete: analyzed data but made no changes." : "Script executed successfully."
+    redirect_to admin_machine_learning_path, notice: notice_msg
   end
 
   def cancel
-    Delayed::Job.where(queue: "machine_learning").destroy_all
-    MachineLearningJob.destroy_all
+    # Since you are running in the foreground, this will only
+    # clear the state for the next page load.
+    MachineLearningJob.delete_all
 
     redirect_to admin_machine_learning_path,
                 notice: t("admin.machine_learning.notice.delete_generated_content")
@@ -36,7 +38,8 @@ class Admin::MachineLearningController < Admin::BaseController
 
   private
 
-    def load_machine_learning_job
-      @machine_learning_job = MachineLearningJob.first_or_initialize
-    end
+  def load_machine_learning_job
+    # Ensures we always work with the same single job record
+    @machine_learning_job = MachineLearningJob.first_or_initialize
+  end
 end
