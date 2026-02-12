@@ -5,16 +5,25 @@ class Admin::MachineLearningController < Admin::BaseController
   end
 
   def execute
-    @machine_learning_job.update!(script: params[:script],
-                                  user: current_user,
-                                  started_at: Time.current,
-                                  finished_at: nil,
-                                  error: nil)
+    # 1. Update the job metadata
+    # Also capture the 'mode' parameter for Dry Run support
+    is_dry_run = params[:mode] == "dry_run"
 
-    ::MachineLearning.new(@machine_learning_job).delay
+    @machine_learning_job.update!(
+      script: params[:script],
+      user: current_user,
+      started_at: Time.current,
+      finished_at: nil,
+      error: nil,
+      dry_run: is_dry_run # Ensure you have this column or attribute
+    )
+
+    # 2. RUN IN FOREGROUND (Blocking call)
+    # We call .run directly. The browser will wait until it's done.
+    ::MachineLearning.new(@machine_learning_job, dry_run: is_dry_run).run
 
     redirect_to admin_machine_learning_path,
-                notice: t("admin.machine_learning.script_info", email: current_user.email)
+                notice: "Foreground execution complete."
   end
 
   def cancel
