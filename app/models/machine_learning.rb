@@ -1,8 +1,9 @@
 # app/models/machine_learning.rb
 class MachineLearning
-  attr_reader :user, :script, :previous_modified_date
+  attr_reader :user, :script, :previous_modified_date, :dry_run
   attr_accessor :job
 
+  DRY_RUN_LIMIT = 5 # Number of items to process during a dry run
   SCRIPTS_FOLDER = Rails.root.join("public", "machine_learning", "scripts").freeze
 
   AVAILABLE_SCRIPTS = {
@@ -16,13 +17,16 @@ class MachineLearning
     "proposal_related"      => :generate_proposal_related_content
   }.freeze
 
-  def initialize(job)
+  def initialize(job, dry_run: false)
     @job = job
     @user = job.user
+    @dry_run = dry_run
     @previous_modified_date = set_previous_modified_date
   end
 
   def run
+    Rails.logger.info "[MachineLearning] RUNNING IN DRY RUN MODE" if dry_run
+
     unless ml_config[:enabled]
       job.update!(error: "Machine learning feature is not enabled", finished_at: Time.current)
       Mailer.machine_learning_error(user).deliver_later
@@ -44,8 +48,11 @@ class MachineLearning
       return false
     end
 
-    job.update!(finished_at: Time.current)
-    Mailer.machine_learning_success(user).deliver_later
+    unless dry_run
+      job.update!(finished_at: Time.current)
+      Mailer.machine_learning_success(user).deliver_later
+    end
+
     true
   rescue StandardError => e
     handle_error(e)
@@ -74,7 +81,11 @@ class MachineLearning
   end
 
   def generate_legislation_question_summaries
-    Legislation::Question.find_each do |question|
+    # This method iterates internally; we apply the limit directly here
+    questions = Legislation::Question.all
+    questions = questions.limit(DRY_RUN_LIMIT) if dry_run
+
+    questions.find_each do |question|
       comments = question.comments.where(hidden_at: nil).pluck(:body)
       next if comments.empty?
 
@@ -82,8 +93,12 @@ class MachineLearning
       result = MlHelper.summarize_comments(comments, context, config: ml_config)
       next if result.blank?
 
-      summary = MlSummaryComment.find_or_initialize_by(commentable: question)
-      summary.update!(body: result["summary_markdown"], sentiment_analysis: result["sentiment"])
+      if dry_run
+        Rails.logger.info "[DryRun] Leg. Summary for ID #{question.id}: #{result['summary_markdown'].truncate(100)}"
+      else
+        summary = MlSummaryComment.find_or_initialize_by(commentable: question)
+        summary.update!(body: result["summary_markdown"], sentiment_analysis: result["sentiment"])
+      end
     end
   end
 
@@ -136,18 +151,22 @@ class MachineLearning
 
     def process_tags_for(scope:, type:, log_name:)
       Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
-      cleanup_tags_for!(type)
+      cleanup_tags_for!(type) unless dry_run
 
       all_taggings_data = []
       all_tags_to_ensure = Set.new
 
       records = scope.pluck(:id, :title, :description)
+      records = records.take(DRY_RUN_LIMIT) if dry_run
+
       total = records.count
     processed = 0
 
       records.each do |id, title, description|
         text = "#{title}\n\n#{description}"
         generated_names = MlHelper.generate_tags(text, 5, config: ml_config)
+
+        Rails.logger.info "[DryRun] Tags for ID #{id}: #{generated_names.join(', ')}" if dry_run
 
         generated_names.each do |tag_name|
           clean_name = tag_name.strip.truncate(150)
@@ -166,15 +185,19 @@ class MachineLearning
         log_progress(log_name, processed, total, id)
     end
 
+      unless dry_run
       bulk_sync_tags_and_taggings(all_tags_to_ensure, all_taggings_data)
-    update_machine_learning_info_for("tags")
+      update_machine_learning_info_for("tags")
+      end
   end
 
     def process_comments_summary_for(klass, log_name, context_prefix)
       Rails.logger.info "[MachineLearning] Starting #{log_name}"
-      cleanup_comments_summary_for!(klass.name)
+      cleanup_comments_summary_for!(klass.name) unless dry_run
 
       ids = klass.joins(:comments).where(comments: { hidden_at: nil }).group("#{klass.table_name}.id").pluck(:id)
+      ids = ids.take(DRY_RUN_LIMIT) if dry_run
+
       total = ids.count
     processed = 0
 
@@ -186,30 +209,37 @@ class MachineLearning
         if comments.any?
           result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
           if result&.[]("summary_markdown").present?
+            Rails.logger.info "[DryRun] Summary for ID #{id}: #{result['summary_markdown'].truncate(100)}" if dry_run
+
+            unless dry_run
             MlSummaryComment.find_or_initialize_by(commentable: record).update!(
               body: result["summary_markdown"],
               sentiment_analysis: result["sentiment"]
             )
           end
         end
+        end
       processed += 1
         log_progress(log_name, processed, total, id)
     end
-      update_machine_learning_info_for("comments_summary")
+      update_machine_learning_info_for("comments_summary") unless dry_run
   end
 
     def process_related_content_for(klass, filename)
-      cleanup_related_content_for!(klass.name)
+      cleanup_related_content_for!(klass.name) unless dry_run
       all_content = klass.joins(:translations).pluck(:id, :title, :description).map { |id, t, d| { id: id, text: "#{t} #{d}" } }
 
+      loop_content = dry_run ? all_content.take(DRY_RUN_LIMIT) : all_content
     results = []
-      total = all_content.count
+      total = loop_content.count
 
-      all_content.each_with_index do |item, idx|
+      loop_content.each_with_index do |item, idx|
         candidates = all_content.reject { |c| c[:id] == item[:id] }
       candidate_texts = candidates.map { |c| c[:text] }
         similar_indices = MlHelper.find_similar_content(item[:text], candidate_texts, 3, config: ml_config)
         related_ids = similar_indices.map { |i| candidates[i][:id] }
+
+        Rails.logger.info "[DryRun] Related for ID #{item[:id]}: #{related_ids.join(', ')}" if dry_run
 
         res = { id: item[:id] }
         related_ids.each_with_index { |rid, i| res["related_#{i}"] = rid }
@@ -217,8 +247,10 @@ class MachineLearning
         log_progress("related content", idx + 1, total, item[:id])
     end
 
+      unless dry_run
       import_related_content_from_array(results, klass.name)
-    update_machine_learning_info_for("related_content")
+      update_machine_learning_info_for("related_content")
+    end
     end
 
     # --- DATABASE BULK HELPERS ---
@@ -227,7 +259,6 @@ class MachineLearning
       return if tag_names_set.empty?
       tag_map = {}
 
-      # 1. Ensure Tags exist
       tag_names_set.each do |name|
         clean_name = name.strip.truncate(150)
         begin
@@ -239,25 +270,19 @@ class MachineLearning
         end
     end
 
-      # 2. Prepare and Deduplicate (REMOVED updated_at)
       final_taggings = taggings_metadata.map do |data|
         real_id = tag_map[data[:tag_name]]
         next unless real_id
-
-        # We only keep the columns that actually exist in the taggings table
         {
           tag_id: real_id,
           taggable_id: data[:taggable_id],
           taggable_type: data[:taggable_type],
           context: data[:context],
-          created_at: data[:created_at] # Keep created_at, remove updated_at
+          created_at: data[:created_at]
         }
       end.compact.uniq { |t| [t[:tag_id], t[:taggable_id], t[:taggable_type], t[:context]] }
 
-      # 3. Basic insert_all
-      if final_taggings.any?
-        Tagging.insert_all(final_taggings)
-    end
+      Tagging.insert_all(final_taggings) if final_taggings.any?
   end
 
     def cleanup_tags_for!(type)
