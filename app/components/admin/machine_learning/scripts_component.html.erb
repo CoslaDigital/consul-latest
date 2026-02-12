@@ -1,10 +1,8 @@
 <div class="tabs-panel is-active machine-learning-scripts" id="scripts">
+  <%# 1. Error State %>
   <% if machine_learning_job.errored? %>
     <div class="callout alert">
-      <p>
-        <strong><%= t("admin.machine_learning.notice.error") %></strong>
-      </p>
-
+      <p><strong><%= t("admin.machine_learning.notice.error") %></strong></p>
       <dl>
         <dt><%= t("admin.machine_learning.executed_by") %></dt>
         <dd><%= machine_learning_job.user.name %></dd>
@@ -16,16 +14,12 @@
         <dd><%= sanitize(machine_learning_job.error) %></dd>
       </dl>
     </div>
-  <% elsif machine_learning_job.finished? %>
-    <div class="callout success">
-      <strong><%= t("admin.machine_learning.notice.success") %></strong>
-    </div>
-  <% elsif machine_learning_job.started? %>
-    <div class="callout warning">
-      <p>
-        <strong><%= t("admin.machine_learning.notice.working") %></strong>
-      </p>
 
+    <%# 2. Currently Running State (Working) %>
+    <%# We check for started? AND NOT finished? to avoid the overlap you saw %>
+  <% elsif machine_learning_job.started? && !machine_learning_job.finished? %>
+    <div class="callout warning">
+      <p><strong><%= t("admin.machine_learning.notice.working") %></strong></p>
       <dl>
         <dt><%= t("admin.machine_learning.executed_by") %></dt>
         <dd><%= machine_learning_job.user.name %></dd>
@@ -34,30 +28,57 @@
         <dd><%= machine_learning_job.script %></dd>
 
         <dt><%= t("admin.machine_learning.started_at") %></dt>
-        <dd><%= machine_learning_job.started_at %></dd>
+        <dd><%= l machine_learning_job.started_at, format: :short %></dd>
       </dl>
+    </div>
+
+    <%# 3. Finished State %>
+  <% elsif machine_learning_job.finished? %>
+    <div class="callout success">
+      <strong><%= t("admin.machine_learning.notice.success") %></strong>
+      <% if machine_learning_job.dry_run? %>
+        <span class="label warning" style="margin-left: 10px;">
+          <%= t("admin.machine_learning.dry_run_label", default: "DRY RUN") %>
+        </span>
+      <% end %>
     </div>
   <% end %>
 
-  <% if machine_learning_job.started? %>
+  <%# 4. Action Buttons %>
+  <%# If it's currently working, show ONLY the cancel button %>
+  <% if machine_learning_job.started? && !machine_learning_job.finished? %>
     <%= button_to t("admin.machine_learning.cancel"),
                   cancel_admin_machine_learning_path,
                   method: :delete, class: "cancel",
                   data: { confirm: t("admin.machine_learning.cancel_alert") } %>
-  <% elsif machine_learning_job.errored? || !machine_learning_job.started? || machine_learning_job.finished? %>
+
+    <%# Otherwise, show the execution form (for new jobs, finished jobs, or errored jobs) %>
+  <% else %>
     <%= form_tag execute_admin_machine_learning_path, method: :post do %>
       <label for="script"><%= t("admin.machine_learning.select_script") %></label>
       <%= select_tag "script", options_for_select(script_select_options) %>
 
       <div id="script_descriptions">
-        <% scripts_info.each_with_index do |script_info, index| %>
-          <div id="<%= script_info[:name] %>" class="help-text">
+        <%# Use :key if :name is missing to ensure IDs match your JS selectors %>
+        <% scripts_info.each do |script_info| %>
+          <div id="<%= script_info[:name] || script_info[:key] %>" class="help-text" style="display: none;">
             <%= sanitize(script_info[:description]) %>
           </div>
         <% end %>
       </div>
 
-      <%= submit_tag t("admin.machine_learning.execute_script") %>
+      <div class="actions">
+        <%# Production Execution %>
+        <%= submit_tag t("admin.machine_learning.execute_script"),
+                       name: "execution_mode",
+                       value: "Execute Script" %>
+
+        <%# Dry Run Execution %>
+        <%= submit_tag t("admin.machine_learning.dry_run_button", default: "Run Dry Run"),
+                       name: "execution_mode",
+                       value: "dry_run",
+                       class: "dry-run" %>
+      </div>
     <% end %>
   <% end %>
 </div>
