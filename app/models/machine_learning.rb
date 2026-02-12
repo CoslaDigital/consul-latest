@@ -25,6 +25,8 @@ class MachineLearning
   end
 
   def run
+    @logger = Logger.new(Rails.root.join("log", "ml.log"))
+    @logger.info "[MachineLearning] Job started for #{job.script} at #{Time.current}"
     Rails.logger.info "[MachineLearning] RUNNING IN DRY RUN MODE" if dry_run
 
     unless ml_config[:enabled]
@@ -81,7 +83,6 @@ class MachineLearning
   end
 
   def generate_legislation_question_summaries
-    # This method iterates internally; we apply the limit directly here
     questions = Legislation::Question.all
     questions = questions.limit(DRY_RUN_LIMIT) if dry_run
 
@@ -93,11 +94,16 @@ class MachineLearning
       result = MlHelper.summarize_comments(comments, context, config: ml_config)
       next if result.blank?
 
+      sentiment_data = process_sentiment_data(result["sentiment"])
+
       if dry_run
         Rails.logger.info "[DryRun] Leg. Summary for ID #{question.id}: #{result['summary_markdown'].truncate(100)}"
       else
         summary = MlSummaryComment.find_or_initialize_by(commentable: question)
-        summary.update!(body: result["summary_markdown"], sentiment_analysis: result["sentiment"])
+        summary.update!(
+          body: result["summary_markdown"],
+          sentiment_analysis: sentiment_data
+        )
       end
     end
   end
@@ -110,28 +116,90 @@ class MachineLearning
     process_related_content_for(Proposal, MachineLearning.proposals_related_filename)
   end
 
-  # --- CLASS METHODS ---
+  # --- CLASS METHODS (ADMIN UI SUPPORT) ---
 
   class << self
     def enabled?
       Setting["feature.machine_learning"].present?
     end
 
+    def llm_configured?
+      Setting['feature.machine_learning'] &&
+        Setting['llm.provider'].present? &&
+        Setting['llm.model'].present?
+    end
+
+    def script_kinds
+      %w[tags related_content comments_summary]
+    end
+
+    def scripts_info
+      AVAILABLE_SCRIPTS.keys.map do |key|
+        {
+          key: key,
+          description: I18n.t("admin.machine_learning.scripts.#{key}.description")
+        }
+      end
+    end
+
+    def script_select_options
+      AVAILABLE_SCRIPTS.keys.map do |key|
+        [I18n.t("admin.machine_learning.scripts.#{key}.label"), key]
+      end
+    end
+
     def data_folder
       Rails.root.join("public", Tenant.path_with_subfolder("machine_learning/data"))
     end
 
-    def llm_configured?
-      Setting['feature.machine_learning'] && Setting['llm.provider'].present? && Setting['llm.model'].present?
+    def data_path(filename)
+      "/#{Tenant.path_with_subfolder("machine_learning/data")}/#{filename}"
     end
 
-    def investments_related_filename; "ml_related_content_budgets.json"; end
+    def data_output_files
+      files = { tags: [], related_content: [], comments_summary: [] }
+      [
+        [proposals_tags_filename, :tags],
+        [investments_tags_filename, :tags],
+        [debates_tags_filename, :tags],
+        [proposals_related_filename, :related_content],
+        [investments_related_filename, :related_content],
+        [proposals_comments_summary_filename, :comments_summary],
+        [investments_comments_summary_filename, :comments_summary]
+      ].each do |filename, kind|
+        files[kind] << filename if File.exist?(data_folder.join(filename))
+      end
+      files
+    end
+
+    def data_intermediate_files
+      excluded = [
+        "proposals.json", "budget_investments.json", "comments.json",
+        proposals_tags_filename, proposals_taggings_filename,
+        investments_tags_filename, investments_taggings_filename,
+        debates_tags_filename, debates_taggings_filename,
+        proposals_related_filename, investments_related_filename,
+        proposals_comments_summary_filename, investments_comments_summary_filename
+      ]
+      json_files = Dir[data_folder.join("*.json")].map { |f| File.basename(f) }
+      csv_files = Dir[data_folder.join("*.csv")].map { |f| File.basename(f) }
+      (json_files + csv_files - excluded).sort
+    end
+
+    # Filename Constants
+    def proposals_tags_filename; "ml_tags_proposals.json"; end
+    def proposals_taggings_filename; "ml_taggings_proposals.json"; end
+    def debates_tags_filename; "ml_tags_debates.json"; end
+    def debates_taggings_filename; "ml_taggings_debates.json"; end
+    def investments_tags_filename; "ml_tags_budgets.json"; end
+    def investments_taggings_filename; "ml_taggings_budgets.json"; end
     def proposals_related_filename; "ml_related_content_proposals.json"; end
+    def investments_related_filename; "ml_related_content_budgets.json"; end
+    def proposals_comments_summary_filename; "ml_comments_summaries_proposals.json"; end
+    def investments_comments_summary_filename; "ml_comments_summaries_budgets.json"; end
   end
 
   private
-
-  # --- HYBRID MEMOIZATION ---
 
   def ml_config
     @ml_config ||= {
@@ -142,7 +210,34 @@ class MachineLearning
     }.freeze
   end
 
-  # --- SHARED PROCESSING LOGIC ---
+  def process_sentiment_data(raw_sentiment)
+    # Default structure
+    default_val = { "positive" => 0, "negative" => 0, "neutral" => 100 }
+    return default_val if raw_sentiment.blank?
+
+    if raw_sentiment.is_a?(Hash)
+      # Ensure keys are strings and values are integers
+      pos = raw_sentiment["positive"].to_i
+      neg = raw_sentiment["negative"].to_i
+      neu = raw_sentiment["neutral"].to_i
+
+      # Math Insurance: Force the sum to 100%
+      total = pos + neg + neu
+      if total != 100 && total > 0
+        neu = 100 - (pos + neg)
+      end
+
+      { "positive" => pos, "negative" => neg, "neutral" => [neu, 0].max }
+    else
+      # Case where LLM returns a string: "positive"
+      label = raw_sentiment.to_s.downcase.strip
+      case label
+      when "positive" then { "positive" => 100, "negative" => 0, "neutral" => 0 }
+      when "negative" then { "positive" => 0, "negative" => 100, "neutral" => 0 }
+      else default_val
+      end
+    end
+  end
 
   def process_tags_for(scope:, type:, log_name:)
     Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
@@ -150,7 +245,6 @@ class MachineLearning
 
     all_taggings_data = []
     all_tags_to_ensure = Set.new
-
     records = scope.pluck(:id, :title, :description)
     records = records.take(DRY_RUN_LIMIT) if dry_run
 
@@ -160,20 +254,15 @@ class MachineLearning
     records.each do |id, title, description|
       text = "#{title}\n\n#{description}"
       generated_names = MlHelper.generate_tags(text, 5, config: ml_config)
-
       Rails.logger.info "[DryRun] Tags for ID #{id}: #{generated_names.join(', ')}" if dry_run
 
       generated_names.each do |tag_name|
         clean_name = tag_name.strip.truncate(150)
         next if clean_name.blank?
-
         all_tags_to_ensure << clean_name
         all_taggings_data << {
-          tag_name: clean_name.downcase,
-          taggable_id: id,
-          taggable_type: type,
-          context: 'ml_tags',
-          created_at: Time.current
+          tag_name: clean_name.downcase, taggable_id: id,
+          taggable_type: type, context: 'ml_tags', created_at: Time.current
         }
       end
       processed += 1
@@ -190,6 +279,7 @@ class MachineLearning
     Rails.logger.info "[MachineLearning] Starting #{log_name}"
     cleanup_comments_summary_for!(klass.name) unless dry_run
 
+    # Identify records with comments
     ids = klass.joins(:comments).where(comments: { hidden_at: nil }).group("#{klass.table_name}.id").pluck(:id)
     ids = ids.take(DRY_RUN_LIMIT) if dry_run
 
@@ -201,15 +291,22 @@ class MachineLearning
       next unless should_generate_summary_for?(record)
 
       comments = record.comments.where("length(body) > 10").order(:created_at).pluck(:body).uniq
+
       if comments.any?
         result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
-        if result&.[]("summary_markdown").present?
-          Rails.logger.info "[DryRun] Summary for ID #{id}: #{result['summary_markdown'].truncate(100)}" if dry_run
 
-          unless dry_run
-            MlSummaryComment.find_or_initialize_by(commentable: record).update!(
+        if result&.[]("summary_markdown").present?
+          # Standardize the sentiment using our private helper method
+          sentiment_data = process_sentiment_data(result["sentiment"])
+
+          if dry_run
+            Rails.logger.info "[DryRun] Summary for ID #{id}: #{result['summary_markdown'].truncate(100)}"
+            Rails.logger.info "[DryRun] Sentiment for ID #{id}: #{sentiment_data.inspect}"
+          else
+            summary = MlSummaryComment.find_or_initialize_by(commentable: record)
+            summary.update!(
               body: result["summary_markdown"],
-              sentiment_analysis: result["sentiment"]
+              sentiment_analysis: sentiment_data # Verified variable name
             )
           end
         end
@@ -235,7 +332,6 @@ class MachineLearning
       related_ids = similar_indices.map { |i| candidates[i][:id] }
 
       Rails.logger.info "[DryRun] Related for ID #{item[:id]}: #{related_ids.join(', ')}" if dry_run
-
       res = { id: item[:id] }
       related_ids.each_with_index { |rid, i| res["related_#{i}"] = rid }
       results << res
@@ -248,12 +344,11 @@ class MachineLearning
     end
   end
 
-  # --- DATABASE BULK HELPERS ---
+  # --- DB HELPERS ---
 
   def bulk_sync_tags_and_taggings(tag_names_set, taggings_metadata)
     return if tag_names_set.empty?
     tag_map = {}
-
     tag_names_set.each do |name|
       clean_name = name.strip.truncate(150)
       begin
@@ -269,11 +364,8 @@ class MachineLearning
       real_id = tag_map[data[:tag_name]]
       next unless real_id
       {
-        tag_id: real_id,
-        taggable_id: data[:taggable_id],
-        taggable_type: data[:taggable_type],
-        context: data[:context],
-        created_at: data[:created_at]
+        tag_id: real_id, taggable_id: data[:taggable_id],
+        taggable_type: data[:taggable_type], context: data[:context], created_at: data[:created_at]
       }
     end.compact.uniq { |t| [t[:tag_id], t[:taggable_id], t[:taggable_type], t[:context]] }
 
@@ -293,20 +385,19 @@ class MachineLearning
     RelatedContent.where(machine_learning: true, parent_relationable_type: type).delete_all
   end
 
-  # --- UTILITY METHODS ---
+  # --- UTILITIES ---
 
   def should_generate_summary_for?(record)
     last_summary = MlSummaryComment.where(commentable: record).order(created_at: :desc).first
     return true if last_summary.blank? || last_summary.sentiment_analysis.blank?
-
     latest_comment = record.comments.where(hidden_at: nil).maximum(:updated_at)
     latest_comment ? latest_comment > last_summary.updated_at : false
   end
 
   def log_progress(task_type, current, total, item_id)
-    if current % 10 == 0 || current == total
-      Rails.logger.info "[MachineLearning] #{task_type}: #{current}/#{total} - ID: #{item_id}"
-    end
+    msg = "[MachineLearning] #{task_type}: #{current}/#{total} - ID: #{item_id}"
+    Rails.logger.info msg
+    puts msg
   end
 
   def import_related_content_from_array(results, record_type)
@@ -341,5 +432,16 @@ class MachineLearning
     Mailer.machine_learning_error(user).deliver_later
   end
 
-  def set_previous_modified_date; {}; end
+  def set_previous_modified_date
+    {
+      MachineLearning.investments_tags_filename => last_modified_date_for(MachineLearning.investments_tags_filename),
+      MachineLearning.proposals_tags_filename => last_modified_date_for(MachineLearning.proposals_tags_filename),
+      MachineLearning.debates_tags_filename => last_modified_date_for(MachineLearning.debates_tags_filename)
+    }
+  end
+
+  def last_modified_date_for(filename)
+    path = MachineLearning.data_folder.join(filename)
+    File.exist?(path) ? File.mtime(path) : nil
+  end
 end
