@@ -8,7 +8,7 @@
         <dd><%= machine_learning_job.user.name %></dd>
 
         <dt><%= t("admin.machine_learning.script_name") %></dt>
-        <dd><%= machine_learning_job.script %></dd>
+        <dd><%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script) %></dd>
 
         <dt><%= t("admin.machine_learning.error") %></dt>
         <dd><%= sanitize(machine_learning_job.error) %></dd>
@@ -16,7 +16,6 @@
     </div>
 
     <%# 2. Currently Running State (Working) %>
-    <%# We check for started? AND NOT finished? to avoid the overlap you saw %>
   <% elsif machine_learning_job.started? && !machine_learning_job.finished? %>
     <div class="callout warning">
       <p><strong><%= t("admin.machine_learning.notice.working") %></strong></p>
@@ -25,7 +24,7 @@
         <dd><%= machine_learning_job.user.name %></dd>
 
         <dt><%= t("admin.machine_learning.script_name") %></dt>
-        <dd><%= machine_learning_job.script %></dd>
+        <dd><%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script) %></dd>
 
         <dt><%= t("admin.machine_learning.started_at") %></dt>
         <dd><%= l machine_learning_job.started_at, format: :short %></dd>
@@ -34,32 +33,50 @@
 
     <%# 3. Finished State %>
   <% elsif machine_learning_job.finished? %>
-    <div class="callout success">
-      <strong><%= t("admin.machine_learning.notice.success") %></strong>
-      <% if machine_learning_job.dry_run? %>
-        <span class="label warning" style="margin-left: 10px;">
-          <%= t("admin.machine_learning.dry_run_label", default: "DRY RUN") %>
-        </span>
-      <% end %>
+    <div class="callout success ml-job-summary">
+      <p>
+        <strong><%= t("admin.machine_learning.notice.success") %></strong>
+        <% if machine_learning_job.dry_run? %>
+          <span class="label warning" style="margin-left: 10px;">
+            <%= t("admin.machine_learning.dry_run_label") %>
+          </span>
+        <% end %>
+      </p>
+
+      <hr>
+
+      <div class="row">
+        <div class="small-12 medium-4 columns">
+          <strong><%= t("admin.machine_learning.stats.duration") %></strong><br>
+          <%= distance_of_time_in_words(machine_learning_job.duration) if machine_learning_job.duration %>
+          <% if machine_learning_job.duration %>
+            <small class="text-muted">(<%= machine_learning_job.duration %>s)</small>
+          <% end %>
+        </div>
+        <div class="small-12 medium-4 columns">
+          <strong><%= t("admin.machine_learning.stats.tokens") %></strong><br>
+          <%= number_with_delimiter(machine_learning_job.total_tokens) %>
+        </div>
+        <div class="small-12 medium-4 columns">
+          <strong><%= t("admin.machine_learning.stats.finished_at") %></strong><br>
+          <%= l machine_learning_job.finished_at, format: :short %>
+        </div>
+      </div>
     </div>
   <% end %>
 
   <%# 4. Action Buttons %>
-  <%# If it's currently working, show ONLY the cancel button %>
   <% if machine_learning_job.started? && !machine_learning_job.finished? %>
     <%= button_to t("admin.machine_learning.cancel"),
                   cancel_admin_machine_learning_path,
-                  method: :delete, class: "cancel",
+                  method: :delete, class: "button hollow alert cancel",
                   data: { confirm: t("admin.machine_learning.cancel_alert") } %>
-
-    <%# Otherwise, show the execution form (for new jobs, finished jobs, or errored jobs) %>
   <% else %>
     <%= form_tag execute_admin_machine_learning_path, method: :post do %>
       <label for="script"><%= t("admin.machine_learning.select_script") %></label>
       <%= select_tag "script", options_for_select(script_select_options) %>
 
-      <div id="script_descriptions">
-        <%# Use :key if :name is missing to ensure IDs match your JS selectors %>
+      <div id="script_descriptions" class="margin-bottom">
         <% scripts_info.each do |script_info| %>
           <div id="<%= script_info[:name] || script_info[:key] %>" class="help-text" style="display: none;">
             <%= sanitize(script_info[:description]) %>
@@ -68,16 +85,15 @@
       </div>
 
       <div class="actions">
-        <%# Production Execution %>
         <%= submit_tag t("admin.machine_learning.execute_script"),
                        name: "execution_mode",
-                       value: "Execute Script" %>
+                       value: "Execute Script",
+                       class: "button" %>
 
-        <%# Dry Run Execution %>
-        <%= submit_tag t("admin.machine_learning.dry_run_button", default: "Run Dry Run"),
+        <%= submit_tag t("admin.machine_learning.dry_run_button"),
                        name: "execution_mode",
                        value: "dry_run",
-                       class: "dry-run" %>
+                       class: "button hollow dry-run" %>
       </div>
     <% end %>
   <% end %>
