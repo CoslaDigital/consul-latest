@@ -31,7 +31,8 @@ class MachineLearning
     @logger = Logger.new(Rails.root.join("log", "ml.log"))
     @logger.info "[MachineLearning] Job started for #{job.script} at #{Time.current}"
     Rails.logger.info "[MachineLearning] RUNNING IN DRY RUN MODE" if dry_run
-
+    start_time = Time.current
+    @total_tokens_used = 0
     unless ml_config[:enabled]
       job.update!(error: "Machine learning feature is not enabled", finished_at: Time.current)
       Mailer.machine_learning_error(user).deliver_later
@@ -54,7 +55,15 @@ class MachineLearning
     end
 
     unless dry_run
-      job.update!(finished_at: Time.current)
+      end_time = Time.current
+      # Calculate duration in seconds
+      duration_seconds = (end_time - start_time).to_i
+
+      job.update!(
+        finished_at: end_time,
+        duration: duration_seconds,
+        total_tokens: @total_tokens_used
+      )
       Mailer.machine_learning_success(user).deliver_now
     end
 
@@ -100,6 +109,9 @@ class MachineLearning
 
       context = "Process: #{question.process.title}\nQuestion: #{question.title}"
       result = MlHelper.summarize_comments(comments, context, config: ml_config)
+      if result && result["usage"]
+        @total_tokens_used += result["usage"]["total_tokens"].to_i
+      end
       next if result.blank?
 
       sentiment_data = process_sentiment_data(result["sentiment"])
@@ -275,7 +287,13 @@ class MachineLearning
 
       records.each do |id, title, description|
         text = "#{title}\n\n#{description}"
-        generated_names = MlHelper.generate_tags(text, 5, config: ml_config)
+        result = MlHelper.generate_tags(text, 5, config: ml_config)
+
+        if result && result["usage"]
+          @total_tokens_used += result["usage"]["total_tokens"].to_i
+        end
+
+        generated_names = result["tags"] || []
 
         generated_names.each do |tag_name|
           clean_name = tag_name.strip.truncate(150)
@@ -329,6 +347,9 @@ class MachineLearning
 
         if comments.any?
           result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
+          if result && result["usage"]
+            @total_tokens_used += result["usage"]["total_tokens"].to_i
+          end
           if result&.[]("summary_markdown").present?
             sentiment_data = process_sentiment_data(result["sentiment"])
 
@@ -360,10 +381,9 @@ class MachineLearning
     def process_related_content_for(klass, filename)
       Rails.logger.info "[MachineLearning] Starting selective related content for #{klass.name}"
 
-      # 1. We still need all content for the "candidates" pool
       all_content = klass.joins(:translations).pluck(:id, :title, :description).map { |id, t, d| { id: id, text: "#{t} #{d}" } }
 
-      # 2. But we only find similarities for NEW or UPDATED records
+      # But we only find similarities for NEW or UPDATED records
       records_to_process = klass.all.select { |r| should_reprocess_record?(r, "related_content") }
       records_to_process = records_to_process.take(DRY_RUN_LIMIT) if dry_run
 
@@ -378,7 +398,13 @@ class MachineLearning
         candidates = all_content.reject { |c| c[:id] == record.id }
       candidate_texts = candidates.map { |c| c[:text] }
 
-        similar_indices = MlHelper.find_similar_content(source_text, candidate_texts, 3, config: ml_config)
+        result = MlHelper.find_similar_content(source_text, candidate_texts, 3, config: ml_config)
+
+        if result && result["usage"]
+          @total_tokens_used += result["usage"]["total_tokens"].to_i
+        end
+
+        similar_indices = result["indices"] || []
         related_ids = similar_indices.map { |i| candidates[i][:id] }
 
         res = { id: record.id }
