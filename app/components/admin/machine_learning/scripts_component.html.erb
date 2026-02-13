@@ -18,12 +18,16 @@
     <%# 2. Currently Running State (Working) %>
   <% elsif machine_learning_job.started? && !machine_learning_job.finished? %>
     <div class="callout warning">
-      <%# FIX: Added email interpolation %>
       <p>
-        <span class="status-pulse"></span>
-        <strong><%= t("admin.machine_learning.notice.working", email: machine_learning_job.user.email) %></strong>
+        <strong>
+          <% if machine_learning_job.user&.email.present? %>
+            <%= t("admin.machine_learning.notice.working", email: machine_learning_job.user.email) %>
+          <% else %>
+            <%# Fallback: remove the variable placeholder if email is missing to avoid %{email} leaking %>
+            <%= t("admin.machine_learning.notice.working").gsub(' at %{email}', '').gsub(' en %{email}', '') %>
+          <% end %>
+        </strong>
       </p>
-      <dl>
         <dt><%= t("admin.machine_learning.executed_by") %></dt>
         <dd><%= machine_learning_job.user.name %></dd>
 
