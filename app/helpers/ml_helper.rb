@@ -67,13 +67,28 @@ module MlHelper
     end
 
     system_prompt = <<~PROMPT
-      You are a qualitative data analyst. Return ONLY valid JSON with this exact structure:
+  You are a qualitative data analyst. Return ONLY valid JSON with this exact structure:
+  {
+    "executive_summary": "One sentence summary.",
+    "themes": [
       {
-        "executive_summary": "One sentence summary.",
-        "themes": [{"name": "Title", "explanation": "Brief text.", "quotes": ["Quote 1"]}],
-        "sentiment": {"positive": 0, "negative": 0, "neutral": 0}
+        "name": "Theme Title",
+        "explanation": "Brief text.",
+        "quotes": ["Quote 1", "Quote 2"]
       }
-    PROMPT
+    ],
+    "sentiment": {"positive": 0, "negative": 0, "neutral": 0}
+  }
+
+  OUTPUT RULES FOR MARKDOWN RENDERING:
+  When the backend processes this JSON into the final 'body' string, it must follow these Markdown rules:
+  1. The Executive Summary should be bolded: **Executive Summary**: [text]
+  2. Themes must be a top-level bullet point using '*': * **Theme Name**: [explanation]
+  3. Quotes must be nested bullet points. Indent them with TWO SPACES and a '*':
+     * **Theme Name**: explanation
+       * "Direct quote 1"
+       * "Direct quote 2"
+PROMPT
 
     user_prompt = "#{context ? "CONTEXT: #{context}\n\n" : ''}COMMENTS:\n#{combined_text}"
 
