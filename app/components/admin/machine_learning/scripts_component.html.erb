@@ -37,27 +37,35 @@
       <p>
         <strong><%= t("admin.machine_learning.notice.success") %></strong>
         <% if machine_learning_job.dry_run? %>
-          <span class="label warning" style="margin-left: 10px;">
-            <%= t("admin.machine_learning.dry_run_label") %>
-          </span>
+        <span class="label warning" style="margin-left: 10px;">
+          <%= t("admin.machine_learning.dry_run_label") %>
+        </span>
         <% end %>
       </p>
 
       <hr>
 
       <div class="row">
-        <div class="small-12 medium-4 columns">
+        <div class="small-12 medium-3 columns">
+          <strong><%= t("admin.machine_learning.executed_script") %></strong><br>
+          <%# Dynamically fetch the label we defined in the scripts: section of the YAML %>
+          <%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script.humanize) %>
+        </div>
+
+        <div class="small-12 medium-3 columns">
           <strong><%= t("admin.machine_learning.stats.duration") %></strong><br>
           <%= distance_of_time_in_words(machine_learning_job.duration) if machine_learning_job.duration %>
           <% if machine_learning_job.duration %>
             <small class="text-muted">(<%= machine_learning_job.duration %>s)</small>
           <% end %>
         </div>
-        <div class="small-12 medium-4 columns">
+
+        <div class="small-12 medium-3 columns">
           <strong><%= t("admin.machine_learning.stats.tokens") %></strong><br>
           <%= number_with_delimiter(machine_learning_job.total_tokens) %>
         </div>
-        <div class="small-12 medium-4 columns">
+
+        <div class="small-12 medium-3 columns text-right">
           <strong><%= t("admin.machine_learning.stats.finished_at") %></strong><br>
           <%= l machine_learning_job.finished_at, format: :short %>
         </div>
@@ -85,15 +93,16 @@
       </div>
 
       <div class="actions">
+        <%# Production Execution %>
         <%= submit_tag t("admin.machine_learning.execute_script"),
                        name: "execution_mode",
-                       value: "Execute Script",
-                       class: "button" %>
+                       value: "Execute Script" %>
 
+        <%# Dry Run Execution - Added the 'dry-run' class %>
         <%= submit_tag t("admin.machine_learning.dry_run_button"),
                        name: "execution_mode",
                        value: "dry_run",
-                       class: "button hollow dry-run" %>
+                       class: "dry-run" %>
       </div>
     <% end %>
   <% end %>
