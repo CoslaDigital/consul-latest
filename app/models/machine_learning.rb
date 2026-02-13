@@ -400,7 +400,6 @@ class MachineLearning
 
       { "positive" => res_pos, "negative" => [res_neg, 0].max, "neutral" => [res_neu, 0].max }
     else
-    else
       label = raw_sentiment.to_s.downcase.strip
       case label
       when "positive" then { "positive" => 100, "negative" => 0, "neutral" => 0 }
