@@ -1,5 +1,13 @@
 .admin .machine-learning-scripts {
 
+  // --- Animations ---
+  @keyframes ml-pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  // --- Icon & State Management ---
   .alert > :first-child {
     @include has-fa-icon(ban, solid);
   }
@@ -12,6 +20,12 @@
     @include has-fa-icon(hourglass-half, solid);
   }
 
+  // Apply the pulse only to the warning (working) state
+  .warning {
+    animation: ml-pulse 2s infinite ease-in-out;
+    border-left: 5px solid $warning-color;
+  }
+
   .alert,
   .success,
   .warning {
@@ -20,6 +34,7 @@
     }
   }
 
+  // --- Layout & Typography ---
   dl {
     font-size: $base-font-size;
 
@@ -41,7 +56,7 @@
   .actions {
     display: flex;
     gap: 1rem;
-    align-items: flex-end; // Aligns buttons if one is slightly taller
+    align-items: center;
     margin-top: $line-height;
   }
 
@@ -50,18 +65,50 @@
     width: auto;
   }
 
+  // --- Buttons ---
   [type=submit] {
     @include regular-button;
     margin-bottom: 0;
-    margin-top: $line-height;
+    margin-top: 0; // Handled by .actions gap/margin
 
+    // Specific colors for the primary execution
+    &:not(.dry-run):not(.cancel) {
+      background-color: $success-color;
+      &:hover { background-color: darken($success-color, 10%); }
+    }
+
+    // Improved Dry Run: Hollow, warning-colored, and dashed
     &.dry-run {
       @include hollow-button($warning-color);
-      border-style: dashed; // Visual hint for simulation
+      border-style: dashed;
+      border-width: 2px;
+      color: darken($warning-color, 15%);
+
+      &:hover {
+        background-color: rgba($warning-color, 0.1);
+        color: darken($warning-color, 25%);
+        border-style: solid;
+      }
     }
 
     &.cancel {
       @include hollow-button($alert-color);
+      &:hover {
+        background-color: $alert-color;
+        color: $white;
+      }
+    }
+  }
+
+  // Metrics summary styling
+  .ml-job-summary {
+    .columns {
+      border-right: 1px solid $light-gray;
+      &:last-child { border-right: none; }
+    }
+    .text-muted {
+      color: $dark-gray;
+      font-size: 0.85rem;
     }
   }
 }
