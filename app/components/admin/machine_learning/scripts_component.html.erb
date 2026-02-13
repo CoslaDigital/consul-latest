@@ -18,8 +18,16 @@
     <%# 2. Currently Running State (Working) %>
   <% elsif machine_learning_job.started? && !machine_learning_job.finished? %>
     <div class="callout warning">
-      <p><strong><%= t("admin.machine_learning.notice.working") %></strong></p>
-      <dl>
+      <p>
+        <strong>
+          <% if machine_learning_job.user&.email.present? %>
+            <%= t("admin.machine_learning.notice.working", email: machine_learning_job.user.email) %>
+          <% else %>
+            <%= t("admin.machine_learning.notice.working").gsub(' at %{email}', '').gsub(' en %{email}', '') %>
+          <% end %>
+        </strong>
+      </p>
+      <dl> <%# Added missing opening tag %>
         <dt><%= t("admin.machine_learning.executed_by") %></dt>
         <dd><%= machine_learning_job.user.name %></dd>
 
@@ -34,30 +42,33 @@
     <%# 3. Finished State %>
   <% elsif machine_learning_job.finished? %>
     <div class="callout success ml-job-summary">
-      <p>
-        <strong><%= t("admin.machine_learning.notice.success") %></strong>
-        <% if machine_learning_job.dry_run? %>
-          <span class="label warning" style="margin-left: 10px;">
-            <%= t("admin.machine_learning.dry_run_label") %>
-          </span>
-        <% end %>
-      </p>
-
+      <p><strong><%= t("admin.machine_learning.notice.success") %></strong></p>
       <hr>
+      <div class="row"> <%# One row to rule them all %>
+        <div class="small-12 medium-3 columns">
+          <strong><%= t("admin.machine_learning.executed_script") %></strong><br>
+          <%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script.humanize) %>
+        </div>
 
-      <div class="row">
-        <div class="small-12 medium-4 columns">
+        <div class="small-12 medium-2 columns">
+          <strong><%= t("admin.machine_learning.executed_by") %></strong><br>
+          <%= machine_learning_job.user.name %>
+        </div>
+
+        <div class="small-12 medium-2 columns">
           <strong><%= t("admin.machine_learning.stats.duration") %></strong><br>
           <%= distance_of_time_in_words(machine_learning_job.duration) if machine_learning_job.duration %>
           <% if machine_learning_job.duration %>
             <small class="text-muted">(<%= machine_learning_job.duration %>s)</small>
           <% end %>
         </div>
-        <div class="small-12 medium-4 columns">
+
+        <div class="small-12 medium-2 columns">
           <strong><%= t("admin.machine_learning.stats.tokens") %></strong><br>
           <%= number_with_delimiter(machine_learning_job.total_tokens) %>
         </div>
-        <div class="small-12 medium-4 columns">
+
+        <div class="small-12 medium-3 columns text-right">
           <strong><%= t("admin.machine_learning.stats.finished_at") %></strong><br>
           <%= l machine_learning_job.finished_at, format: :short %>
         </div>
@@ -67,10 +78,12 @@
 
   <%# 4. Action Buttons %>
   <% if machine_learning_job.started? && !machine_learning_job.finished? %>
-    <%= button_to t("admin.machine_learning.cancel"),
-                  cancel_admin_machine_learning_path,
-                  method: :delete, class: "button hollow alert cancel",
-                  data: { confirm: t("admin.machine_learning.cancel_alert") } %>
+    <div class="actions">
+      <%= button_to t("admin.machine_learning.cancel"),
+                    cancel_admin_machine_learning_path,
+                    method: :delete, class: "button hollow alert cancel",
+                    data: { confirm: t("admin.machine_learning.cancel_alert") } %>
+    </div>
   <% else %>
     <%= form_tag execute_admin_machine_learning_path, method: :post do %>
       <label for="script"><%= t("admin.machine_learning.select_script") %></label>
