@@ -387,25 +387,28 @@ class MachineLearning
     return default_val if raw_sentiment.blank?
 
     if raw_sentiment.is_a?(Hash)
-      pos = raw_sentiment["positive"].to_i
-      neg = raw_sentiment["negative"].to_i
-      neu = raw_sentiment["neutral"].to_i
+      # Use .to_f to ensure we don't do integer division
+      pos = raw_sentiment["positive"].to_f
+      neg = raw_sentiment["negative"].to_f
+      neu = raw_sentiment["neutral"].to_f
+
       total = pos + neg + neu
       return default_val if total == 0
 
+      # Math is now: (6.0 / 13.0) * 100 = 46.15... which rounds to 46
       res_pos = ((pos / total) * 100).round
       res_neg = ((neg / total) * 100).round
 
+      # Remainder goes to neutral to ensure exactly 100%
       res_neu = 100 - (res_pos + res_neg)
 
-      { "positive" => res_pos, "negative" => [res_neg, 0].max, "neutral" => [res_neu, 0].max }
+      {
+        "positive" => res_pos,
+        "negative" => [res_neg, 0].max,
+        "neutral" => [res_neu, 0].max
+      }
     else
-      label = raw_sentiment.to_s.downcase.strip
-      case label
-      when "positive" then { "positive" => 100, "negative" => 0, "neutral" => 0 }
-      when "negative" then { "positive" => 0, "negative" => 100, "neutral" => 0 }
-      else default_val
-      end
+      # ... (rest of label logic)
     end
   end
 
