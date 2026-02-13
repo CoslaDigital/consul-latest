@@ -391,8 +391,15 @@ class MachineLearning
       neg = raw_sentiment["negative"].to_i
       neu = raw_sentiment["neutral"].to_i
       total = pos + neg + neu
-      neu = 100 - (pos + neg) if total != 100 && total > 0
-      { "positive" => pos, "negative" => neg, "neutral" => [neu, 0].max }
+      return default_val if total == 0
+
+      res_pos = ((pos / total) * 100).round
+      res_neg = ((neg / total) * 100).round
+
+      res_neu = 100 - (res_pos + res_neg)
+
+      { "positive" => res_pos, "negative" => [res_neg, 0].max, "neutral" => [res_neu, 0].max }
+    else
     else
       label = raw_sentiment.to_s.downcase.strip
       case label
