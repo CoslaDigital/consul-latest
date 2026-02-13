@@ -1760,6 +1760,8 @@ en:
       comments_summary: "Comments summary"
       comments_summary_description: "Displays an automatically generated comment summary on all items that can be commented on."
       data_folder_content: "Data folder content"
+      dry_run_button: "Run Dry Run"
+      dry_run_label: "DRY RUN"
       error: "Error:"
       execute_script: "Execute script"
       executed_by: "Executed by:"
@@ -1767,66 +1769,70 @@ en:
       feature_disabled: "This feature is disabled. To use Machine Learning you can enable it from the %{link}."
       feature_disabled_link: "settings page"
       help:
-        title_1: "What is AI / Machine Learning?"
         description_1: "Machine Learning in this platform refers to the use of Large Language Models (LLMs) to automate complex analytical tasks. Unlike traditional code that follows rigid 'if-then' rules, these models can understand nuance, sentiment, and context in human language, allowing the system to categorize and summarize thousands of citizen contributions in seconds."
-        title_2: "What does the AI / Machine Learning module do in CONSUL DEMOCRACY?"
         description_2: "This module provides a suite of tools to help administrators and users navigate large volumes of data. It processes Proposals, Investments, and Debates to generate automatic summaries, identify emerging themes through tagging, and discover hidden connections between different pieces of content. This reduces the 'information overload' for participants and helps decision-makers identify community priorities quickly."
-        title_3: "How to use this module"
         description_3: "Once the module is activated and an LLM provider (like OpenAI) is configured, navigate to the 'Execute scripts' tab. You can run scripts for specific content types (e.g., Proposals or Budgets). We recommend using the 'Dry Run' feature first to test the logic without saving data. After execution, you can view the results directly on the public pages or download the raw JSON data from the 'Settings' tab."
-        title_4: "Overview of Script Types & Usage Hints"
         description_4: "The module currently supports three primary types of analysis. Use these hints to decide which to run:"
         description_4b: "<strong>1. Comments Summary & Sentiment:</strong> Best used when a proposal has 20+ comments. It generates an Executive Summary and identifies key 'Themes & Voices.' Hint: Run this to give users a 'too long; didn't read' version of a heated debate."
         description_4c: "<strong>2. Smart Tagging:</strong> Analyzes the title and description to suggest relevant categories. Hint: Use this if your platform has many 'Uncategorized' proposals; it helps improve searchability and filtering for users."
         description_4d: "<strong>3. Related Content:</strong> Compares the text of all items to find similarities. Hint: Run this to prevent duplicate proposals. It will show users 'Related Proposals' that may already address their concerns."
         description_4e: "<strong>Freshness Logic:</strong> The scripts are 'smart'—they only re-process items that have changed or received new comments since the last run. You can override this using the 'Force Regeneration' option if you have updated your AI prompts."
-        title_5: "Technical Execution & Performance"
         description_5: "Scripts are executed as background tasks to ensure the interface remains responsive. For each completed job, the system records the duration and total tokens consumed. This allows you to monitor API costs and processing efficiency directly from the 'Execute' tab."
+        title_1: "What is AI / Machine Learning?"
+        title_2: "What does the AI / Machine Learning module do in CONSUL DEMOCRACY?"
+        title_3: "How to use this module"
+        title_4: "Overview of Script Types & Usage Hints"
+        title_5: "Technical Execution & Performance"
       help_text: "This functionality is experimental."
       last_execution: "Last execution"
       no_content: "No content generated yet."
       notice:
-        success: "The last script has been executed successfully."
-        error: "An error has occurred. You can see the details below."
-        working: "The script is running. The administrator who executed it will receive an email when it is finished."
         delete_generated_content: "Generated content has been successfully deleted."
+        error: "An error has occurred. You can see the details below."
+        success: "The machine learning script has finished successfully."
+        working: "The script is running in the background. You will receive an email at %{email} when it is finished."
       output_files: "Output files:"
       related_content: "Related content"
       related_content_description: "Adds automatically generated related content to proposals and participatory budget projects."
       script_info: "You will receive an email in %{email} when the script finishes running."
       script_name: "Script name:"
+      scripts:
+        budget_comments:
+          description: "Generates AI summaries and sentiment analysis for comments on Budget Investments."
+          label: "Budgets: Summarize Comments"
+        budget_related:
+          description: "Identifies similar Budget Investments to prevent duplication."
+          label: "Budgets: Related Content"
+        budget_tags:
+          description: "Extracts specific topic tags from Budget Investments using the LLM."
+          label: "Budgets: Generate Tags"
+        debate_tags:
+          description: "Generates topic tags for Debates to improve discoverability."
+          label: "Debates: Generate Tags"
+        legislation_summaries:
+          description: "Generates AI summaries for comments on Legislation Questions."
+          label: "Legislation: Summarize Questions"
+        proposal_comments:
+          description: "Generates AI summaries and sentiment analysis for comments on Citizen Proposals."
+          label: "Proposals: Summarize Comments"
+        proposal_related:
+          description: "Identifies similar Citizen Proposals to group related ideas."
+          label: "Proposals: Related Content"
+        proposal_tags:
+          description: "Extracts specific topic tags from Citizen Proposals using the LLM."
+          label: "Proposals: Generate Tags"
       select_script: "Select machine learning script to execute"
       started_at: "Started at:"
+      stats:
+        duration: "Execution Time"
+        finished_at: "Completed at"
+        tokens: "Tokens Consumed"
       tab_help: "Help"
       tab_scripts: "Execute script"
       tab_settings: "Settings / Generated content"
       tags: "Tags"
       tags_description: "Generates automatic tags on all items that can be tagged on."
       title: "Machine learning"
-      scripts:
-        budget_comments:
-          label: "Budgets: Summarize Comments"
-          description: "Generates AI summaries for comments on Budget Investments."
-        proposal_comments:
-          label: "Proposals: Summarize Comments"
-          description: "Generates AI summaries for comments on Citizen Proposals."
-        legislation_summaries:
-          label: "Legislation: Summarize Questions"
-          description: "Generates summaries for comments on Legislation Questions."
-        budget_tags:
-          label: "Budgets: Generate Tags"
-          description: "Extracts tags from Budget Investments using AI."
-        debate_tags:
-          label: "Debates: Generate Tags"
-          description: "Generates tags for Debates using the LLM."
-        proposal_tags:
-          label: "Proposals: Generate Tags"
-          description: "Extracts tags from Proposals using AI."
-        budget_related:
-          label: "Budgets: Related Content"
-          description: "Finds related content for Budget Investments."
-        proposal_related:
-          label: "Proposals: Related Content"
-          description: "Finds related content for Proposals."
     cookies:
       vendors:
         empty: No vendors found
