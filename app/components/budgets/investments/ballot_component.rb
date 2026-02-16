@@ -54,31 +54,31 @@ class Budgets::Investments::BallotComponent < ApplicationComponent
           heading_link: heading_link(assigned_heading, budget))
       end
     end
-    
-    def cannot_vote_text
-      # Return early if there's no reason to show a message
-      return unless reason.present? && !voted?
 
-      # Start with the default options used by most translations
-      options = {
-        verify_account: link_to_verify_account,
-        my_heading: link_to_my_heading,
-        change_ballot: link_to_change_ballot,
-        heading_link: heading_link(assigned_heading, budget)
-      }
+  def cannot_vote_text
+    # Return early if there's no reason to show a message
+    return unless reason.present? && !voted?
 
-      # ** ADD THIS LOGIC **
-      # If the specific reason is invalid_geozone, add geozone data to the options
-      # We use .to_s to safely compare against both symbols (:invalid_geozone)
-      # and strings ("invalid_geozone").
-      if reason.to_s == "invalid_geozone"
-        options[:user_geozone] = current_user.geozone_id
-        options[:required_geozones] = investment.heading.geozone_ids.inspect
-      end
+    options = {
+      verify_account: link_to_verify_account,
+      my_heading: link_to_my_heading,
+      change_ballot: link_to_change_ballot,
+      heading_link: heading_link(assigned_heading, budget)
+    }
 
-      # Call the translation helper, passing all options.
-      # The :invalid_geozone translation will use the new variables,
-      # while other translations will simply ignore them.
-      t("budgets.ballots.reasons_for_not_balloting.#{reason}", **options)
+    # If the specific reason is invalid_geozone, add geozone names to the options
+    if reason.to_s == "invalid_geozone"
+      # Get the user's geozone name (or a fallback if none)
+      user_geozone = current_user.geozone&.name || "None"
+
+      # Get the required geozone names from the heading
+      required_geozones = Geozone.where(id: investment.heading.geozone_ids).pluck(:name).join(', ')
+
+      options[:user_geozone] = user_geozone
+      options[:required_geozones] = required_geozones
     end
+
+    # Call the translation helper, passing all options.
+    t("budgets.ballots.reasons_for_not_balloting.#{reason}", **options)
+  end
 end
