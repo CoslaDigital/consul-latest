@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -496,6 +496,23 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "connection_audits", force: :cascade do |t|
+    t.string "auditable_type"
+    t.bigint "auditable_id"
+    t.inet "ip_address"
+    t.string "country_code"
+    t.string "city"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.boolean "suspicious", default: false
+    t.string "failure_reason"
+    t.jsonb "raw_metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auditable_type", "auditable_id"], name: "index_connection_audits_on_auditable"
+    t.index ["ip_address"], name: "index_connection_audits_on_ip_address"
+  end
+
   create_table "cookies_vendors", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -635,21 +652,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.datetime "ends_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "event_type"
     t.string "location"
-    t.bigint "author_id"
-    t.index ["author_id"], name: "index_events_on_author_id"
-  end
-
-  create_table "events", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.datetime "starts_at"
-    t.datetime "ends_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "event_type"
-    t.string "location"
     t.bigint "author_id"
     t.index ["author_id"], name: "index_events_on_author_id"
   end
@@ -989,6 +993,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.bigint "user_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "dry_run"
+    t.integer "duration"
+    t.integer "total_tokens"
     t.index ["user_id"], name: "index_machine_learning_jobs_on_user_id"
   end
 
@@ -1043,6 +1050,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_01_22_144823) do
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.jsonb "sentiment_analysis"
   end
 
   create_table "moderators", id: :serial, force: :cascade do |t|
