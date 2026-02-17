@@ -28,14 +28,15 @@
   </div>
 </div>
 
-<table class="investment-projects-summary">
-  <thead>
+<div class="stats-group">
+  <table class="investment-projects-summary">
+    <thead>
     <tr>
       <th colspan="2"><%= t("admin.stats.budget_balloting.votes_per_heading") %></th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <% vote_count_by_heading.each do |heading_name, count| %>
       <tr id="vote_count_<%= heading_name.parameterize %>">
         <td class="name">
@@ -46,17 +47,19 @@
         </td>
       </tr>
     <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+</div>
 
-<table class="investment-projects-summary user-count-by-heading">
-  <thead>
+<div class="stats-group">
+  <table class="investment-projects-summary user-count-by-heading">
+    <thead>
     <tr>
       <th colspan="2"><%= t("admin.stats.budget_balloting.participants_per_district") %></th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <% user_count_by_heading.each do |heading_name, count| %>
       <tr id="user_count_<%= heading_name.parameterize %>">
         <td class="name">
@@ -67,5 +70,89 @@
         </td>
       </tr>
     <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+</div>
+
+<div id="location_summary_section" class="stats-group">
+  <div class="cluster-controls">
+    <h3 class="section-title"><%= t("stats.budgets.participation_density_view") %></h3>
+
+    <div class="precision-filter">
+      <%= form_tag url_for(controller: "/admin/stats", action: "budget_balloting"), method: :get, class: "inline-form" do %>
+        <%= hidden_field_tag :budget_id, budget.id %>
+
+        <div class="input-group">
+        <span class="input-group-label">
+          <%= t("stats.budgets.density_level") %>
+        </span>
+
+          <%= select_tag :precision,
+                         options_for_select([
+                                              [t("stats.budgets.precisions.district"), 1],
+                                              [t("stats.budgets.precisions.neighborhood"), 2],
+                                              [t("stats.budgets.precisions.street"), 3],
+                                              [t("stats.budgets.precisions.building"), 4]
+                                            ], precision.to_i),
+                         class: "input-group-field"
+          %>
+
+          <div class="input-group-button">
+            <%= submit_tag t("stats.budgets.precisions.update"), class: "button" %>
+          </div>
+      <% end %>
+      </div>
+    </div>
+  </div>
+
+  <table class="survey-districts">
+    <thead>
+    <tr>
+      <th><%= t("admin.stats.budget_balloting.location_cluster") %></th>
+      <th class="text-center"><%= t("admin.stats.budget_balloting.status") %></th>
+      <th class="text-center"><%= t("admin.stats.budget_balloting.voters") %></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% cluster_summary.each do |row| %>
+      <tr class="<%= 'suspicious-cluster' if row.suspicious %>">
+        <td>
+          <strong><%= row.city.presence || "IP Recorded" %></strong>
+          <small>(<%= row.country_code.presence || "---" %>)</small>
+          <br>
+          <small class="help-text icon-area">
+            Area: <%= row.lat_cluster %>, <%= row.lng_cluster %>
+          </small>
+        </td>
+
+        <td class="text-center">
+          <% if row.suspicious %>
+              <span class="label alert" title="<%= row.failure_reason %>">
+                Suspicious
+              </span>
+            <div class="help-text" style="color: #cc4b37; font-size: 0.8rem;">
+              <%= row.failure_reason.split('|').first %>
+            </div>
+          <% else %>
+            <span class="label success">Authorized</span>
+          <% end %>
+        </td>
+
+        <td class="text-center">
+          <strong><%= number_with_delimiter row.voter_count %></strong>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<section class="voter-map-section stats-group">
+  <h3 class="section-title">Voter Density Map</h3>
+
+  <div class="budgets-map">
+    <%= render_map(nil,
+                   investments_coordinates: voter_coordinates,
+                   geozones_data: geozones_data) %>
+  </div>
+</section>
