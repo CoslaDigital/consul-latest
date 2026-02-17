@@ -18,7 +18,15 @@ module Budgets
         load_investment
         load_heading
 
-        @ballot.add_investment(@investment)
+        if @ballot.add_investment(@investment)
+          # Trigger the audit job via Delayed Job
+          Delayed::Job.enqueue ConnectionAuditJob.new(
+            @ballot.class.name,
+            @ballot.id,
+            request.remote_ip,
+            request.user_agent
+          )
+        end
       end
 
       def destroy
