@@ -1,0 +1,29 @@
+<%# app/views/admin/stats/login_ips.html.erb %>
+<h2>User Login IP Clusters</h2>
+
+<table class="stack">
+  <thead>
+  <tr>
+    <th>City</th>
+    <th>IP Address</th>
+    <th>Login Count</th>
+    <th>Coordinates</th>
+    <th>Note</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @login_clusters.each do |cluster| %>
+    <tr>
+      <td><%= cluster.city || "Unknown" %></td>
+      <td><%= cluster.ip_address %></td>
+      <td><strong><%= cluster.count %></strong></td>
+      <td><%= cluster.latitude %>, <%= cluster.longitude %></td>
+      <td>
+        <% if cluster.latitude.to_f == 51.5085 %>
+          <span class="label warning">ISP Default (London)</span>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
