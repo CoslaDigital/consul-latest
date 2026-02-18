@@ -69,4 +69,11 @@ class Admin::StatsController < Admin::BaseController
   def sdg
     @goals = SDG::Goal.order(:code)
   end
+
+  def login_ips
+    @precision = (params[:precision] || 2).to_i
+    # Fetch audits for Users specifically
+    @cluster_summary = ConnectionAudit.where(auditable_type: "User")
+                                      .combined_participation_stats(@precision)
+  end
 end
