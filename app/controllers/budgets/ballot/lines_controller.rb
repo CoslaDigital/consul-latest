@@ -19,13 +19,18 @@ module Budgets
         load_heading
 
         if @ballot.add_investment(@investment)
-          # Trigger the audit job via Delayed Job
-          Delayed::Job.enqueue ConnectionAuditJob.new(
-            @ballot.class.name,
-            @ballot.id,
-            request.remote_ip,
-            request.user_agent
-          )
+          # Time-based Guard: Audit once every 24 hours per ballot
+          unless ConnectionAudit.where(auditable: @ballot)
+                                .where("created_at > ?", 24.hours.ago)
+                                .exists?
+
+            Delayed::Job.enqueue ConnectionAuditJob.new(
+              @ballot.class.name,
+              @ballot.id,
+              request.remote_ip,
+              request.user_agent
+            )
+          end
         end
       end
 
