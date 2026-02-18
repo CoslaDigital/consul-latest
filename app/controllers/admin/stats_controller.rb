@@ -69,4 +69,12 @@ class Admin::StatsController < Admin::BaseController
   def sdg
     @goals = SDG::Goal.order(:code)
   end
+
+  def login_ips
+    # We group by the same fields used in your budget stats to find clusters
+    @login_clusters = ConnectionAudit.where(auditable_type: "User")
+                                     .select("city, latitude, longitude, ip_address, count(*) as count")
+                                     .group(:city, :latitude, :longitude, :ip_address)
+                                     .order("count DESC")
+  end
 end
