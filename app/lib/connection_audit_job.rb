@@ -3,28 +3,41 @@ class ConnectionAuditJob < Struct.new(:auditable_type, :auditable_id, :ip, :user
     auditable = auditable_type.constantize.find_by(id: auditable_id)
     return unless auditable
 
-    # 1. Fetch Tenant Secrets
-    secrets = Tenant.current_secrets.dig(:apis) || {}
-    provider = secrets[:geocoder_provider]&.to_sym || :ipinfo_io
-    api_key = secrets[:geocoder_api_key]
-    max_dist = secrets[:geocoder_max_distance_km] || 50
+    # 1. Fetch Tenant Secrets (Hybrid lookup to handle flat or nested structure)
+    all_secrets = Tenant.current_secrets
+    api_config = all_secrets.dig(:apis) || {}
+
+    provider = api_config[:geocoder_provider]&.to_sym || all_secrets[:geocoder_provider]&.to_sym || :ipinfo_io
+    api_key = api_config[:geocoder_api_key] || all_secrets[:geocoder_api_key]
+    max_dist = api_config[:geocoder_max_distance_km] || all_secrets[:geocoder_max_distance_km] || 50
 
     audit = auditable.connection_audits.new(
       ip_address: ip,
       raw_metadata: { user_agent: user_agent }
     )
 
-    # 2. Manual Geocoding (Explicit assignment)
+    # 2. Manual Geocoding (Thread-safe direct parameters)
     begin
-      Geocoder.configure(ip_lookup: provider, api_key: api_key, timeout: 15) if api_key.present?
+      # We pass options directly to .search to bypass global config issues
+      search_options = {
+        ip_lookup: provider,
+        timeout: 15,
+        skip_cache: true
+      }
+      search_options[:api_key] = api_key if api_key.present?
 
-      result = Geocoder.search(ip).first
+      result = Geocoder.search(ip, search_options).first
 
       if result
         audit.city = result.city
         audit.country_code = result.country_code
         audit.latitude = result.latitude
         audit.longitude = result.longitude
+
+        # Log if we hit the "London Snap" default coordinate
+        if audit.latitude.to_f == 51.5085 && audit.longitude.to_f == -0.1257
+          audit.raw_metadata[:geocoding_note] = "ISP Default (London Center)"
+        end
       else
         audit.failure_reason = "No geocoding results found for IP"
       end
@@ -56,6 +69,8 @@ class ConnectionAuditJob < Struct.new(:auditable_type, :auditable_id, :ip, :user
             units: :km
           )
 
+          # If it's a "London Snap" default, we might want to be more lenient,
+          # but for now, we follow your max_dist rule.
           if distance > max_dist.to_f
             audit.suspicious = true
             audit.failure_reason = "Distance: #{distance.round(2)}km from city center"
