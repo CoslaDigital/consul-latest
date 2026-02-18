@@ -7,8 +7,6 @@ class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
     @precision = (precision.presence || 2).to_i
   end
 
-  # --- PUBLIC INTERFACE (Used by the .html.erb template) ---
-
   def vote_count
     stats.total_votes
   end
@@ -60,14 +58,13 @@ class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
 
   def precision_label
     case precision
-    when 1 then "District (10km)"
-    when 2 then "Neighborhood (1km)"
-    when 3 then "Street (100m)"
-    else "Custom"
+    when 1 then t("admin.stats.budgets.precisions.district")
+    when 2 then t("admin.stats.budgets.precisions.neighborhood")
+    when 3 then t("admin.stats.budgets.precisions.street")
+    when 4 then t("admin.stats.budgets.precisions.building")
+    else t("admin.stats.budgets.density_level")
     end
   end
-
-  # --- PRIVATE INTERNAL LOGIC ---
 
   private
 
