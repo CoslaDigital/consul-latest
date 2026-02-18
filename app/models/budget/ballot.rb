@@ -1,5 +1,6 @@
 class Budget
   class Ballot < ApplicationRecord
+    include Loggable
     belongs_to :user
     belongs_to :budget
     belongs_to :poll_ballot, class_name: "Poll::Ballot"
