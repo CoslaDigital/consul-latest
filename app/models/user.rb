@@ -18,6 +18,8 @@ class User < ApplicationRecord
 
   include Graphqlable
 
+  include Loggable
+
   has_one :administrator
   has_one :moderator
   has_one :valuator

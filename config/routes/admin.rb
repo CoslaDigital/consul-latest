@@ -244,6 +244,7 @@ namespace :admin do
       get :direct_messages, on: :collection
       get :polls, on: :collection
       get :sdg, on: :collection
+      get :login_ips, on: :collection
     end
 
     namespace :legislation do
