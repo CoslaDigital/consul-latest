@@ -69,3 +69,72 @@
     <% end %>
   </tbody>
 </table>
+
+<div id="location_summary_section" style="margin-top: 2.5rem;">
+  <div class="cluster-controls margin-bottom">
+    <strong>Participation Density View:</strong>
+    <div class="button-group tiny">
+      <%= link_to "District", { budget_id: budget.id, precision: 1 },
+                  class: "button #{'secondary' if precision == 1}" %>
+
+      <%= link_to "Neighborhood", { budget_id: budget.id, precision: 2 },
+                  class: "button #{'secondary' if precision == 2}" %>
+
+      <%= link_to "Street", { budget_id: budget.id, precision: 3 },
+                  class: "button #{'secondary' if precision == 3}" %>
+    </div>
+  </div>
+
+  <table class="investment-projects-summary">
+    <thead>
+    <tr>
+      <th>Location Cluster</th>
+      <th class="text-center">Status</th>
+      <th class="text-center">Voters</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% cluster_summary.each do |row| %>
+      <tr style="<%= 'background-color: #fff5f5;' if row.suspicious %>">
+        <td>
+          <strong><%= row.city.presence || "IP Recorded" %></strong>
+          <small>(<%= row.country_code.presence || "---" %>)</small>
+          <br>
+          <small class="help-text">
+            <i class="fa fa-crosshairs"></i> Area: <%= row.lat_cluster %>, <%= row.lng_cluster %>
+          </small>
+        </td>
+
+        <td class="text-center">
+          <% if row.suspicious %>
+              <span class="label alert" title="<%= row.failure_reason %>">
+                <i class="fa fa-exclamation-triangle"></i> Suspicious
+              </span>
+            <div class="help-text" style="color: #cc4b37; font-size: 0.8rem;">
+              <%= row.failure_reason.split('|').first %>
+            </div>
+          <% else %>
+            <span class="label success"><i class="fa fa-check"></i> Authorized</span>
+          <% end %>
+        </td>
+
+        <td class="text-center">
+          <strong><%= number_with_delimiter row.voter_count %></strong>
+        </td>
+
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<section class="voter-map-section" style="margin-top: 2rem;">
+  <h3>Voter Density Map</h3>
+
+  <div class="budgets-map">
+    <%# Use the same helper as your working example %>
+    <%= render_map(nil,
+                   investments_coordinates: voter_coordinates,
+                   geozones_data: geozones_data) %>
+  </div>
+</section>

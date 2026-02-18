@@ -51,6 +51,12 @@ class Admin::StatsController < Admin::BaseController
 
   def budget_balloting
     @budget = Budget.find(params[:budget_id])
+    @precision = (params[:precision] || 2).to_i
+
+    @budget_balloting_component = Admin::Stats::BudgetBallotingComponent.new(
+      @budget,
+      precision: @precision
+    )
 
     authorize! :read_admin_stats, @budget, message: t("admin.stats.budgets.no_data_before_balloting_phase")
   end
