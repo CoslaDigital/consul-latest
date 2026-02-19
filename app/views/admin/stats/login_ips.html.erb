@@ -23,7 +23,21 @@
   <h3 class="section-title">Login Density Map</h3>
   <div class="budgets-map">
     <%# Map coordinates prepared from the @cluster_summary results %>
-    <% coords = @cluster_summary.map { |c| { lat: c.lat_cluster, long: c.lng_cluster, title: "#{c.voter_count} Logins" } } %>
+    <% coords = @cluster_summary.map do |c|
+      {
+        lat: c.lat_cluster,
+        long: c.lng_cluster,
+        title: "#{c.voter_count} Logins",
+        # This generates the link to the drill-down view
+        link: login_audit_details_admin_stats_path(
+          lat: c.lat_cluster,
+          lng: c.lng_cluster,
+          precision: @precision
+        )
+      }
+    end
+    %>
+    <%# coords = @cluster_summary.map { |c| { lat: c.lat_cluster, long: c.lng_cluster, title: "#{c.voter_count} Logins" } } %>
     <%= render_map(nil, investments_coordinates: coords) %>
   </div>
 </section>
