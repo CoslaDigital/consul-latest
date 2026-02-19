@@ -1,0 +1,29 @@
+<%# app/views/admin/stats/_precision_filter.html.erb %>
+<div class="precision-filter">
+  <%= form_tag url, method: :get, class: "inline-form" do %>
+    <% request.query_parameters.except(:precision, :authenticity_token, :utf8).each do |name, value| %>
+      <%= hidden_field_tag name, value %>
+    <% end %>
+
+    <div class="filter-controls">
+      <div class="input-group">
+        <span class="input-group-label">
+          <i class="fas fa-map-marker-alt"></i> <%= t("stats.budgets.density_level") %>
+        </span>
+
+        <%= select_tag :precision,
+                       options_for_select([
+                                            [t("stats.budgets.precisions.district"), 1],
+                                            [t("stats.budgets.precisions.neighborhood"), 2],
+                                            [t("stats.budgets.precisions.street"), 3],
+                                            [t("stats.budgets.precisions.building"), 4]
+                                          ], precision.to_i),
+                       class: "input-group-field" %>
+      </div>
+
+      <div class="filter-actions">
+        <%= submit_tag t("stats.budgets.precisions.update"), class: "button expanded" %>
+      </div>
+    </div>
+  <% end %>
+</div>

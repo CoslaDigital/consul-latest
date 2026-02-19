@@ -1,3 +1,6 @@
+/* app/assets/stylesheets/admin/participation_stats.scss */
+@use "sass:color"; // CRITICAL: This fixes the namespace error
+
 .participation-stats {
   @include breakpoint(medium) {
     .stats-content {
@@ -29,6 +32,35 @@
   .stats-group {
     margin-bottom: $line-height;
     margin-top: $line-height;
+  }
+
+  // Moved inside .participation-stats to match your view structure
+  .survey-districts {
+    td strong a {
+      color: $brand;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        color: $brand-secondary;
+        border-bottom-color: $brand-secondary;
+      }
+    }
+
+    .suspicious-cluster {
+      background-color: $alert-bg;
+
+      &:hover {
+        // This now works because of the @use at the top
+        background-color: color.adjust($alert-bg, $lightness: -2%);
+      }
+
+      .help-text {
+        color: $color-alert;
+        font-weight: bold;
+      }
+    }
   }
 
   .number-with-info {
@@ -129,56 +161,39 @@
 }
 
 .precision-filter {
-  margin-top: $line-height;
-  margin-bottom: $line-height;
+  .dropdown-settings-form {
+    background: $white;
+    padding: $line-height;
+    border: 1px solid $border;
+    border-radius: $global-radius;
+    max-width: rem-calc(550);
 
-  .input-group {
-    max-width: rem-calc(500);
-    margin-bottom: 0;
-    align-items: stretch;
-    border: 1px solid $info-border;
-  }
+    .input-group {
+      display: flex;
+      margin-bottom: calc($line-height / 2);
 
-  .input-group-label {
-    @include has-fa-icon(map-marker-alt, solid);
-    background: $info-bg;
-    border: 0;
-    color: $text-medium;
-    font-size: rem-calc(12);
-    text-transform: uppercase;
-    font-weight: bold;
-    padding: 0 rem-calc(15); // Fixed: added parentheses and value
-    white-space: nowrap;
+      .input-group-label {
+        background: $info-bg;
+        border: 1px solid $info-border;
+        border-right: 0;
+        color: $color-info;
+      }
 
-    &::before {
-      margin-right: rem-calc(8);
+      .input-group-field {
+        height: $input-height;
+        border: 1px solid $info-border;
+        margin: 0;
+        flex: 1;
+      }
+    }
+
+    .filter-actions {
+      .button {
+        height: $input-height;
+        margin: 0;
+        background: $brand;
+        font-weight: bold;
+      }
     }
   }
-
-  .input-group-field {
-    border: 0;
-    border-left: 1px solid $info-border;
-    height: auto;
-    box-shadow: none;
-    margin: 0;
-
-    &:focus {
-      border: 0;
-      border-left: 1px solid $info-border;
-      box-shadow: none;
-    }
-  }
-
-  .input-group-button {
-    .button {
-      margin: 0;
-      height: 100%;
-      border-radius: 0;
-      text-transform: uppercase;
-      font-size: rem-calc(12);
-      font-weight: bold;
-      padding: 0 rem-calc(20);
-    }
-  }
-
 }
