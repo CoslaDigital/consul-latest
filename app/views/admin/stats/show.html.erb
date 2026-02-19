@@ -18,6 +18,7 @@
                     admin_verifications_path, class: "button hollow" %>
         <%= link_to t("admin.stats.show.sdg"),
                     sdg_admin_stats_path, class: "button hollow" if feature?(:sdg) %>
+        <%= link_to "Audit User Logins", login_ips_admin_stats_path, class: "button hollow" %>
       </div>
 
       <div class="clear"></div>
