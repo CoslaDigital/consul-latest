@@ -1,0 +1,49 @@
+<%# app/views/admin/stats/_audit_cluster_table.html.erb %>
+<table class="survey-districts">
+  <thead>
+  <tr>
+    <th><%= t("admin.stats.budget_balloting.location_cluster") %></th>
+    <th class="text-center"><%= t("admin.stats.budget_balloting.status") %></th>
+    <th class="text-center">Count</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% clusters.each do |row| %>
+    <tr class="<%= 'suspicious-cluster' if row.suspicious %>">
+      <td>
+        <%# Link the cluster name to the detail view %>
+        <strong>
+          <%= link_to login_audit_details_admin_stats_path(
+                        lat: row.lat_cluster,
+                        lng: row.lng_cluster,
+                        precision: @precision,
+                        type: (defined?(type) ? type : @audit_type || "login")
+                      ) do %>
+            <%= row.city.presence || "Unlocated IPs" %>
+          <% end %>
+        </strong>
+
+        <small>(<%= row.country_code.presence || "---" %>)</small><br>
+        <small class="help-text">
+          Area: <%= row.lat_cluster %>, <%= row.lng_cluster %>
+          <% if row.lat_cluster.to_f == 51.51 && row.lng_cluster.to_f == -0.13 %>
+            <span class="label warning tiny">ISP Default (London)</span>
+          <% end %>
+        </small>
+      </td>
+
+      <td class="text-center">
+        <% if row.suspicious %>
+          <span class="label alert" title="<%= row.failure_reason %>">Suspicious</span>
+        <% else %>
+          <span class="label success">Authorized</span>
+        <% end %>
+      </td>
+
+      <td class="text-center">
+        <strong><%= number_with_delimiter row.voter_count %></strong>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

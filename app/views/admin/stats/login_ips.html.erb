@@ -1,0 +1,43 @@
+<%# app/views/admin/stats/login_ips.html.erb %>
+<% include_stat_graphs_javascript %>
+
+<%= back_link_to admin_stats_path %>
+
+<h2>User Login Audit - <%= t("stats.budgets.participation_density_view") %></h2>
+
+<div id="location_summary_section" class="stats-group">
+  <h3 class="section-title">Login Clusters</h3>
+
+
+  <div class="small-12 medium-6 large-4">
+    <%= render "admin/stats/precision_filter",
+               url: login_ips_admin_stats_path,
+               precision: @precision %>
+  </div>
+
+
+  <%= render "admin/stats/audit_cluster_table", clusters: @cluster_summary %>
+</div>
+
+<section class="voter-map-section stats-group">
+  <h3 class="section-title">Login Density Map</h3>
+  <div class="budgets-map">
+    <%# Map coordinates prepared from the @cluster_summary results %>
+    <% coords = @cluster_summary.map do |c|
+      {
+        lat: c.lat_cluster,
+        long: c.lng_cluster,
+        title: "#{c.voter_count} Logins",
+        # This generates the link to the drill-down view
+        link: login_audit_details_admin_stats_path(
+          lat: c.lat_cluster,
+          lng: c.lng_cluster,
+          precision: @precision
+        )
+      }
+    end
+    %>
+    <%# coords = @cluster_summary.map { |c| { lat: c.lat_cluster, long: c.lng_cluster, title: "#{c.voter_count} Logins" } } %>
+    <%= render_map(nil, investments_coordinates: coords) %>
+  </div>
+</section>
