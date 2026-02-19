@@ -1,10 +1,11 @@
 class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
-  attr_reader :budget, :precision
+  attr_reader :budget, :precision, :type
   use_helpers :include_stat_graphs_javascript, :render_map
 
-  def initialize(budget, precision: 2)
+  def initialize(budget, precision: 2, type: "vote")
     @budget = budget
     @precision = (precision.presence || 2).to_i
+    @type = type
   end
 
   def vote_count
@@ -40,7 +41,12 @@ class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
         lat: cluster.lat_cluster,
         long: cluster.lng_cluster,
         title: "#{cluster.voter_count} Voters",
-        link: "#"
+        link: helpers.login_audit_details_admin_stats_path(
+          lat: cluster.lat_cluster,
+          lng: cluster.lng_cluster,
+          precision: precision,
+          type: type
+        )
       }
     end
   end

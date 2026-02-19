@@ -1,0 +1,62 @@
+<%# app/views/admin/stats/login_audit_details.html.erb %>
+<%
+  # Determine return path based on the audit type
+  back_path = if @audit_type == "vote"
+                # If we came from a budget, we need the budget_id (if available)
+                # or just go back to the general budgets stats list
+                params[:budget_id].present? ?
+                  budget_balloting_admin_stats_path(budget_id: params[:budget_id], precision: @precision) :
+                  budgets_admin_stats_path
+              else
+                login_ips_admin_stats_path(precision: @precision)
+              end
+%>
+
+<%= back_link_to back_path %>
+
+<div class="participation-stats">
+  <% audit_label = @audit_type == "vote" ? "Vote" : "Login" %>
+
+  <% if @lat.present? && @lng.present? %>
+    <h2><%= audit_label %> Audit Details: <%= @lat %>, <%= @lng %></h2>
+  <% else %>
+    <h2><%= audit_label %> Audit Details: Unlocated IPs</h2>
+    <p class="help-text">These records represent connections where geographic data could not be determined (e.g., local
+      network or private IPs).</p>
+  <% end %>
+
+  <table class="stack">
+    <thead>
+    <tr>
+      <th>User ID</th>
+      <th>IP Address</th>
+      <th class="text-center">Status</th>
+      <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @audits.each do |audit| %>
+      <tr>
+        <td>
+          <%= link_to audit.auditable_id, "/admin/users/#{audit.auditable_id}/edit" if audit.auditable_id %>
+        </td>
+        <td><code><%= audit.ip_address %></code></td>
+        <td class="text-center">
+          <% if audit.suspicious %>
+                <span class="label alert" title="<%= audit.failure_reason %>">
+                  Suspicious
+                </span>
+            <div class="help-text"><%= audit.failure_reason %></div>
+          <% else %>
+            <span class="label success">Authorized</span>
+          <% end %>
+        </td>
+        <td><%= l audit.created_at, format: :short %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <%= paginate @audits %>
+</div>
+</div>

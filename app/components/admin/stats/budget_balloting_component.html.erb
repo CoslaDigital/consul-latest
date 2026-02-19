@@ -68,12 +68,11 @@
 <%# Geographic Summary Section %>
 <div id="location_summary_section" class="stats-group">
   <h3 class="section-title"><%= t("stats.budgets.participation_density_view") %></h3>
-
+  <div class="small-12 medium-6 large-4">
   <%= render "admin/stats/precision_filter",
              url: url_for(controller: "/admin/stats", action: "budget_balloting"),
              precision: precision %>
-
-  <%# DRY PARTIAL 2: The Data Table %>
+  </div>
   <%= render "admin/stats/audit_cluster_table", clusters: cluster_summary %>
 </div>
 

@@ -1,4 +1,5 @@
 /* app/assets/stylesheets/admin/participation_stats.scss */
+@use "sass:color"; // CRITICAL: This fixes the namespace error
 
 .participation-stats {
   @include breakpoint(medium) {
@@ -31,6 +32,35 @@
   .stats-group {
     margin-bottom: $line-height;
     margin-top: $line-height;
+  }
+
+  // Moved inside .participation-stats to match your view structure
+  .survey-districts {
+    td strong a {
+      color: $brand;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        color: $brand-secondary;
+        border-bottom-color: $brand-secondary;
+      }
+    }
+
+    .suspicious-cluster {
+      background-color: $alert-bg;
+
+      &:hover {
+        // This now works because of the @use at the top
+        background-color: color.adjust($alert-bg, $lightness: -2%);
+      }
+
+      .help-text {
+        color: $color-alert;
+        font-weight: bold;
+      }
+    }
   }
 
   .number-with-info {
@@ -133,39 +163,37 @@
 .precision-filter {
   .dropdown-settings-form {
     background: $white;
-    margin: 0;
+    padding: $line-height;
     border: 1px solid $border;
     border-radius: $global-radius;
+    max-width: rem-calc(550);
 
     .input-group {
       display: flex;
-      margin: 0;
+      margin-bottom: calc($line-height / 2);
 
       .input-group-label {
-        background: $light;
-        border: 1px solid $border;
+        background: $info-bg;
+        border: 1px solid $info-border;
         border-right: 0;
-        color: $text-medium;
+        color: $color-info;
       }
 
       .input-group-field {
         height: $input-height;
-        border: 1px solid $border;
+        border: 1px solid $info-border;
         margin: 0;
-
-        &:focus {
-          border-color: $brand;
-        }
+        flex: 1;
       }
+    }
 
-      .input-group-button .button {
+    .filter-actions {
+      .button {
         height: $input-height;
         margin: 0;
-        padding: 0 rem-calc(20);
         background: $brand;
-        border-radius: 0 $global-radius $global-radius 0;
+        font-weight: bold;
       }
     }
   }
-
 }
