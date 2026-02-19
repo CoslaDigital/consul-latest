@@ -1,3 +1,5 @@
+/* app/assets/stylesheets/admin/participation_stats.scss */
+
 .participation-stats {
   @include breakpoint(medium) {
     .stats-content {
@@ -129,55 +131,40 @@
 }
 
 .precision-filter {
-  margin-top: $line-height;
-  margin-bottom: $line-height;
-
-  .input-group {
-    max-width: rem-calc(500);
-    margin-bottom: 0;
-    align-items: stretch;
-    border: 1px solid $info-border;
-  }
-
-  .input-group-label {
-    @include has-fa-icon(map-marker-alt, solid);
-    background: $info-bg;
-    border: 0;
-    color: $text-medium;
-    font-size: rem-calc(12);
-    text-transform: uppercase;
-    font-weight: bold;
-    padding: 0 rem-calc(15); // Fixed: added parentheses and value
-    white-space: nowrap;
-
-    &::before {
-      margin-right: rem-calc(8);
-    }
-  }
-
-  .input-group-field {
-    border: 0;
-    border-left: 1px solid $info-border;
-    height: auto;
-    box-shadow: none;
+  .dropdown-settings-form {
+    background: $white;
     margin: 0;
+    border: 1px solid $border;
+    border-radius: $global-radius;
 
-    &:focus {
-      border: 0;
-      border-left: 1px solid $info-border;
-      box-shadow: none;
-    }
-  }
-
-  .input-group-button {
-    .button {
+    .input-group {
+      display: flex;
       margin: 0;
-      height: 100%;
-      border-radius: 0;
-      text-transform: uppercase;
-      font-size: rem-calc(12);
-      font-weight: bold;
-      padding: 0 rem-calc(20);
+
+      .input-group-label {
+        background: $light;
+        border: 1px solid $border;
+        border-right: 0;
+        color: $text-medium;
+      }
+
+      .input-group-field {
+        height: $input-height;
+        border: 1px solid $border;
+        margin: 0;
+
+        &:focus {
+          border-color: $brand;
+        }
+      }
+
+      .input-group-button .button {
+        height: $input-height;
+        margin: 0;
+        padding: 0 rem-calc(20);
+        background: $brand;
+        border-radius: 0 $global-radius $global-radius 0;
+      }
     }
   }
 

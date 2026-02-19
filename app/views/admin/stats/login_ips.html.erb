@@ -1,29 +1,29 @@
 <%# app/views/admin/stats/login_ips.html.erb %>
-<h2>User Login IP Clusters</h2>
+<% include_stat_graphs_javascript %>
 
-<table class="stack">
-  <thead>
-  <tr>
-    <th>City</th>
-    <th>IP Address</th>
-    <th>Login Count</th>
-    <th>Coordinates</th>
-    <th>Note</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @login_clusters.each do |cluster| %>
-    <tr>
-      <td><%= cluster.city || "Unknown" %></td>
-      <td><%= cluster.ip_address %></td>
-      <td><strong><%= cluster.count %></strong></td>
-      <td><%= cluster.latitude %>, <%= cluster.longitude %></td>
-      <td>
-        <% if cluster.latitude.to_f == 51.5085 %>
-          <span class="label warning">ISP Default (London)</span>
-        <% end %>
-      </td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+<%= back_link_to admin_stats_path %>
+
+<h2>User Login Audit - <%= t("stats.budgets.participation_density_view") %></h2>
+
+<div id="location_summary_section" class="stats-group">
+  <h3 class="section-title">Login Clusters</h3>
+
+
+  <div class="small-12 medium-6 large-4">
+    <%= render "admin/stats/precision_filter",
+               url: login_ips_admin_stats_path,
+               precision: @precision %>
+  </div>
+
+
+  <%= render "admin/stats/audit_cluster_table", clusters: @cluster_summary %>
+</div>
+
+<section class="voter-map-section stats-group">
+  <h3 class="section-title">Login Density Map</h3>
+  <div class="budgets-map">
+    <%# Map coordinates prepared from the @cluster_summary results %>
+    <% coords = @cluster_summary.map { |c| { lat: c.lat_cluster, long: c.lng_cluster, title: "#{c.voter_count} Logins" } } %>
+    <%= render_map(nil, investments_coordinates: coords) %>
+  </div>
+</section>

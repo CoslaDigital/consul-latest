@@ -71,10 +71,9 @@ class Admin::StatsController < Admin::BaseController
   end
 
   def login_ips
-    # We group by the same fields used in your budget stats to find clusters
-    @login_clusters = ConnectionAudit.where(auditable_type: "User")
-                                     .select("city, latitude, longitude, ip_address, count(*) as count")
-                                     .group(:city, :latitude, :longitude, :ip_address)
-                                     .order("count DESC")
+    @precision = (params[:precision] || 2).to_i
+    # Fetch audits for Users specifically
+    @cluster_summary = ConnectionAudit.where(auditable_type: "User")
+                                      .combined_participation_stats(@precision)
   end
 end
