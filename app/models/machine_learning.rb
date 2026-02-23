@@ -239,331 +239,327 @@ class MachineLearning
 
   private
 
-  # --- CORE PROCESSING HELPERS ---
+    # --- CORE PROCESSING HELPERS ---
 
-  def process_tags_for(scope:, type:, log_name:)
-    Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
-    cleanup_tags_for!(type) unless dry_run
+    def process_tags_for(scope:, type:, log_name:)
+      Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
+      cleanup_tags_for!(type) unless dry_run
 
-    all_taggings_data = []
-    all_tags_to_ensure = Set.new
-    export_tags = []
-    export_taggings = []
+      all_taggings_data = []
+      all_tags_to_ensure = Set.new
+      export_tags = []
+      export_taggings = []
 
-    records = scope.select { |r| should_reprocess_record?(r, "tags") }
-    records = records.take(DRY_RUN_LIMIT) if dry_run
+      records = scope.select { |r| should_reprocess_record?(r, "tags") }
+      records = records.take(DRY_RUN_LIMIT) if dry_run
 
-    total = records.count
-    processed = 0
+      total = records.count
+      processed = 0
 
-    records.each do |id, title, description|
-      text = "#{title}\n\n#{description}"
-      result = MlHelper.generate_tags(text, 5, config: ml_config)
+      records.each do |id, title, description|
+        text = "#{title}\n\n#{description}"
+        result = MlHelper.generate_tags(text, 5, config: ml_config)
 
-      if result && result["usage"]
-        @total_tokens_used += result["usage"]["total_tokens"].to_i
-      end
-
-      generated_names = result["tags"] || []
-
-      generated_names.each do |tag_name|
-        clean_name = tag_name.strip.truncate(150)
-        next if clean_name.blank?
-
-        all_tags_to_ensure << clean_name
-        all_taggings_data << {
-          tag_name: clean_name.downcase, taggable_id: id,
-          taggable_type: type, context: 'ml_tags', created_at: Time.current
-        }
-
-        export_tags << { name: clean_name, created_at: Time.current.iso8601 }
-        export_taggings << { tag_name: clean_name, taggable_id: id, taggable_type: type, context: 'ml_tags' }
-      end
-      processed += 1
-      log_progress(log_name, processed, total, id)
-    end
-
-    unless dry_run
-      bulk_sync_tags_and_taggings(all_tags_to_ensure, all_taggings_data)
-
-      tags_fn, taggings_fn = case type
-                             when 'Proposal' then [self.class.proposals_tags_filename, self.class.proposals_taggings_filename]
-                             when 'Budget::Investment' then [self.class.investments_tags_filename, self.class.investments_taggings_filename]
-                             when 'Debate' then [self.class.debates_tags_filename, self.class.debates_taggings_filename]
-                             end
-
-      save_results_to_json(export_tags.uniq, tags_fn)
-      save_results_to_json(export_taggings, taggings_fn)
-      update_machine_learning_info_for("tags")
-    end
-  end
-
-  def process_comments_summary_for(klass, log_name, context_prefix)
-    Rails.logger.info "[MachineLearning] Starting #{log_name}"
-    cleanup_comments_summary_for!(klass.name) unless dry_run
-
-    ids = klass.joins(:comments).where(comments: { hidden_at: nil }).group("#{klass.table_name}.id").pluck(:id)
-    ids = ids.take(DRY_RUN_LIMIT) if dry_run
-
-    results = []
-    total = ids.count
-    processed = 0
-
-    ids.each do |id|
-      record = klass.find(id)
-      next unless should_generate_summary_for?(record)
-
-      comments = record.comments.order(:created_at)
-                       .filter_map { |c| c.body if c.body.present? && c.body.length > 10 }.uniq
-
-      if comments.any?
-        result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
         if result && result["usage"]
           @total_tokens_used += result["usage"]["total_tokens"].to_i
         end
-        if result&.[]("summary_markdown").present?
-          sentiment_data = process_sentiment_data(result["sentiment"])
 
-          if dry_run
-            Rails.logger.info "[DryRun] Summary for ID #{id}: #{result['summary_markdown'].truncate(100)}"
-          else
-            summary = MlSummaryComment.find_or_initialize_by(commentable: record)
-            summary.update!(body: result["summary_markdown"], sentiment_analysis: sentiment_data)
+        generated_names = result["tags"] || []
 
-            results << {
-              commentable_id: id,
-              commentable_type: klass.name,
-              body: result["summary_markdown"]
-            }
+        generated_names.each do |tag_name|
+          clean_name = tag_name.strip.truncate(150)
+          next if clean_name.blank?
+
+          all_tags_to_ensure << clean_name
+          all_taggings_data << {
+            tag_name: clean_name.downcase, taggable_id: id,
+            taggable_type: type, context: 'ml_tags', created_at: Time.current
+          }
+
+          export_tags << { name: clean_name, created_at: Time.current.iso8601 }
+          export_taggings << { tag_name: clean_name, taggable_id: id, taggable_type: type, context: 'ml_tags' }
+        end
+        processed += 1
+        log_progress(log_name, processed, total, id)
+      end
+
+      unless dry_run
+        bulk_sync_tags_and_taggings(all_tags_to_ensure, all_taggings_data)
+
+        tags_fn, taggings_fn = case type
+                               when 'Proposal' then [self.class.proposals_tags_filename, self.class.proposals_taggings_filename]
+                               when 'Budget::Investment' then [self.class.investments_tags_filename, self.class.investments_taggings_filename]
+                               when 'Debate' then [self.class.debates_tags_filename, self.class.debates_taggings_filename]
+                               end
+
+        save_results_to_json(export_tags.uniq, tags_fn)
+        save_results_to_json(export_taggings, taggings_fn)
+        update_machine_learning_info_for("tags")
+      end
+    end
+
+    def process_comments_summary_for(klass, log_name, context_prefix)
+      Rails.logger.info "[MachineLearning] Starting #{log_name}"
+      cleanup_comments_summary_for!(klass.name) unless dry_run
+
+      ids = klass.joins(:comments).where(comments: { hidden_at: nil }).group("#{klass.table_name}.id").pluck(:id)
+      ids = ids.take(DRY_RUN_LIMIT) if dry_run
+
+      results = []
+      total = ids.count
+      processed = 0
+
+      ids.each do |id|
+        record = klass.find(id)
+        next unless should_generate_summary_for?(record)
+
+        comments = record.comments.order(:created_at)
+                         .filter_map { |c| c.body if c.body.present? && c.body.length > 10 }.uniq
+
+        if comments.any?
+          result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
+          if result && result["usage"]
+            @total_tokens_used += result["usage"]["total_tokens"].to_i
+          end
+          if result&.[]("summary_markdown").present?
+            sentiment_data = process_sentiment_data(result["sentiment"])
+
+            if dry_run
+              Rails.logger.info "[DryRun] Summary for ID #{id}: #{result['summary_markdown'].truncate(100)}"
+            else
+              summary = MlSummaryComment.find_or_initialize_by(commentable: record)
+              summary.update!(body: result["summary_markdown"], sentiment_analysis: sentiment_data)
+
+              results << {
+                commentable_id: id,
+                commentable_type: klass.name,
+                body: result["summary_markdown"]
+              }
+            end
           end
         end
-      end
-      processed += 1
-      log_progress(log_name, processed, total, id)
-    end
-
-    unless dry_run
-      filename = klass.name == "Proposal" ? self.class.proposals_comments_summary_filename : self.class.investments_comments_summary_filename
-      save_results_to_json(results, filename)
-      update_machine_learning_info_for("comments_summary")
-    end
-  end
-
-  def process_related_content_for(klass, filename)
-    Rails.logger.info "[MachineLearning] Starting selective related content for #{klass.name}"
-
-    all_content = klass.joins(:translations).pluck(:id, :title, :description).map { |id, t, d| { id: id, text: "#{t} #{d}" } }
-
-    # But we only find similarities for NEW or UPDATED records
-    records_to_process = klass.all.select { |r| should_reprocess_record?(r, "related_content") }
-    records_to_process = records_to_process.take(DRY_RUN_LIMIT) if dry_run
-
-    results = []
-    total = records_to_process.count
-
-    records_to_process.each_with_index do |record, idx|
-      # Local Cleanup
-      RelatedContent.where(parent_relationable: record, machine_learning: true).destroy_all unless dry_run
-
-      source_text = "#{record.title} #{record.description}"
-      candidates = all_content.reject { |c| c[:id] == record.id }
-      candidate_texts = candidates.map { |c| c[:text] }
-
-      result = MlHelper.find_similar_content(source_text, candidate_texts, 3, config: ml_config)
-
-      if result && result["usage"]
-        @total_tokens_used += result["usage"]["total_tokens"].to_i
+        processed += 1
+        log_progress(log_name, processed, total, id)
       end
 
-      similar_indices = result["indices"] || []
-      related_ids = similar_indices.map { |i| candidates[i][:id] }
-
-      res = { id: record.id }
-      related_ids.each_with_index { |rid, i| res["related_#{i}"] = rid }
-      results << res
-      log_progress("related content", idx + 1, total, record.id)
-    end
-
-    unless dry_run
-      import_related_content_from_array(results, klass.name)
-      save_results_to_json(results, filename)
-      update_machine_learning_info_for("related_content")
-    end
-  end
-
-  # --- OUTPUT HELPERS ---
-
-  def save_results_to_json(results, filename)
-    return if results.empty? || filename.blank?
-    path = self.class.data_folder.join(filename)
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, results.to_json)
-
-    if filename.include?("summaries")
-      csv_path = path.to_s.sub('.json', '.csv')
-      CSV.open(csv_path, "wb") do |csv|
-        csv << ["commentable_id", "commentable_type", "body"]
-        results.each { |r| csv << [r[:commentable_id], r[:commentable_type], r[:body]] }
+      unless dry_run
+        filename = klass.name == "Proposal" ? self.class.proposals_comments_summary_filename : self.class.investments_comments_summary_filename
+        save_results_to_json(results, filename)
+        update_machine_learning_info_for("comments_summary")
       end
     end
-  end
 
-  def process_sentiment_data(raw_sentiment)
-    default_val = { "positive" => 0, "negative" => 0, "neutral" => 100 }
-    return default_val if raw_sentiment.blank?
+    def process_related_content_for(klass, filename)
+      Rails.logger.info "[MachineLearning] Starting selective related content for #{klass.name}"
 
-    if raw_sentiment.is_a?(Hash)
-      # Use .to_f to ensure we don't do integer division
-      pos = raw_sentiment["positive"].to_f
-      neg = raw_sentiment["negative"].to_f
-      neu = raw_sentiment["neutral"].to_f
+      all_content = klass.joins(:translations).pluck(:id, :title, :description).map { |id, t, d| { id: id, text: "#{t} #{d}" } }
 
-      total = pos + neg + neu
-      return default_val if total == 0
+      # But we only find similarities for NEW or UPDATED records
+      records_to_process = klass.all.select { |r| should_reprocess_record?(r, "related_content") }
+      records_to_process = records_to_process.take(DRY_RUN_LIMIT) if dry_run
 
-      # Math is now: (6.0 / 13.0) * 100 = 46.15... which rounds to 46
-      res_pos = ((pos / total) * 100).round
-      res_neg = ((neg / total) * 100).round
+      results = []
+      total = records_to_process.count
 
-      # Remainder goes to neutral to ensure exactly 100%
-      res_neu = 100 - (res_pos + res_neg)
+      records_to_process.each_with_index do |record, idx|
+        # Local Cleanup
+        RelatedContent.where(parent_relationable: record, machine_learning: true).destroy_all unless dry_run
 
+        source_text = "#{record.title} #{record.description}"
+        candidates = all_content.reject { |c| c[:id] == record.id }
+        candidate_texts = candidates.map { |c| c[:text] }
+
+        result = MlHelper.find_similar_content(source_text, candidate_texts, 3, config: ml_config)
+
+        if result && result["usage"]
+          @total_tokens_used += result["usage"]["total_tokens"].to_i
+        end
+
+        similar_indices = result["indices"] || []
+        related_ids = similar_indices.map { |i| candidates[i][:id] }
+
+        res = { id: record.id }
+        related_ids.each_with_index { |rid, i| res["related_#{i}"] = rid }
+        results << res
+        log_progress("related content", idx + 1, total, record.id)
+      end
+
+      unless dry_run
+        import_related_content_from_array(results, klass.name)
+        save_results_to_json(results, filename)
+        update_machine_learning_info_for("related_content")
+      end
+    end
+
+    # --- OUTPUT HELPERS ---
+
+    def save_results_to_json(results, filename)
+      return if results.empty? || filename.blank?
+      path = self.class.data_folder.join(filename)
+      FileUtils.mkdir_p(File.dirname(path))
+      File.write(path, results.to_json)
+
+      if filename.include?("summaries")
+        csv_path = path.to_s.sub('.json', '.csv')
+        CSV.open(csv_path, "wb") do |csv|
+          csv << ["commentable_id", "commentable_type", "body"]
+          results.each { |r| csv << [r[:commentable_id], r[:commentable_type], r[:body]] }
+        end
+      end
+    end
+
+    def process_sentiment_data(raw_sentiment)
+      # Default fallback to 100% neutral
+      fallback = { "positive" => 0, "negative" => 0, "neutral" => 100 }
+      return fallback if raw_sentiment.blank?
+
+      if raw_sentiment.is_a?(Hash)
+        # Ensure keys are strings and values are numbers
+        s = raw_sentiment.transform_keys(&:to_s)
+        pos = s["positive"].to_f
+        neg = s["negative"].to_f
+        neu = s["neutral"].to_f
+        total = pos + neg + neu
+
+        return fallback if total == 0
+
+        # Normalize to 100
+        r_pos = ((pos / total) * 100).round
+        r_neg = ((neg / total) * 100).round
+        r_neu = 100 - (r_pos + r_neg)
+
+        { "positive" => r_pos, "negative" => r_neg, "neutral" => r_neu }
+      else
+        fallback
+      end
+    end
+
+    # --- DB & UTILITY HELPERS ---
+
+    def bulk_sync_tags_and_taggings(tag_names_set, taggings_metadata)
+      return if tag_names_set.empty?
+      tag_map = {}
+      tag_names_set.each do |name|
+        clean_name = name.strip.truncate(150)
+        begin
+          tag = Tag.find_or_create_by!(name: clean_name)
+          tag_map[clean_name.downcase] = tag.id
+        rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+          tag = Tag.where("LOWER(name) = ?", clean_name.downcase).first
+          tag_map[clean_name.downcase] = tag.id if tag
+        end
+      end
+      final_taggings = taggings_metadata.map do |data|
+        real_id = tag_map[data[:tag_name]]
+        next unless real_id
+        { tag_id: real_id, taggable_id: data[:taggable_id], taggable_type: data[:taggable_type], context: data[:context], created_at: data[:created_at] }
+      end.compact.uniq { |t| [t[:tag_id], t[:taggable_id], t[:taggable_type], t[:context]] }
+      Tagging.insert_all(final_taggings) if final_taggings.any?
+    end
+
+    def cleanup_tags_for!(type)
+      Tagging.where(context: "ml_tags", taggable_type: type).delete_all
+      Tag.where("NOT EXISTS (SELECT 1 FROM taggings WHERE taggings.tag_id = tags.id)").delete_all
+    end
+
+    def cleanup_comments_summary_for!(type)
+      MlSummaryComment.where(commentable_type: type).delete_all
+    end
+
+    def cleanup_related_content_for!(type)
+      RelatedContent.where(machine_learning: true, parent_relationable_type: type).delete_all
+    end
+
+    def update_machine_learning_info_for(kind)
+      MachineLearningInfo.find_or_create_by!(kind: kind).update!(generated_at: job.started_at, script: job.script)
+    end
+
+    # --- FRESHNESS HELPERS ---
+
+    def should_generate_summary_for?(record)
+      # 1. ALWAYS run if a Force Run was requested
+      return true if @force
+
+      # 2. Find the existing summary for this record
+      last_summary = MlSummaryComment.find_by(commentable: record)
+
+      # 3. If no summary exists, or it's missing sentiment analysis, we must run
+      return true if last_summary.nil? || last_summary.sentiment_analysis.blank?
+
+      # 4. Check for any change in the comments (New, Edited, or Hidden/Deleted)
+      # We use maximum(:updated_at) on ALL comments (even hidden ones)
+      # because hiding a comment updates its 'updated_at' and 'hidden_at' fields.
+      latest_comment_change = record.comments.maximum(:updated_at)
+
+      # If there are no comments at all, there is nothing to summarize
+      return false unless latest_comment_change
+
+      # 5. SMART CHECK:
+      # Only return true if a comment has been modified AFTER the summary was created.
+      latest_comment_change > last_summary.updated_at
+    end
+
+    def should_reprocess_record?(record, kind)
+      # Check if data exists for this specific record
+      exists = case kind
+               when "tags"
+                 record.taggings.where(context: "ml_tags").exists?
+               when "related_content"
+                 RelatedContent.where(parent_relationable: record, machine_learning: true).exists?
+               end
+
+      return true unless exists
+
+      # Check if the record itself (Title/Description) was updated since the last global run
+      info = MachineLearningInfo.find_by(kind: kind)
+      return true if info.nil?
+
+      # If record was edited after the last time this script finished, it's stale
+      record.updated_at > info.generated_at
+    end
+
+    def log_progress(task_type, current, total, item_id)
+      msg = "[MachineLearning] #{task_type}: #{current}/#{total} - ID: #{item_id}"
+      Rails.logger.info msg
+    end
+
+    def ml_config
+      @ml_config ||= { enabled: Setting['feature.machine_learning'], provider: Setting['llm.provider'], model: Setting['llm.model'], max_tokens: Setting['llm.max_tokens'] }.freeze
+    end
+
+    def import_related_content_from_array(results, record_type)
+      results.each do |result|
+        parent_id = result.delete(:id)
+        score = result.size
+        result.each do |_, child_id|
+          next unless child_id.present?
+          RelatedContent.create!(parent_relationable_id: parent_id, parent_relationable_type: record_type, child_relationable_id: child_id, child_relationable_type: record_type, machine_learning: true, machine_learning_score: score, author: user)
+          score -= 1
+        end
+      end
+    end
+
+    def handle_error(error)
+      message = error.message
+      backtrace = error.backtrace.select { |line| line.include?("machine_learning.rb") }.first(3)
+      job.update!(finished_at: Time.current, error: ([message] + backtrace).join("<br>"))
+      Mailer.machine_learning_error(user).deliver_later
+    end
+
+    def fail_job(message)
+      job.update!(error: message, finished_at: Time.current)
+      Mailer.machine_learning_error(user).deliver_later
+    end
+
+    def set_previous_modified_date
       {
-        "positive" => res_pos,
-        "negative" => [res_neg, 0].max,
-        "neutral" => [res_neu, 0].max
+        MachineLearning.investments_tags_filename => last_modified_date_for(MachineLearning.investments_tags_filename),
+        MachineLearning.proposals_tags_filename => last_modified_date_for(MachineLearning.proposals_tags_filename)
       }
-    else
-      # ... (rest of label logic)
     end
-  end
 
-  # --- DB & UTILITY HELPERS ---
-
-  def bulk_sync_tags_and_taggings(tag_names_set, taggings_metadata)
-    return if tag_names_set.empty?
-    tag_map = {}
-    tag_names_set.each do |name|
-      clean_name = name.strip.truncate(150)
-      begin
-        tag = Tag.find_or_create_by!(name: clean_name)
-        tag_map[clean_name.downcase] = tag.id
-      rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
-        tag = Tag.where("LOWER(name) = ?", clean_name.downcase).first
-        tag_map[clean_name.downcase] = tag.id if tag
-      end
+    def last_modified_date_for(filename)
+      path = MachineLearning.data_folder.join(filename)
+      File.exist?(path) ? File.mtime(path) : nil
     end
-    final_taggings = taggings_metadata.map do |data|
-      real_id = tag_map[data[:tag_name]]
-      next unless real_id
-      { tag_id: real_id, taggable_id: data[:taggable_id], taggable_type: data[:taggable_type], context: data[:context], created_at: data[:created_at] }
-    end.compact.uniq { |t| [t[:tag_id], t[:taggable_id], t[:taggable_type], t[:context]] }
-    Tagging.insert_all(final_taggings) if final_taggings.any?
-  end
-
-  def cleanup_tags_for!(type)
-    Tagging.where(context: "ml_tags", taggable_type: type).delete_all
-    Tag.where("NOT EXISTS (SELECT 1 FROM taggings WHERE taggings.tag_id = tags.id)").delete_all
-  end
-
-  def cleanup_comments_summary_for!(type)
-    MlSummaryComment.where(commentable_type: type).delete_all
-  end
-
-  def cleanup_related_content_for!(type)
-    RelatedContent.where(machine_learning: true, parent_relationable_type: type).delete_all
-  end
-
-  def update_machine_learning_info_for(kind)
-    MachineLearningInfo.find_or_create_by!(kind: kind).update!(generated_at: job.started_at, script: job.script)
-  end
-
-  # --- FRESHNESS HELPERS ---
-
-  def should_generate_summary_for?(record)
-    # 1. ALWAYS run if a Force Run was requested
-    return true if @force
-
-    # 2. Find the existing summary for this record
-    last_summary = MlSummaryComment.find_by(commentable: record)
-
-    # 3. If no summary exists, or it's missing sentiment analysis, we must run
-    return true if last_summary.nil? || last_summary.sentiment_analysis.blank?
-
-    # 4. Check for any change in the comments (New, Edited, or Hidden/Deleted)
-    # We use maximum(:updated_at) on ALL comments (even hidden ones)
-    # because hiding a comment updates its 'updated_at' and 'hidden_at' fields.
-    latest_comment_change = record.comments.maximum(:updated_at)
-
-    # If there are no comments at all, there is nothing to summarize
-    return false unless latest_comment_change
-
-    # 5. SMART CHECK:
-    # Only return true if a comment has been modified AFTER the summary was created.
-    latest_comment_change > last_summary.updated_at
-  end
-
-  def should_reprocess_record?(record, kind)
-    # Check if data exists for this specific record
-    exists = case kind
-             when "tags"
-               record.taggings.where(context: "ml_tags").exists?
-             when "related_content"
-               RelatedContent.where(parent_relationable: record, machine_learning: true).exists?
-             end
-
-    return true unless exists
-
-    # Check if the record itself (Title/Description) was updated since the last global run
-    info = MachineLearningInfo.find_by(kind: kind)
-    return true if info.nil?
-
-    # If record was edited after the last time this script finished, it's stale
-    record.updated_at > info.generated_at
-  end
-
-  def log_progress(task_type, current, total, item_id)
-    msg = "[MachineLearning] #{task_type}: #{current}/#{total} - ID: #{item_id}"
-    Rails.logger.info msg
-  end
-
-  def ml_config
-    @ml_config ||= { enabled: Setting['feature.machine_learning'], provider: Setting['llm.provider'], model: Setting['llm.model'], max_tokens: Setting['llm.max_tokens'] }.freeze
-  end
-
-  def import_related_content_from_array(results, record_type)
-    results.each do |result|
-      parent_id = result.delete(:id)
-      score = result.size
-      result.each do |_, child_id|
-        next unless child_id.present?
-        RelatedContent.create!(parent_relationable_id: parent_id, parent_relationable_type: record_type, child_relationable_id: child_id, child_relationable_type: record_type, machine_learning: true, machine_learning_score: score, author: user)
-        score -= 1
-      end
-    end
-  end
-
-  def handle_error(error)
-    message = error.message
-    backtrace = error.backtrace.select { |line| line.include?("machine_learning.rb") }.first(3)
-    job.update!(finished_at: Time.current, error: ([message] + backtrace).join("<br>"))
-    Mailer.machine_learning_error(user).deliver_later
-  end
-
-  def fail_job(message)
-    job.update!(error: message, finished_at: Time.current)
-    Mailer.machine_learning_error(user).deliver_later
-  end
-
-  def set_previous_modified_date
-    {
-      MachineLearning.investments_tags_filename => last_modified_date_for(MachineLearning.investments_tags_filename),
-      MachineLearning.proposals_tags_filename => last_modified_date_for(MachineLearning.proposals_tags_filename)
-    }
-  end
-
-  def last_modified_date_for(filename)
-    path = MachineLearning.data_folder.join(filename)
-    File.exist?(path) ? File.mtime(path) : nil
-  end
 end
