@@ -54,16 +54,17 @@ class MachineLearning
       return false
     end
 
-    unless dry_run
-      end_time = Time.current
-      # Calculate duration in seconds
-      duration_seconds = (end_time - start_time).to_i
+    end_time = Time.current
+    # Calculate duration in seconds
+    duration_seconds = (end_time - start_time).to_i
 
-      job.update!(
-        finished_at: end_time,
-        duration: duration_seconds,
-        total_tokens: @total_tokens_used
-      )
+    job.update!(
+      finished_at: end_time,
+      duration: duration_seconds,
+      total_tokens: @total_tokens_used
+    )
+
+    unless dry_run
       Mailer.machine_learning_success(user).deliver_now
     end
 
@@ -243,7 +244,7 @@ class MachineLearning
 
     def process_tags_for(scope:, type:, log_name:)
       Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
-      cleanup_tags_for!(type) unless dry_run
+
 
       all_taggings_data = []
       all_tags_to_ensure = Set.new
@@ -300,7 +301,6 @@ class MachineLearning
 
     def process_comments_summary_for(klass, log_name, context_prefix)
       Rails.logger.info "[MachineLearning] Starting #{log_name}"
-      cleanup_comments_summary_for!(klass.name) unless dry_run
 
       ids = klass.joins(:comments).where(comments: { hidden_at: nil }).group("#{klass.table_name}.id").pluck(:id)
       ids = ids.take(DRY_RUN_LIMIT) if dry_run
@@ -320,6 +320,7 @@ class MachineLearning
           result = MlHelper.summarize_comments(comments, "#{context_prefix}: #{record.title}", config: ml_config)
           if result && result["usage"]
             @total_tokens_used += result["usage"]["total_tokens"].to_i
+            job.update_column(:total_tokens, @total_tokens_used)
           end
           if result&.[]("summary_markdown").present?
             sentiment_data = process_sentiment_data(result["sentiment"])

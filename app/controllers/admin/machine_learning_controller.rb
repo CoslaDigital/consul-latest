@@ -5,25 +5,25 @@ class Admin::MachineLearningController < Admin::BaseController
   end
 
   def execute
-    # 1. Capture parameters
+    # 1. Standardize parameters (Handling both 'execution_mode' and 'dry_run' params)
     script = params[:script]
-    is_dry_run = params[:execution_mode] == "dry_run"
+    is_dry_run = params[:execution_mode] == "dry_run" || params[:dry_run] == "true"
 
-    # We reset finished_at and error so the UI state transitions back to "working"
-    @machine_learning_job.update!(
+    # 2. Create a FRESH job record
+    # This allows the UI to show a history of runs
+    @job = MachineLearningJob.create!(
       script: script,
       user: current_user,
       started_at: Time.current,
-      finished_at: nil,
-      error: nil,
       dry_run: is_dry_run
     )
 
-    #Execution
-    #::MachineLearning.new(@machine_learning_job).run
-    ::MachineLearning.new(@machine_learning_job).delay(queue: 'machine_learning').run
+    # 3. Execution
+    # If your background worker (DelayedJob/Sidekiq) isn't running,
+    # use MachineLearning.new(@job).run (without .delay) for instant feedback.
+    ::MachineLearning.new(@job).delay(queue: 'machine_learning').run
 
-    notice_msg = is_dry_run ? "Dry run complete: analyzed data but made no changes." : "Script executed successfully."
+    notice_msg = is_dry_run ? "Dry run started (Background)" : "Job started in background."
     redirect_to admin_machine_learning_path, notice: notice_msg
   end
 
