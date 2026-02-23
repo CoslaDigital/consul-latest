@@ -20,6 +20,7 @@ class MachineLearning
     @job = job
     @user = job.user
     @dry_run = job.dry_run
+    @force = job.config&.[]("force_update") == "1"
     @previous_modified_date = set_previous_modified_date
   end
 

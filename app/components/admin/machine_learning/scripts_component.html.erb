@@ -6,94 +6,89 @@
       <dl>
         <dt><%= t("admin.machine_learning.executed_by") %></dt>
         <dd><%= machine_learning_job.user.name %></dd>
-
-        <dt><%= t("admin.machine_learning.script_name") %></dt>
-        <dd><%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script) %></dd>
-
         <dt><%= t("admin.machine_learning.error") %></dt>
         <dd><%= sanitize(machine_learning_job.error) %></dd>
       </dl>
     </div>
 
-    <%# 2. Currently Running State (Working) %>
-  <% elsif machine_learning_job.started? && !machine_learning_job.finished? %>
+    <%# 2. Currently Running State (Catching it more reliably) %>
+  <% elsif machine_learning_job.active? %>
     <div class="callout warning">
       <p><strong><%= t("admin.machine_learning.notice.working") %></strong></p>
       <dl>
-        <dt><%= t("admin.machine_learning.executed_by") %></dt>
-        <dd><%= machine_learning_job.user.name %></dd>
-
         <dt><%= t("admin.machine_learning.script_name") %></dt>
         <dd><%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script) %></dd>
-
         <dt><%= t("admin.machine_learning.started_at") %></dt>
         <dd><%= l machine_learning_job.started_at, format: :short %></dd>
       </dl>
+
+      <%= button_to t("admin.machine_learning.cancel"),
+                    cancel_admin_machine_learning_path,
+                    method: :delete,
+                    class: "button hollow alert margin-top",
+                    data: { confirm: t("admin.machine_learning.cancel_alert") } %>
     </div>
 
     <%# 3. Finished State %>
   <% elsif machine_learning_job.finished? %>
     <div class="callout success ml-job-summary">
       <p>
-        <strong><%= t("admin.machine_learning.notice.success") %></strong>
+        <strong>
+          <%= t("admin.machine_learning.scripts.#{machine_learning_job.script}.label", default: machine_learning_job.script) %>
+          :
+          <%= t("admin.machine_learning.notice.success") %>
+        </strong>
         <% if machine_learning_job.dry_run? %>
-          <span class="label warning" style="margin-left: 10px;">
-            <%= t("admin.machine_learning.dry_run_label") %>
-          </span>
+          <span class="label warning"><%= t("admin.machine_learning.dry_run_label") %></span>
         <% end %>
       </p>
-
       <hr>
-
       <div class="row">
-        <div class="small-12 medium-4 columns">
-          <strong><%= t("admin.machine_learning.stats.duration") %></strong><br>
-          <%= distance_of_time_in_words(machine_learning_job.duration) if machine_learning_job.duration %>
-          <% if machine_learning_job.duration %>
-            <small class="text-muted">(<%= machine_learning_job.duration %>s)</small>
-          <% end %>
+        <div class="small-4 columns">
+          <strong>Tokens:</strong> <%= number_with_delimiter(machine_learning_job.total_tokens) %>
         </div>
-        <div class="small-12 medium-4 columns">
-          <strong><%= t("admin.machine_learning.stats.tokens") %></strong><br>
-          <%= number_with_delimiter(machine_learning_job.total_tokens) %>
+        <div class="small-4 columns">
+          <strong>Duration:</strong> <%= machine_learning_job.duration %>s
         </div>
-        <div class="small-12 medium-4 columns">
-          <strong><%= t("admin.machine_learning.stats.finished_at") %></strong><br>
-          <%= l machine_learning_job.finished_at, format: :short %>
+        <div class="small-4 columns">
+          <strong>Finished:</strong> <%= l machine_learning_job.finished_at, format: :short %>
         </div>
       </div>
     </div>
   <% end %>
 
-  <%# 4. Action Buttons %>
-  <% if machine_learning_job.started? && !machine_learning_job.finished? %>
-    <%= button_to t("admin.machine_learning.cancel"),
-                  cancel_admin_machine_learning_path,
-                  method: :delete, class: "button hollow alert cancel",
-                  data: { confirm: t("admin.machine_learning.cancel_alert") } %>
-  <% else %>
+  <%# 4. Action Form (Only shown if NOT running) %>
+  <% unless machine_learning_job.active? %>
     <%= form_tag execute_admin_machine_learning_path, method: :post do %>
       <label for="script"><%= t("admin.machine_learning.select_script") %></label>
       <%= select_tag "script", options_for_select(script_select_options) %>
 
+      <%# Simplified descriptions: No JS needed if we show them as help text %>
       <div id="script_descriptions" class="margin-bottom">
-        <% scripts_info.each do |script_info| %>
-          <div id="<%= script_info[:name] || script_info[:key] %>" class="help-text" style="display: none;">
-            <%= sanitize(script_info[:description]) %>
+        <p class="help-text"><em>Select a script to process content and generate AI summaries or tags.</em></p>
+      </div>
+
+      <div class="callout secondary">
+        <div class="row">
+          <div class="small-12 medium-6 columns">
+            <label>
+              <%= check_box_tag :force_update, "1", false %>
+              <strong>Force Update</strong>
+              <p class="help-text">Process all records regardless of age.</p>
+            </label>
           </div>
-        <% end %>
+          <div class="small-12 medium-6 columns">
+            <label>
+              <%= check_box_tag :dry_run, "true", false %>
+              <strong>Dry Run</strong>
+              <p class="help-text">Test logic without saving to DB.</p>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="actions">
-        <%= submit_tag t("admin.machine_learning.execute_script"),
-                       name: "execution_mode",
-                       value: "Execute Script",
-                       class: "button" %>
-
-        <%= submit_tag t("admin.machine_learning.dry_run_button"),
-                       name: "execution_mode",
-                       value: "dry_run",
-                       class: "button hollow dry-run" %>
+        <%= submit_tag t("admin.machine_learning.execute_script"), class: "button success large" %>
       </div>
     <% end %>
   <% end %>

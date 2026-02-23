@@ -1,8 +1,9 @@
 class MachineLearningJob < ApplicationRecord
   belongs_to :user, optional: false
 
-  # FIX: A job is only "started" if it hasn't finished or errored yet.
-  # This prevents the "Cancel" button from showing up on finished jobs.
+  def active?
+    started?
+  end
   def started?
     started_at.present? && finished_at.blank? && error.blank?
   end
