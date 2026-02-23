@@ -101,6 +101,9 @@ class MachineLearning
     results = []
 
     questions.find_each do |question|
+      # NEW: Only call AI if comments have changed or summary is missing
+      next unless should_generate_summary_for?(question)
+
       comments = question.comments
                          .where(hidden_at: nil)
                          .order(:created_at)
@@ -110,18 +113,28 @@ class MachineLearning
 
       context = "Process: #{question.process.title}\nQuestion: #{question.title}"
       result = MlHelper.summarize_comments(comments, context, config: ml_config)
+
       if result && result["usage"]
-        @total_tokens_used += result["usage"]["total_tokens"].to_i
+        tokens = result["usage"]["total_tokens"].to_i
+        @total_tokens_used += tokens
+        # NEW: Update the UI progress during the loop
+        job.update_column(:total_tokens, @total_tokens_used)
       end
-      next if result.blank?
+
+      next if result.blank? || result["summary_markdown"].blank?
 
       sentiment_data = process_sentiment_data(result["sentiment"])
 
       if dry_run
         Rails.logger.info "[DryRun] Leg. Summary for ID #{question.id}: #{result['summary_markdown'].truncate(100)}"
       else
+        # NEW: Using find_or_initialize_by ensures we update existing records
+        # rather than creating duplicates
         summary = MlSummaryComment.find_or_initialize_by(commentable: question)
-        summary.update!(body: result["summary_markdown"], sentiment_analysis: sentiment_data)
+        summary.update!(
+          body: result["summary_markdown"],
+          sentiment_analysis: sentiment_data
+        )
 
         results << {
           commentable_id: question.id,
@@ -244,7 +257,6 @@ class MachineLearning
 
     def process_tags_for(scope:, type:, log_name:)
       Rails.logger.info "[MachineLearning] Starting #{log_name} generation"
-
 
       all_taggings_data = []
       all_tags_to_ensure = Set.new
