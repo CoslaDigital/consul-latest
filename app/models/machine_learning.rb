@@ -2,7 +2,7 @@ require "csv"
 require "fileutils"
 
 class MachineLearning
-  attr_reader :job, :ml_config
+  attr_reader :job, :ml_config, :dry_run
 
   # Maps the UI script keys to internal processing methods and categories
   AVAILABLE_SCRIPTS = {
@@ -12,7 +12,9 @@ class MachineLearning
     "investment_tags" => { method: :generate_investment_tags, kind: "tags" },
     "investment_related_content" => { method: :generate_investment_related_content, kind: "related_content" },
     "investment_summary_comments" => { method: :generate_investment_summary_comments, kind: "comments_summary" },
-    "legislation_summary_comments" => { method: :generate_legislation_summary_comments, kind: "comments_summary" }
+    "legislation_summary_comments" => { method: :generate_legislation_summary_comments, kind: "comments_summary" },
+    "poll_summary_answers" => { method: :generate_poll_summary_answers, kind: "comments_summary" },
+    "budget_overall_summary" => { method: :generate_budget_overall_summary, kind: "comments_summary" }
   }.freeze
 
   # --- CLASS METHODS (Admin UI & Legacy Support) ---
@@ -67,6 +69,14 @@ class MachineLearning
       "ml_comments_summaries_legislation.json";
     end
 
+    def poll_comments_summary_filename
+      "ml_comments_summaries_polls.json"
+    end
+
+    def budget_overall_summary_filename
+      "ml_comments_summaries_budget_overall.json"
+    end
+
     def data_output_files
       files = { tags: [], related_content: [], comments_summary: [] }
 
@@ -78,7 +88,9 @@ class MachineLearning
         [investments_related_filename, :related_content],
         [proposals_comments_summary_filename, :comments_summary],
         [investments_comments_summary_filename, :comments_summary],
-        [legislation_comments_summary_filename, :comments_summary]
+        [legislation_comments_summary_filename, :comments_summary],
+        [poll_comments_summary_filename, :comments_summary],
+        [budget_overall_summary_filename, :comments_summary]
       ]
 
       mappings.each do |filename, kind|
@@ -100,7 +112,8 @@ class MachineLearning
         proposals_tags_filename, investments_tags_filename,
         proposals_related_filename, investments_related_filename,
         proposals_comments_summary_filename, investments_comments_summary_filename,
-        legislation_comments_summary_filename
+        legislation_comments_summary_filename,
+        poll_comments_summary_filename, budget_overall_summary_filename
       ]
 
       (all_files - output_files).sort
@@ -165,10 +178,12 @@ class MachineLearning
     def process_summaries_for(scope, record_type, filename)
       export_data = []
       scope.find_each do |record|
-        comments = Comment.where(commentable: record).pluck(:body).reject(&:blank?)
+        conversation = Ml::Conversation.new(record_type, record.id)
+        comments = conversation.comments.map(&:body).compact_blank
         next if comments.empty? || !should_reprocess_record?(record, "summary")
 
-        result = MlHelper.summarize_comments(comments, record.title, config: ml_config)
+        context = conversation.compile_context
+        result = MlHelper.summarize_comments(comments, context, config: ml_config)
         if result && result["summary_markdown"]
           unless @dry_run
             summary = MlSummaryComment.find_or_initialize_by(commentable: record)
@@ -330,5 +345,14 @@ class MachineLearning
 
     def generate_legislation_summary_comments
       process_summaries_for(Legislation::Question.all, "Legislation::Question", self.class.legislation_comments_summary_filename)
+    end
+
+    def generate_poll_summary_answers
+      scope = Poll::Question.joins(:votation_type).where(votation_types: { vote_type: :open })
+      process_summaries_for(scope, "Poll::Question", self.class.poll_comments_summary_filename)
+    end
+
+    def generate_budget_overall_summary
+      process_summaries_for(Budget.all, "Budget", self.class.budget_overall_summary_filename)
     end
 end

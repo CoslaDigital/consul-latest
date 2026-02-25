@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-module Sensemaker
-  CommentLikeItem = Conversation::CommentLikeItem
-
+module Ml
   class Conversation < ::Conversation
   end
 end

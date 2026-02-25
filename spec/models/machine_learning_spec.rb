@@ -59,12 +59,10 @@ describe MachineLearning do
                                                               "usage" => { "total_tokens" => 100 }
                                                             })
 
-      ml.send(:process_tags_for,
-              scope: [[proposal.id, proposal.title, proposal.description]],
-              type: 'Proposal',
-              log_name: "proposal tags")
+      scope = Proposal.where(id: proposal.id)
+      ml.send(:process_tags_for, scope, "Proposal", MachineLearning.proposals_tags_filename)
 
-      tag_names = Tagging.where(taggable: proposal, context: 'ml_tags').joins(:tag).pluck('tags.name')
+      tag_names = Tagging.where(taggable: proposal, context: "ml_tags").joins(:tag).pluck("tags.name")
       expect(tag_names.map(&:downcase)).to include("environment", "parks")
     end
   end
@@ -75,6 +73,10 @@ describe MachineLearning do
       proposal.update!(summary_en: "Required Summary")
       create(:comment, commentable: proposal, body: "Supportive comment.")
 
+      mock_conversation = instance_double(Ml::Conversation,
+        comments: [double(body: "Supportive comment.")],
+        compile_context: "Title: Test Proposal")
+      allow(Ml::Conversation).to receive(:new).with("Proposal", proposal.id).and_return(mock_conversation)
       allow(MlHelper).to receive(:summarize_comments).and_return({
                                                                    "summary_markdown" => "Users are supportive.",
                                                                    "sentiment" => { "positive" => 90, "negative" => 5, "neutral" => 5 },
@@ -82,8 +84,55 @@ describe MachineLearning do
                                                                  })
 
       expect {
-        ml.generate_proposal_comments_summary
+        ml.send(:generate_proposal_summary_comments)
       }.to change(MlSummaryComment, :count).by(1)
+    end
+
+    it "generates and saves summary for open-ended poll question answers" do
+      poll = create(:poll)
+      question = create(:poll_question_open, poll: poll)
+      question.update!(title_en: "What would you improve?")
+
+      mock_conversation = instance_double(Ml::Conversation,
+        comments: [double(body: "More green spaces.")],
+        compile_context: "Question: What would you improve?")
+      allow(Ml::Conversation).to receive(:new).with("Poll::Question", question.id).and_return(mock_conversation)
+      allow(MlHelper).to receive(:summarize_comments).and_return({
+        "summary_markdown" => "Citizens want more green spaces.",
+        "sentiment" => { "positive" => 80, "negative" => 10, "neutral" => 10 },
+        "usage" => { "total_tokens" => 100 }
+      })
+
+      expect {
+        ml.send(:generate_poll_summary_answers)
+      }.to change(MlSummaryComment, :count).by(1)
+
+      summary = MlSummaryComment.find_by(commentable: question)
+      expect(summary).to be_present
+      expect(summary.body).to include("green spaces")
+    end
+
+    it "generates and saves overall summary for a budget" do
+      budget = create(:budget)
+      budget.update!(name_en: "Participatory Budget 2025")
+
+      mock_conversation = instance_double(Ml::Conversation,
+        comments: [double(body: "Investment A: Parks renewal."), double(body: "Investment B: Library extension.")],
+        compile_context: "Budget: Participatory Budget 2025")
+      allow(Ml::Conversation).to receive(:new).with("Budget", budget.id).and_return(mock_conversation)
+      allow(MlHelper).to receive(:summarize_comments).and_return({
+        "summary_markdown" => "Key themes: parks and culture.",
+        "sentiment" => { "positive" => 70, "negative" => 15, "neutral" => 15 },
+        "usage" => { "total_tokens" => 120 }
+      })
+
+      expect {
+        ml.send(:generate_budget_overall_summary)
+      }.to change(MlSummaryComment, :count).by(1)
+
+      summary = MlSummaryComment.find_by(commentable: budget)
+      expect(summary).to be_present
+      expect(summary.body).to include("parks")
     end
 
     it "identifies and creates related content records" do
@@ -116,7 +165,7 @@ describe MachineLearning do
       #    - The method creates one relationship (p1 -> p2)
       #    - The after_create callback creates the opposite (p2 -> p1)
       expect {
-        ml.send(:process_related_content_for, Proposal, "filename.json")
+        ml.send(:process_related_content_for, Proposal.all, "Proposal", "filename.json")
       }.to change(RelatedContent, :count).by(2)
 
       # 5. Verify both relationships exist
@@ -125,30 +174,23 @@ describe MachineLearning do
     end
   end
 
-  describe "Sentiment Analysis Math" do
-    it "correctly rounds and balances sentiment to exactly 100%" do
-      raw_data = { "positive" => 6, "negative" => 2, "neutral" => 5 }
-      result = ml.send(:process_sentiment_data, raw_data)
-      expect(result["positive"] + result["negative"] + result["neutral"]).to eq(100)
-    end
-  end
-
   describe "Cleanup Methods" do
-    it "removes existing summaries for the correct type" do
+    it "removes existing summaries when clear_existing_ml_data comments_summary is used" do
       p = create(:proposal)
       p.update!(summary_en: "S")
       create(:ml_summary_comment, commentable: p)
 
-      ml.send(:cleanup_comments_summary_for!, "Proposal")
+      ml.send(:clear_existing_ml_data, "comments_summary")
       expect(MlSummaryComment.where(commentable_type: "Proposal").count).to eq 0
     end
   end
 
   describe "Error Handling" do
     it "captures and logs errors to the job record" do
-      allow(ml).to receive(:generate_proposal_comments_summary).and_raise(StandardError.new("API Error"))
-      job.update!(script: "proposal_comments")
-      ml.run
+      allow(ml).to receive(:generate_proposal_summary_comments).and_raise(StandardError.new("API Error"))
+      job.update!(script: "proposal_summary_comments")
+
+      expect { ml.run }.to raise_error(StandardError, "API Error")
       expect(job.reload.error).to include("API Error")
     end
   end

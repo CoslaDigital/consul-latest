@@ -7,6 +7,8 @@ module MlHelper
     system_prompt = <<~PROMPT
       You are a qualitative data analyst. Your goal is to analyze public comments and identify major recurring themes.
 
+      The CONTEXT block includes metadata about the item being analysed. Weigh this metadata when generating the executive_summary so the summary reflects both the comment themes and the context.
+
       Instructions:
       1. Identify 3-5 distinct Key Themes (e.g., "Safety Concerns", "Support for Green Space").
       2. For EACH theme, provide a brief explanation and select 1-2 DIRECT VERBATIM QUOTES from the text.

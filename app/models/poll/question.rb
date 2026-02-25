@@ -11,6 +11,7 @@ class Poll::Question < ApplicationRecord
   belongs_to :author, -> { with_hidden }, class_name: "User", inverse_of: :poll_questions
 
   has_many :comments, as: :commentable, inverse_of: :commentable
+  has_one :summary_comment, as: :commentable, class_name: "MlSummaryComment", dependent: :destroy
   has_many :answers, class_name: "Poll::Answer"
   has_many :question_options, -> { order :given_order },
            class_name: "Poll::Question::Option",
