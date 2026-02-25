@@ -17,7 +17,7 @@ namespace :ml do
 
       # 3. Handle Tagging cleanup
       puts "Cleaning up ML tags..."
-      Tagging.where(context: 'ml_tags').delete_all
+      Tagging.where(context: "ml_tags").delete_all
       # Optional: Clean up orphaned tags that have no other taggings
       Tag.where("NOT EXISTS (SELECT 1 FROM taggings WHERE taggings.tag_id = tags.id)").delete_all
 

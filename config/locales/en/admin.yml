@@ -1840,6 +1840,12 @@ en:
       tags: "Tags"
       tags_description: "Generates automatic tags on all items that can be tagged on."
       title: "Machine learning"
+      script_selection_help: "Select a script to process content and generate AI summaries or tags."
+      execution_options:
+        force_update_label: "Force Update"
+        force_update_help: "Process all records regardless of age."
+        dry_run_label: "Dry Run"
+        dry_run_help: "Test logic without saving to DB."
     cookies:
       vendors:
         empty: No vendors found

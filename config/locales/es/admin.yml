@@ -1833,6 +1833,12 @@ es:
       tags: "Etiquetas"
       tags_description: "Genera etiquetas automáticas en todos los elementos que pueden ser etiquetados."
       title: "Machine learning"
+      script_selection_help: "Selecciona un script para procesar contenido y generar etiquetas o resúmenes por IA."
+      execution_options:
+        force_update_label: "Forzar actualización"
+        force_update_help: "Procesa todos los registros independientemente de su antigüedad."
+        dry_run_label: "Simulacro (Dry Run)"
+        dry_run_help: "Prueba la lógica sin guardar en la base de datos."
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros

@@ -4,6 +4,7 @@ class MachineLearningJob < ApplicationRecord
   def active?
     started?
   end
+
   def started?
     started_at.present? && finished_at.blank? && error.blank?
   end
@@ -18,6 +19,7 @@ class MachineLearningJob < ApplicationRecord
 
   def duration
     return 0 unless started_at && finished_at
+
     (finished_at - started_at).to_i
   end
 
