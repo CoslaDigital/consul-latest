@@ -1,8 +1,9 @@
 module MlHelper
-  # 1. SUMMARIZATION & SENTIMENT
+  # SUMMARIZATION & SENTIMENT
   def self.summarize_comments(comments, context = nil, config: nil)
     return nil if comments.blank?
-    model_name = config&.[](:model) || Setting['llm.model']
+
+    model_name = config&.[](:model) || Setting["llm.model"]
 
     system_prompt = <<~PROMPT
       You are a qualitative data analyst. Your goal is to analyze public comments and identify major recurring themes.
@@ -27,39 +28,41 @@ module MlHelper
       }
     PROMPT
 
-    data = perform_ai_call("CONTEXT: #{context}\n\nCOMMENTS:\n#{comments.join("\n").truncate(6000)}", model_name, system_prompt)
+    input_text = "CONTEXT: #{context}\n\nCOMMENTS:\n#{comments.join("\n").truncate(6000)}"
+    data = perform_ai_call(input_text, model_name, system_prompt)
     return nil if data.blank?
 
-    # RESTORED: Your original Markdown builder logic
-    markdown = "**Executive Summary**: #{data['executive_summary']}\n\n**Key Themes & Voices**:\n"
-    (data['themes'] || []).each do |t|
-      name = t['name'] || t['title']
+    markdown = "**Executive Summary**: #{data["executive_summary"]}\n\n**Key Themes & Voices**:\n"
+    (data["themes"] || []).each do |t|
+      name = t["name"] || t["title"]
       next if name.blank?
-      markdown += "* **#{name}**: #{t['explanation']}\n"
-      t['quotes']&.each { |q| markdown += "  > \"#{q}\"\n" }
+
+      markdown += "* **#{name}**: #{t["explanation"]}\n"
+      t["quotes"]&.each { |q| markdown += "  > \"#{q}\"\n" }
       markdown += "\n"
     end
 
     {
       "summary_markdown" => markdown.strip,
-      "sentiment" => (data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 100 }),
+      "sentiment" => data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 100 },
       "usage" => data["usage"]
     }
   end
 
-  # 2. TAGGING
+  #  TAGGING
   def self.generate_tags(text, count = 5, config: nil)
     return nil if text.blank?
-    model_name = config&.[](:model) || Setting['llm.model']
 
-    system_prompt = "You are a categorization expert. Return ONLY a comma-separated list of up to #{count} lowercase tags for the text. No intro, no bullets."
+    model_name = config&.[](:model) || Setting["llm.model"]
+    system_prompt = "You are a categorization expert. Return ONLY a comma-separated list of " \
+      "up to #{count} lowercase tags for the text. No intro, no bullets."
 
     chat = Llm::Config.context.chat(model: model_name)
     chat.with_instructions(system_prompt)
     response = chat.ask(text.truncate(2000))
 
     {
-      "tags" => response.content.split(",").map(&:strip).reject(&:blank?),
+      "tags" => response.content.split(",").map(&:strip).compact_blank,
       "usage" => {
         "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0)
       }
@@ -72,7 +75,8 @@ module MlHelper
   # 3. RELATED CONTENT
   def self.find_similar_content(source_text, candidate_texts, limit = 3, config: nil)
     return nil if source_text.blank? || candidate_texts.blank?
-    model_name = config&.[](:model) || Setting['llm.model']
+
+    model_name = config&.[](:model) || Setting["llm.model"]
 
     prompt = <<~PROMPT
       Identify which of the following Candidates are most conceptually related to the Source.
@@ -87,7 +91,6 @@ module MlHelper
     perform_ai_call(prompt, model_name)
   end
 
-  # --- PRIVATE UTILITY ---
   def self.perform_ai_call(prompt, model_name, system_instructions = nil)
     chat = Llm::Config.context.chat(model: model_name)
     chat.with_instructions(system_instructions) if system_instructions.present?

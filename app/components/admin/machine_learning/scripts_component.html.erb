@@ -64,7 +64,7 @@
       <%= select_tag "script", options_for_select(script_select_options) %>
 
       <div id="script_descriptions" class="margin-bottom">
-        <p class="help-text"><em>Select a script to process content and generate AI summaries or tags.</em></p>
+        <p class="help-text"><em><%= t("admin.machine_learning.script_selection_help") %></em></p>
       </div>
 
       <div class="callout secondary">
@@ -72,15 +72,15 @@
           <div class="small-12 medium-6 columns">
             <label>
               <%= check_box_tag :force_update, "1", false %>
-              <strong>Force Update</strong>
-              <p class="help-text">Process all records regardless of age.</p>
+              <strong><%= t("admin.machine_learning.execution_options.force_update_label") %></strong>
+              <p class="help-text"><%= t("admin.machine_learning.execution_options.force_update_help") %></p>
             </label>
           </div>
           <div class="small-12 medium-6 columns">
             <label>
               <%= check_box_tag :dry_run, "true", false %>
-              <strong>Dry Run</strong>
-              <p class="help-text">Test logic without saving to DB.</p>
+              <strong><%= t("admin.machine_learning.execution_options.dry_run_label") %></strong>
+              <p class="help-text"><%= t("admin.machine_learning.execution_options.dry_run_help") %></p>
             </label>
           </div>
         </div>

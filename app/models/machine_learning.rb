@@ -7,12 +7,22 @@ class MachineLearning
   # Maps the UI script keys to internal processing methods and categories
   AVAILABLE_SCRIPTS = {
     "proposal_tags" => { method: :generate_proposal_tags, kind: "tags" },
-    "proposal_related_content" => { method: :generate_proposal_related_content, kind: "related_content" },
-    "proposal_summary_comments" => { method: :generate_proposal_summary_comments, kind: "comments_summary" },
+    "proposal_related_content" => {
+      method: :generate_proposal_related_content, kind: "related_content"
+    },
+    "proposal_summary_comments" => {
+      method: :generate_proposal_summary_comments, kind: "comments_summary"
+    },
     "investment_tags" => { method: :generate_investment_tags, kind: "tags" },
-    "investment_related_content" => { method: :generate_investment_related_content, kind: "related_content" },
-    "investment_summary_comments" => { method: :generate_investment_summary_comments, kind: "comments_summary" },
-    "legislation_summary_comments" => { method: :generate_legislation_summary_comments, kind: "comments_summary" }
+    "investment_related_content" => {
+      method: :generate_investment_related_content, kind: "related_content"
+    },
+    "investment_summary_comments" => {
+      method: :generate_investment_summary_comments, kind: "comments_summary"
+    },
+    "legislation_summary_comments" => {
+      method: :generate_legislation_summary_comments, kind: "comments_summary"
+    }
   }.freeze
 
   # --- CLASS METHODS (Admin UI & Legacy Support) ---
@@ -27,7 +37,9 @@ class MachineLearning
     end
 
     def script_select_options
-      AVAILABLE_SCRIPTS.keys.map { |k| [I18n.t("admin.machine_learning.scripts.#{k}.label", default: k.humanize), k] }
+      AVAILABLE_SCRIPTS.keys.map do |k|
+        [I18n.t("admin.machine_learning.scripts.#{k}.label", default: k.humanize), k]
+      end
     end
 
     def data_folder
@@ -40,31 +52,31 @@ class MachineLearning
 
     # Legacy Filename Constants
     def proposals_tags_filename
-      "ml_tags_proposals.json";
+      "ml_tags_proposals.json"
     end
 
     def investments_tags_filename
-      "ml_tags_budgets.json";
+      "ml_tags_budgets.json"
     end
 
     def proposals_related_filename
-      "ml_related_content_proposals.json";
+      "ml_related_content_proposals.json"
     end
 
     def investments_related_filename
-      "ml_related_content_budgets.json";
+      "ml_related_content_budgets.json"
     end
 
     def proposals_comments_summary_filename
-      "ml_comments_summaries_proposals.json";
+      "ml_comments_summaries_proposals.json"
     end
 
     def investments_comments_summary_filename
-      "ml_comments_summaries_budgets.json";
+      "ml_comments_summaries_budgets.json"
     end
 
     def legislation_comments_summary_filename
-      "ml_comments_summaries_legislation.json";
+      "ml_comments_summaries_legislation.json"
     end
 
     def data_output_files
@@ -83,9 +95,7 @@ class MachineLearning
 
       mappings.each do |filename, kind|
         # Check if the file actually exists in the tenant's data folder
-        if File.exist?(data_folder.join(filename))
-          files[kind] << filename
-        end
+        files[kind] << filename if File.exist?(data_folder.join(filename))
       end
 
       files.with_indifferent_access
@@ -153,7 +163,7 @@ class MachineLearning
         if result && result["tags"]
           unless @dry_run
             record.set_tag_list_on(:ml_tags, result["tags"])
-            record.save(validate: false)
+            record.save!(validate: false)
             export_data << { id: record.id, name: result["tags"].join(", "), kind: record_type }
           end
           track_usage(result)
@@ -165,7 +175,7 @@ class MachineLearning
     def process_summaries_for(scope, record_type, filename)
       export_data = []
       scope.find_each do |record|
-        comments = Comment.where(commentable: record).pluck(:body).reject(&:blank?)
+        comments = Comment.where(commentable: record).pluck(:body).compact_blank
         next if comments.empty? || !should_reprocess_record?(record, "summary")
 
         result = MlHelper.summarize_comments(comments, record.title, config: ml_config)
@@ -176,7 +186,9 @@ class MachineLearning
               body: result["summary_markdown"],
               sentiment_analysis: result["sentiment"]
             )
-            export_data << { commentable_id: record.id, commentable_type: record_type, body: result["summary_markdown"] }
+            export_data << {
+              commentable_id: record.id, commentable_type: record_type, body: result["summary_markdown"]
+            }
           end
           track_usage(result)
         end
@@ -195,7 +207,9 @@ class MachineLearning
         candidates = records.reject { |r| r.id == record.id }
         candidate_texts = candidates.map { |c| "#{c.title} #{c.description}" }
 
-        result = MlHelper.find_similar_content("#{record.title} #{record.description}", candidate_texts, 3, config: ml_config)
+        result = MlHelper.find_similar_content(
+          "#{record.title} #{record.description}", candidate_texts, 3, config: ml_config
+        )
         if result && result["indices"]
           related_ids = result["indices"].map { |i| candidates[i]&.id }.compact
           save_related_content(record, related_ids, record_type) unless @dry_run
@@ -224,7 +238,9 @@ class MachineLearning
         )
 
         if existing
-          existing.update!(machine_learning: true, machine_learning_score: score, author_id: job.user_id, hidden_at: nil)
+          existing.update!(
+            machine_learning: true, machine_learning_score: score, author_id: job.user_id, hidden_at: nil
+          )
         else
           # Callback creates the opposite record automatically
           RelatedContent.create!(
@@ -245,7 +261,7 @@ class MachineLearning
         MlSummaryComment.delete_all
       when "related_content"
         ml_scope = RelatedContent.with_hidden.where(machine_learning: true)
-        ml_ids = ml_scope.pluck(:id)
+        ml_ids = ml_scope.ids
         if ml_ids.any?
           # ForeignKey Fix: Delete scores first
           RelatedContentScore.where(related_content_id: ml_ids).delete_all
@@ -257,6 +273,7 @@ class MachineLearning
 
     def should_reprocess_record?(record, type)
       return true if @force
+
       case type
       when "tags" then !record.taggings.where(context: "ml_tags").exists?
       when "summary" then MlSummaryComment.where(commentable: record).empty?
@@ -272,21 +289,22 @@ class MachineLearning
     # --- EXPORT & UTILITY ---
 
     def finalize_batch(kind, export_data, filename)
-      unless @dry_run
-        save_results_to_json(export_data, filename)
-        update_machine_learning_info_for(kind)
-      end
+      return if @dry_run
+
+      save_results_to_json(export_data, filename)
+      update_machine_learning_info_for(kind)
     end
 
     def save_results_to_json(results, filename)
       return if results.empty?
+
       path = self.class.data_folder.join(filename)
       FileUtils.mkdir_p(File.dirname(path))
 
       File.write(path, JSON.pretty_generate(results))
 
       # CSV Mirroring for legacy Open Data support
-      csv_path = path.to_s.sub('.json', '.csv')
+      csv_path = path.to_s.sub(".json", ".csv")
       CSV.open(csv_path, "wb") do |csv|
         csv << results.first.keys
         results.each { |r| csv << r.values }
@@ -294,7 +312,9 @@ class MachineLearning
     end
 
     def update_machine_learning_info_for(kind)
-      MachineLearningInfo.find_or_create_by!(kind: kind).update!(generated_at: Time.current, script: job.script)
+      MachineLearningInfo.find_or_create_by!(kind: kind).update!(
+        generated_at: Time.current, script: job.script
+      )
     end
 
     def track_usage(result)
@@ -321,14 +341,20 @@ class MachineLearning
     end
 
     def generate_investment_related_content
-      process_related_content_for(Budget::Investment.all, "Budget::Investment", self.class.investments_related_filename)
+      process_related_content_for(
+        Budget::Investment.all, "Budget::Investment", self.class.investments_related_filename
+      )
     end
 
     def generate_investment_summary_comments
-      process_summaries_for(Budget::Investment.all, "Budget::Investment", self.class.investments_comments_summary_filename)
+      process_summaries_for(
+        Budget::Investment.all, "Budget::Investment", self.class.investments_comments_summary_filename
+      )
     end
 
     def generate_legislation_summary_comments
-      process_summaries_for(Legislation::Question.all, "Legislation::Question", self.class.legislation_comments_summary_filename)
+      process_summaries_for(
+        Legislation::Question.all, "Legislation::Question", self.class.legislation_comments_summary_filename
+      )
     end
 end

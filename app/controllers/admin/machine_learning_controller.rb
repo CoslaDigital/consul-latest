@@ -9,8 +9,6 @@ class Admin::MachineLearningController < Admin::BaseController
     script = params[:script]
     is_dry_run = params[:dry_run] == "1" || params[:dry_run] == "true"
 
-    force_update = params[:force_update]
-
     @job = MachineLearningJob.create!(
       script: script,
       user: current_user,
@@ -19,7 +17,7 @@ class Admin::MachineLearningController < Admin::BaseController
       config: { "force_update" => params[:force_update] }
     )
 
-    ::MachineLearning.new(@job).delay(queue: 'machine_learning').run
+    ::MachineLearning.new(@job).delay(queue: "machine_learning").run
 
     notice_msg = is_dry_run ? "Dry run started (Background)" : "Job started in background."
     redirect_to admin_machine_learning_path, notice: notice_msg

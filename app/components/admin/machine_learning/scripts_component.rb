@@ -23,6 +23,6 @@ class Admin::MachineLearning::ScriptsComponent < ApplicationComponent
     end
 
     def processed_resource_name
-      machine_learning_job.script.split('_').first.singularize.capitalize
+      machine_learning_job.script.split("_").first.singularize.capitalize
     end
 end

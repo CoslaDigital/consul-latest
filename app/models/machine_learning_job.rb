@@ -18,6 +18,7 @@ class MachineLearningJob < ApplicationRecord
 
   def duration
     return 0 unless started_at && finished_at
+
     (finished_at - started_at).to_i
   end
 

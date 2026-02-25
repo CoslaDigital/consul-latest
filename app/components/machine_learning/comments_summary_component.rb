@@ -24,6 +24,7 @@ class MachineLearning::CommentsSummaryComponent < ApplicationComponent
 
     def sentiment_present?
       return false if sentiment.blank?
-      (sentiment['positive'].to_i + sentiment['negative'].to_i + sentiment['neutral'].to_i) > 0
+
+      (sentiment["positive"].to_i + sentiment["negative"].to_i + sentiment["neutral"].to_i) > 0
     end
 end
