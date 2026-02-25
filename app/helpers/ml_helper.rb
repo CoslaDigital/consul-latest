@@ -57,7 +57,7 @@ module MlHelper
 
     model_name = config&.[](:model) || Setting["llm.model"]
     system_prompt = "You are a categorization expert. Return ONLY a comma-separated list of " \
-      "up to #{count} lowercase tags for the text. No intro, no bullets."
+                    "up to #{count} lowercase tags for the text. No intro, no bullets."
 
     chat = Llm::Config.context.chat(model: model_name)
     chat.with_instructions(system_prompt)

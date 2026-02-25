@@ -328,14 +328,14 @@ class Conversation
 
   private
 
-  def format_user_answer_for_question(question, user_answers)
-    if question.open?
-      user_answers.first.answer.to_s
-    elsif question.accepts_options? && question.question_options.any?
-      selected_options = user_answers.map { |answer| answer.option&.title }.compact
-      selected_options.join(", ")
-    else
-      ""
+    def format_user_answer_for_question(question, user_answers)
+      if question.open?
+        user_answers.first.answer.to_s
+      elsif question.accepts_options? && question.question_options.any?
+        selected_options = user_answers.map { |answer| answer.option&.title }.compact
+        selected_options.join(", ")
+      else
+        ""
+      end
     end
-  end
 end
