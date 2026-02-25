@@ -42,6 +42,7 @@ class Budget < ApplicationRecord
   has_many :valuators, through: :budget_valuators
 
   has_one :poll
+  has_one :summary_comment, as: :commentable, class_name: "MlSummaryComment", dependent: :destroy
 
   after_create :generate_phases
   accepts_nested_attributes_for :phases
