@@ -1,11 +1,8 @@
 module MlHelper
-  # --- PUBLIC METHODS ---
-
-  # 1. SUMMARIZATION & SENTIMENT
+  # SUMMARIZATION & SENTIMENT
   def self.summarize_comments(comments, context = nil, config: nil)
     return nil if comments.blank?
 
-    # Determine strategy once
     model_name = config&.[](:model) || Setting["llm.model"]
     provider_name = config&.[](:provider) || Setting["llm.provider"]
 
@@ -53,6 +50,9 @@ module MlHelper
       "sentiment" => data["sentiment"] || { "positive" => 0, "negative" => 0, "neutral" => 100 },
       "usage" => data["usage"]
     }
+  rescue RubyLLM::Error => e
+    Rails.logger.error "[MlHelper] Summarization failed after retries: #{e.message}"
+    nil
   end
 
   # 2. TAGGING
@@ -77,13 +77,12 @@ module MlHelper
           "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0)
         }
       }
-    rescue => e
-      Rails.logger.error "[MlHelper] Tagging Error: #{e.message}"
+    rescue RubyLLM::Error => e
+      Rails.logger.error "[MlHelper] Tagging failed after retries: #{e.message}"
       nil
-    end
   end
 
-  # 3. RELATED CONTENT
+    # RELATED CONTENT
   def self.find_similar_content(source_text, candidate_texts, limit = 3, config: nil)
     return nil if source_text.blank? || candidate_texts.blank?
 
@@ -113,8 +112,6 @@ module MlHelper
     chat.with_instructions(system_instructions) if system_instructions.present?
 
     response = chat.ask(prompt)
-
-    # Extract JSON block from markdown response
     json_match = response.content.match(/\{.*\}/m)
     return nil unless json_match
 
@@ -123,8 +120,11 @@ module MlHelper
       "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0)
     }
     data
-  rescue => e
-    Rails.logger.error "[MlHelper] AI Call Error (#{provider_name}): #{e.message}"
+  rescue RubyLLM::Error => e
+    Rails.logger.error "[MlHelper] AI call failed after retries: #{e.message}"
+    nil
+  rescue JSON::ParserError => e
+    Rails.logger.error "[MlHelper] JSON Parsing Error: #{e.message}"
     nil
   end
 
