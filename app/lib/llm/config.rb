@@ -6,10 +6,10 @@ module Llm
           Tenant.current_secrets.llm&.each do |key, value|
             config.send("#{key}=", value)
           end
-          config.max_retries = 3
-          config.retry_interval = 12.0 # Start with 12 seconds (for 5 RPM)
+          config.request_timeout = 60 # 1 min default
+          config.max_retries = 2
+          config.retry_interval = 1.0 # 1 second is plenty for cloud/general use
           config.retry_backoff_factor = 2
-          config.retry_interval_randomness = 0.5
         end
       end
 
