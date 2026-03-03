@@ -47,7 +47,7 @@ module MlHelper
 
     model_name = config&.[](:model) || Setting["llm.model"]
     provider_name = Setting["llm.provider"].to_s.downcase.to_sym
-    system_prompt = "Return ONLY a comma-separated list of up to #{count} lowercase tags. No intro."
+    system_prompt = "Return ONLY a comma-separated list of up to #{count} lowercase single-word tags. No introduction or sentences."
 
     # Use specialized context for Ollama (Bypass + Timeout)
     active_context = Llm::Config.context
@@ -66,8 +66,17 @@ module MlHelper
     raw_content = extract_text_content(response)
     return nil if raw_content.blank?
 
+    # Remove the stray dot that was here
+    clean_content = ActionController::Base.helpers.strip_tags(raw_content)
+
+    tags = clean_content.split(",")
+                        .map(&:strip)
+                        .map { |t| t.gsub(/[^\w\s-]/, "") }
+                        .map { |t| t.truncate(150) }
+                        .compact_blank
+
     {
-      "tags" => raw_content.split(",").map(&:strip).compact_blank,
+      "tags" => tags.first(count),
       "usage" => {
         "total_tokens" => (response.respond_to?(:input_tokens) ? (response.input_tokens || 0) : 0) +
           (response.respond_to?(:output_tokens) ? (response.output_tokens || 0) : 0)
