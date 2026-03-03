@@ -38,7 +38,7 @@ module MlHelper
     }
   rescue RubyLLM::Error => e
     Rails.logger.error "[MlHelper] Summarization failed: #{e.message}"
-    nil
+    raise e
   end
 
   # TAGGING
@@ -75,7 +75,7 @@ module MlHelper
     }
   rescue RubyLLM::Error => e
     Rails.logger.error "[MlHelper] Tagging failed: #{e.message}"
-    nil
+    raise e
   end
 
   # RELATED CONTENT (Unchanged structure, uses perform_ai_call)
@@ -134,7 +134,7 @@ module MlHelper
     end
   rescue RubyLLM::Error => e
     Rails.logger.error "[MlHelper] AI call failed: #{e.message}"
-    nil
+    raise e
   end
 
   def self.extract_text_content(response)
