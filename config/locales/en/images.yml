@@ -15,6 +15,7 @@ en:
       pick_an_image: "Select an image from the suggestions below:"
       no_images_found: No suggestions could be found.
       suggested_image_filename: Image by %{author_name}.jpg
+      suggested_image_filename: Image by %{author_name}.jpg
     actions:
       destroy:
         notice: Image was deleted successfully.
