@@ -39,9 +39,6 @@ module Llm
           return unless config.ollama_api_base.present?
 
           begin
-            # We use the config as-is from the secrets file.
-            # This allows switching between Native (/api) and Compatible (/v1)
-            # endpoints simply by changing the secret value.
             provider = RubyLLM::Providers::Ollama.new(config)
             new_models = provider.list_models
 
