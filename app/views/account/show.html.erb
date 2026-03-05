@@ -104,6 +104,9 @@
         </div>
 
         <div class="user-permissions small-12 medium-5 column">
+
+          <%= render Account::TwoFactorComponent.new(current_user) %>
+
           <h2><%= t("account.show.user_permission_title") %></h2>
 
           <p><%= t("account.show.user_permission_info") %></p>

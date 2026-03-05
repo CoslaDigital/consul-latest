@@ -1,0 +1,17 @@
+<%# app/components/account/two_factor_component.html.erb %>
+
+<h2><%= t("account.show.two_factor") %></h2>
+
+<% if user.otp_required_for_login %>
+  <p><%= t("devise_views.sessions.two_factor.enabled") %></p>
+  <p><%= link_to(t("devise_views.sessions.two_factor.disable_link"),
+                 account_two_factor_authentication_path,
+                 class: "button",
+                 method: :delete,
+                 data: { confirm: t("devise_views.sessions.two_factor.disable_confirm") }) %></p>
+<% else %>
+  <p><%= t("devise_views.sessions.two_factor.disabled") %></p>
+  <p><%= link_to(t("devise_views.sessions.two_factor.enable_link"),
+                 account_two_factor_authentication_path,
+                 class: "button") %></p>
+<% end %>
