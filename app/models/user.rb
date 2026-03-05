@@ -532,7 +532,7 @@ Rails.logger.info("oauth_user #{oauth_user}")
   end
 
   def requires_2fa?
-    administrator?
+    administrator? && Setting.otp_enabled?
   end
 
   def generate_otp_secret

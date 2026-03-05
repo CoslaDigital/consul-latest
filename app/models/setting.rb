@@ -253,7 +253,17 @@ class Setting < ApplicationRecord
     end
 
     def otp_enabled?
+      return false unless two_factor_configured?
+
       Setting["feature.force_2factor"] == "active"
+    end
+
+    def two_factor_configured?
+      secrets = Tenant.current_secrets
+      secrets[:devise_otp_key].present? &&
+        secrets.dig(:active_record_encryption, :primary_key).present? &&
+        secrets.dig(:active_record_encryption, :deterministic_key).present? &&
+        secrets.dig(:active_record_encryption, :key_derivation_salt).present?
     end
   end
 end
