@@ -11,6 +11,8 @@ en:
       delete: "Delete"
       hide: Hide
       label: "%{action} %{name}"
+      lock: "Lock"
+      unlock: "Unlock"
       restore: Restore
       mark_featured: Featured
       unmark_featured: Unmark featured
@@ -1642,6 +1644,8 @@ en:
       account:
         active_status: Account activated
         inactive_status: Account not activated
+        locked: "Locked"
+        unlocked: "Unlocked"
       index:
         title: User
         no_users: There are no users.
