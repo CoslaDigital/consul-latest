@@ -17,7 +17,7 @@
           <th scope="col"><%= t("admin.users.columns.verification_level") %></th>
           <th scope="col"><%= t("admin.users.columns.activation_status") %></th>
           <% if User.devise_modules.include?(:lockable) %>
-            <td><%= user.access_locked? ? t("admin.users.account.locked") : t("admin.users.account.unlocked") %></td>
+            <th scope="col"><%= t("admin.users.columns.locked_status") %></th>
           <% end %>
         <% end %>
       </tr>
@@ -36,7 +36,15 @@
             <td><%= user.user_type %></td>
             <td><%= user.confirmed_at? ? t("admin.users.account.active_status") : t("admin.users.account.inactive_status") %></td>
             <% if User.devise_modules.include?(:lockable) %>
-              <td><%= user.access_locked? ? t("admin.users.account.locked") : t("admin.users.account.unlocked") %></td>
+              <td>
+                <div class="table-actions" style="justify-content: center;">
+                  <% if user.access_locked? %>
+                    <%= content_tag :span, "", class: "locked-icon", aria: { label: t('admin.users.account.locked') } %>
+                  <% else %>
+                    <%= content_tag :span, "", class: "unlocked-icon", aria: { label: t('admin.users.account.unlocked') } %>
+                  <% end %>
+                </div>
+              </td>
             <% end %>
           <% end %>
         </tr>

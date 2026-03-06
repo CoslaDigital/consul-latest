@@ -1631,4 +1631,14 @@ $font-awesome-icons: (
   .cards-link {
     @include has-fa-icon(images, regular);
   }
+
+  .locked-icon {
+    @include has-fa-icon(lock, solid);
+    color: $alert-color;
+  }
+
+  .unlocked-icon {
+    @include has-fa-icon(lock-open, solid);
+    color: $color-success;
+  }
 }
