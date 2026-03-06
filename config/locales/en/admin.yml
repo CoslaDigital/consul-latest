@@ -11,6 +11,8 @@ en:
       delete: "Delete"
       hide: Hide
       label: "%{action} %{name}"
+      lock: "Lock"
+      unlock: "Unlock"
       restore: Restore
       mark_featured: Featured
       unmark_featured: Unmark featured
@@ -1638,9 +1640,12 @@ en:
         roles: Roles
         verification_level: Verification level
         activation_status: Activation Status
+        locked_status: "Locked Status"
       account:
         active_status: Account activated
         inactive_status: Account not activated
+        locked: "Locked"
+        unlocked: "Unlocked"
       index:
         title: User
         no_users: There are no users.
@@ -1648,6 +1653,14 @@ en:
         filters:
           active: Active
           erased: Erased
+          locked: "Locked"
+          unlocked: "Unlocked"
+      lock:
+        success: "User locked successfully"
+        error: "User could not be locked"
+      unlock:
+        success: "User unlocked successfully"
+        error: "User could not be unlocked"
       search:
         placeholder: Search user by email, name or document number
     verifications:

@@ -11,6 +11,8 @@ es:
       delete: Borrar
       hide: Ocultar
       label: "%{action} %{name}"
+      lock: "Bloquear"
+      unlock: "Desbloquear"
       restore: Volver a mostrar
       mark_featured: Destacar
       unmark_featured: Quitar destacado
@@ -1579,9 +1581,18 @@ es:
         roles: Roles
         verification_level: Nivel de verficación
         activation_status: Estado de la confirmación
+        locked_status: "Estado de bloqueo"
       account:
         active_status: Cuenta confirmada
         inactive_status: Cuenta no confirmada
+        locked: "Bloqueado"
+        unlocked: "Desbloqueado"
+      lock:
+        success: "Usuario bloqueado correctamente"
+        error: "No se pudo bloquear el usuario"
+      unlock:
+        success: "Usuario desbloqueado correctamente"
+        error: "No se pudo desbloquear el usuario"
       index:
         title: Usuarios
         no_users: No hay usuarios.
