@@ -290,8 +290,7 @@ namespace :admin do
     namespace :site_customization do
       resources :cards, only: [:index]
       resources :pages, except: [:show] do
-
-      resources :cards, except: [:show], as: :widget_cards
+        resources :cards, except: [:show], as: :widget_cards
       end
       resources :images, only: [:index, :update, :destroy]
       resources :content_blocks, except: [:show]
