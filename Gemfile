@@ -68,7 +68,7 @@ gem "whenever", "~> 1.0.0", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
 gem "ed25519"
-gem  "bcrypt_pbkdf"
+gem "bcrypt_pbkdf"
 gem "faker"
 source "https://rails-assets.org" do
   gem "rails-assets-markdown-it", "~> 9.0.1"
