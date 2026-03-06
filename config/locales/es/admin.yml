@@ -1579,9 +1579,12 @@ es:
         roles: Roles
         verification_level: Nivel de verficación
         activation_status: Estado de la confirmación
+        locked_status: "Estado de bloqueo"
       account:
         active_status: Cuenta confirmada
         inactive_status: Cuenta no confirmada
+        locked: "Bloqueado"
+        unlocked: "Desbloqueado"
       index:
         title: Usuarios
         no_users: No hay usuarios.
