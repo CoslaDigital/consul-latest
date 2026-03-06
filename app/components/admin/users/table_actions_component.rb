@@ -23,4 +23,12 @@ class Admin::Users::TableActionsComponent < ApplicationComponent
     def lock_label
       locked? ? t("admin.users.account.locked") : t("admin.users.account.unlocked")
     end
+
+    def lock_action
+      locked? ? :unlock : :lock
+    end
+
+    def lock_path
+      locked? ? unlock_admin_user_path(user) : lock_admin_user_path(user)
+    end
 end

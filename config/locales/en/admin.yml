@@ -1651,6 +1651,12 @@ en:
           erased: Erased
           locked: "Locked"
           unlocked: "Unlocked"
+      lock:
+        success: "User locked successfully"
+        error: "User could not be locked"
+      unlock:
+        success: "User unlocked successfully"
+        error: "User could not be unlocked"
       search:
         placeholder: Search user by email, name or document number
     verifications:

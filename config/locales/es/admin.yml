@@ -1585,6 +1585,12 @@ es:
         inactive_status: Cuenta no confirmada
         locked: "Bloqueado"
         unlocked: "Desbloqueado"
+      lock:
+        success: "Usuario bloqueado correctamente"
+        error: "No se pudo bloquear el usuario"
+      unlock:
+        success: "Usuario desbloqueado correctamente"
+        error: "No se pudo desbloquear el usuario"
       index:
         title: Usuarios
         no_users: No hay usuarios.
