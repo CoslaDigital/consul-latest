@@ -1,0 +1,6 @@
+<%# app/components/admin/users/table_actions_component.html.erb %>
+<div class="table-actions" style="justify-content: center;">
+  <% if lockable? %>
+    <%= content_tag :span, "", class: lock_icon_class, aria: { label: lock_label } %>
+  <% end %>
+</div>
