@@ -35,8 +35,7 @@
           precision: @precision
         )
       }
-    end
-    %>
+    end %>
     <%# coords = @cluster_summary.map { |c| { lat: c.lat_cluster, long: c.lng_cluster, title: "#{c.voter_count} Logins" } } %>
     <%= render_map(nil, investments_coordinates: coords) %>
   </div>

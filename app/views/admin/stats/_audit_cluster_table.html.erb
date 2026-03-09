@@ -9,7 +9,7 @@
   </thead>
   <tbody>
   <% clusters.each do |row| %>
-    <tr class="<%= 'suspicious-cluster' if row.suspicious %>">
+    <tr class="<%= "suspicious-cluster" if row.suspicious %>">
       <td>
         <%# Link the cluster name to the detail view %>
         <strong>
