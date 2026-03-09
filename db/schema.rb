@@ -1055,28 +1055,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_04_175342) do
     t.jsonb "sentiment_analysis"
   end
 
-  create_table "models", force: :cascade do |t|
-    t.string "model_id", null: false
-    t.string "name", null: false
-    t.string "provider", null: false
-    t.string "family"
-    t.datetime "model_created_at"
-    t.integer "context_window"
-    t.integer "max_output_tokens"
-    t.date "knowledge_cutoff"
-    t.jsonb "modalities", default: {}
-    t.jsonb "capabilities", default: []
-    t.jsonb "pricing", default: {}
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
-    t.index ["family"], name: "index_models_on_family"
-    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
-    t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
-    t.index ["provider"], name: "index_models_on_provider"
-  end
-
   create_table "moderators", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.index ["user_id"], name: "index_moderators_on_user_id"
