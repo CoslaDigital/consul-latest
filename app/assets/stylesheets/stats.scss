@@ -1,7 +1,8 @@
+/* app/assets/stylesheets/admin/participation_stats.scss */
+@use "sass:color"; // CRITICAL: This fixes the namespace error
+
 .participation-stats {
-
   @include breakpoint(medium) {
-
     .stats-content {
       border-left: 1px solid $border;
     }
@@ -25,11 +26,41 @@
   .section-title {
     border-bottom: 1px solid $border;
     font-size: rem-calc(24);
+    margin-bottom: $line-height;
   }
 
   .stats-group {
     margin-bottom: $line-height;
     margin-top: $line-height;
+  }
+
+  // Moved inside .participation-stats to match your view structure
+  .survey-districts {
+    td strong a {
+      color: $brand;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        color: $brand-secondary;
+        border-bottom-color: $brand-secondary;
+      }
+    }
+
+    .suspicious-cluster {
+      background-color: $alert-bg;
+
+      &:hover {
+        // This now works because of the @use at the top
+        background-color: color.adjust($alert-bg, $lightness: -2%);
+      }
+
+      .help-text {
+        color: $color-alert;
+        font-weight: bold;
+      }
+    }
   }
 
   .number-with-info {
@@ -88,7 +119,6 @@
     }
 
     &.total-participants {
-
       .number {
         font-size: rem-calc(60);
         line-height: rem-calc(60);
@@ -130,33 +160,40 @@
   }
 }
 
-table {
+.precision-filter {
+  .dropdown-settings-form {
+    background: $white;
+    padding: $line-height;
+    border: 1px solid $border;
+    border-radius: $global-radius;
+    max-width: rem-calc(550);
 
-  &.survey-districts {
+    .input-group {
+      display: flex;
+      margin-bottom: calc($line-height / 2);
 
-    @include breakpoint(medium down) {
-      thead {
-        font-size: rem-calc(12);
+      .input-group-label {
+        background: $info-bg;
+        border: 1px solid $info-border;
+        border-right: 0;
+        color: $color-info;
+      }
 
-        th {
-          width: 25%;
-          word-break: break-all;
-        }
+      .input-group-field {
+        height: $input-height;
+        border: 1px solid $info-border;
+        margin: 0;
+        flex: 1;
       }
     }
 
-    tr th {
-      border: 1px solid $border;
-      text-align: center;
-    }
-
-    .phase-subheader {
-      font-size: rem-calc(11);
-      font-weight: normal;
-    }
-
-    .success {
-      background: #c1fdd2;
+    .filter-actions {
+      .button {
+        height: $input-height;
+        margin: 0;
+        background: $brand;
+        font-weight: bold;
+      }
     }
   }
 }

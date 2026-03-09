@@ -1,0 +1,23 @@
+<%# app/views/admin/stats/_precision_filter.html.erb %>
+<%= form_tag url, method: :get, class: "dropdown-settings-form" do %>
+  <% request.query_parameters.except(:precision, :authenticity_token, :utf8).each do |name, value| %>
+    <%= hidden_field_tag name, value %>
+  <% end %>
+
+  <label for="precision" style="margin-bottom: 0.25rem; display: block;">
+    <%= t("stats.budgets.density_label", default: "Density Level") %>
+  </label>
+
+  <%= select_tag "precision",
+                 options_for_select([
+                                      [t("stats.budgets.precisions.district"), 1],
+                                      [t("stats.budgets.precisions.neighborhood"), 2],
+                                      [t("stats.budgets.precisions.street"), 3],
+                                      [t("stats.budgets.precisions.building"), 4]
+                                    ], precision.to_i),
+                 style: "width: 100%; margin-bottom: 0.75rem;" %>
+
+  <%= submit_tag t("stats.budgets.precisions.update"),
+                 class: "button",
+                 style: "width: auto; margin-left: 0;" %>
+<% end %>
