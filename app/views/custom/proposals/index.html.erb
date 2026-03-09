@@ -1,6 +1,5 @@
 <% provide :title, t("proposals.index.title") %>
 
-<%# --- Set your layout style for testing --- %>
 <%# proposal_style = :hero %>
 <% proposal_style = :default %>
 <% content_for :header_addon do %>
@@ -49,7 +48,6 @@
         <% end %>
       </div>
     <% end %>
-
 
     <% unless params[:selected].present? %>
       <div class="row">
@@ -118,7 +116,7 @@
         <%= render "categories" %>
         <%= render "shared/tag_cloud", taggable: "Proposal" %>
         <div class="sidebar-divider"></div>
-          <div class="proposals-geozones">
+        <div class="proposals-geozones">
           <h2 class="sidebar-title"><%= link_to t("shared.tags_cloud.districts_list"), map_proposals_path, id: "map", title: t("shared.tags_cloud.districts_list") %></h2>
           <br>
           <ul id="geozones" class="no-bullet">
@@ -126,7 +124,9 @@
               <li><%= link_to geozone.name, proposals_path(search: geozone.name) %></li>
             <% end %>
           </ul>
-      <% end %>
+        </div> <%# Properly closing the proposals-geozones div %>
+      <% end %> <%# Closing the params[:retired].blank? condition %>
+
       <%= render "retired" %>
       <%= render "proposals_lists" %>
     </aside>
