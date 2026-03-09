@@ -24,7 +24,7 @@
                    include_blank: t("geozones.none"),
                    hint: t("admin.budget_headings.form.geozone_info") %>
     <% end %>
-    
+
     <% if heading.budget.approval_voting? %>
       <%= f.number_field :max_ballot_lines,
                          hint: t("admin.budget_headings.form.max_ballot_lines_info") %>
@@ -32,7 +32,7 @@
     </div>
     <hr> <!-- Dividing line before the geozone section -->
 
-   <div class="row">    
+  <div class="row">
      <div class="small-12 column">
       <%= f.check_box :geozone_restricted, data: { checkbox_toggle: "#geozones" }, hint: t("admin.budget_headings.form.geozone_restricted_info") %>
       <p class="help-text" id="geozone-restricted-help-text">
