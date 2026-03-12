@@ -43,7 +43,6 @@ module Abilities
       can :read, Legislation::Proposal
       can [:retire_form, :retire], Legislation::Proposal, author_id: user.id
 
-      can :create, Comment
       can :create, Debate
       can [:create, :created], Proposal
       can :create, Legislation::Proposal
@@ -115,11 +114,17 @@ module Abilities
           poll.answerable_by?(user)
         end
 
+        # NEW: Specifically restrict Poll commenting to answerable users
         can :create_comment, Poll do |poll|
           poll.answerable_by?(user)
         end
-        # Fallback: Default permission for any other commentable types
-        can :create_comment, :all if user.present?
+      end
+
+      # NEW: Fallback to allow commenting on other types for any logged-in user
+      # This preserves existing behavior for Proposals, Debates, etc.
+      can :create_comment, :all do |record|
+        user.present? && !record.is_a?(Poll)
+      end
       end
 
       can [:create, :show], ProposalNotification, proposal: { author_id: user.id }
