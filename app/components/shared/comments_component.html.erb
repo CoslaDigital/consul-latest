@@ -3,8 +3,13 @@
     <%= content %>
 
     <% cache cache_key do %>
-      <% if current_user %>
+      <% if can?(:create_comment, record) %>
         <%= render Comments::FormComponent.new(record, valuation: valuation) %>
+      <% elsif current_user %>
+        <%# User is logged in but doesn't have permission (e.g., wrong Geozone) %>
+        <div class="callout warning shadow">
+          <%= t("comments.not_allowed_to_comment") %>
+        </div>
       <% else %>
         <%= render "shared/login_to_comment" %>
       <% end %>

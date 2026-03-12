@@ -114,6 +114,12 @@ module Abilities
         can :answer, Poll do |poll|
           poll.answerable_by?(user)
         end
+
+        can :create_comment, Poll do |poll|
+          poll.answerable_by?(user)
+        end
+        # Fallback: Default permission for any other commentable types
+        can :create_comment, :all if user.present?
       end
 
       can [:create, :show], ProposalNotification, proposal: { author_id: user.id }
