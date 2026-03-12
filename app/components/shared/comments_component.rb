@@ -17,7 +17,10 @@ class Shared::CommentsComponent < ApplicationComponent
         commentable_cache_key(record),
         comment_tree.comments,
         comment_tree.comment_authors,
-        record.comments_count
+        record.comments_count,
+        current_user&.level_two_or_three_verified?,
+        current_user&.geozone_id,
+        can?(:create_comment, record)
       ]
     end
 end
