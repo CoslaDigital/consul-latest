@@ -1,23 +1,36 @@
-<% if can?(:create_comment, record) %>
-  <%= render Comments::FormComponent.new(record, valuation: valuation) %>
-<% elsif current_user %>
-  <%# User is logged in but restricted %>
-  <div class="callout warning shadow margin-top">
-    <% if record.is_a?(Poll) && record.geozone_restricted? && !record.geozone_ids.include?(current_user.geozone_id) %>
-      <p>
-        <i class="fa fa-map-marker"></i>
-        <%= t("polls.comments.geozone_restricted", geozones: record.geozones.pluck(:name).to_sentence) %>
-      </p>
-    <% elsif !current_user.level_two_or_three_verified? %>
-      <p>
-        <i class="fa fa-shield"></i>
-        <%= t("polls.comments.verification_required") %>
-        <%= link_to t("shared.verify_account"), verification_path, class: "active" %>
-      </p>
-    <% else %>
-      <p><%= t("comments.not_allowed_to_comment") %></p>
+<div class="row comments">
+  <div id="comments" class="small-12 column">
+    <%= content %>
+
+    <% cache cache_key do %>
+      <%# --- 1. THE INTERACTIVE SECTION (Restricted) --- %>
+      <% if can?(:create_comment, record) %>
+        <%= render Comments::FormComponent.new(record, valuation: valuation) %>
+      <% elsif current_user %>
+        <div class="callout warning shadow margin-top">
+          <% if record.is_a?(Poll) && record.geozone_restricted? && !record.geozone_ids.include?(current_user.geozone_id) %>
+            <p>
+              <i class="fa fa-map-marker"></i>
+              <%= t("polls.comments.geozone_restricted", geozones: record.geozones.pluck(:name).to_sentence) %>
+            </p>
+          <% elsif !current_user.level_two_or_three_verified? %>
+            <p>
+              <i class="fa fa-shield"></i>
+              <%= t("polls.comments.verification_required") %>
+              <%= link_to t("shared.verify_account"), verification_path, class: "active" %>
+            </p>
+          <% else %>
+            <p><%= t("comments.not_allowed_to_comment") %></p>
+          <% end %>
+        </div>
+      <% else %>
+        <%= render "shared/login_to_comment" %>
+      <% end %>
+
+      <%# --- 2. THE DISPLAY SECTION (Always visible to everyone) --- %>
+      <%= render Shared::OrderLinksComponent.new("comments", anchor: "comments") %>
+      <%= render "comments/comment_list", comments: comment_tree.root_comments, valuation: valuation %>
+      <%= paginate comment_tree.root_comments, params: { anchor: "comments" } %>
     <% end %>
   </div>
-<% else %>
-  <%= render "shared/login_to_comment" %>
-<% end %>
+</div>
