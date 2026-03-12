@@ -125,7 +125,6 @@ module Abilities
       can :create_comment, :all do |record|
         user.present? && !record.is_a?(Poll)
       end
-      end
 
       can [:create, :show], ProposalNotification, proposal: { author_id: user.id }
 
