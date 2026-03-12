@@ -26,6 +26,7 @@ en:
       confirm_delete: "Are you sure? This action will delete this comment. You can't undo this action."
       delete: "Delete comment"
     comments_closed: Comments are closed
+    not_allowed_to_comment: "You do not have permission to comment on this item."
     verified_only: To participate %{verify_account}
     comment:
       admin: Administrator
@@ -535,6 +536,9 @@ en:
       index:
         title: Polls
         create: Create poll
+        comments:
+          geozone_restricted: "This discussion is limited to residents of %{geozones}."
+          verification_required: "You need to verify your account to participate in this poll's discussion."
         count:
           one: You have created %{count} poll.
           other: You have created %{count} polls.
