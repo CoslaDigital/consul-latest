@@ -28,7 +28,7 @@
   <table class="stack">
     <thead>
     <tr>
-      <th>User ID</th>
+      <th>User</th>
       <th>IP Address</th>
       <th class="text-center">Status</th>
       <th>Date</th>
@@ -38,7 +38,14 @@
     <% @audits.each do |audit| %>
       <tr>
         <td>
-          <%= link_to audit.auditable_id, "/admin/users/#{audit.auditable_id}/edit" if audit.auditable_id %>
+          <% if audit.auditable_id %>
+            <% user = User.find_by(id: audit.auditable_id) %>
+            <% if user %>
+              <%= link_to "#{user.name}", user_path(user) %>
+            <% else %>
+              <%= audit.auditable_id %> (deleted user)
+            <% end %>
+          <% end %>
         </td>
         <td><code><%= audit.ip_address %></code></td>
         <td class="text-center">
