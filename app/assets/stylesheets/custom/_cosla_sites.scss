@@ -67,6 +67,8 @@
   --main-header: #351;
   --top-links: var(--main-header);
   --subnavigation: #ffd;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
    // Import shared styles
    @import "cosla_shared";
    @include shared-styles;
@@ -83,6 +85,8 @@
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
    // Import shared styles
    @import "cosla_shared";
    @include shared-styles;
