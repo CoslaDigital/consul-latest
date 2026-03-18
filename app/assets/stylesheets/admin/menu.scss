@@ -114,6 +114,10 @@
       @include icon(calendar, solid);
     }
 
+    &.sensemaker-link {
+      @include icon(lightbulb, solid);
+    }
+
     &.administrators-link {
       @include icon(user, solid);
     }

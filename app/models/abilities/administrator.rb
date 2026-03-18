@@ -72,6 +72,7 @@ module Abilities
       can :read_results, Budget do |budget|
         budget.balloting_finished? && budget.has_winning_investments?
       end
+      can :read_sensemaking, Budget
 
       can [:read, :create, :update, :destroy], Budget::Group
       can [:read, :create, :update, :destroy], Budget::Heading
@@ -156,6 +157,7 @@ module Abilities
       can [:manage, :create, :update], Document
 
       can [:read, :enable, :manage, :show], :two_factor_authentication
+      can [:manage, :publish, :unpublish], Sensemaker::Job
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant
