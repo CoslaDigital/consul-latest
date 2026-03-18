@@ -1,12 +1,12 @@
 load Rails.root.join("app","components","layout","common_html_attributes_component.rb")
 
 class Layout::CommonHtmlAttributesComponent
-  use_helpers :rtl?
+  delegate :rtl?, to: :helpers
 
   private
 
     def attributes
-      sanitize([dir, lang, html_class].compact.join(" "))
+      helpers.sanitize([dir, lang, html_class].compact.join(" "))
     end
 
     def dir

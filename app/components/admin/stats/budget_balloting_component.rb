@@ -1,6 +1,6 @@
 class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
   attr_reader :budget, :precision, :type
-  use_helpers :include_stat_graphs_javascript, :render_map
+  delegate :include_stat_graphs_javascript, :render_map, to: :helpers
 
   def initialize(budget, precision: 2, type: "vote")
     @budget = budget

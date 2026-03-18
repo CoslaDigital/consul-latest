@@ -3,7 +3,7 @@ class Documents::DocumentComponent < ApplicationComponent
   alias_method :show_destroy_link?, :show_destroy_link
 
   # We need these helpers for permissions and formatting
-  use_helpers :can?, :number_to_human_size
+  delegate :can?, :number_to_human_size, to: :helpers
 
   def initialize(document, show_destroy_link: false)
     @document = document

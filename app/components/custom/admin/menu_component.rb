@@ -2,8 +2,7 @@ load Rails.root.join("app","components","admin","menu_component.rb")
 
 class Admin::MenuComponent < ApplicationComponent
   include LinkListHelper
-  use_helpers :can?
-  delegate :current_user, :session, to: :helpers
+  delegate :can?, :current_user, :session, to: :helpers
   def links
     if Rails.application.multitenancy_management_mode?
       multitenancy_management_links

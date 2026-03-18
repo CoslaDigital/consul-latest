@@ -3,7 +3,7 @@ load Rails.root.join("app", "components", "admin", "site_customization", "inform
 
 class Admin::SiteCustomization::InformationTexts::FormComponent < ApplicationComponent
   attr_reader :contents
-  use_helpers :site_customization_enable_translation?
+  delegate :site_customization_enable_translation?, to: :helpers
 
   def initialize(contents)
     @contents = contents
