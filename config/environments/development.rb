@@ -33,7 +33,7 @@ Rails.application.configure do
   end
 
   # Allow accessing the application through a domain so subdomains can be used
-  config.hosts << "lvh.me"
+  config.hosts << "consuldev.communitychoices.scot:3000"
   config.hosts << /.*\.lvh\.me/
 
   # Store uploaded files on the local file system (see config/storage.yml for options).

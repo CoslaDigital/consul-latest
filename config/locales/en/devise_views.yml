@@ -39,16 +39,16 @@ en:
       registrations:
         new:
           password_confirmation_label: Confirm password
-          responsible_name_note: This would be the person representing the association/collective in whose name the proposals are presented
+          responsible_name_note: This would be the person representing the organisation in whose name the proposals are submitted
           submit: Register
-          title: Register as an organisation or collective
+          title: Register as an organisation
         success:
           back_to_index: I understand; go back to main page
           instructions_1: "<strong>We will contact you soon</strong> to verify that you do in fact represent this collective."
           instructions_2: While your <strong>email is reviewed</strong>, we have sent you a <strong>link to confirm your account</strong>.
           instructions_3: Once confirmed, you may begin to participate as an unverified collective.
-          thank_you: Thank you for registering your collective on the website. It is now <strong>pending verification</strong>.
-          title: Registration of organisation / collective
+          thank_you: Thank you for registering your organisation on the website. It is now <strong>pending verification</strong>.
+          title: Registration of organisation
     passwords:
       edit:
         change_submit: Change my password
@@ -60,9 +60,29 @@ en:
         title: Forgotten password?
     sessions:
       new:
+        otp_label: Enter your 6-Digit Code
         remember_me: Remember me
         submit: Enter
         title: Sign in
+      two_factor:
+        enabled: "Two factor authentication is enabled."
+        disabled: "Two factor authentication is NOT enabled."
+        enable_link: "Enable Two Factor Authentication"
+        disable_link: "Disable Two Factor Authentication"
+        disable_confirm: "Are you sure you want to disable two factor authentication?"
+        authentication:
+          title: "Enter your two-factor authentication code"
+          instruction: "Open your authenticator app and enter the code below to complete your sign-in."
+          card_title: "Two Factor Authentication"
+          otp_label: "Authentication Code"
+          submit: "Verify and Sign In"
+        backup_codes:
+          title: "Two-Factor Authentication Enabled"
+          save_title: "Save Your Backup Codes"
+          instruction: "Please treat these backup codes like a password. We recommend storing them in a secure password manager."
+          warning: "Each code can only be used once. These codes will **not be shown again**."
+          codes_title: "Your Backup Codes"
+          save_button: "I have saved my codes"
     shared:
       links:
         login: Enter
@@ -98,6 +118,7 @@ en:
           cancel: Cancel login
           organization_signup: Do you represent an organisation or collective? %{signup_link}
           organization_signup_link: Sign up here
+          individual_signup: Sign up as an individual
           password_confirmation_label: Confirm password
           submit: Register
           terms: By registering you accept the %{terms}

@@ -16,11 +16,17 @@
     <%= render Shared::BasicContentComponent.new(proposal) do %>
       <%= render Shared::BasicInfoComponent.new(proposal) do %>
         <% if Geozone.any? %>
+          <span class="bullet">&nbsp;&bull;&nbsp;</span>
           <span class="geozone">
             <%= link_to geozone_name(proposal), proposals_path(search: geozone_name(proposal)) %>
           </span>
         <% end %>
       <% end %>
+
+        <h4><%= t("budgets.investments.show.estimated_price") %></h4>
+        <p class="investment-project-amount">
+          <%= proposal.price.nil? ? content_tag(:em, t("proposals.proposal.price_not_yet_known")) : proposal.formatted_price %>
+        </p>
     <% end %>
 
     <% if show_proposal_votes? %>

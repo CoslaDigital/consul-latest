@@ -1,0 +1,12 @@
+<%# app/components/admin/users/table_actions_component.html.erb %>
+<div class="table-actions" style="justify-content: center;">
+  <% if lockable? %>
+    <%= render Admin::ActionComponent.new(
+      lock_action,
+      user,
+      path: lock_path,
+      method: :put,
+      class: locked? ? "locked-icon" : "unlocked-icon"
+    ) %>
+  <% end %>
+</div>

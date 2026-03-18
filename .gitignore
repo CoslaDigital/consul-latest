@@ -41,3 +41,4 @@ tmp/
 /coverage/
 
 /vendor/sensemaking-tools/
+/config/master.key

@@ -90,6 +90,23 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def proposal_published(proposal)
+    @proposal = proposal
+    @email_to = @proposal.author.email
+
+    with_user(@proposal.author) do
+      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
+    end
+  end
+
+  def proposal_published_admin(proposal)
+    @proposal = proposal
+    with_user(@proposal.author) do
+      @email_to = ::Setting["admin_email"]
+      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published") if @email_to.present?
+    end
+  end
+
   def budget_investment_unfeasible(investment)
     @investment = investment
     @author = investment.author

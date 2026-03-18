@@ -34,6 +34,13 @@ es:
       percent_heading_census: "% Censo distrito"
       participatory_disclaimer: "** Las cifras de total de participantes se refieren a personas que han creado, apoyado o votado propuestas."
       heading_disclaimer: "*** Los datos de distrito se refieren al distrito en el que el usuario ha votado, no necesariamente en el que está empadronado."
+      participation_density_view: "Vista de densidad de participación"
+      density_level: "Nivel de densidad"
+      precisions:
+        district: "Distrito (10km)"
+        neighborhood: "Barrio (1km)"
+        street: "Calle (100m)"
+        building: "Edificio (10m)"
     polls:
       by_channel: "Participantes por medio"
       vote_by_channel: "Votos emitidos por medio"

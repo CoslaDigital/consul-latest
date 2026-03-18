@@ -3,7 +3,7 @@
   App.Map = {
     maps: [],
     initialize: function() {
-      $("*[data-map]:visible").each(function() {
+      $('*[data-map]:visible').each(function() {
         App.Map.initializeMap(this);
       });
     },
@@ -15,32 +15,32 @@
       App.Map.maps = [];
     },
     initializeMap: function(element) {
-      var createMarker, editable, geozoneLayers, investmentsMarkers, map, marker, markerClustering,
-        markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector;
+      var createMarker, editable, investmentsMarkers, map, marker, markerClustering,
+        markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector,
+        geozoneLayers = {}, // Object to hold geozone layers
+        layerControl = {}; // Object to hold control layers
+
       App.Map.cleanInvestmentCoordinates(element);
-      removeMarkerSelector = $(element).data("marker-remove-selector");
+      removeMarkerSelector = $(element).data('marker-remove-selector');
       investmentsMarkers = $(element).data("marker-investments-coordinates");
       editable = $(element).data("marker-editable");
       markerClustering = $(element).data("marker-clustering");
-      if (markerClustering) {
-        markers = L.markerClusterGroup({ chunkedLoading: true });
-      } else {
-        markers = L.layerGroup();
-      }
-      marker = null;
-      markerIcon = function(alt_text) {
-        return L.divIcon({
-          className: "map-marker",
-          iconSize: [30, 30],
-          iconAnchor: [15, 40],
-          html: $('<div class="map-icon"></div>').attr("aria-label", alt_text)[0].outerHTML
-        });
-      };
-      createMarker = function(latitude, longitude, text) {
+
+      // Define markers layer
+      markers = markerClustering ? L.markerClusterGroup({ chunkedLoading: true }) : L.layerGroup();
+
+      markerIcon = L.divIcon({
+        className: "map-marker",
+        iconSize: [30, 30],
+        iconAnchor: [15, 40],
+        html: '<div class="map-icon"></div>'
+      });
+
+      createMarker = function(latitude, longitude) {
         var newMarker, markerLatLng;
         markerLatLng = new L.LatLng(latitude, longitude);
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon(text),
+          icon: markerIcon,
           draggable: editable
         });
         if (editable) {
@@ -51,6 +51,7 @@
         markers.addLayer(newMarker);
         return newMarker;
       };
+
       removeMarker = function() {
         if (marker) {
           map.removeLayer(marker);
@@ -58,6 +59,7 @@
         }
         App.Map.clearFormfields(element);
       };
+
       moveOrPlaceMarker = function(e) {
         if (marker) {
           marker.setLatLng(e.latlng);
@@ -73,8 +75,9 @@
 
       markerData = App.Map.markerData(element);
       if (markerData.lat && markerData.long && !investmentsMarkers) {
-        marker = createMarker(markerData.lat, markerData.long, markerData.title);
+        marker = createMarker(markerData.lat, markerData.long);
       }
+
       if (editable) {
         $(removeMarkerSelector).on("click", removeMarker);
         map.on("zoomend", function() {
@@ -86,11 +89,18 @@
       }
 
       App.Map.addInvestmentsMarkers(investmentsMarkers, createMarker);
-      geozoneLayers = App.Map.geozoneLayers(map);
-      App.Map.addGeozones(map, geozoneLayers);
-      App.Map.addLayerControl(map, geozoneLayers);
+      App.Map.addGeozones(map, geozoneLayers); // Pass the geozoneLayers object
 
+      // Add markers layer
       map.addLayer(markers);
+
+      // Add Layer Control
+      layerControl = {
+        "Markers": markers,
+        ...geozoneLayers // Add geozone layers to the control
+      };
+
+      L.control.layers(null, layerControl).addTo(map);
     },
     leafletMap: function(element) {
       var centerData, mapCenterLatLng, map;
@@ -98,7 +108,6 @@
       centerData = App.Map.centerData(element);
       mapCenterLatLng = new L.LatLng(centerData.lat, centerData.long);
       map = L.map(element.id, { scrollWheelZoom: false }).setView(mapCenterLatLng, centerData.zoom);
-
       map.on("focus", function() {
         map.scrollWheelZoom.enable();
       });
@@ -117,14 +126,14 @@
 
       dataCoordinates = {
         lat: $(element).data("marker-latitude"),
-        long: $(element).data("marker-longitude"),
-        title: $(element).data("marker-title")
+        long: $(element).data("marker-longitude")
       };
       formCoordinates = {
         lat: inputs.lat.val(),
         long: inputs.long.val(),
         zoom: inputs.zoom.val()
       };
+
       if (App.Map.validCoordinates(formCoordinates)) {
         latitude = formCoordinates.lat;
         longitude = formCoordinates.long;
@@ -136,7 +145,6 @@
       return {
         lat: latitude,
         long: longitude,
-        title: dataCoordinates.title,
         zoom: formCoordinates.zoom
       };
     },
@@ -192,7 +200,8 @@
           var marker;
 
           if (App.Map.validCoordinates(coordinates)) {
-            marker = createMarker(coordinates.lat, coordinates.long, coordinates.title);
+            marker = createMarker(coordinates.lat, coordinates.long);
+            marker.options.id = coordinates.investment_id;
             marker.bindPopup(App.Map.getPopupContent(coordinates));
           }
         });
@@ -217,54 +226,49 @@
       L.tileLayer(mapTilesProvider, { attribution: mapAttribution }).addTo(map);
     },
     addGeozones: function(map, geozoneLayers) {
-      $.each(geozoneLayers, function(_, geozoneLayer) {
-        App.Map.addGeozone(map, geozoneLayer);
-      });
-    },
-    addLayerControl: function(map, geozoneLayers) {
-      if (Object.keys(geozoneLayers).length > 1) {
-        L.control.layers(null, geozoneLayers).addTo(map);
-      }
-    },
-    geozoneLayers: function(map) {
       var geozones = $(map._container).data("geozones");
-      var layers = {};
 
       if (geozones) {
         geozones.forEach(function(geozone) {
-          if (geozone.outline_points) {
-            layers[geozone.name] = App.Map.geozoneLayer(geozone);
-          }
+          App.Map.addGeozone(geozone, map, geozoneLayers);
         });
       }
-
-      return layers;
     },
-    geozoneLayer: function(geozone) {
+    addGeozone: function(geozone, map, geozoneLayers) {
+      // Parse the GeoJSON string
       var geojsonData = JSON.parse(geozone.outline_points);
 
-      return L.geoJSON(geojsonData, {
+      // Create a GeoJSON layer
+      var geoJsonLayer = L.geoJSON(geojsonData, {
         style: function(feature) {
           return {
-            color: feature.properties.color || geozone.color,
+            color: geozone.color || feature.properties.color || "blue",
             fillOpacity: 0.3,
             className: "map-polygon"
           };
         },
         onEachFeature: function(feature, layer) {
-          var headings = feature.properties.headings || geozone.headings;
-
-          if (headings) {
+          if (feature.properties.headings || geozone.headings) {
+            // Use feature properties headings if provided, else fallback to geozone headings
+            var headings = feature.properties.headings || geozone.headings;
             layer.bindPopup(headings.join("<br>"));
           }
         }
       });
-    },
-    addGeozone: function(map, geozoneLayer) {
-      geozoneLayer.addTo(map);
+
+      // Use geozone headings as the name for the layer, fallback to a default name
+      var layerName = (geozone.headings && geozone.headings.length > 0)
+        ? geozone.headings.join(", ")
+        : `Geozone ${Object.keys(geozoneLayers).length + 1}`;
+
+      // Store the GeoJSON layer in the geozoneLayers object with the actual name
+      geozoneLayers[layerName] = geoJsonLayer;
+
+      // Add the GeoJSON layer to the map
+      geoJsonLayer.addTo(map);
     },
     getPopupContent: function(data) {
-      return "<a href='" + data.link + "'>" + data.title + "</a>";
+      return "<a href='" + data.link + "'>" + data.title + '</a>';
     },
     validZoom: function(zoom) {
       return App.Map.isNumeric(zoom);

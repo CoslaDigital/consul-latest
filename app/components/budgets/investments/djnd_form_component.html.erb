@@ -1,0 +1,110 @@
+<%= translatable_form_for(investment, url: url, html: { class: "budget-investment-form" }) do |f| %>
+
+  <%= render "shared/errors", resource: investment, message: t("custom.errors.submit_investment") %>
+
+  <fieldset class="required-fields">
+
+    <% unless budget.single_heading? %>
+      <div>
+        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true } %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= render "shared/globalize_locales", resource: investment %>
+    </div>
+
+    <%= f.translatable_fields do |translations_form| %>
+      <div>
+        <%= translations_form.text_field :title,
+              maxlength: Budget::Investment.title_max_length,
+              data: suggest_data(investment) %>
+      </div>
+      <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
+
+      <div>
+        <%= translations_form.hidden_field :description,
+              value: "Description replaced by questions",
+              maxlength: Budget::Investment.description_max_length,
+              class: "html-area" %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <%= f.invisible_captcha :subtitle %>
+
+  <fieldset>
+    <%= f.fields_for :answers do |builder| %>
+      <p>
+        <%= builder.text_area :text, label: budget.questions.order(:id)[builder.index].text, rows: 5 %>
+        <%= builder.hidden_field :budget_id %>
+        <%= builder.hidden_field :budget_question_id %>
+        <% if investment.errors[:answers].count > 0 && params[:budget_investment][:answers_attributes][builder.index.to_s][:text].strip == "" %>
+          <span class="form-error is-visible"><%= t("custom.errors.no_answer") %></span>
+        <% end %>
+      </p>
+    <% end %>
+
+    <%= f.label :price, "Vrednost predloga (v evrih)", class: "inline-block" %>
+    <p class="help-text">Vpišite celo število brez kakršnih koli pik, vejic, črk in ostalih simbolov.</p>
+    <%= f.number_field :price, label: false, :required => true %>
+
+    <% if feature?(:allow_images) %>
+      <%= render Images::NestedComponent.new(f) %>
+    <% end %>
+
+    <% if feature?(:allow_attached_documents) %>
+      <%= render Documents::NestedComponent.new(f) %>
+    <% end %>
+
+    <% if feature?(:map) %>
+      <div>
+        <%= render "map_locations/form_fields",
+                   form: f,
+                   map_location: investment.map_location || MapLocation.new,
+                   label: t("budgets.investments.form.map_location"),
+                   help: t("budgets.investments.form.map_location_instructions"),
+                   i18n_namespace: "budgets.investments" %>
+      </div>
+    <% end %>
+
+    <% if categories.count > 0 %>
+      <div>
+        <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
+        <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
+
+        <div id="category_tags" class="tags">
+          <% categories.each do |tag| %>
+            <a class="js-add-tag-link"><%= tag.name %></a>
+          <% end %>
+        </div>
+
+        <br>
+        <%= f.text_field :tag_list, value: investment.tag_list.to_s,
+                          label: false,
+                          placeholder: t("budgets.investments.form.tags_placeholder"),
+                          aria: { describedby: "tags-list-help-text" },
+                          class: "js-tag-list tag-autocomplete",
+                          data: { js_url: suggest_tags_path },
+                          readonly: true %>
+      </div>
+    <% end %>
+
+  </fieldset>
+
+  <div class="text-center">
+    <% unless current_user.manager? || investment.persisted? %>
+      <div class="hide-field">
+        <%= f.check_box :terms_of_service,
+          checked: true,
+          title: t("form.accept_terms_title"),
+          label: t("form.accept_terms",
+                   policy: link_to(t("form.policy"), "/privacy", target: "blank"),
+                   conditions: link_to(t("form.conditions"), "/conditions", target: "blank")
+                  ) %>
+      </div>
+    <% end %>
+
+    <%= f.submit t("budgets.investments.form.submit"), class: "action-button" %>
+  </div>
+<% end %>

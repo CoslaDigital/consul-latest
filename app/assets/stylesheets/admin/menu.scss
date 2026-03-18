@@ -114,6 +114,10 @@
       @include icon(lightbulb, solid);
     }
 
+    &.events-link {
+      @include icon(calendar, solid);
+    }
+
     &.administrators-link {
       @include icon(user, solid);
     }

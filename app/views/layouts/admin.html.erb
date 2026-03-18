@@ -17,6 +17,8 @@
           <%= render Admin::MenuComponent.new %>
         <% elsif namespace == "moderation" %>
           <%= render Moderation::MenuComponent.new %>
+        <% elsif namespace == "process_management" %>
+          <%= render Admin::MenuComponent.new %>
         <% elsif namespace == "sdg_management" %>
           <%= render SDGManagement::MenuComponent.new %>
         <% elsif namespace == "officing" %>

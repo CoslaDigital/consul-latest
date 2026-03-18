@@ -70,12 +70,14 @@ class Setting < ApplicationRecord
         "feature.google_login": true,
         "feature.twitter_login": true,
         "feature.wordpress_login": false,
+        "feature.public_stats": true,
         "feature.signature_sheets": true,
         "feature.user.recommendations": true,
         "feature.user.recommendations_on_debates": true,
         "feature.user.recommendations_on_proposals": true,
         "feature.user.skip_verification": "true",
         "feature.community": true,
+        "feature.resources": true,
         "feature.map": nil,
         "feature.allow_attached_documents": true,
         "feature.allow_images": true,
@@ -89,13 +91,16 @@ class Setting < ApplicationRecord
         "feature.saml_login": false,
         "feature.sdg": true,
         "feature.machine_learning": false,
+        "feature.force_2factor": false,
         "feature.remove_investments_supports": true,
         "feature.cookies_consent": false,
         "feature.gdpr.require_consent_for_notifications": false,
         "feature.sensemaker": false,
+        "feature.events": true,
         "homepage.widgets.feeds.debates": true,
         "homepage.widgets.feeds.processes": true,
         "homepage.widgets.feeds.proposals": true,
+        "homepage.widgets.feeds.upcoming": true,
         # Code to be included at the top (inside <body>) of every page
         "html.per_page_code_body": "",
         # Code to be included at the top (inside <head>) of every page (useful for tracking)
@@ -171,6 +176,7 @@ class Setting < ApplicationRecord
         "machine_learning.related_content": false,
         "machine_learning.tags": false,
         "postal_codes": "",
+        "admin_email": "",
         "remote_census.general.endpoint": "",
         "remote_census.request.method_name": "",
         "remote_census.request.structure": "",
@@ -246,6 +252,20 @@ class Setting < ApplicationRecord
       locale = Setting["locales.default"].to_s.strip.to_sym
 
       ([locale] & I18n.available_locales).first || I18n.default_locale
+    end
+
+    def otp_enabled?
+      return false unless two_factor_configured?
+
+      Setting["feature.force_2factor"] == "active"
+    end
+
+    def two_factor_configured?
+      secrets = Tenant.current_secrets
+      secrets[:devise_otp_key].present? &&
+        secrets.dig(:active_record_encryption, :primary_key).present? &&
+        secrets.dig(:active_record_encryption, :deterministic_key).present? &&
+        secrets.dig(:active_record_encryption, :key_derivation_salt).present?
     end
   end
 end
