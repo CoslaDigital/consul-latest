@@ -66,7 +66,7 @@
       <details>
         <summary><%= t("admin.sensemaker.new.advanced_options") %></summary>
         <p class="small margin-bottom-sm"><%= t("admin.sensemaker.new.expert_options_hint") %></p>
-        <% script_options = Sensemaker::JobRunner::SCRIPTS.map { |script| [I18n.t("sensemaker.scripts.#{script.parameterize.underscore}.title"), script] } %>
+        <% script_options = Sensemaker::JobRunner::SCRIPTS.map { |script| [I18n.t("admin.sensemaker.scripts.#{script.parameterize.underscore}.title"), script] } %>
         <div class="flex-between margin-bottom-xl">
           <%= f.select :script, script_options, { include_blank: t("admin.sensemaker.new.select_script_blank"), required: false, label: false }, class: "no-margin" %>
           <%= f.submit t("admin.sensemaker.new.run"), data: { temp_disable: true } %>

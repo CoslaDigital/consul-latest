@@ -3,7 +3,7 @@
     <%= link_to t("admin.sensemaker.job_row.job_id_link", id: job.id), admin_sensemaker_job_path(job), class: "job-link" %>
     <%= content_tag :p, analysable_title, style: "" %>
   </td>
-  <td class="small"><%= t("sensemaker.scripts.#{job.script.parameterize.underscore}.title") %></td>
+  <td class="small"><%= t("admin.sensemaker.scripts.#{job.script.parameterize.underscore}.title") %></td>
   <% if job.running? %>
     <td><%= job.started_at.strftime("%Y-%m-%d %H:%M") %></td>
   <% else %>
