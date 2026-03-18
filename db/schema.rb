@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_04_175342) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_24_085341) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1461,6 +1461,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_04_175342) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.boolean "advanced_stats"
+    t.boolean "sensemaking", default: false
     t.index ["process_type", "process_id"], name: "index_reports_on_process_type_and_process_id"
   end
 
@@ -1534,6 +1535,28 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_04_175342) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["code"], name: "index_sdg_targets_on_code", unique: true
     t.index ["goal_id"], name: "index_sdg_targets_on_goal_id"
+  end
+
+  create_table "sensemaker_jobs", force: :cascade do |t|
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.string "script"
+    t.integer "pid"
+    t.text "error"
+    t.bigint "user_id", null: false
+    t.string "analysable_type", null: false
+    t.integer "analysable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "additional_context"
+    t.bigint "parent_job_id"
+    t.string "input_file"
+    t.string "persisted_output"
+    t.boolean "published", default: false
+    t.integer "comments_analysed", default: 0
+    t.index ["analysable_type", "analysable_id"], name: "index_sensemaker_jobs_on_analysable_type_and_analysable_id"
+    t.index ["parent_job_id"], name: "index_sensemaker_jobs_on_parent_job_id"
+    t.index ["user_id"], name: "index_sensemaker_jobs_on_user_id"
   end
 
   create_table "settings", id: :serial, force: :cascade do |t|
@@ -1920,6 +1943,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_04_175342) do
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"
   add_foreign_key "sdg_managers", "users"
+  add_foreign_key "sensemaker_jobs", "sensemaker_jobs", column: "parent_job_id"
+  add_foreign_key "sensemaker_jobs", "users"
   add_foreign_key "users", "geozones"
   add_foreign_key "valuators", "users"
 end

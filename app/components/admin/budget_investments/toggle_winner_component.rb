@@ -1,6 +1,6 @@
 class Admin::BudgetInvestments::ToggleWinnerComponent < ApplicationComponent
   attr_reader :investment
-  use_helpers :can?
+  delegate :can?, to: :helpers
   delegate :winner?, to: :investment
 
   def initialize(investment)

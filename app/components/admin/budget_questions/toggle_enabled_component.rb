@@ -1,6 +1,6 @@
 class Admin::BudgetQuestions::ToggleEnabledComponent < ApplicationComponent
   attr_reader :question
-  use_helpers :can?
+  delegate :can?, to: :helpers
   delegate :enabled?, to: :question
 
   def initialize(question)
