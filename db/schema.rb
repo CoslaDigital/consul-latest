@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_24_085341) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -993,11 +993,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_24_085341) do
     t.bigint "user_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "dry_run"
-    t.integer "duration"
-    t.integer "total_tokens"
-    t.jsonb "config", default: {}
-    t.integer "records_processed"
     t.index ["user_id"], name: "index_machine_learning_jobs_on_user_id"
   end
 
@@ -1052,7 +1047,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_24_085341) do
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.jsonb "sentiment_analysis"
   end
 
   create_table "moderators", id: :serial, force: :cascade do |t|
