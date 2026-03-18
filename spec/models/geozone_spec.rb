@@ -66,7 +66,6 @@ describe Geozone do
   describe "#outline_points" do
     it "returns nil when geojson is nil" do
       geozone.geojson = nil
-
       expect(geozone.outline_points).to be nil
     end
 

@@ -27,6 +27,7 @@ class Admin::MenuComponent < ApplicationComponent
         profiles_links,
         stats_link,
         settings_links,
+        (events_link if feature?(:events)),
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?)
       ]
@@ -261,6 +262,14 @@ class Admin::MenuComponent < ApplicationComponent
       ]
     end
 
+  def events_link
+    [
+      t("admin.menu.events"),
+      admin_events_path,
+      controller_name == "events",
+      class: "events-link"      
+    ]
+  end
     def site_customization_links
       section(t("admin.menu.title_site_customization"),
               active: customization?, class: "site-customization-link") do
@@ -476,7 +485,10 @@ class Admin::MenuComponent < ApplicationComponent
           tags_link,
           (locales_link if I18n.available_locales.many?),
           geozones_link,
-          local_census_records_link
+          postcodes_link,
+          local_census_records_link,
+          class: ("is-active" if settings?)
+
         )
       end
     end
@@ -521,6 +533,14 @@ class Admin::MenuComponent < ApplicationComponent
         t("admin.menu.geozones"),
         admin_geozones_path,
         controller_name == "geozones"
+      ]
+    end
+    
+    def postcodes_link
+      [
+        t("admin.menu.postcodes"),
+        admin_postcodes_path,
+        controller_name == "postcodes"
       ]
     end
 

@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby file: ".ruby-version"
+#ruby file: ".ruby-version"
 
 gem "rails", "~> 7.2.3"
 
@@ -27,6 +27,7 @@ gem "devise-security", "~> 0.18.0"
 gem "exiftool_vendored", "~> 13.52.0"
 gem "file_validators", "~> 3.0.0"
 gem "font-awesome-sass", "~> 5.15.1" # Remember to update vendor/assets/images/fontawesome when updating this gem
+gem "geocoder", "~> 1.8"
 gem "globalize", "~> 7.1.1"
 gem "globalize-accessors", "~> 0.3.0"
 gem "googleauth", "~> 1.16.1"
@@ -69,11 +70,17 @@ gem "view_component", "~> 4.2.0"
 gem "whenever", "~> 1.1.2", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
+gem "ed25519"
+gem "bcrypt_pbkdf"
+gem "faker"
+source "https://rails-assets.org" do
+  gem "rails-assets-markdown-it", "~> 9.0.1"
+end
 
 group :development, :test do
   gem "debug", "~> 1.9.2"
   gem "factory_bot_rails", "~> 6.5.1"
-  gem "faker", "~> 3.5.2"
+  gem "faker"
   gem "i18n-tasks", "~> 0.9.37"
   gem "knapsack_pro", "~> 8.4.0"
   gem "launchy", "~> 3.1.1"

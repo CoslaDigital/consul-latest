@@ -73,6 +73,12 @@ namespace :admin do
     end
 
     resources :budgets, except: [:create, :new] do
+      resources :budget_questions do
+        member do
+          patch :mark_as_enabled
+          patch :unmark_as_enabled
+        end
+      end
       member do
         patch :publish
         put :calculate_winners
@@ -88,6 +94,8 @@ namespace :admin do
           patch :deselect
           patch :show_to_valuators
           patch :hide_from_valuators
+          patch :mark_as_winner
+          patch :unmark_as_winner
         end
 
         resources :audits, only: :show, controller: "budget_investment_audits"
@@ -161,7 +169,12 @@ namespace :admin do
       resources :managers, only: [:index, :create, :destroy]
     end
 
-    resources :users, only: :index
+    resources :users, only: :index do
+      member do
+        put :lock
+        put :unlock
+      end
+    end
 
     scope module: :poll do
       resources :polls do
@@ -244,6 +257,8 @@ namespace :admin do
       get :direct_messages, on: :collection
       get :polls, on: :collection
       get :sdg, on: :collection
+      get :login_ips, on: :collection
+      get :login_audit_details, on: :collection
     end
 
     namespace :legislation do
@@ -265,7 +280,17 @@ namespace :admin do
     resources :geozones, only: [:index, :new, :create, :edit, :update, :destroy]
     resource :locales, only: [:show, :update]
 
+    resources :postcodes, only: [:index, :new, :create, :edit, :update, :destroy, :ncsv, :process_csv, :ncsv_review] do
+      collection do
+        get :ncsv
+        post :process_csv
+        get :ncsv_review
+      end
+    end
+    resources :cards, controller: "widget/cards", path: "widget/cards"
+
     namespace :site_customization do
+      resources :cards, only: [:index]
       resources :pages, except: [:show] do
         resources :cards, except: [:show], as: :widget_cards
       end

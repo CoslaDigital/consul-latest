@@ -12,6 +12,7 @@ en:
       save_changes_submit: Save changes
       recommendations: Recommendations
       title: My account
+      two_factor: Two Factor Authentication
       user_permission_info: With your account you can...
       user_permission_title: Participation
       user_permission_verify: To perform all the actions verify your account.
@@ -227,6 +228,8 @@ en:
           zero: "You don't have new notifications"
         notifications: Notifications
       sdg: "SDG"
+      events: "Events"
+      process_admin: "Manage Processes"
     skip_to_main_content: "Skip to main content"
   notifications:
     index:
@@ -250,8 +253,8 @@ en:
       mark_as_unread: Mark as unread
       notifiable_hidden: This resource is not available anymore.
   map:
-    title: "Districts"
-    proposal_for_district: "Start a proposal for your district"
+    title: "Administrative Areas"
+    proposal_for_district: "Start a proposal for your area"
     start_proposal: Create a proposal
   omniauth:
     facebook:
@@ -269,12 +272,17 @@ en:
       sign_in: Sign in with Wordpress
       sign_up: Sign up with Wordpress
       name: Wordpress
+    saml:
+      sign_in: Sign in with mygovscot myaccount
+      sign_up: Sign up with Saml
+      name: Saml
     twitter:
       sign_in: Sign in with Twitter
       sign_up: Sign up with Twitter
       name: Twitter
     info:
-      sign_in: "Sign in with:"
+      sign_in: "You can sign in with any of the methods on this page"
+      sign_in_help: ""
       sign_up: "Sign up with:"
     saml:
       sign_in: Sign in with SAML
@@ -318,9 +326,19 @@ en:
       done: Done
       other: Other
     form:
-      proposal_responsible_name_note: "(individually or as representative of a collective; will not be displayed publically)"
-      proposal_summary_note: "(maximum 200 characters)"
+      geozone: Geographic Area
+      geozone_help: "This is the area in which your reside"
+      proposal_responsible_name_note: "(individually or as representative of an organisation; will not be displayed publically)"
+      proposal_title: "Name"
+      proposal_summary: "Summary"
+      proposal_description: "Description"
       proposal_video_url_note: You may add a link to YouTube or Vimeo
+      proposal_title_note: "Give a suitable name to your proposal"
+      proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
+      proposal_description_note: "Provide a detailed description of your project"
+      proposal_video_url_note: You may add a link to YouTube or Vimeo
+      proposal_estimated_price: Estimated Cost
+      proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it
       tag_category_label: "Categories"
       tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
       tags_label: Tags
@@ -376,7 +394,7 @@ en:
         help: Help with proposals
       section_footer:
         title: Help with proposals
-        description: Citizens' proposals are an opportunity for neighbours and collectives to decide directly how they want their city to be, after getting sufficient support and submitting to a citizens' vote.
+        description: Citizens' proposals are an opportunity for neighbours and organisations to decide directly how they want their city to be, after getting sufficient support and submitting to a citizens' vote.
     new:
       form:
         submit_button: Create proposal
@@ -391,6 +409,7 @@ en:
       published: The proposal has been published
     proposal:
       created: "You've created a proposal!"
+      price_not_yet_known: "Not yet known"
       share:
         guide: "Now you can share it so people can start supporting."
         edit: "Before it gets shared you'll be able to change the text as you like."
@@ -416,6 +435,7 @@ en:
       code: "Proposal code:"
       comments_tab: Comments
       dashboard_proposal_link: Dashboard
+      budget_investment_link: Create Budget Proposal
       flag: This proposal has been flagged as inappropriate by several users.
       notifications_tab: Notifications
       milestones_tab: Milestones
@@ -687,7 +707,7 @@ en:
     back: Go back
     check_all: Select all
     check_none: Select none
-    collective: Collective
+    collective: organisation
     flag: Flag as inappropriate
     follow: "Follow"
     following: "Following"
@@ -760,6 +780,7 @@ en:
         one: "1 language in use"
         other: "%{count} languages in use"
     optional: "Optional fields"
+    optional_note: "Please add additional information below"
     required: "Required fields"
     comments:
       one: "1 comment"
@@ -852,14 +873,17 @@ en:
         debates: "Most active debates"
         proposals: "Most active proposals"
         processes: "Open processes"
+        upcoming: "Upcoming Events"
       see_all:
         debates: See all debates
         proposals: See all proposals
         processes: See all processes
+        upcoming: "See all events"
       no_items:
         debates: There are no debates right now
         proposals: There are no proposals right now
         processes: There are no open processes right now
+        upcoming: There are no events right now
       process_label: Process
       see_process: See process
     cards:
@@ -961,3 +985,17 @@ en:
       title: Third party cookies
       description: This website use third-party cookies. These cookies can enhance functionality or collect information to improve your user experience.
     save_preferences: Save preferences
+  two_factor_authentication:
+    show:
+      title: "Set Up Two-Factor Authentication"
+      description: "Scan the QR code with your authenticator app and enter the code below."
+      google_authenticator: "Google Authenticator"
+      authy: "Authy"
+      app_store: "App Store"
+      google_play: "Google Play"
+      otp_label: "Enter 6-digit code"
+      enable_button: "Enable Two-Factor Authentication"
+      qr_alt: "QR Code for Two-Factor Authentication"
+    enable:
+      success_notice: "Two-factor authentication enabled successfully."
+      invalid_otp_alert: "Invalid OTP"

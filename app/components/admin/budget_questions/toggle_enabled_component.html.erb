@@ -1,0 +1,6 @@
+<%# app/components/admin/budget_questions/toggle_enabled_component.html.erb %>
+<%# if can?(action, question) %>
+  <%= render Admin::ToggleSwitchComponent.new(action, question, pressed: enabled?, **options) %>
+<%# elsif selected? %>
+  <%#= selected_text %>
+<%# end %>

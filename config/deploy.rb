@@ -22,7 +22,7 @@ set :application, deploysecret(:app_name, default: "consul")
 set :deploy_to, deploysecret(:deploy_to)
 set :ssh_options, port: deploysecret(:ssh_port)
 
-set :repo_url, "https://github.com/consuldemocracy/consuldemocracy.git"
+set :repo_url, "https://github.com/CoslaDigital/consul-latest.git"
 
 set :revision, `git rev-parse --short #{fetch(:branch)}`.strip
 
@@ -40,12 +40,12 @@ set :local_user, ENV["USER"]
 
 set :fnm_path, "$HOME/.fnm"
 set :fnm_install_command, "curl -fsSL https://fnm.vercel.app/install | " \
-                          "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
+  "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
 set :fnm_update_command, "#{fetch(:fnm_install_command)} --skip-shell"
 set :fnm_setup_command, -> do
-                          "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
-                            "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
-                        end
+  "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
+    "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
+end
 set :fnm_install_node_command, -> { "#{fetch(:fnm_setup_command)} && fnm use --install-if-missing" }
 set :fnm_map_bins, %w[node npm rake yarn]
 

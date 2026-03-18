@@ -51,6 +51,13 @@ class Admin::StatsController < Admin::BaseController
 
   def budget_balloting
     @budget = Budget.find(params[:budget_id])
+    @precision = (params[:precision] || 2).to_i
+
+    @budget_balloting_component = Admin::Stats::BudgetBallotingComponent.new(
+      @budget,
+      precision: @precision,
+      type: "vote"
+    )
 
     authorize! :read_admin_stats, @budget, message: t("admin.stats.budgets.no_data_before_balloting_phase")
   end
@@ -62,5 +69,36 @@ class Admin::StatsController < Admin::BaseController
 
   def sdg
     @goals = SDG::Goal.order(:code)
+  end
+
+  def login_ips
+    @precision = (params[:precision] || 2).to_i
+    # Fetch audits for Users specifically
+    @cluster_summary = ConnectionAudit.where(auditable_type: "User")
+                                      .combined_participation_stats(@precision)
+  end
+
+  def login_audit_details
+    @precision = (params[:precision] || 2).to_i
+    @lat = params[:lat]
+    @lng = params[:lng]
+    # Default to 'login' if no type is passed
+    @audit_type = params[:type] || "login"
+
+    query = ConnectionAudit.where(auditable_type: "User")
+
+    # Filter by action if the column exists (requires the migration we discussed)
+    if ConnectionAudit.column_names.include?("action")
+      query = query.where(action: @audit_type)
+    end
+
+    if @lat.present? && @lng.present?
+      query = query.where("ROUND(latitude::numeric, ?) = ?", @precision, @lat.to_f)
+                   .where("ROUND(longitude::numeric, ?) = ?", @precision, @lng.to_f)
+    else
+      query = query.where(latitude: nil, longitude: nil)
+    end
+
+    @audits = query.order(created_at: :desc).page(params[:page])
   end
 end

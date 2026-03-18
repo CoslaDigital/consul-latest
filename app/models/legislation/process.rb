@@ -6,6 +6,7 @@ class Legislation::Process < ApplicationRecord
   include Documentable
   include SDG::Relatable
   include Searchable
+  include CalendarItem
 
   acts_as_paranoid column: :hidden_at
   acts_as_taggable_on :customs
@@ -120,6 +121,10 @@ class Legislation::Process < ApplicationRecord
   def proposals_phase
     Legislation::Process::Phase.new(proposals_phase_start_date,
                                     proposals_phase_end_date, proposals_phase_enabled)
+  end
+
+  def summary_publication
+    Legislation::Process::Publication.new(summary_publication_date, summary_publication_enabled)
   end
 
   def draft_publication

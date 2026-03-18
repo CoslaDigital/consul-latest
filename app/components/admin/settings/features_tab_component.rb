@@ -8,12 +8,14 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.saml_login
       feature.twitter_login
       feature.wordpress_login
+      feature.public_stats
       feature.signature_sheets
       feature.user.recommendations
       feature.user.recommendations_on_debates
       feature.user.recommendations_on_proposals
       feature.user.skip_verification
       feature.community
+      feature.resources
       feature.map
       feature.allow_attached_documents
       feature.allow_images
@@ -25,9 +27,11 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.graphql_api
       feature.sdg
       feature.machine_learning
+      feature.force_2factor
       feature.remove_investments_supports
       feature.gdpr.require_consent_for_notifications
       feature.dashboard.notification_emails
+      feature.events
     ]
   end
 end

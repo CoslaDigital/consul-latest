@@ -16,6 +16,9 @@
           <th scope="col"><%= t("admin.users.columns.roles") %></th>
           <th scope="col"><%= t("admin.users.columns.verification_level") %></th>
           <th scope="col"><%= t("admin.users.columns.activation_status") %></th>
+          <% if User.devise_modules.include?(:lockable) %>
+            <th scope="col"><%= t("admin.users.columns.locked_status") %></th>
+          <% end %>
         <% end %>
       </tr>
     </thead>
@@ -32,6 +35,9 @@
             <td><%= display_user_roles(user) %></td>
             <td><%= user.user_type %></td>
             <td><%= user.confirmed_at? ? t("admin.users.account.active_status") : t("admin.users.account.inactive_status") %></td>
+            <td>
+              <%= render Admin::Users::TableActionsComponent.new(user) %>
+            </td>
           <% end %>
         </tr>
       <% end %>

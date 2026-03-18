@@ -17,6 +17,7 @@ en:
     buttons:
       download_document: Download file
       destroy_document: Delete document
+      copy_link: "Copy Link"
     errors:
       messages:
         in_between: must be in between %{min} and %{max}

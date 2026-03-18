@@ -1,0 +1,37 @@
+en:
+  budgets:
+
+    ballots:
+      reasons_for_not_balloting:
+        invalid_geozone: "You cannot vote on this project because your location is not valid. Your geozone is %{user_geozone}, but this project requires one of the following: %{required_geozones}."
+
+    index:
+      milestones: Progress Updates
+    investments:
+      form:
+        title: "Submit a Project Proposal"
+        description: "Project Description"
+        heading_note: "Select the area this proposal applies to"
+        subtitle: "%{heading} (%{price})"
+        subtitle_note: "What is your project or application called?"
+        subtitle_without_price: "%{heading}"
+        subtitle_without_price_note: "subtitle help text"
+        summary: "Project Summary"
+        summary_note: "Give a brief summary of you project (maximum 200 characters)"
+    select:
+      title: "Select Budget"
+      proposal_name: "Proposal Name"
+      select_budget: "Select Budget"
+      choose_budget: "Choose a budget"
+      next: "Next"
+      no_budgets: "No budgets are currently accepting new projects"
+    select_headings:
+      title: "Select Budget Heading"
+      proposal_name: "Proposal Name"
+      budget_name: "Budget Name"
+      select_group: "Select Group"
+      choose_group: "Choose a group"
+      select_heading: "Select Heading"
+      choose_heading: "Choose a heading"
+      submit: "Submit"
+

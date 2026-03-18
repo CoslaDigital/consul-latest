@@ -1603,6 +1603,10 @@ $font-awesome-icons: (
     @include has-fa-icon(tools, solid);
   }
 
+  .copy-link {
+    @include has-fa-icon(copy, regular)
+  }
+
   .download-link {
     @include has-fa-icon(download, solid);
   }
@@ -1626,5 +1630,15 @@ $font-awesome-icons: (
 
   .cards-link {
     @include has-fa-icon(images, regular);
+  }
+
+  .locked-icon {
+    @include has-fa-icon(lock, solid);
+    color: $alert-color;
+  }
+
+  .unlocked-icon {
+    @include has-fa-icon(lock-open, solid);
+    color: $color-success;
   }
 }

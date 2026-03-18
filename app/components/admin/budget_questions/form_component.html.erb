@@ -1,0 +1,42 @@
+<%= render "shared/globalize_locales", resource: @budget_question if @budget_question.respond_to?(:translations) %>
+
+<%= translatable_form_for [:admin, @budget, @budget_question] do |f| %>
+  <%= render "shared/errors", resource: @budget_question if @budget_question.errors.any? %>
+
+  <div class="row">
+    <div class="small-12 medium-4 column">
+      <h3><%= t("admin.budget_questions.form.options", default: "Options") %></h3>
+      <%= f.check_box :enabled, label: t("budget_questions.new.enabled"), hint: t("admin.budget_questions.new.enabled_instructions") %>
+      <%= f.check_box :is_private, label: t("budget_questions.new.is_private"), hint: t("admin.budget_questions.new.is_private_instructions") %>
+      <%= f.check_box :is_mandatory, label: t("budget_questions.new.is_mandatory"), hint: t("admin.budget_questions.new.is_mandatory_instructions") %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 column">
+      <hr>
+      <%= f.translatable_fields do |translations_form| %>
+        <div class="small-12 column">
+          <%# Question (translatable) %>
+          <%= translations_form.text_area :text,
+                                          rows: 4,
+                                          label: t("admin.budget_questions.form.question", default: "Question"),
+                                          maxlength: 500 %>
+        </div>
+
+        <div class="small-12 column">
+          <%= translations_form.text_area :hint,
+                                          rows: 3,
+                                          label: t("admin.budget_questions.form.hint", default: "Hint (optional)"),
+                                          hint: t("admin.budget_questions.form.hint_instructions", default: "Optional hint text to guide the user.") %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 medium-6 large-3 margin-top column">
+      <%= f.submit class: "button success expanded" %>
+    </div>
+  </div>
+<% end %>
