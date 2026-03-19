@@ -25,7 +25,6 @@ gem "delayed_job_active_record", "~> 4.1.11"
 gem "devise", "~> 5.0.2"
 gem "devise-security", "~> 0.18.0"
 gem "exiftool_vendored", "~> 13.52.0"
-gem "faker"
 gem "file_validators", "~> 3.0.0"
 gem "font-awesome-sass", "~> 5.15.1" # Remember to update vendor/assets/images/fontawesome when updating this gem
 gem "geocoder", "~> 1.8"
