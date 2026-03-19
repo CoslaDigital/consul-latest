@@ -47,8 +47,8 @@
           <%= render "relationable/related_content", relationable: @proposal %>
         <% end %>
 
-        <div class="js-moderator-proposal-actions margin">
-          <%= render "proposals/actions", proposal: @proposal %>
+        <div class="margin">
+          <%= render Shared::ModerationActionsComponent.new(@proposal) %>
         </div>
       </div>
 
@@ -71,13 +71,14 @@
                 <span class="icon-money"></span>
                 <%= t("proposals.show.budget_investment_link") %>
               <% end %>
-
             </div>
           <% end %>
 
           <%= render "proposals/support_status", proposal: @proposal %>
 
           <%= render "proposals/social_share", proposal: @proposal, share_title: t("proposals.show.share") %>
+
+          <%= render Sensemaker::ReportLinkComponent.new(@proposal) %>
 
           <% if current_user %>
             <div class="sidebar-divider"></div>
@@ -93,7 +94,7 @@
   </div>
 <% end %>
 
-<% unless preview || feature?(:hide_comments) %>
+<% unless preview %>
   <div class="additional-content">
     <div class="filter-subnav">
       <div class="row">
