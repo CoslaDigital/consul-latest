@@ -8,7 +8,10 @@
 <section class="comments">
   <div class="row">
     <div id="comments" class="small-12 column">
-      <%= render @comment %>
+      <%= render "comments/comment_list",
+                 comments: [@comment],
+                 valuation: false,
+                 current_user: current_user %>
     </div>
   </div>
 </section>
