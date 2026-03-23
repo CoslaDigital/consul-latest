@@ -1,40 +1,40 @@
 load Rails.root.join("app", "controllers", "budgets", "investments_controller.rb")
 module Budgets
-  class InvestmentsController < ApplicationController 
-
+  class InvestmentsController < ApplicationController
     def new
       puts "Starting new method"
       @investment.budget.questions.order(:id).each do |question|
-        answer = @investment.answers.build({budget_id: @investment.budget.id, budget_question_id: question.id})
+        @investment.answers.build({ budget_id: @investment.budget.id,
+                                    budget_question_id: question.id })
       end
-    @budget = Budget.find(params[:budget_id])
-    puts "Found Budget ID: #{@budget.id}"
+      @budget = Budget.find(params[:budget_id])
+      puts "Found Budget ID: #{@budget.id}"
     # Check for proposal ID before proceeding
-    if params[:proposal_id].present?
-    @proposal = Proposal.find(params[:proposal_id])
-    puts "Found Proposal ID: #{@proposal.id}"
-    
-    @investment = Budget::Investment.new(map_proposal_to_investment(@proposal))
-    puts "Initialized new Investment with attributes: #{@investment.attributes.inspect}"
-    @investment.terms_of_service = true    
-    if @investment.save
-      puts "Successfully saved new Investment ID: #{@investment.id}"
-      copy_image(@proposal, @investment)
-      copy_documents(@proposal, @investment)
-      copy_sdg_relations(@proposal, @investment)
-      redirect_to budget_investment_path(@budget, @investment),
-                    notice: t("flash.actions.create.budget_investment")
-    else
-      puts "Failed to save new Investment"
-      render :new, alert: "Failed to create investment"
-    end
-    end
+      if params[:proposal_id].present?
+        @proposal = Proposal.find(params[:proposal_id])
+        puts "Found Proposal ID: #{@proposal.id}"
+
+        @investment = Budget::Investment.new(map_proposal_to_investment(@proposal))
+        puts "Initialized new Investment with attributes: #{@investment.attributes.inspect}"
+        @investment.terms_of_service = true
+        if @investment.save
+          puts "Successfully saved new Investment ID: #{@investment.id}"
+          copy_image(@proposal, @investment)
+          copy_documents(@proposal, @investment)
+          copy_sdg_relations(@proposal, @investment)
+          redirect_to budget_investment_path(@budget, @investment),
+                      notice: t("flash.actions.create.budget_investment")
+        else
+          puts "Failed to save new Investment"
+          render :new, alert: "Failed to create investment"
+        end
+      end
     end
 
     def show
       @commentable = @investment
       @comment_tree = CommentTree.new(@commentable, params[:page], @current_order)
-      set_comment_flags(@comment_tree.comments)
+      # set_comment_flags(@comment_tree.comments)
       @investment_ids = [@investment.id]
       @remote_translations = detect_remote_translations([@investment], @comment_tree.comments)
     end
@@ -52,14 +52,13 @@ module Budgets
     end
 
     def update
+      puts "Investment Params: #{investment_params.inspect}"
       if @investment.update(investment_params)
-        puts "Investment Params: #{investment_params.inspect}" # Debugging statement
         redirect_to budget_investment_path(@budget, @investment),
                     notice: t("flash.actions.update.budget_investment")
       else
-        puts "Investment Params: #{investment_params.inspect}" # Debugging statement
         render "edit"
-        
+
       end
     end
 
@@ -79,108 +78,108 @@ module Budgets
   private
 
       def map_proposal_to_investment(proposal)
-    {
-      author_id: proposal.author_id,
-      hidden_at: proposal.hidden_at,
-      flags_count: proposal.flags_count,
-      ignored_flag_at: proposal.ignored_flag_at,
-      cached_votes_up: proposal.cached_votes_up,
-      comments_count: proposal.comments_count,
-      confirmed_hide_at: proposal.confirmed_hide_at,
-      confidence_score: proposal.confidence_score,
-      created_at: proposal.created_at,
-      updated_at: proposal.updated_at,
-      responsible_name: proposal.responsible_name,
-      video_url: proposal.video_url,
-      tsv: proposal.tsv,
-      map_location: proposal.map_location,
-      community_id: proposal.community_id,
-      selected: proposal.selected,
-      tag_list: proposal.tag_list,
-      ml_tag_list: proposal.ml_tag_list,
-      milestone_tag_list: proposal.milestone_tag_list,
-      title: proposal.title,
-      summary: proposal.summary,
-      description: proposal.description,
-#      proposal_id: proposal.id, # This is a hidden field
-      budget_id: params[:budget_id], # This is a hidden field
-      group_id: params[:group_id], # This is a hidden field
-      heading_id: params[:heading_id] # This is a hidden field
-    }
-  end
-  
-  def copy_image(proposal, investment)
-    puts "Starting copy_image method"
-    puts "Proposal ID: #{proposal.id}"
-    puts "Investment ID: #{investment.id}"
-
-    images = Image.where(imageable_type: "Proposal", imageable_id: proposal.id)
-    puts "Found #{images.count} images for Proposal ID: #{proposal.id}"
-
-    return if images.empty?
-
-    images.each do |image|
-      puts "Duplicating Image ID: #{image.id}"
-      @new_image = image.dup
-      @new_image.imageable_type = "Budget::Investment"
-      @new_image.imageable_id = investment.id
-      @new_image.attachment.attach(image.attachment.blob)
-      if @new_image.save
-        puts "Successfully created duplicated Image ID: #{@new_image.id} for Investment ID: #{investment.id}"
-      else
-        puts "Failed to create duplicated Image ID: #{image.id} for Investment ID: #{investment.id}"
-        puts "Validation errors: #{@new_image.errors.full_messages.join(", ")}"
+        {
+          author_id: proposal.author_id,
+          hidden_at: proposal.hidden_at,
+          flags_count: proposal.flags_count,
+          ignored_flag_at: proposal.ignored_flag_at,
+          cached_votes_up: proposal.cached_votes_up,
+          comments_count: proposal.comments_count,
+          confirmed_hide_at: proposal.confirmed_hide_at,
+          confidence_score: proposal.confidence_score,
+          created_at: proposal.created_at,
+          updated_at: proposal.updated_at,
+          responsible_name: proposal.responsible_name,
+          video_url: proposal.video_url,
+          tsv: proposal.tsv,
+          map_location: proposal.map_location,
+          community_id: proposal.community_id,
+          selected: proposal.selected,
+          tag_list: proposal.tag_list,
+          ml_tag_list: proposal.ml_tag_list,
+          milestone_tag_list: proposal.milestone_tag_list,
+          title: proposal.title,
+          summary: proposal.summary,
+          description: proposal.description,
+          #      proposal_id: proposal.id, # This is a hidden field
+          budget_id: params[:budget_id], # This is a hidden field
+          group_id: params[:group_id], # This is a hidden field
+          heading_id: params[:heading_id] # This is a hidden field
+        }
       end
-    end
 
-    puts "Completed copy_image method"
-  end
-  
-  def copy_documents(proposal, investment)
-    puts "Starting copy_documents method"
-    puts "Proposal ID: #{proposal.id}"
-    puts "Investment ID: #{investment.id}"
-    documents = Document.where(documentable_type: "Proposal", documentable_id: proposal.id)
-    puts "Found #{documents.count} documents for Proposal ID: #{proposal.id}"
-    return if documents.empty?  # Early exit if no documents to copy
-    documents.each do |document|
-    puts "Duplicating Document ID: #{document.id}"
-                @new_document = document.dup
-                @new_document.documentable_type = "Budget::Investment"
-                @new_document.documentable_id = investment.id    # Handle attachment if documents have attachments
-                if document.respond_to?(:attachment) && document.attachment.attached?
-                  @new_document.attachment.attach(document.attachment.blob)
-                end
-                if @new_document.save
-                puts "Successfully created duplicated Document ID: #{@new_document.id} for Investment ID: #{investment.id}"
-                  else
-                   puts "Failed to create duplicated Document ID: #{document.id} for Investment ID: #{investment.id}"
-                   puts "Validation errors: #{@new_document.errors.full_messages.join(", ")}"
-                  end
-                 end
-                   puts "Completed copy_documents method"
-  end
-     
-  def copy_sdg_relations(proposal, investment)
+      def copy_image(proposal, investment)
+        puts "Starting copy_image method"
+        puts "Proposal ID: #{proposal.id}"
+        puts "Investment ID: #{investment.id}"
 
-  # Find SDG::Relation records associated with the proposal
-  sdg_relations = proposal.sdg_relations
+        images = Image.where(imageable_type: "Proposal", imageable_id: proposal.id)
+        puts "Found #{images.count} images for Proposal ID: #{proposal.id}"
 
-  # Create new SDG::Relation records for the investment
-  sdg_relations.each do |relation|
-    investment.sdg_relations.create(
-      related_sdg: relation.related_sdg,
-      related_sdg_type: relation.related_sdg_type
-    )
-  end
+        return if images.empty?
 
-  # Save the changes
-  if investment.save
-    puts "Successfully copied SDGs from Proposal ID: #{proposal.id} to Investment ID: #{investment.id}"
-  else
-    puts "Failed to copy SDGs: #{investment.errors.full_messages.join(', ')}"
-    end
-  end  
+        images.each do |image|
+          puts "Duplicating Image ID: #{image.id}"
+          @new_image = image.dup
+          @new_image.imageable_type = "Budget::Investment"
+          @new_image.imageable_id = investment.id
+          @new_image.attachment.attach(image.attachment.blob)
+          if @new_image.save
+            puts "Successfully created duplicated Image ID: #{@new_image.id} for Investment ID: #{investment.id}"
+          else
+            puts "Failed to create duplicated Image ID: #{image.id} for Investment ID: #{investment.id}"
+            puts "Validation errors: #{@new_image.errors.full_messages.join(", ")}"
+          end
+        end
+
+        puts "Completed copy_image method"
+      end
+
+      def copy_documents(proposal, investment)
+        puts "Starting copy_documents method"
+        puts "Proposal ID: #{proposal.id}"
+        puts "Investment ID: #{investment.id}"
+        documents = Document.where(documentable_type: "Proposal", documentable_id: proposal.id)
+        puts "Found #{documents.count} documents for Proposal ID: #{proposal.id}"
+        return if documents.empty? # Early exit if no documents to copy
+
+        documents.each do |document|
+          puts "Duplicating Document ID: #{document.id}"
+          @new_document = document.dup
+          @new_document.documentable_type = "Budget::Investment"
+          @new_document.documentable_id = investment.id # Handle attachment if documents have attachments
+          if document.respond_to?(:attachment) && document.attachment.attached?
+            @new_document.attachment.attach(document.attachment.blob)
+          end
+          if @new_document.save
+            puts "Successfully created duplicated Document ID: #{@new_document.id} for Investment ID: #{investment.id}"
+          else
+            puts "Failed to create duplicated Document ID: #{document.id} for Investment ID: #{investment.id}"
+            puts "Validation errors: #{@new_document.errors.full_messages.join(", ")}"
+          end
+        end
+        puts "Completed copy_documents method"
+      end
+
+      def copy_sdg_relations(proposal, investment)
+        # Find SDG::Relation records associated with the proposal
+        sdg_relations = proposal.sdg_relations
+
+        # Create new SDG::Relation records for the investment
+        sdg_relations.each do |relation|
+          investment.sdg_relations.create(
+            related_sdg: relation.related_sdg,
+            related_sdg_type: relation.related_sdg_type
+          )
+        end
+
+        # Save the changes
+        if investment.save
+          puts "Successfully copied SDGs from Proposal ID: #{proposal.id} to Investment ID: #{investment.id}"
+        else
+          puts "Failed to copy SDGs: #{investment.errors.full_messages.join(", ")}"
+        end
+      end
 
       def resource_model
         Budget::Investment
@@ -195,7 +194,7 @@ module Budgets
       end
 
       def allowed_params
-        attributes = [:video_url, :estimated_price, :summary,  :heading_id, :tag_list, :organization_name, :location,
+        attributes = [:video_url, :estimated_price, :summary, :heading_id, :tag_list, :organization_name, :location,
                       :terms_of_service, :related_sdg_list,
                       answers_attributes: [:id, :text, :budget_id, :investment_id, :budget_question_id],
                       image_attributes: image_attributes,
