@@ -312,9 +312,18 @@ namespace :sensemaker do
     end
 
     def setup_sensemaker_directory(sensemaker_path, logger)
-      logger.info "Setting up sensemaking-tools data directory..."
-      FileUtils.mkdir_p(sensemaker_path) unless File.directory?(sensemaker_path)
-      logger.info "Sensemaker data directory created."
+      # 1. Define where the 'forever home' is
+      shared_vendor_path = Rails.root.join("../../shared/vendor/sensemaking-tools")
+
+      logger.info "Ensuring Sensemaker vendor directory exists in shared..."
+      FileUtils.mkdir_p(shared_vendor_path)
+
+      # 2. If the current release doesn't have the link yet, create it
+      # (Capistrano usually does this, but this makes the rake task 'self-healing')
+      unless File.symlink?(sensemaker_path) || File.exist?(sensemaker_path)
+        logger.info "Creating symlink to shared folder..."
+        FileUtils.ln_s(shared_vendor_path, sensemaker_path)
+      end
     end
 
     def setup_data_directory(data_path, logger)
