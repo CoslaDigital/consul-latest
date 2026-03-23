@@ -1,19 +1,20 @@
 module Sensemaker
   module Paths
-    def self.sensemaker_package_folder
+    def self.stable_root
+      # Forces the path to the 'current' symlink instead of a timestamped release
       if Rails.env.test?
-        Rails.root.join("tmp/sensemaker_test_folder/package")
+        Rails.root
       else
-        Rails.root.join("node_modules/@cosla/sensemaking-tools")
+        Pathname.new("/home/deploy/consul/current")
       end
     end
 
     def self.sensemaker_folder
-      if Rails.env.test?
-        Rails.root.join("tmp/sensemaker_test_folder")
-      else
-        Rails.root.join("vendor/sensemaking-tools")
-      end
+      stable_root.join("vendor/sensemaking-tools")
+    end
+
+    def self.sensemaker_package_folder
+      stable_root.join("node_modules/@cosla/sensemaking-tools")
     end
 
     def self.sensemaker_relative_data_folder
@@ -38,11 +39,7 @@ module Sensemaker
     end
 
     def self.visualization_folder
-      if Rails.env.test?
-        Rails.root.join("tmp/sensemaker_test_folder/web-ui")
-      else
-        Rails.root.join("node_modules/@cosla/sensemaking-web-ui")
-      end
+      stable_root.join("node_modules/@cosla/sensemaking-web-ui")
     end
   end
 end
