@@ -14,9 +14,7 @@
               investment.author,
               Flag.flagged?(current_user, investment)] do %>
       <div class="small-12 medium-9 column">
-        <%= back_link_to budget_investments_path(investment.budget, heading_id: investment.heading) %>
-
-        <%= render "/budgets/investments/investment_detail", investment: investment %>
+        <%= render Budgets::Investments::InvestmentDetailComponent.new(investment) %>
       </div>
     <% end %>
 
@@ -85,16 +83,16 @@
       <% if investment.should_show_estimated_price? %>
          <h3><%= t("budgets.investments.show.estimated_price") %></h3>
         <p class="investment-project-amount">
-        <%= investment.formatted_estimated_price %> 
+          <%= investment.formatted_estimated_price %>
   </p>
   <hr>
 <% end %>
-       
+
 
       <% if investment.should_show_price? %>
         <div class="sidebar-divider"></div>
-          
-           <% if investment.formatted_price.nil? %>
+
+        <% if investment.formatted_price.nil? %>
                 <h2><%= t("budgets.investments.show.estimated_price") %></h2>
                <div class="supports text-center">
                <p class="investment-project-amount">
@@ -110,8 +108,8 @@
              </p>
              </div>
            <% end %>
-          
-        
+
+
         <% if investment.should_show_price_explanation? %>
           <div class="text-center" data-magellan>
             <%= link_to t("budgets.investments.show.see_price_explanation"),
