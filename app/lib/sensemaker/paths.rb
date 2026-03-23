@@ -25,7 +25,16 @@ module Sensemaker
     end
 
     def self.sensemaker_data_folder
-      Rails.root.join(sensemaker_relative_data_folder)
+      data_path = sensemaker_relative_data_folder
+
+      # 1. Check if it's already an absolute path (starts with /)
+      if Pathname.new(data_path).absolute?
+        Pathname.new(data_path)
+      else
+        # 2. If relative, join it to the SHARED folder, not Rails.root
+        # This ensures files persist across deployments.
+        Rails.root.join("../../shared", data_path).expand_path
+      end
     end
 
     def self.visualization_folder
