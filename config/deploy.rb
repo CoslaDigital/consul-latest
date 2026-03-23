@@ -33,7 +33,7 @@ set :use_sudo, false
 set :linked_files, %w[config/database.yml config/secrets.yml]
 set :linked_dirs, %w[.bundle log tmp public/system public/assets
                      public/ckeditor_assets public/machine_learning/data storage
-                     vendor/sensemaking-tools]
+                     vendor/sensemaking-tools node_modules/@cosla/sensemaking-web-ui]
 
 set :keep_releases, 5
 
@@ -84,6 +84,7 @@ namespace :deploy do
   task :create_shared_dirs do
     on roles(:app) do
       execute "mkdir -p #{shared_path}/vendor/sensemaking-tools"
+      execute "mkdir -p #{shared_path}/node_modules/@cosla/sensemaking-web-ui"
     end
   end
   before :starting, "deploy:create_shared_dirs"
