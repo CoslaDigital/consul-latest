@@ -312,20 +312,18 @@ namespace :sensemaker do
     end
 
     def setup_sensemaker_directory(sensemaker_path, logger)
-      shared_path = Rails.root.join("../../shared/vendor/sensemaking-tools")
+      # Only ensure the shared target exists; Capistrano handles the symlink
+      shared_sensemaker_path = Rails.root.join("../../shared/vendor/sensemaking-tools").expand_path
 
-      FileUtils.mkdir_p(shared_path) unless File.directory?(shared_path)
-
-      # Check if we have a real folder blocking our symlink
-      if File.directory?(sensemaker_path) && !File.symlink?(sensemaker_path)
-        logger.warn "Found a real folder blocking the symlink. Removing it..."
-        FileUtils.rm_rf(sensemaker_path)
+      unless File.directory?(shared_sensemaker_path)
+        logger.info "Creating shared sensemaking-tools directory..."
+        FileUtils.mkdir_p(shared_sensemaker_path)
       end
 
-      # Create the link if it's missing
-      unless File.exist?(sensemaker_path)
-        logger.info "Creating symlink to shared folder..."
-        FileUtils.ln_s(shared_path, sensemaker_path)
+      if File.symlink?(sensemaker_path)
+        logger.info "✓ Symlink already in place: #{sensemaker_path}"
+      else
+        logger.warn "✗ Symlink missing at #{sensemaker_path} — check Capistrano linked_dirs config"
       end
     end
 

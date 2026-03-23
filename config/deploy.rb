@@ -80,6 +80,14 @@ namespace :deploy do
 
   after :finished, "refresh_sitemap"
 
+  desc "Create shared directories needed before linking"
+  task :create_shared_dirs do
+    on roles(:app) do
+      execute "mkdir -p #{shared_path}/vendor/sensemaking-tools"
+    end
+  end
+  before :starting, "deploy:create_shared_dirs"
+
   desc "Deploys and runs the tasks needed to upgrade to a new release"
   task :upgrade do
     after "add_new_settings", "execute_release_tasks"
