@@ -596,7 +596,7 @@ Rails.logger.info("oauth_user #{oauth_user}")
   end
 
   def can_be_administrator?
-    otp_required_for_login
+    otp_required_for_login || !Setting.otp_enabled?
   end
 
   private
