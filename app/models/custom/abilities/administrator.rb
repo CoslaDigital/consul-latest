@@ -40,6 +40,8 @@ module Abilities
       can :confirm_hide, Proposal
       cannot :confirm_hide, Proposal, hidden_at: nil
 
+      can :hide, Proposal, author_id: user.id
+
       can :confirm_hide, Legislation::Proposal
       cannot :confirm_hide, Legislation::Proposal, hidden_at: nil
 
@@ -71,6 +73,7 @@ module Abilities
       can :read_results, Budget do |budget|
         budget.balloting_finished? && budget.has_winning_investments?
       end
+      can :read_sensemaking, Budget
 
       can [:read, :create, :update, :destroy], Budget::Group
       can [:read, :create, :update, :destroy], Budget::Heading
@@ -109,7 +112,7 @@ module Abilities
       end
       can [:read, :order_options], Poll::Question::Option
       can [:create, :update, :destroy], Poll::Question::Option do |option|
-        can?(:update, option.question)
+        can?(:update, option.question) && option.question.accepts_options?
       end
       can :read, Poll::Question::Option::Video
       can [:create, :update, :destroy], Poll::Question::Option::Video do |video|
@@ -123,6 +126,7 @@ module Abilities
       can :manage, SiteCustomization::Image
       can :manage, SiteCustomization::ContentBlock
       can :manage, Widget::Card
+      can :index_all, Widget::Card
 
       can :access, :ckeditor
       can :manage, Ckeditor::Picture
@@ -132,15 +136,15 @@ module Abilities
       can [:create, :update, :destroy], Legislation::Process
       can [:manage], ::Legislation::DraftVersion
       can [:manage], ::Legislation::Question
-      can [:manage], ::Legislation::Proposal
+      can [:create, :read, :update, :destroy, :select, :deselect], ::Legislation::Proposal
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
 
-      can [:manage], Document
+      can [:manage, :create, :update], Document
       can [:destroy], Document do |document|
         document.documentable_type == "Poll::Question::Option" && can?(:update, document.documentable)
       end
-      can [:create, :destroy], DirectUpload
+      can [:create, :destroy, :manage], DirectUpload
 
       can [:deliver], Newsletter, hidden_at: nil
       can [:manage], Dashboard::AdministratorTask
@@ -151,6 +155,10 @@ module Abilities
       can [:create, :read], LocalCensusRecords::Import
 
       can :manage, Cookies::Vendor
+      can [:manage, :create, :update], Document
+
+      can [:read, :enable, :manage, :show], :two_factor_authentication
+      can [:manage, :publish, :unpublish], Sensemaker::Job
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant
