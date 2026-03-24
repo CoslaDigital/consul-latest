@@ -101,7 +101,7 @@
         <%= render "categories" %>
         <%= render "shared/tag_cloud", taggable: "Proposal" %>
         <div class="sidebar-divider"></div>
-          <div class="proposals-geozones">
+        <div class="proposals-geozones">
           <h2 class="sidebar-title"><%= link_to t("shared.tags_cloud.districts_list"), map_proposals_path, id: "map", title: t("shared.tags_cloud.districts_list") %></h2>
           <br>
           <ul id="geozones" class="no-bullet">
@@ -109,6 +109,7 @@
               <li><%= link_to geozone.name, proposals_path(search: geozone.name) %></li>
             <% end %>
           </ul>
+        </div>
       <% end %>
       <%= render "retired" %>
       <%= render "proposals_lists" %>
