@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_04_175342) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -993,11 +993,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_04_175342) do
     t.bigint "user_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "dry_run"
-    t.integer "duration"
-    t.integer "total_tokens"
-    t.jsonb "config", default: {}
-    t.integer "records_processed"
     t.index ["user_id"], name: "index_machine_learning_jobs_on_user_id"
   end
 
@@ -1052,29 +1047,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_04_175342) do
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.jsonb "sentiment_analysis"
-  end
-
-  create_table "models", force: :cascade do |t|
-    t.string "model_id", null: false
-    t.string "name", null: false
-    t.string "provider", null: false
-    t.string "family"
-    t.datetime "model_created_at"
-    t.integer "context_window"
-    t.integer "max_output_tokens"
-    t.date "knowledge_cutoff"
-    t.jsonb "modalities", default: {}
-    t.jsonb "capabilities", default: []
-    t.jsonb "pricing", default: {}
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
-    t.index ["family"], name: "index_models_on_family"
-    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
-    t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
-    t.index ["provider"], name: "index_models_on_provider"
   end
 
   create_table "moderators", id: :serial, force: :cascade do |t|
