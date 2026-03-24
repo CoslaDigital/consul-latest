@@ -220,26 +220,27 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
   def download
     @sensemaker_job = Sensemaker::Job.find(params[:id])
-    artefacts = @sensemaker_job.existing_output_artefact_paths
 
     if params[:artefact].present?
-      requested = File.join(Sensemaker::Paths.sensemaker_data_folder, params[:artefact])
-      if artefacts.include?(requested)
-        return send_file requested, filename: File.basename(requested)
+      # Sanitize the filename to prevent directory traversal
+      safe_filename = File.basename(params[:artefact])
+      requested = File.join(Sensemaker::Paths.sensemaker_data_folder, safe_filename)
+
+      if File.exist?(requested)
+        return send_file requested, filename: safe_filename
       else
         return redirect_to admin_sensemaker_job_path(@sensemaker_job),
                            alert: I18n.t("admin.sensemaker.notice.output_file_not_found")
       end
     end
 
+    # Fallback for the primary persisted file
     path = @sensemaker_job.persisted_output_path
     if path.present? && File.exist?(path)
-      return send_file path,
-                       filename: File.basename(path)
+      return send_file path, filename: File.basename(path)
     end
 
-    redirect_to admin_sensemaker_jobs_path,
-                alert: I18n.t("admin.sensemaker.notice.output_file_not_found")
+    redirect_to admin_sensemaker_jobs_path, alert: "Output file not found."
   end
 
   def cancel

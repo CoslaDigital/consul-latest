@@ -134,7 +134,8 @@ module Sensemaker
       p = read_attribute(:persisted_output)
       return nil if p.blank?
 
-      Rails.root.join(p)
+      # Anchor to the stable data folder
+      File.join(Sensemaker::Paths.sensemaker_data_folder, File.basename(p))
     end
 
     def output_artefact_paths
@@ -164,7 +165,10 @@ module Sensemaker
     end
 
     def existing_output_artefact_paths
-      output_artefact_paths.select { |path| File.exist?(path) }
+      # Ensure we generate the list of artefacts using the STABLE path
+      output_artefact_paths.map do |path|
+        File.join(Sensemaker::Paths.sensemaker_data_folder, File.basename(path))
+      end.select { |path| File.exist?(path) }
     end
 
     def has_outputs?
