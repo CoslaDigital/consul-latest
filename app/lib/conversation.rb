@@ -352,8 +352,9 @@ class Conversation
                             description: sanitize_html(question.description))
           end
         end
+        default_note = "Note: Comments are prefixed with (Qn) to indicate which question they refer to."
         parts << I18n.t("#{i18n_scope}.legislation_process.prefix_note",
-                        default: "Note: Comments are prefixed with (Qn) to indicate which question they refer to.")
+                        default: default_note)
       end
     end
 
