@@ -43,10 +43,10 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
       processes.each do |process|
         collection = []
 
-        collection << {
-          title: I18n.t("admin.sensemaker.new.analyse_entire_process", default: "Analyse entire process"),
-          collection: [{ title: result_title_for(process), object: process }]
-        }
+        collection << { title: I18n.t("admin.sensemaker.new.analyse_all_questions",
+                                      model_label: I18n.t("activerecord.models.legislation/question.other"),
+                                      default: "Analyse all questions"),
+                        object: process }
         @result_count += 1
 
         unless process.proposals.empty?
