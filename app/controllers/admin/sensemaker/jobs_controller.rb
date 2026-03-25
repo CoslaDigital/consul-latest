@@ -43,6 +43,12 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
       processes.each do |process|
         collection = []
 
+        collection << {
+          title: I18n.t("admin.sensemaker.new.analyse_entire_process", default: "Analyse entire process"),
+          collection: [{ title: result_title_for(process), object: process }]
+        }
+        @result_count += 1
+
         unless process.proposals.empty?
           collection << {
             title: I18n.t("activerecord.models.legislation/proposal.other"),
