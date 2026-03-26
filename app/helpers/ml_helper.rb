@@ -1,9 +1,13 @@
 module MlHelper
-  # SUMMARIZATION & SENTIMENT
+  # --- PUBLIC METHODS ---
+
+  # 1. SUMMARIZATION & SENTIMENT
   def self.summarize_comments(comments, context = nil, config: nil)
     return nil if comments.blank?
 
+    # Determine strategy once
     model_name = config&.[](:model) || Setting["llm.model"]
+    provider_name = config&.[](:provider) || Setting["llm.provider"]
 
     system_prompt = <<~PROMPT
       You are a qualitative data analyst. Your goal is to analyze public comments and identify major recurring themes.
@@ -29,7 +33,9 @@ module MlHelper
     PROMPT
 
     input_text = "CONTEXT: #{context}\n\nCOMMENTS:\n#{comments.join("\n").truncate(6000)}"
-    data = perform_ai_call(input_text, model_name, system_prompt)
+
+    # Pass both model and provider to the runner
+    data = perform_ai_call(input_text, model_name, provider_name, system_prompt)
     return nil if data.blank?
 
     markdown = "**Executive Summary**: #{data["executive_summary"]}\n\n**Key Themes & Voices**:\n"
@@ -49,27 +55,32 @@ module MlHelper
     }
   end
 
-  #  TAGGING
+  # 2. TAGGING
   def self.generate_tags(text, count = 5, config: nil)
     return nil if text.blank?
 
     model_name = config&.[](:model) || Setting["llm.model"]
+    provider_name = config&.[](:provider) || Setting["llm.provider"]
+
     system_prompt = "You are a categorization expert. Return ONLY a comma-separated list of " \
       "up to #{count} lowercase tags for the text. No intro, no bullets."
 
-    chat = Llm::Config.context.chat(model: model_name)
-    chat.with_instructions(system_prompt)
-    response = chat.ask(text.truncate(2000))
+    begin
+      # Agnostic chat initialization using determined provider
+      chat = Llm::Config.context.chat(model: model_name, provider: provider_name)
+      chat.with_instructions(system_prompt)
+      response = chat.ask(text.truncate(2000))
 
-    {
-      "tags" => response.content.split(",").map(&:strip).compact_blank,
-      "usage" => {
-        "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0)
+      {
+        "tags" => response.content.split(",").map(&:strip).compact_blank,
+        "usage" => {
+          "total_tokens" => (response.input_tokens || 0) + (response.output_tokens || 0)
+        }
       }
-    }
-  rescue => e
-    Rails.logger.error "[MlHelper] Tagging Error: #{e.message}"
-    nil
+    rescue => e
+      Rails.logger.error "[MlHelper] Tagging Error: #{e.message}"
+      nil
+    end
   end
 
   # 3. RELATED CONTENT
@@ -77,6 +88,7 @@ module MlHelper
     return nil if source_text.blank? || candidate_texts.blank?
 
     model_name = config&.[](:model) || Setting["llm.model"]
+    provider_name = config&.[](:provider) || Setting["llm.provider"]
 
     prompt = <<~PROMPT
       Identify which of the following Candidates are most conceptually related to the Source.
@@ -88,14 +100,21 @@ module MlHelper
       { "indices": [1, 5, 2] }
     PROMPT
 
-    perform_ai_call(prompt, model_name)
+    perform_ai_call(prompt, model_name, provider_name)
   end
 
-  def self.perform_ai_call(prompt, model_name, system_instructions = nil)
-    chat = Llm::Config.context.chat(model: model_name)
+  # --- PRIVATE RUNNER ---
+
+  def self.perform_ai_call(prompt, model_name, provider_name, system_instructions = nil)
+    # Ensure provider is a symbol or nil for RubyLLM
+    provider = provider_name&.to_sym
+
+    chat = Llm::Config.context.chat(model: model_name, provider: provider)
     chat.with_instructions(system_instructions) if system_instructions.present?
 
     response = chat.ask(prompt)
+
+    # Extract JSON block from markdown response
     json_match = response.content.match(/\{.*\}/m)
     return nil unless json_match
 
@@ -105,7 +124,7 @@ module MlHelper
     }
     data
   rescue => e
-    Rails.logger.error "[MlHelper] AI Call Error: #{e.message}"
+    Rails.logger.error "[MlHelper] AI Call Error (#{provider_name}): #{e.message}"
     nil
   end
 
