@@ -1,9 +1,10 @@
 module MlHelper
-  # SUMMARIZATION & SENTIMENT
+  # 1. SUMMARIZATION & SENTIMENT
   def self.summarize_comments(comments, context = nil, config: nil)
     return nil if comments.blank?
 
     model_name = config&.[](:model) || Setting["llm.model"]
+    # FIX: Pull provider once to pass down
     provider_name = config&.[](:provider) || Setting["llm.provider"]
 
     system_prompt = <<~PROMPT
@@ -22,7 +23,7 @@ module MlHelper
 
     input_text = "CONTEXT: #{context}\n\nCOMMENTS:\n#{comments.join("\n").truncate(6000)}"
 
-    # Pass both model and provider to the runner
+    # FIX: Pass provider_name to the call
     data = perform_ai_call(input_text, model_name, provider_name, system_prompt)
     return nil if data.blank?
 
@@ -46,23 +47,27 @@ module MlHelper
     raise e
   end
 
-  # TAGGING
+  # 2. TAGGING
   def self.generate_tags(text, count = 5, config: nil)
     return nil if text.blank?
 
     model_name = config&.[](:model) || Setting["llm.model"]
-    provider_name = Setting["llm.provider"].to_s.downcase.to_sym
+    provider_name = (config&.[](:provider) || Setting["llm.provider"]).to_s.downcase.to_sym
+
     system_prompt = "Return ONLY a comma-separated list of up to #{count} " \
       "lowercase single-word tags. No introduction or sentences."
 
-    # Use specialized context for Ollama (Bypass + Timeout)
     active_context = Llm::Config.context
-    chat_params = { model: model_name }
+    chat_params = { model: model_name, provider: provider_name } # FIX: Explicitly set provider
 
     if provider_name == :ollama
       chat_params[:assume_model_exists] = true
-      chat_params[:provider] = :ollama
       active_context = active_context.dup { |c| c.request_timeout = 300 }
+    elsif provider_name == :vertexai
+      # Ensure Vertex uses the specific regional endpoint from secrets
+      active_context = active_context.dup do |c|
+        c.vertexai_location = Tenant.current_secrets.llm&.[]("vertexai_location") || "us-central1"
+      end
     end
 
     chat = active_context.chat(**chat_params)
@@ -92,7 +97,7 @@ module MlHelper
     raise e
   end
 
-  # RELATED CONTENT
+  # 3. RELATED CONTENT
   def self.find_similar_content(source_text, candidate_texts, limit = 3, config: nil)
     return nil if source_text.blank? || candidate_texts.blank?
 
@@ -106,69 +111,61 @@ module MlHelper
       Return ONLY a JSON object with the indices of the top #{limit} matches: { "indices": [1, 5, 2] }
     PROMPT
 
+    # FIX: Pass provider_name
     perform_ai_call(prompt, model_name, provider_name)
   end
 
   # --- PRIVATE RUNNER ---
 
   def self.perform_ai_call(prompt, model_name, provider_name, system_instructions = nil)
-    # Ensure provider is a symbol or nil for RubyLLM
-    provider = provider_name&.to_sym
+    provider = provider_name.to_s.downcase.to_sym
+    active_context = Llm::Config.context
+    chat_params = { model: model_name, provider: provider } # FIX: Explicitly set provider
 
-    chat = Llm::Config.context.chat(model: model_name, provider: provider)
-
-    def self.perform_ai_call(prompt, model_name, system_instructions = nil)
-      provider_name = Setting["llm.provider"].to_s.downcase.to_sym
-      active_context = Llm::Config.context
-      chat_params = { model: model_name }
-
-      if provider_name == :ollama
-        chat_params[:assume_model_exists] = true
-        chat_params[:provider] = :ollama
-        # Override for local hardware: High timeout, but shorter retry interval than Claude
-        active_context = active_context.dup do |c|
-          c.request_timeout = 300
-          c.retry_interval = 2.0 # Locally, 2s is enough; 12s is overkill
-        end
-      elsif provider_name == :anthropic || model_name.include?("claude")
-        # Keep the logic specifically for Claude quota/rate limits
-        active_context = active_context.dup do |c|
-          c.retry_interval = 12.0
-        end
+    if provider == :ollama
+      chat_params[:assume_model_exists] = true
+      active_context = active_context.dup do |c|
+        c.request_timeout = 300
+        c.retry_interval = 2.0
       end
+    elsif provider == :vertexai
+      # FIX: Force the context to use the correct Vertex location
+      active_context = active_context.dup do |c|
+        c.vertexai_location = Tenant.current_secrets.llm&.[]("vertexai_location") || "us-central1"
+      end
+    elsif provider == :anthropic || model_name.include?("claude")
+      active_context = active_context.dup { |c| c.retry_interval = 12.0 }
+    end
 
-      chat = active_context.chat(**chat_params)
+    chat = active_context.chat(**chat_params)
     chat.with_instructions(system_instructions) if system_instructions.present?
 
     response = chat.ask(prompt)
-      content = extract_text_content(response)
-      return nil if content.blank?
+    content = extract_text_content(response)
+    return nil if content.blank?
 
-      json_match = content.match(/\{.*}/m)
+    json_match = content.match(/\{.*}/m)
     return nil unless json_match
 
-      begin
-        data = JSON.parse(json_match[0])
-        input_tokens = response.respond_to?(:input_tokens) ? (response.input_tokens || 0) : 0
-        output_tokens = response.respond_to?(:output_tokens) ? (response.output_tokens || 0) : 0
+    begin
+      data = JSON.parse(json_match[0])
+      input_tokens = response.respond_to?(:input_tokens) ? (response.input_tokens || 0) : 0
+      output_tokens = response.respond_to?(:output_tokens) ? (response.output_tokens || 0) : 0
 
-        data["usage"] = {
-          "total_tokens" => input_tokens + output_tokens
-        }
-        data
-      rescue JSON::ParserError
-        nil
-      end
+      data["usage"] = { "total_tokens" => input_tokens + output_tokens }
+      data
+    rescue JSON::ParserError
+      nil
+    end
   rescue RubyLLM::Error => e
-    Rails.logger.error "[MlHelper] AI call failed: #{e.message}"
+    Rails.logger.error "[MlHelper] AI call failed (#{provider}): #{e.message}"
     raise e
   end
 
-    def self.extract_text_content(response)
-      return nil if response.nil? || response.content.nil?
+  def self.extract_text_content(response)
+    return nil if response.nil? || response.content.nil?
+    response.content.is_a?(String) ? response.content : response.content.text
+  end
 
-      response.content.is_a?(String) ? response.content : response.content.text
-    end
-
-    private_class_method :perform_ai_call, :extract_text_content
+  private_class_method :perform_ai_call, :extract_text_content
 end
