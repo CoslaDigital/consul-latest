@@ -7,11 +7,11 @@ class Admin::MachineLearning::ScriptsComponent < ApplicationComponent
 
   private
 
-    def script_select_options
-      scripts_info.map { |info| [info[:name], { "aria-describedby": info[:name] }] }
-    end
+  def script_select_options
+    ::MachineLearning.script_select_options
+  end
 
-    def scripts_info
-      @scripts_info ||= ::MachineLearning.scripts_info
-    end
+  def scripts_info
+    ::MachineLearning.scripts_info
+  end
 end
