@@ -160,10 +160,9 @@
 
 .tenant-ylag {
   --brand: #004a83;
-  --main-header: #EC407A;
   --footer: #FCE4EC;
   --top-links: var(--footer);
-  --top-links-contrast: #{$black};
+  --top-links-contrast: #{$white};
   --brand-secondary: #cc007e;
   --footer: var(--brand-secondary);
   --main-header: var(--brand);
