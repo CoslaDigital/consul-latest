@@ -158,13 +158,13 @@
    @include shared-styles;
 }
 
-.tenant-highland {
-  --brand: #FF3366;
+.tenant-ylag {
+  --brand: #004a83;
   --main-header: #EC407A;
   --footer: #FCE4EC;
   --top-links: var(--footer);
   --top-links-contrast: #{$black};
-  --brand-secondary: #f4b56e;
+  --brand-secondary: ##cc007e;
   --footer: var(--brand-secondary);
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
