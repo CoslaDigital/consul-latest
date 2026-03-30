@@ -162,9 +162,10 @@
   --brand: #004a83;
   --footer: #FCE4EC;
   --top-links: var(--footer);
-  --top-links-contrast: #{$white};
+  --top-links-contrast: #FFF;
   --brand-secondary: #cc007e;
   --footer: var(--brand-secondary);
+  --footer-contrast: #FFF;
   --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
