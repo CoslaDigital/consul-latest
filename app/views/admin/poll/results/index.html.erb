@@ -21,7 +21,15 @@
     <%= render "results_by_booth" %>
   <% end %>
 
+  <% if @poll.answers.any? %>
+    <% @poll.questions.each do |question| %>
+      <%= render Polls::Results::QuestionComponent.new(question) %>
+    <% end %>
+  <% end %>
+
   <% if @poll.voters.any? %>
     <%= render "show_results", resource: @poll %>
   <% end %>
+
+
 </div>
