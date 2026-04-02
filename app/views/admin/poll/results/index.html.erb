@@ -22,6 +22,7 @@
   <% end %>
 
   <% if @poll.answers.any? %>
+    <h3><%= t("admin.polls.show.results_tab") %></h3>
     <% @poll.questions.each do |question| %>
       <%= render Polls::Results::QuestionComponent.new(question) %>
     <% end %>
