@@ -46,10 +46,27 @@ class ImageSuggestionsController < ApplicationController
 
   private
 
-    def image_suggestion_params
+    def original_image_suggestion_params
       @image_suggestion_params ||= params.require(@resource_type.parameterize.underscore)
                                          .permit(translations_attributes: [:title, :description])
                                          .fetch(:translations_attributes, {})
                                          .values.first || {}
     end
+
+    def image_suggestion_params
+      resource_key = @resource_type.parameterize.underscore
+
+      permitted_params = params.require(resource_key).permit(
+        :heading_id, :summary, :estimated_price, :subtitle,
+        :video_url, :location, :organization_name, :tag_list,
+        :related_sdg_list, sdg_goal_ids: [],
+        map_location_attributes: [:latitude, :longitude, :zoom],
+        translations_attributes: [:id, :locale, :title, :description, :_destroy]
+      )
+
+      @image_suggestion_params ||= permitted_params
+                                     .fetch(:translations_attributes, {})
+                                     .values.first || {}
+    end
+
 end
