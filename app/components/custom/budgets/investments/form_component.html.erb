@@ -82,6 +82,7 @@
 
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) %>
+      <%= render Images::SuggestImagesComponent.new(f) %>
     <% end %>
 
     <% if feature?(:allow_attached_documents) %>
