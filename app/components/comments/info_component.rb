@@ -1,10 +1,10 @@
 class Comments::InfoComponent < ApplicationComponent
-  attr_reader :comment, :valuation, :current_user
+  attr_reader :comment, :valuation, :user_viewer
 
-  def initialize(comment, valuation: false, current_user: nil)
+  def initialize(comment, valuation: false, user_viewer: nil)
     @comment = comment
     @valuation = valuation
-    @current_user = current_user
+    @user_viewer = user_viewer
   end
 
   def render?

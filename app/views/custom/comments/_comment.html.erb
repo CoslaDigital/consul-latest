@@ -1,5 +1,5 @@
 <% valuation = local_assigns.fetch(:valuation, false) %>
-<% cache [locale_and_user_status(comment), can?(:admin, :all), comment, commentable_cache_key(comment.commentable), comment.author] do %>
+<%# cache [locale_and_user_status(comment), can?(:admin, :all), comment, commentable_cache_key(comment.commentable), comment.author] do %>
   <div id="<%= dom_id(comment) %>" class="comment small-12">
     <div class="comment-body">
       <% if comment.hidden? %>
@@ -13,7 +13,7 @@
 
         <%= render Comments::InfoComponent.new(comment,
                                                valuation: valuation,
-                                               current_user: current_user) %>
+                                               user_viewer: current_user) %>
 
         <div class="comment-user
                   <%= user_level_class comment %>
@@ -28,4 +28,4 @@
 
     <%= render "comments/comment_list", comments: child_comments_of(comment), valuation: valuation %>
   </div>
-<% end %>
+<%# end %>
