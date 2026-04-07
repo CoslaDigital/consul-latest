@@ -67,7 +67,7 @@ class Shared::AvatarComponent < ApplicationComponent
     end
 
     def initial
-      record.name.first.upcase
+      (record.name&.first || "?").upcase
     end
 
     def avatar_image
