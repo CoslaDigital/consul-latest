@@ -41,10 +41,11 @@
         </div>
       </div>
     <% end %>
-     <div class="milestone-actions margin-top">
+    <div class="milestone-actions margin-top">
       <% if can? :update, milestone %>
-        <%= link_to "Edit Milestone",
-                    edit_budget_investment_milestone_path(@budget, @investment, milestone),
+        <%# This link now works for any parent (Proposal or Investment) %>
+        <%= link_to t("milestones.milestone.edit_button", default: "Edit Milestone"),
+                    edit_polymorphic_path([milestone.milestoneable, milestone]),
                     class: "button tiny" %>
       <% end %>
     </div>

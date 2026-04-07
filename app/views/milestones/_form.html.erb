@@ -1,0 +1,16 @@
+<%# 1. Manually determine the correct URL for the user-facing form %>
+<% if milestone.new_record? %>
+  <%# URL for creating a new milestone %>
+  <% url = budget_investment_milestones_path(@budget, @investment) %>
+<% else %>
+  <%# URL for updating an existing milestone %>
+  <% url = budget_investment_milestone_path(@budget, @investment, milestone) %>
+<% end %>
+
+<%= render "shared/globalize_locales", resource: milestone %>
+
+<%# 2. Pass the main object and the explicit URL string to the helper %>
+<%= translatable_form_for milestone, url: url do |f| %>
+  <%# 3. Render the shared fields, passing in the form builder 'f' %>
+  <%= render 'shared/milestones/form_fields', form: f %>
+<% end %>
