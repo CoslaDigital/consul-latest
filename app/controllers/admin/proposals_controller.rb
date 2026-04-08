@@ -19,7 +19,8 @@ class Admin::ProposalsController < Admin::BaseController
     respond_to do |format|
       format.html { @proposals = @proposals.page(params[:page]) }
       format.csv do
-        send_data Proposal::Exporter.new(@proposals).to_csv,
+        # Use the model's CSV method directly
+        send_data @proposals.to_csv,
                   filename: "proposals-#{Date.today}.csv"
       end
     end
