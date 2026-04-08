@@ -1,14 +1,13 @@
 <%
-  milestone ||= @milestone
-  # Use the parent detected by the controller
+  # Use the parent detected by the controller or attached to the milestone
   parent = milestone.milestoneable || @milestoneable
 
+  # Construct the route array
   if parent.is_a?(Budget::Investment)
-    # We use :budget and :investment symbols to match the route names exactly
-    # and avoid the "budget_budget" naming collision.
+    # Uses symbols to avoid budget_budget stuttering and grabs IDs from @budget/@investment
     target = [:budget, :investment, milestone]
   else
-    # For Proposals or other top-level models
+    # Standard 2-level nesting for Proposals
     target = [parent, milestone]
   end
 %>

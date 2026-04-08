@@ -1,6 +1,10 @@
-<h1>Edit Milestone</h1>
+<div class="milestone-edit row">
+  <div class="small-12 column">
+    <%= back_link_to milestoneable_path %>
 
-<%# Render the same form from the new shared path %>
-<%= render "shared/milestones/form",
-           milestone: @milestone,
-           url: budget_investment_milestone_path(@budget, @investment, @milestone) %>
+    <h1><%= t("admin.milestones.edit.title", default: "Edit Milestone") %></h1>
+
+    <%# Use the shared form partial %>
+    <%= render "form", milestone: @milestone %>
+  </div>
+</div>

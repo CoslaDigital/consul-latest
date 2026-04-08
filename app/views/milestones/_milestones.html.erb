@@ -1,9 +1,19 @@
 <div class="tabs-panel tab-milestones" id="tab-milestones">
+  <% if milestoneable.present? && can?(:create, Milestone.new(milestoneable: milestoneable)) %>
+    <%
+      # This is the "magic" line. It finds 'new_budget_investment_milestone'
+      # or 'new_proposal_milestone' automatically.
+      new_path = if milestoneable.is_a?(Budget::Investment)
+                   new_budget_investment_milestone_path(milestoneable.budget, milestoneable)
+                 else
+                   new_polymorphic_path([milestoneable, :milestone])
+                 end
+    %>
 
-  <% if can? :create, Milestone.new(milestoneable: @investment) %>
-    <%= link_to t("investments.show.new_milestone"),
-                new_budget_investment_milestone_path(@budget, @investment),
+    <%= link_to t("milestones.index.new_milestone", default: "New Milestone"),
+                new_path,
                 class: "button success" %>
   <% end %>
+
   <%= render "milestones/milestones_content", milestoneable: milestoneable %>
 </div>
