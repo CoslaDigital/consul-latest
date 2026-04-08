@@ -43,9 +43,15 @@
     <% end %>
     <div class="milestone-actions margin-top">
       <% if can? :update, milestone %>
-        <%# This link now works for any parent (Proposal or Investment) %>
+        <%
+          # We use the symbols to match the route names exactly
+          # and avoid the "budget_budget" naming collision.
+          path = edit_polymorphic_path([:budget, :investment, milestone],
+                                       budget_id: milestone.milestoneable.budget_id,
+                                       investment_id: milestone.milestoneable_id)
+        %>
         <%= link_to t("milestones.milestone.edit_button", default: "Edit Milestone"),
-                    edit_polymorphic_path([milestone.milestoneable, milestone]),
+                    path,
                     class: "button tiny" %>
       <% end %>
     </div>

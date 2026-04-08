@@ -1,14 +1,15 @@
-# app/controllers/milestones_controller.rb
-
 class MilestonesController < ApplicationController
-  # This finds the parent budget and investment from the URL
-  before_action :set_budget_and_investment
+  # Make these available to your views for back links and forms
+  helper_method :milestoneable_path, :milestoneable
 
-  # CanCanCan will automatically load and authorize @milestone
-  # using the @investment parent object we find above.
-  load_and_authorize_resource :milestone, through: :investment
+  # 1. Detect the parent (Proposal or Investment)
+  before_action :load_milestoneable
 
-  # This is good to keep if your forms need a list of statuses
+  # 2. Use CanCanCan to load the milestone THROUGH the detected parent
+  load_and_authorize_resource :milestone, through: :milestoneable
+
+  # 3. Ensure route variables (@budget, @investment) exist for nested path helpers
+  before_action :set_route_variables, only: [:new, :create, :edit, :update]
   before_action :load_statuses, only: [:new, :create, :edit, :update]
 
   def new
@@ -16,9 +17,8 @@ class MilestonesController < ApplicationController
   end
 
   def create
-    # @milestone is built automatically with the correct params
     if @milestone.save
-      redirect_to budget_investment_path(@budget, @investment), notice: "Milestone successfully created."
+      redirect_to milestoneable_path, notice: t("milestones.create.notice", default: "Milestone successfully created.")
     else
       render :new
     end
@@ -29,9 +29,8 @@ class MilestonesController < ApplicationController
   end
 
   def update
-    # @milestone is loaded automatically
     if @milestone.update(milestone_params)
-      redirect_to budget_investment_path(@budget, @investment), notice: "Milestone successfully updated."
+      redirect_to milestoneable_path, notice: t("milestones.update.notice", default: "Milestone successfully updated.")
     else
       render :edit
     end
@@ -39,24 +38,53 @@ class MilestonesController < ApplicationController
 
   def destroy
     @milestone.destroy
-    redirect_to budget_investment_path(@budget, @investment), notice: "Milestone successfully deleted."
+    redirect_to milestoneable_path, notice: t("milestones.delete.notice", default: "Milestone successfully deleted.")
+  end
+
+  # Generic path helper that handles different nesting levels
+  def milestoneable_path
+    if @milestoneable.is_a?(Budget::Investment)
+      budget_investment_path(@budget, @investment, anchor: "tab-milestones")
+    else
+      polymorphic_path(@milestoneable, anchor: "tab-milestones")
+    end
   end
 
   private
 
-    def set_budget_and_investment
-      @budget = Budget.find(params[:budget_id])
-      @investment = @budget.investments.find(params[:investment_id])
+    def load_milestoneable
+      @milestoneable = milestoneable
+      raise ActiveRecord::RecordNotFound if @milestoneable.nil?
+    end
+
+    def milestoneable
+      # Polymorphic detector: finds the parent based on URL parameters
+      if params[:investment_id]
+        Budget::Investment.find(params[:investment_id])
+      elsif params[:proposal_id]
+        Proposal.find(params[:proposal_id])
+      end
+    end
+
+    def set_route_variables
+      # Hydrates @budget and @investment only if we are in a budget context
+      # This prevents UrlGenerationErrors in the views/forms
+      if @milestoneable.is_a?(Budget::Investment)
+        @investment = @milestoneable
+        @budget = @investment.budget
+
+        # Verify the budget in the URL matches the investment's budget
+        if params[:budget_id].present? && params[:budget_id].to_i != @budget.id
+          raise ActiveRecord::RecordNotFound
+        end
+      end
     end
 
     def load_statuses
-      # This is an example; adjust if your Status model is different
       @statuses = Milestone::Status.all if defined?(Milestone::Status)
     end
 
     def milestone_params
-      # Make sure this permit list matches your form fields
-      # params.require(:milestone).permit(:title, :description, :due_date, :status_id) # Use status_id if it's an association
       params.require(:milestone).permit(
         :status_id,
         :publication_date,
