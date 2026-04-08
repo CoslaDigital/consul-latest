@@ -48,6 +48,51 @@ class Postcode < ApplicationRecord
     range_match&.geozone_id
   end
 
+  def self.to_csv
+    require "csv"
+    sanitizer = Rails::Html::FullSanitizer.new
+    headers = [
+      I18n.t("admin.proposals.index.id", default: "ID"),
+      I18n.t("admin.proposals.index.code", default: "Code"),
+      I18n.t("activerecord.attributes.proposal.title", default: "Title"),
+      I18n.t("proposals.form.proposal_summary", default: "Summary"),
+      I18n.t("activerecord.attributes.proposal.description", default: "Description"),
+      I18n.t("activerecord.attributes.proposal.price", default: "Price"),
+      I18n.t("admin.proposals.index.author", default: "Author"),
+      I18n.t("activerecord.attributes.proposal.responsible_name", default: "Responsible Name"),
+      I18n.t("attributes.email", default: "Email"),
+      I18n.t("proposals.form.geozone", default: "Geozone"),
+      I18n.t("admin.proposals.index.milestones", default: "Milestones"),
+      I18n.t("admin.proposals.index.selected", default: "Selected"),
+      I18n.t("admin.proposals.index.status", default: "Status")
+    ]
+
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+
+      all.find_each do |proposal|
+        clean_summary = sanitizer.sanitize(proposal.summary)&.squish
+        clean_description = sanitizer.sanitize(proposal.description)&.squish
+
+        csv << [
+          proposal.id,
+          proposal.code,
+          proposal.title,
+          clean_summary,
+          clean_description,
+          proposal.price,
+          proposal.author.try(:username),
+          proposal.responsible_name,
+          proposal.author.try(:email),
+          proposal.geozone&.name,
+          proposal.milestones.count,
+          proposal.selected?,
+          proposal.status # <--- The new status field
+        ]
+      end
+    end
+  end
+
   private
 
   # Finds an exact match for an individual postcode
