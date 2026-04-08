@@ -9,9 +9,9 @@ module Abilities
 
       return if user.blank?
 
+      if Setting.can_edit_milestones?
       can [:update, :destroy], Milestone do |milestone|
         parent = milestone.milestoneable
-        # Guard: Must have parent, parent must have author_id, author_id must match
         parent.present? &&
           parent.respond_to?(:author_id) &&
           parent.author_id == user.id
@@ -20,10 +20,10 @@ module Abilities
       # 2. Permission to CREATE milestones
       can :create, Milestone do |milestone|
         parent = milestone.milestoneable
-        # This handles Milestone.new(milestoneable: @investment/@proposal)
         parent.present? &&
           parent.respond_to?(:author_id) &&
           parent.author_id == user.id
+      end
       end
 
       cannot :create, Debate
