@@ -1,0 +1,35 @@
+class ProposalMatch < ApplicationRecord
+  # Associations
+  belongs_to :proposal # The Ask
+  belongs_to :offer # The Resource
+
+  # State Machine for the Match
+  enum status: {
+    pending: 0, # Request sent, waiting for response
+    accepted: 10, # Match! They are collaborating
+    rejected: 20, # Swipe left
+    fulfilled: 30 # The collaboration was completed successfully
+  }
+
+  # Validations
+  validates :proposal, presence: true
+  validates :offer, presence: true
+  # Prevent duplicate pending/active requests between the same two items
+  validates :proposal_id, uniqueness: { scope: :offer_id, message: "has already requested this offer" }
+
+  # Callbacks to handle timestamping based on state changes
+  before_update :set_lifecycle_timestamps, if: :status_changed?
+
+  private
+
+    def set_lifecycle_timestamps
+      if accepted? && accepted_at.nil?
+        self.accepted_at = Time.current
+      elsif fulfilled? && completed_at.nil?
+        self.completed_at = Time.current
+
+        # Optional: Automatically close the Offer if it's fully consumed
+        offer.claimed!
+      end
+    end
+end
