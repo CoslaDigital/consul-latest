@@ -1,14 +1,23 @@
 class Offer < ApplicationRecord
+
   include Flaggable
   include Taggable
-  include Sanitizable
   include Searchable
   include HasPublicAuthor
   include Imageable
-  include Mappable
+  # include Mappable
   include Notifiable
 
-  # Soft deletion (matches Consul's standard setup)
+  include Filterable
+  include Followable
+  include Documentable
+  include SDG::Relatable
+
+  # Optional (Uncomment if needed)
+  # include Videoable
+  # include Communitable
+  # include Graphqlable
+
   acts_as_paranoid column: :hidden_at
   include ActsAsParanoidAliases
 
@@ -24,13 +33,15 @@ class Offer < ApplicationRecord
   has_many :comments, as: :commentable, inverse_of: :commentable, dependent: :destroy
 
   # State Machine for the Offer's lifecycle
-  enum status: {
+  enum :status, {
     available: 0,
-    pending: 1, # Currently in talks with a Proposal
-    claimed: 2 # Offer has been fulfilled/used up
+    pending: 1,
+    claimed: 2
   }
 
   # Validations
+
+  validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
   validates :title, presence: true, length: { in: 4..150 }
   validates :description, presence: true
   validates :author, presence: true
@@ -38,6 +49,8 @@ class Offer < ApplicationRecord
   # Scopes for easy filtering
   scope :sort_by_created_at, -> { reorder(created_at: :desc) }
   scope :active, -> { where(status: :available) }
+
+  scope :last_week, -> { where(created_at: 7.days.ago..) }
 
   # Search definition (integrating with Consul's pg_search)
   def searchable_values
@@ -48,5 +61,13 @@ class Offer < ApplicationRecord
       tag_list.join(" ") => "B",
       geozone&.name => "B"
     }
+  end
+
+  def after_hide
+    tags.each { |t| t.decrement_custom_counter_for("Offer") }
+  end
+
+  def after_restore
+    tags.each { |t| t.increment_custom_counter_for("Offer") }
   end
 end

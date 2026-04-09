@@ -114,6 +114,23 @@ module Abilities
         can :answer, Poll do |poll|
           poll.answerable_by?(user)
         end
+        # ==========================================
+        # NEW: Mutual Aid / Offer Matching Abilities
+        # ==========================================
+
+        # Offers CRUD
+        can :create, Offer
+        can [:update, :destroy], Offer, author_id: user.id, hidden_at: nil
+
+        # Matchmaking (The Handshake)
+        can :create, ProposalMatch
+
+        # A user can only accept/reject/fulfill a match if they own EITHER
+        # the originating Offer or the originating Proposal.
+        can [:accept, :reject, :fulfill], ProposalMatch do |match|
+          match.offer.author_id == user.id || match.proposal.author_id == user.id
+        end
+        # ==========================================
       end
 
       can [:create, :show], ProposalNotification, proposal: { author_id: user.id }

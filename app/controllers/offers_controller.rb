@@ -1,28 +1,41 @@
 class OffersController < ApplicationController
-  # Consul uses Devise or similar for auth
+  # 1. Devise Authentication
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_offer, only: [:show, :edit, :update, :destroy]
-  before_action :verify_author, only: [:edit, :update, :destroy]
+
+  # 2. The CanCanCan Magic - This handles authorization AND finds the @offer for you!
+  load_and_authorize_resource
 
   def index
-    # We only want to show available offers in the public feed
-    @offers = Offer.active.sort_by_created_at.page(params[:page])
+    @valid_orders = %w[created_at]
+    @offers = @offers.active.sort_by_created_at.page(params[:page])
+
+    # Initialize the tag cloud for the sidebar
+    @tag_cloud = TagCloud.new(Offer, params[:search])
   end
 
   def show
-    # For the "Match" UI: If the user is logged in, find all their active proposals (Asks)
-    # so they can select which proposal they want to link to this Offer.
     if current_user
       @my_proposals = current_user.proposals.not_archived.not_retired
     end
+
+    # 1. Define the valid sorting tabs for the comments section
+    @valid_orders = %w[most_voted newest oldest]
+
+    # 2. Grab the current selected order, or default to most_voted
+    @current_order = params[:order].presence || "most_voted"
+
+    # 3. Initialize the tree
+    @comment_tree = CommentTree.new(@offer, params[:page], @current_order)
   end
 
   def new
-    @offer = Offer.new
+    # @offer = Offer.new is automatically handled
   end
 
   def create
-    @offer = current_user.offers.build(offer_params)
+    # CanCanCan automatically builds @offer with offer_params,
+    # but we must link it to the current user before saving.
+    @offer.author = current_user
 
     if @offer.save
       redirect_to @offer, notice: "Your offer has been published to the community!"
@@ -32,9 +45,11 @@ class OffersController < ApplicationController
   end
 
   def edit
+    # @offer is automatically loaded and authorized
   end
 
   def update
+    # CanCanCan automatically checks if they are the author based on ability.rb
     if @offer.update(offer_params)
       redirect_to @offer, notice: "Offer updated successfully."
     else
@@ -43,25 +58,20 @@ class OffersController < ApplicationController
   end
 
   def destroy
-    # Using acts_as_paranoid, this will set hidden_at
     @offer.destroy
     redirect_to offers_url, notice: "Offer removed."
   end
 
   private
 
-    def set_offer
-      @offer = Offer.find(params[:id])
-    end
-
     def offer_params
-      # geozone_id and tag_list are crucial for the matchmaking logic
-      params.require(:offer).permit(:title, :description, :geozone_id, :tag_list)
-    end
-
-    def verify_author
-      unless @offer.author == current_user || current_user.administrator?
-        redirect_to offers_path, alert: "You are not authorized to edit this offer."
-      end
+      params.require(:offer).permit(
+        :title,
+        :description,
+        :geozone_id,
+        :tag_list,
+        :terms_of_service,
+        image_attributes: [:id, :title, :cached_attachment, :attachment, :user_id]
+      )
     end
 end

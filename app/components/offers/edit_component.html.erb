@@ -1,0 +1,11 @@
+<% provide :main_class, "offer-edit" %>
+
+<%= back_link_to offer_path(offer), t("offers.edit.back", default: "Back to Offer") %>
+
+<%= header %>
+
+<div class="row">
+  <div class="small-12 medium-8 column">
+    <%= render Offers::FormComponent.new(offer, url: offer_path(offer)) %>
+  </div>
+</div>

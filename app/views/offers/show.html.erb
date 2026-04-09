@@ -18,9 +18,8 @@
         <%= render Shared::GeozoneLinkComponent.new(@offer, offers_path(search: geozone_name(@offer))) %>
       </div>
 
-      <div class="html-area margin-bottom">
-        <%= simple_format(@offer.description) %>
-      </div>
+
+      <%= render "info" %>
 
       <div class="margin-top">
         <%= render Shared::ModerationActionsComponent.new(@offer) %>
@@ -75,9 +74,30 @@
 </div>
 
 <% unless preview %>
+  <% if @offer.author == current_user && @offer.proposal_matches.pending.any? %>
+    <aside class="callout secondary margin-top">
+      <h3><%= t("offers.show.pending_requests", default: "Collaboration Requests") %></h3>
+      <ul class="no-bullet">
+        <% @offer.proposal_matches.pending.each do |match| %>
+          <li class="padding-top border-bottom margin-bottom">
+            <p>
+              <strong><%= match.proposal.author.name %></strong> wants to match this with:
+              <%= link_to match.proposal.title, match.proposal %>
+            </p>
+            <div class="button-group">
+              <%= button_to "Accept", accept_proposal_match_path(match),
+                            method: :put, class: "button success small" %>
+              <%= button_to "Decline", reject_proposal_match_path(match),
+                            method: :put, class: "button alert hollow small" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </aside>
+  <% end %>
   <div class="tabs-content margin-top" data-tabs-content="offers_tabs">
     <div class="tabs-panel is-active" id="tab-comments">
-      <%= render "comments/comments", commentable: @offer %>
+      <%= render "offers/comments", commentable: @offer %>
     </div>
   </div>
 <% end %>

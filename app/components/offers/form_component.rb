@@ -1,6 +1,4 @@
 class Offers::FormComponent < ApplicationComponent
-  include TranslatableFormHelper
-  include GlobalizeHelper
 
   attr_reader :offer, :url
   delegate :suggest_data, :geozone_select_options, to: :helpers
@@ -16,7 +14,4 @@ class Offers::FormComponent < ApplicationComponent
       Tag.category.order(:name)
     end
 
-    def map_location
-      offer.map_location || MapLocation.new(offer: Offer.new)
-    end
 end

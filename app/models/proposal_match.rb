@@ -4,12 +4,7 @@ class ProposalMatch < ApplicationRecord
   belongs_to :offer # The Resource
 
   # State Machine for the Match
-  enum status: {
-    pending: 0, # Request sent, waiting for response
-    accepted: 10, # Match! They are collaborating
-    rejected: 20, # Swipe left
-    fulfilled: 30 # The collaboration was completed successfully
-  }
+  enum :status, { pending: 0, accepted: 10, rejected: 20, fulfilled: 30 }
 
   # Validations
   validates :proposal, presence: true
