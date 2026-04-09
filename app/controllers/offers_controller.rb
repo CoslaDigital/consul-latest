@@ -86,6 +86,16 @@ class OffersController < ApplicationController
     redirect_to offers_url, notice: "Offer removed."
   end
 
+  def mine
+    @my_offers = current_user.offers.order(created_at: :desc)
+
+    # We use { proposal: :author } to tell Rails to pre-load
+    # the proposal AND the person who wrote it in one go.
+    @inbound_matches = ProposalMatch.where(proposal_id: current_user.proposals.pluck(:id))
+                                    .includes(:offer, proposal: :author)
+                                    .order(created_at: :desc)
+  end
+
   private
 
     def offer_params

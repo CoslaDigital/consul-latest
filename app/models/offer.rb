@@ -33,11 +33,7 @@ class Offer < ApplicationRecord
   has_many :comments, as: :commentable, inverse_of: :commentable, dependent: :destroy
 
   # State Machine for the Offer's lifecycle
-  enum :status, {
-    available: 0,
-    pending: 1,
-    claimed: 2
-  }
+  enum :status, { pending: 0, accepted: 1, confirmed: 2, rejected: 3, withdrawn: 4, fulfilled: 5 }
 
   # Validations
 

@@ -119,9 +119,9 @@ module Abilities
         # ==========================================
 
         # Offers CRUD
-        can :create, Offer
+        can [:create, :mine], Offer
         can [:update, :destroy], Offer, author_id: user.id, hidden_at: nil
-
+        can :confirm, ProposalMatch, proposal: { author_id: user.id }
         # Matchmaking (The Handshake)
         can :create, ProposalMatch
 

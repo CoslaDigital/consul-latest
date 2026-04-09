@@ -2,23 +2,78 @@
 <div class="collaboration-status-box">
   <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status", default: "Collaborations") %></h2>
 
-  <%# 1. Show Accepted Matches to everyone (Proof of Impact) %>
-  <% if @proposal.proposal_matches.accepted.any? %>
-    <div class="callout success tiny">
+  <%# 1. SUCCESS STORIES: Fulfilled Collaborations (Visible to everyone) %>
+  <% if @proposal.proposal_matches.fulfilled.any? %>
+    <div class="callout success tiny" style="border-color: #28a745; background-color: #f1fcf4;">
+      <h6 class="margin-bottom-s">
+        <i class="fa fa-certificate"></i> <%= t("proposals.show.fulfilled_collabs", default: "Support History") %></h6>
       <ul class="no-bullet margin-bottom-0">
-        <% @proposal.proposal_matches.accepted.each do |match| %>
+        <% @proposal.proposal_matches.fulfilled.each do |match| %>
           <li class="margin-bottom-s">
-            <i class="fa fa-handshake-o"></i>
-            <strong><%= t("shared.accepted") %>:</strong>
-            <%= link_to match.offer.title, match.offer %>
-            <br><small>Provided by: <%= match.offer.author.name %></small>
+            <strong><%= t("shared.completed") %>:</strong> <%= match.offer.title %>
+            <br><small>Supported by <%= match.offer.author.name %></small>
           </li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <%# 2. Show Pending Matches (Author sees management links, Public sees status) %>
+  <%# 2. ACTIVE WORK: Confirmed Collaborations %>
+  <% if @proposal.proposal_matches.confirmed.any? %>
+    <div class="callout success tiny">
+      <h6 class="margin-bottom-s">
+        <i class="fa fa-check-square"></i> <%= t("proposals.show.active_collabs", default: "Active Collaborations") %>
+      </h6>
+      <ul class="no-bullet margin-bottom-0">
+        <% @proposal.proposal_matches.confirmed.each do |match| %>
+          <li class="margin-bottom-s">
+            <strong><%= match.offer.author.name %></strong> is providing:<br>
+            <%= link_to match.offer.title, match.offer %>
+
+            <%# AUTHOR ONLY: Can mark as fulfilled %>
+            <% if @proposal.author == current_user %>
+              <div class="margin-top-s">
+                <%= button_to t("proposals.show.fulfill_button", default: "Mark as Completed"),
+                              fulfill_proposal_match_path(match),
+                              method: :patch,
+                              class: "button hollow success expanded tiny margin-bottom-0",
+                              data: { confirm: t("proposals.show.confirm_fulfillment_check", default: "Confirm that this help has been received and the task is complete?") } %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# 3. THE SECOND HANDSHAKE: Needs Confirmation (Visible to Proposal Author) %>
+  <% if @proposal.author == current_user && @proposal.proposal_matches.accepted.any? %>
+    <div class="callout primary tiny">
+      <h6><i class="fa fa-handshake-o"></i> <%= t("proposals.show.awaiting_confirmation", default: "Finalize Help") %>
+      </h6>
+      <ul class="no-bullet margin-bottom-0">
+        <% @proposal.proposal_matches.accepted.each do |match| %>
+          <li class="margin-bottom">
+            <p class="small margin-bottom-s">
+              <strong><%= match.offer.author.name %></strong> agreed to help! Finalize this to start working together.
+            </p>
+            <%= button_to t("proposals.show.confirm_button", default: "Confirm & Start"),
+                          confirm_proposal_match_path(match),
+                          method: :patch,
+                          class: "button success expanded small margin-bottom-0" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% elsif @proposal.proposal_matches.accepted.any? %>
+    <div class="callout secondary tiny">
+      <p class="help-text margin-bottom-0">
+        <i class="fa fa-hourglass-half"></i> <%= t("proposals.show.matching_in_progress", default: "A collaboration is being finalized...") %>
+      </p>
+    </div>
+  <% end %>
+
+  <%# 4. PENDING REQUESTS %>
   <% if @proposal.proposal_matches.pending.any? %>
     <div class="callout warning tiny">
       <ul class="no-bullet margin-bottom-0">
@@ -37,7 +92,7 @@
     </div>
   <% end %>
 
-  <%# 3. Show Rejected only to the Author %>
+  <%# 5. REJECTED LOG (Author Only) %>
   <% if @proposal.author == current_user && @proposal.proposal_matches.rejected.any? %>
     <details>
       <summary class="help-text"><%= t("proposals.show.declined_offers", default: "Declined Offers") %></summary>
@@ -49,47 +104,40 @@
     </details>
   <% end %>
 
-  <%# 4. Proactive "Offer Help" section for Offer Authors %>
+  <%# 6. PROACTIVE OFFER FORM %>
   <% if current_user && current_user != @proposal.author %>
-    <%# Check if user already has an existing match attempt %>
     <% user_match = @proposal.proposal_matches.where(offer_id: current_user.offers.pluck(:id)).first %>
 
-    <div class="sidebar-divider"></div>
-
     <% if user_match %>
+      <div class="sidebar-divider"></div>
       <div class="callout secondary tiny text-center">
         <p class="help-text margin-bottom-0">
-          <%= t("proposals.show.already_linked", default: "You have linked your offer:") %><br>
-          <strong><%= user_match.offer.title %></strong><br>
+          <%= t("proposals.show.your_link_status", default: "Your Offer Status:") %><br>
           <span class="label <%= user_match.status %>"><%= user_match.status.titleize %></span>
         </p>
       </div>
     <% elsif current_user.offers.active.any? %>
+      <div class="sidebar-divider"></div>
       <div class="offer-to-help-form margin-top">
         <p class="small"><strong><%= t("proposals.show.offer_help_title", default: "I can help with this!") %></strong>
         </p>
 
         <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
           <%= f.hidden_field :proposal_id, value: @proposal.id %>
-
           <div class="field margin-bottom">
-            <%= f.collection_select :offer_id,
-                                    current_user.offers.active,
-                                    :id,
-                                    :title,
-                                    { prompt: t("proposals.show.select_offer_prompt", default: "Select your Offer...") },
+            <%= f.collection_select :offer_id, current_user.offers.active, :id, :title,
+                                    { prompt: t("proposals.show.select_offer_prompt") },
                                     class: "full-width" %>
           </div>
-
           <div class="actions">
-            <%= f.submit t("proposals.show.propose_button", default: "Propose Collaboration"),
-                         class: "button success expanded small" %>
+            <%= f.submit t("proposals.show.propose_button"), class: "button success expanded small" %>
           </div>
         <% end %>
       </div>
     <% else %>
+      <div class="sidebar-divider"></div>
       <div class="text-center">
-        <p class="help-text small"><%= t("proposals.show.no_offers_to_link", default: "Want to help? Create an offer first!") %></p>
+        <p class="help-text small"><%= t("proposals.show.no_offers_to_link") %></p>
         <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded small" %>
       </div>
     <% end %>

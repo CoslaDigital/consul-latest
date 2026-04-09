@@ -79,6 +79,13 @@
 
       <div class="sidebar-divider"></div>
 
+      <% if current_user %>
+        <div class="sidebar-divider"></div>
+        <%= link_to mine_offers_path, class: "button hollow expanded success" do %>
+          <i class="fa fa-dashboard"></i> <%= t("offers.index.my_offers", default: "My Mutual Aid Dashboard") %>
+        <% end %>
+      <% end %>
+
       <%# --- TAGS --- %>
       <%= render "shared/tag_cloud", taggable: "Offer" %>
 

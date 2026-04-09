@@ -43,6 +43,17 @@ class ProposalMatchesController < ApplicationController
     end
   end
 
+  # app/controllers/proposal_matches_controller.rb
+  def confirm
+    if @proposal_match.update(status: :confirmed, confirmed_at: Time.current)
+      # Notify the Provider that the Requester has finalized the deal
+      Notification.add(@proposal_match.offer.author, @proposal_match)
+
+      redirect_back fallback_location: root_path,
+                    notice: t("proposal_matches.confirm.success", default: "Collaboration is now officially active!")
+    end
+  end
+
   private
 
     def proposal_match_params

@@ -4,7 +4,18 @@ class ProposalMatch < ApplicationRecord
   belongs_to :offer # The Resource
 
   # State Machine for the Match
-  enum :status, { pending: 0, accepted: 10, rejected: 20, fulfilled: 30 }
+  enum :status, {
+    pending: 0,
+    accepted: 10,
+    confirmed: 15,
+    rejected: 20,
+    withdrawn: 25,
+    fulfilled: 30
+  }, default: :pending
+
+  scope :confirmed, -> { where(status: :confirmed) }
+  scope :pending, -> { where(status: :pending) }
+  scope :fulfilled, -> { where(status: :fulfilled) }
 
   # Validations
   validates :proposal, presence: true
