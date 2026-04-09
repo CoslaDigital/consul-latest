@@ -9,6 +9,7 @@ class Proposals::CollaborationComponent < ApplicationComponent
   def render?
     # Don't show the collaboration box if the proposal is retired or the user isn't verified
     !proposal.retired?
+    true
   end
 
   private

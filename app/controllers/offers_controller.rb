@@ -7,7 +7,24 @@ class OffersController < ApplicationController
 
   def index
     @valid_orders = %w[created_at]
-    @offers = @offers.active.sort_by_created_at.page(params[:page])
+
+    @offers = Offer.all
+
+    @offers = params[:filter] == "archived" ? Offer.archived : Offer.active
+
+    # 2. Filter by specific status if requested (e.g., just Claimed)
+    if params[:status].present?
+      @offers = @offers.where(status: params[:status])
+    end
+
+    # 3. Handle Sorting Tabs
+    @current_order = params[:order] || "newest"
+    @offers = case @current_order
+              when "most_active" then @offers.most_active
+              else @offers.newest
+              end
+
+    @offers = @offers.page(params[:page])
 
     # Initialize the tag cloud for the sidebar
     @tag_cloud = TagCloud.new(Offer, params[:search])

@@ -1,9 +1,5 @@
 <% provide :title, t("offers.index.title", default: "Community Offers") %>
-<% content_for :header_addon do %>
-  <%= render "shared/search_form",
-             search_path: offers_path(page: 1),
-             i18n_namespace: "offers.index.search_form" %>
-<% end %>
+
 <% content_for :canonical do %>
   <%= render "shared/canonical", href: offers_url %>
 <% end %>
@@ -13,34 +9,43 @@
 <div class="row">
   <div id="offers" class="offers-list small-12 medium-9 column">
 
+    <%# 1. Search Form %>
+    <div class="margin-bottom">
+      <%= render "shared/search_form",
+                 search_path: offers_path(status: params[:status]),
+                 i18n_namespace: "offers.index.search_form" %>
+    </div>
+
     <%= render Shared::BannerComponent.new("offers") %>
 
+    <%# 2. Sorting Tabs (Newest / Most Active) %>
+    <ul class="menu-tabs">
+      <li class="<%= "is-active" if @current_order == "newest" %>">
+        <%= link_to t("offers.index.tabs.newest", default: "Newest"),
+                    offers_path(order: "newest", status: params[:status], search: params[:search]) %>
+      </li>
+      <li class="<%= "is-active" if @current_order == "most_active" %>">
+        <%= link_to t("offers.index.tabs.most_active", default: "Most Active"),
+                    offers_path(order: "most_active", status: params[:status], search: params[:search]) %>
+      </li>
+    </ul>
 
-
-    <%= render "shared/order_links", i18n_namespace: "offers.index" %>
-
-    <% if @offers.any? %>
-      <div class="show-for-small-only">
-        <%= link_to t("offers.index.start_offer", default: "Create an Offer"),
-                    new_offer_path,
-                    class: "button expanded" %>
-      </div>
-    <% end %>
-
-    <div id="offers-list">
-      <% if @offers.any? || current_user.blank? %>
+    <%# 3. Main List Content %>
+    <div id="offers-list" class="margin-top">
+      <% if @offers.any? %>
         <% @offers.each do |offer| %>
           <%= render "offers/offer", offer: offer %>
         <% end %>
+        <%= paginate @offers %>
       <% else %>
         <div class="callout primary">
-          <%= t("offers.index.empty", default: "There are no active offers at the moment. Be the first to offer help!") %>
+          <%= t("offers.index.empty", default: "No offers found matching your criteria.") %>
         </div>
       <% end %>
-      <%= paginate @offers %>
     </div>
   </div>
 
+  <%# --- SIDEBAR --- %>
   <div class="small-12 medium-3 column">
     <aside class="margin-bottom">
       <%= link_to t("offers.index.start_offer", default: "Create an Offer"),
@@ -49,15 +54,44 @@
 
       <div class="sidebar-divider"></div>
 
+      <%# --- FLAT STATUS FILTER LIST --- %>
+      <h2 class="sidebar-title"><%= t("offers.index.status_filter_title", default: "Offers lists") %></h2>
+      <ul class="no-bullet margin-top">
+        <li>
+          <%= link_to offers_path(search: params[:search]) do %>
+            <i class="fa fa-list"></i>
+            <%= params[:status].blank? ? "<strong>Active offers</strong>".html_safe : "Active offers" %>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to offers_path(status: "claimed", search: params[:search]) do %>
+            <i class="fa fa-check-circle-o"></i>
+            <%= params[:status] == "claimed" ? "<strong>Claimed offers</strong>".html_safe : "Claimed offers" %>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to offers_path(status: "withdrawn", search: params[:search]) do %>
+            <i class="fa fa-ban"></i>
+            <%= params[:status] == "withdrawn" ? "<strong>Withdrawn offers</strong>".html_safe : "Withdrawn offers" %>
+          <% end %>
+        </li>
+      </ul>
+
+      <div class="sidebar-divider"></div>
+
+      <%# --- TAGS --- %>
       <%= render "shared/tag_cloud", taggable: "Offer" %>
 
       <div class="sidebar-divider"></div>
+
+      <%# --- GEOZONES --- %>
       <div class="offers-geozones">
         <h2 class="sidebar-title"><%= t("shared.tags_cloud.districts_list") %></h2>
-        <br>
-        <ul id="geozones" class="no-bullet">
+        <ul id="geozones" class="no-bullet margin-top">
           <% Geozone.all.each do |geozone| %>
-            <li><%= link_to geozone.name, offers_path(search: geozone.name) %></li>
+            <li>
+              <%= link_to geozone.name, offers_path(search: geozone.name, status: params[:status]) %>
+            </li>
           <% end %>
         </ul>
       </div>

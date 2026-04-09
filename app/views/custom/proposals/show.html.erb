@@ -73,6 +73,7 @@
               <% end %>
             </div>
           <% end %>
+          <%= render Proposals::CollaborationComponent.new(@proposal, current_user) %>
 
           <%= render "proposals/support_status", proposal: @proposal %>
 

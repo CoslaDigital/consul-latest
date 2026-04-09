@@ -49,10 +49,19 @@ class Offer < ApplicationRecord
   # Scopes for easy filtering
   scope :sort_by_created_at, -> { reorder(created_at: :desc) }
   scope :active, -> { where(status: :available) }
+  scope :available, -> { where(status: :available) }
+  scope :pending, -> { where(status: :pending) }
+  scope :claimed, -> { where(status: :claimed) }
+
+  scope :active, -> { where(status: [:available, :pending]) }
+
+  scope :archived, -> { where(status: [:claimed, :withdrawn]) }
+
+  scope :most_active, -> { order(comments_count: :desc, created_at: :desc) }
+  scope :newest, -> { order(created_at: :desc) }
 
   scope :last_week, -> { where(created_at: 7.days.ago..) }
 
-  # Search definition (integrating with Consul's pg_search)
   def searchable_values
     {
       title => "A",

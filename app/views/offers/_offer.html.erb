@@ -12,8 +12,8 @@
             <% end %>
           </p>
 
-          <div class="offer-description margin-top">
-            <%= truncate(offer.description, length: 200) %>
+          <div class="offer-description">
+            <%= truncate(strip_tags(offer.description), length: 200) %>
           </div>
         </div>
       </div>
