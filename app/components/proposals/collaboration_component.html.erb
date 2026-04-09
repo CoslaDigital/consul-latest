@@ -1,0 +1,46 @@
+<div class="sidebar-divider"></div>
+<div class="callout secondary collaboration-box">
+  <h2 class="sidebar-title"><%= t("proposals.show.collaboration_title", default: "Mutual Aid / Collaboration") %></h2>
+
+  <% if current_user.nil? %>
+    <p class="help-text"><%= t("proposals.show.login_to_help", default: "Sign in to offer help or resources for this project.") %></p>
+    <%= link_to t("devise.sessions.new.log_in"), new_user_session_path, class: "button hollow expanded small" %>
+
+  <% elsif current_user == proposal.author %>
+    <% if proposal.proposal_matches.any? %>
+      <h6><%= t("proposals.show.active_matches", default: "Matches:") %></h6>
+      <ul class="no-bullet">
+        <% proposal.proposal_matches.each do |match| %>
+          <li class="margin-bottom">
+            <span class="label <%= match.status %>"><%= match.status.titleize %></span><br>
+            <%= link_to match.offer.title, match.offer %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="help-text">
+        <em><%= t("proposals.show.waiting_for_help", default: "No collaboration requests yet.") %></em></p>
+    <% end %>
+
+  <% elsif existing_match %>
+    <div class="text-center">
+      <span class="label <%= existing_match.status %>"><%= existing_match.status.titleize %></span>
+      <p class="help-text margin-top">
+        <%= t("proposals.show.you_offered", default: "You offered:") %><br>
+        <strong><%= link_to existing_match.offer.title, existing_match.offer %></strong>
+      </p>
+    </div>
+
+  <% elsif user_offers.any? %>
+    <p class="small"><%= t("proposals.show.offer_help_prompt", default: "Link one of your resources to this proposal:") %></p>
+    <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
+      <%= f.hidden_field :proposal_id, value: proposal.id %>
+      <%= f.collection_select :offer_id, user_offers, :id, :title, { prompt: "Select an Offer..." }, class: "margin-bottom" %>
+      <%= f.submit t("proposals.show.submit_collaboration", default: "Offer Collaboration"), class: "button success expanded small" %>
+    <% end %>
+
+  <% else %>
+    <p class="help-text"><%= t("proposals.show.create_offer_help", default: "Have a resource that could help? Create an offer first!") %></p>
+    <%= link_to t("offers.index.create"), new_offer_path, class: "button success hollow expanded small" %>
+  <% end %>
+</div>

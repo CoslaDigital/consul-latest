@@ -48,6 +48,6 @@ class ProposalMatchesController < ApplicationController
 
       # Using Consul's native Notification system
       # You'll eventually need to define this in en.yml under 'notifications.proposal_match_created'
-      Notification.add(recipient.id, match) if recipient
+      Notification.add(recipient, match) if recipient
     end
 end
