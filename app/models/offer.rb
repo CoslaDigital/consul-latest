@@ -70,4 +70,8 @@ class Offer < ApplicationRecord
   def after_restore
     tags.each { |t| t.increment_custom_counter_for("Offer") }
   end
+
+  def active?
+    status == "available" && hidden_at.nil?
+  end
 end

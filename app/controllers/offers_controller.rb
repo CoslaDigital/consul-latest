@@ -71,6 +71,7 @@ class OffersController < ApplicationController
         :geozone_id,
         :tag_list,
         :terms_of_service,
+        :status,
         image_attributes: [:id, :title, :cached_attachment, :attachment, :user_id]
       )
     end
