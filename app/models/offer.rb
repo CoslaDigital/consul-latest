@@ -54,7 +54,7 @@ class Offer < ApplicationRecord
   scope :claimed, -> { where(status: :claimed) }
 
   scope :active, -> { where(status: [:available, :pending]) }
-
+  scope :withdrawn, -> { where(status: :withdrawn) }
   scope :archived, -> { where(status: [:claimed, :withdrawn]) }
 
   scope :most_active, -> { order(comments_count: :desc, created_at: :desc) }

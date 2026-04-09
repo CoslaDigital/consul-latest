@@ -23,10 +23,17 @@ class ProposalMatchesController < ApplicationController
   end
 
   def accept
-    # load_and_authorize_resource found the match via ID and checked 'can :accept'
-    if @proposal_match.update(status: :accepted, accepted_at: Time.current)
-      # Optional: Notify the other party that the handshake is complete
-      redirect_back fallback_location: root_path, notice: t("proposal_matches.accept.success", default: "Match accepted!")
+    # Start a transaction to ensure both updates happen together
+    Offer.transaction do
+      if @proposal_match.update(status: :accepted, accepted_at: Time.current)
+        # Automatically move the Offer to 'pending' status
+        @proposal_match.offer.update!(status: :pending)
+
+        Notification.add(@proposal_match.proposal.author, @proposal_match)
+
+        redirect_back fallback_location: root_path,
+                      notice: t("proposal_matches.accept.success", default: "Collaboration confirmed! The offer is now marked as 'Pending'.")
+      end
     end
   end
 

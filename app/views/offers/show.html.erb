@@ -28,13 +28,35 @@
       </div>
 
       <% unless preview %>
-        <%# --- 1. PENDING REQUESTS (Visible to Offer Author) --- %>
+        <%# --- 1. AUTHOR STATUS MANAGEMENT (Prompt to Claim) --- %>
+        <% if @offer.author == current_user && @offer.pending? %>
+          <aside class="callout warning margin-top">
+            <p>
+              <i class="fa fa-exclamation-triangle"></i>
+              <strong><%= t("offers.show.pending_notice", default: "This offer is currently 'Pending'.") %></strong>
+              <br><%= t("offers.show.pending_help", default: "Is this resource now fully committed? Mark it as claimed to hide it from the active list.") %>
+            </p>
+            <div class="button-group">
+              <%= button_to t("offers.show.mark_claimed", default: "Mark as Claimed"),
+                            offer_path(@offer, offer: { status: :claimed }),
+                            method: :patch,
+                            class: "button success small" %>
+
+              <%= button_to t("offers.show.keep_available", default: "Keep Available"),
+                            offer_path(@offer, offer: { status: :available }),
+                            method: :patch,
+                            class: "button hollow secondary small" %>
+            </div>
+          </aside>
+        <% end %>
+
+        <%# --- 2. PENDING REQUESTS (Visible to Offer Author) --- %>
         <% if @offer.author == current_user && @offer.proposal_matches.pending.any? %>
           <aside class="callout secondary margin-top">
             <h3><%= t("offers.show.pending_requests", default: "Collaboration Requests") %></h3>
             <ul class="no-bullet">
               <% @offer.proposal_matches.pending.each do |match| %>
-                <li class="padding-top border-bottom margin-bottom" style="list-style: none;">
+                <li class="padding-top border-bottom padding-bottom" style="list-style: none;">
                   <p>
                     <strong><%= match.proposal.author.name %></strong> wants to match this with:
                     <%= link_to match.proposal.title, proposal_path(match.proposal), class: "strong" %>
@@ -57,7 +79,7 @@
           </aside>
         <% end %>
 
-        <%# --- 2. ACTIVE COLLABORATIONS (Visible to involved parties) --- %>
+        <%# --- 3. ACTIVE COLLABORATIONS --- %>
         <% active_matches = @offer.proposal_matches.accepted %>
         <% if active_matches.any? %>
           <div class="callout success margin-top">
@@ -83,7 +105,7 @@
           </div>
         <% end %>
 
-        <%# --- 3. COMMENTS SECTION --- %>
+        <%# --- 4. COMMENTS SECTION --- %>
         <div class="tabs-content margin-top" data-tabs-content="offers_tabs">
           <div class="tabs-panel is-active" id="tab-comments">
             <%= render "offers/comments" %>
@@ -107,7 +129,6 @@
             <p><em><%= t("offers.show.is_yours", default: "This is your offer.") %></em></p>
             <%= link_to t("offers.edit.title", default: "Edit Offer"), edit_offer_path(@offer), class: "button hollow expanded" %>
 
-            <%# --- IF THE OFFER IS PAUSED/CLAIMED --- %>
           <% elsif !@offer.active? %>
             <div class="callout warning tiny">
               <p>

@@ -8,13 +8,19 @@ class OffersController < ApplicationController
   def index
     @valid_orders = %w[created_at]
 
-    @offers = Offer.all
+    # 1. Start with the correct base collection based on the 'status' param
+    if params[:status] == "claimed"
+      @offers = Offer.claimed
+    elsif params[:status] == "withdrawn"
+      @offers = Offer.withdrawn
+    else
+      # Default to Active (Available + Pending)
+      @offers = Offer.active
+    end
 
-    @offers = params[:filter] == "archived" ? Offer.archived : Offer.active
-
-    # 2. Filter by specific status if requested (e.g., just Claimed)
-    if params[:status].present?
-      @offers = @offers.where(status: params[:status])
+    # 2. Filter by Search if present
+    if params[:search].present?
+      @offers = @offers.search(params[:search])
     end
 
     # 3. Handle Sorting Tabs
@@ -24,6 +30,7 @@ class OffersController < ApplicationController
               else @offers.newest
               end
 
+    # 4. Paginate
     @offers = @offers.page(params[:page])
 
     # Initialize the tag cloud for the sidebar
