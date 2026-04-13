@@ -9,6 +9,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_comments
                           feature.hide_votes
                           feature.restrict_debate_creation
+                          feature.user_milestones
                         ]
     original_settings + custom_settings
   end

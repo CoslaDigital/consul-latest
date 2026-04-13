@@ -41,6 +41,24 @@
         </div>
       </div>
     <% end %>
+    <div class="milestone-actions margin-top">
+      <% if can? :update, milestone %>
+        <%
+          # Detect parent type and build the correct path
+          parent = milestone.milestoneable
 
+          path = if parent.is_a?(Budget::Investment)
+                   # 3-level nesting for Investments
+                   edit_budget_investment_milestone_path(parent.budget_id, parent.id, milestone)
+                 else
+                   # 2-level nesting for Proposals (and anything else)
+                   edit_polymorphic_path([parent, milestone])
+                 end
+        %>
+        <%= link_to t("milestones.milestone.edit_button", default: "Edit Milestone"),
+                    path,
+                    class: "button tiny" %>
+      <% end %>
+    </div>
   </div>
 </li>
