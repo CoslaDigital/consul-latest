@@ -56,11 +56,12 @@ en:
       success: "Offer updated successfully."
     destroy:
       success: "Offer removed."
-
     mine:
       title: "My Mutual Aid Dashboard"
       offered_by_me: "Resources I'm Offering"
-      offered_to_me: "Help Offered to My Projects"
+      offered_by_me_help: "Manage claims on your offers"
+      offered_to_me: "Resources Offered to My Projects"
+      offered_to_me_help: "view offers of assistance and collaboration"
       active_count: "active collaborations"
 
   proposal_matches:
