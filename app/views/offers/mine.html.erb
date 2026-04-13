@@ -1,9 +1,9 @@
-<% provide :title, t("offers.mine.title", default: "My Mutual Aid") %>
+<% provide :title, t("offers.mine.title", default: "My Mutual Aid Dashboard") %>
 
 <div class="row margin-top">
   <div class="small-12 column">
     <%= back_link_to offers_path %>
-    <h1><%= t("offers.mine.title", default: "My Mutual Aid Dashboard") %></h1>
+    <h1><%= t("offers.mine.title") %></h1>
   </div>
 </div>
 
@@ -11,33 +11,38 @@
   <%# --- LEFT COLUMN: MY OFFERS (I am providing) --- %>
   <div class="small-12 medium-6 column">
     <div class="callout secondary">
-      <h2><i class="fa fa-gift"></i> <%= t("offers.mine.offered_by_me", default: "Resources I'm Offering") %></h2>
-      <p class="help-text"><%= t("offers.mine.offered_by_me_help", default: "Manage your offers and approve incoming requests.") %></p>
+      <h2 class="h3"><i class="fa fa-gift"></i> <%= t("offers.mine.offered_by_me", default: "Resources I'm Offering") %>
+      </h2>
+      <p class="help-text"><%= t("offers.mine.offered_by_me_help") %></p>
 
       <% if @my_offers.any? %>
         <% @my_offers.each do |offer| %>
-          <div class="card margin-bottom padding-1">
-            <span class="label <%= offer.status %> float-right"><%= offer.status.titleize %></span>
-            <h5 class="margin-bottom-0"><%= link_to offer.title, offer %></h5>
+          <div id="<%= dom_id(offer) %>" class="offer-dashboard-item margin-bottom">
+            <div class="panel">
+              <span class="label float-right <%= offer.status %>"><%= t("offers.status.#{offer.status}") %></span>
 
-            <%# Show pending requests for this specific offer so the provider can act fast %>
-            <% if offer.proposal_matches.pending.any? %>
-              <div class="callout warning tiny margin-top-s">
-                <p class="small margin-bottom-s"><strong>New requests waiting:</strong></p>
-                <% offer.proposal_matches.pending.each do |match| %>
-                  <div class="button-group">
-                    <%= button_to "Accept #{match.proposal.author.name}", accept_proposal_match_path(match), method: :patch, class: "button success tiny" %>
-                    <%= button_to "Decline", reject_proposal_match_path(match), method: :patch, class: "button alert hollow tiny" %>
-                  </div>
-                <% end %>
+              <%# Use the shared component for title and description logic %>
+              <%= render Shared::BasicContentComponent.new(offer, show_tags: false) %>
+
+              <%# Action Area for Provider %>
+              <% if offer.proposal_matches.pending.any? %>
+                <div class="callout warning tiny margin-top">
+                  <p class="small"><strong><%= t("offers.mine.pending_requests") %>:</strong></p>
+                  <% offer.proposal_matches.pending.each do |match| %>
+                    <div class="button-group margin-top-s">
+                      <%= button_to "Accept #{match.proposal.author.name}", accept_proposal_match_path(match), method: :patch, class: "button success tiny" %>
+                      <%= button_to "Decline", reject_proposal_match_path(match), method: :patch, class: "button alert hollow tiny" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <div class="margin-top-s border-top padding-top-s">
+                <small>
+                  <strong><%= offer.proposal_matches.confirmed.count %></strong> <%= t("offers.mine.active_count") %>
+                  | <%= link_to t("offers.edit.title"), edit_offer_path(offer) %>
+                </small>
               </div>
-            <% end %>
-
-            <div class="margin-top-s">
-              <small>
-                <strong><%= offer.proposal_matches.confirmed.count %></strong> <%= t("offers.mine.active_count", default: "active collaborations") %>
-                | <%= link_to t("offers.edit.title"), edit_offer_path(offer) %>
-              </small>
             </div>
           </div>
         <% end %>
@@ -51,35 +56,42 @@
   <%# --- RIGHT COLUMN: OFFERS TO ME (I am receiving) --- %>
   <div class="small-12 medium-6 column">
     <div class="callout primary">
-      <h2>
+      <h2 class="h3">
         <i class="fa fa-handshake-o"></i> <%= t("offers.mine.offered_to_me", default: "Help Offered to My Projects") %>
       </h2>
-      <p class="help-text"><%= t("offers.mine.offered_to_me_help", default: "Review help sent to you and confirm completions.") %></p>
+      <p class="help-text"><%= t("offers.mine.offered_to_me_help") %></p>
 
       <% if @inbound_matches.any? %>
         <% @inbound_matches.each do |match| %>
-          <div class="card margin-bottom padding-1 border-left-<%= match.status %>">
-            <span class="label <%= match.status %> float-right"><%= match.status.titleize %></span>
+          <div class="offer-dashboard-item margin-bottom">
+            <div class="panel border-left-<%= match.status %>">
+              <span class="label float-right <%= match.status %>"><%= t("proposal_matches.status.#{match.status}") %></span>
 
-            <p class="margin-bottom-0">
-              <strong><%= match.offer.author.name %></strong> linked
-              <%= link_to match.offer.title, match.offer %>
-              to: <strong><%= link_to match.proposal.title, match.proposal %></strong>
-            </p>
+              <p class="margin-bottom-0">
+                <strong><%= match.offer.author.name %></strong> <%= t("offers.mine.linked_text", default: "offered help via") %>
+                <%= link_to match.offer.title, match.offer %>
+              </p>
+              <p class="small text-muted">
+                <%= t("offers.mine.for_project", default: "For your project:") %>
+                <strong><%= link_to match.proposal.title, match.proposal %></strong>
+              </p>
 
-            <div class="margin-top-s">
-              <% if match.accepted? %>
-                <div class="callout success tiny margin-bottom-0">
-                  <p class="small">Provider has agreed! Finalize to start:</p>
-                  <%= button_to t("proposals.show.confirm_button"), confirm_proposal_match_path(match), method: :patch, class: "button success tiny expanded" %>
-                </div>
-              <% elsif match.confirmed? %>
-                <%= button_to t("proposals.show.fulfill_button"), fulfill_proposal_match_path(match), method: :patch, class: "button hollow success tiny expanded", data: { confirm: t("offers.show.confirm_fulfill") } %>
-              <% elsif match.pending? %>
-                <span class="help-text small"><i class="fa fa-clock-o"></i> Waiting for provider to review...</span>
-              <% elsif match.fulfilled? %>
-                <span class="text-success small"><i class="fa fa-check-circle"></i> Completed and Archived</span>
-              <% end %>
+              <div class="margin-top">
+                <% if match.accepted? %>
+                  <div class="callout success tiny">
+                    <p class="small"><%= t("proposals.show.finalize_help_text", default: "Provider has agreed! Confirm to start:") %></p>
+                    <%= button_to t("proposals.show.confirm_button"), confirm_proposal_match_path(match), method: :patch, class: "button success tiny expanded" %>
+                  </div>
+                <% elsif match.confirmed? %>
+                  <%= button_to t("proposals.show.fulfill_button"), fulfill_proposal_match_path(match), method: :patch, class: "button hollow success tiny expanded", data: { confirm: t("proposals.show.confirm_fulfillment_check") } %>
+                <% elsif match.pending? %>
+                  <span class="help-text small"><i class="fa fa-clock-o"></i> <%= t("proposal_matches.status.pending") %>
+                  </span>
+                <% elsif match.fulfilled? %>
+                  <span class="text-success small"><i class="fa fa-check-circle"></i> <%= t("proposal_matches.status.fulfilled") %>
+                  </span>
+                <% end %>
+              </div>
             </div>
           </div>
         <% end %>
