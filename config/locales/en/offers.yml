@@ -1,15 +1,62 @@
 en:
   offers:
     index:
+      title: "Community Offers"
+      start_offer: "Create an Offer"
+      my_offers: "My Mutual Aid Dashboard"
+      status_filter_title: "Offer Lists"
+      empty: "No offers found matching your criteria."
       search_form:
         label: "Search offers"
         placeholder: "Search offers by keyword, district, or resource..."
         button: "Search"
+      orders:
+        newest: "Newest"
+        most_active: "Most Active"
+      orders_label: "Order by"
+      section_header:
+        title: "Mutual Aid - Offers of assitance"
+
+    new:
+      title: "Create an Offer"
+      subtitle: "Offer your skills, time, or resources to help citizen proposals succeed."
+      recommendations_title: "Tips for a great offer"
+      recommendation_one: "Be specific about what you are offering (e.g., '10 hours of design work' instead of 'design')."
+      recommendation_two: "Specify your availability and timeframe."
+      recommendation_three: "Tag your offer accurately so proposals can find you."
+      form:
+        submit_button: "Publish Offer"
+
+    edit:
+      title: "Edit Offer"
+      form:
+        submit_button: "Update Offer"
+
+    form:
+      status_label: "Availability Status"
+      status_help: "Set to 'Pending' or 'Claimed' if you want to temporarily stop receiving new requests."
+      title_label: "What resource are you providing?"
+      title_placeholder: "e.g. 5 hours of web consulting"
+      description_label: "Explain the details, limitations, and availability of your offer."
+      geozone: "District / Neighborhood"
+      geozone_help: "Where is this available? Leave blank if city-wide or remote."
+      tags_label: "Tags"
+      tags_instructions: "Tags help match your offer to relevant proposals."
+      tags_placeholder: "e.g., Environment, Legal, Labor"
+
     status:
       available: "Available"
       pending: "In Discussion"
       claimed: "Claimed"
       withdrawn: "Withdrawn"
+
+    create:
+      success: "Your offer has been published to the community!"
+    update:
+      success: "Offer updated successfully."
+    destroy:
+      success: "Offer removed."
+
     mine:
       title: "My Mutual Aid Dashboard"
       offered_by_me: "Resources I'm Offering"

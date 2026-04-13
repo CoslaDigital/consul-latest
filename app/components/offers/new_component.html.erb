@@ -2,17 +2,24 @@
 
 <%= back_link_to offers_path, t("offers.index.section_header.title", default: "Offers") %>
 
-<%= header do %>
-  <p class="lead"><%= t("offers.new.subtitle", default: "Offer your skills, time, or resources to help citizen proposals succeed.") %></p>
-<% end %>
+<div class="row">
+  <div class="small-12 medium-9 column">
+    <%= header do %>
+      <<%= t("offers.new.title", default: "Create an Offer") %>
+      <p class="lead"><%= t("offers.new.subtitle") %></p>
+    <% end %>
 
-<aside>
-  <h2><%= t("offers.new.recommendations_title", default: "Tips for a great offer") %></h2>
-  <ul class="recommendations">
-    <li><%= t("offers.new.recommendation_one", default: "Be specific about what you are offering (e.g., '10 hours of design work' instead of 'design').") %></li>
-    <li><%= t("offers.new.recommendation_two", default: "Specify your availability and timeframe.") %></li>
-    <li><%= t("offers.new.recommendation_three", default: "Tag your offer accurately so proposals can find you.") %></li>
-  </ul>
-</aside>
+    <aside class="callout primary">
+      <h2>
+        <i class="fa fa-info-circle"></i> <%= t("offers.new.recommendations_title", default: "Tips for a great offer") %>
+      </h2>
+      <ul class="recommendations">
+        <li><%= t("offers.new.recommendation_one", default: "Be specific about what you are offering (e.g., '10 hours of design work' instead of 'design').") %></li>
+        <li><%= t("offers.new.recommendation_two", default: "Specify your availability and timeframe.") %></li>
+        <li><%= t("offers.new.recommendation_three", default: "Tag your offer accurately so proposals can find you.") %></li>
+      </ul>
+    </aside>
 
-<%= render Offers::FormComponent.new(offer, url: offers_path) %>
+    <%= render Offers::FormComponent.new(offer, url: offers_path) %>
+  </div>
+</div>

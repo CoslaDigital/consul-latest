@@ -1,74 +1,84 @@
-<%= form_with(model: offer, url: url, local: true, class: "offer-form") do |f| %>
-  <%= render "shared/errors", resource: offer %>
+<div class="row">
+  <div class="small-12 medium-9 column">
+    <%= form_with(model: offer, url: url, local: true, class: "offer-form") do |f| %>
+      <%= render "shared/errors", resource: offer %>
 
-  <fieldset class="required-fields">
-    <legend><%= t("shared.required") %></legend>
+      <fieldset class="required-fields">
+        <legend><%= t("shared.required") %></legend>
 
-    <div class="margin-bottom">
-      <%= f.label :status, t("offers.form.status_label", default: "Availability Status") %>
-      <%= f.select :status, Offer.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "full-width" %>
-      <p class="help-text">
-        <%= t("offers.form.status_help", default: "Set to 'Pending' or 'Claimed' if you want to temporarily or permanently stop receiving new requests.") %>
-      </p>
-    </div>
+        <%# 1. Status %>
+        <div class="margin-bottom">
+          <%= f.select :status, Offer.statuses.keys.map { |s| [t("offers.status.#{s}"), s] }, {},
+                       class: "full-width",
+                       label: false %>
+          <p class="help-text">
+            <%= t("offers.form.status_help", default: "Set to 'Pending' or 'Claimed' if you want to temporarily stop receiving new requests.") %>
+          </p>
+        </div>
 
-    <div class="margin-bottom">
-      <%= f.label :title, t("offers.form.title_note", default: "What resource are you providing?") %>
-      <%= f.text_field :title, maxlength: 150 %>
-    </div>
+        <%# 2. Title %>
+        <div class="margin-bottom">
+          <%= f.label :title, t("offers.form.title_label", default: "What resource are you providing?") %>
+          <%= f.text_field :title, maxlength: 150, label: false, placeholder: t("offers.form.title_placeholder", default: "e.g. 5 hours of web consulting") %>
+        </div>
 
-    <div class="margin-bottom">
-      <%= f.label :description, t("offers.form.description_note", default: "Explain the details, limitations, and availability of your offer.") %>
-      <%= f.text_area :description, rows: 6, maxlength: 5000, class: "html-area" %>
-    </div>
-  </fieldset>
+        <%# 3. Description %>
+        <div class="margin-bottom">
+          <%= f.label :description, t("offers.form.description_label", default: "Explain the details, limitations, and availability of your offer.") %>
+          <%= f.text_area :description, rows: 8, maxlength: 5000, class: "html-area", label: false %>
+        </div>
+      </fieldset>
 
-  <fieldset>
-    <legend><%= t("shared.optional") %></legend>
+      <fieldset>
+        <legend><%= t("shared.optional") %></legend>
 
-    <% if feature?(:allow_images) %>
-      <%= render Images::NestedComponent.new(f) %>
-    <% end %>
-
-    <% if Geozone.any? %>
-      <div>
-        <%= f.select :geozone_id, geozone_select_options,
-                     label: t("offers.form.geozone", default: "District / Neighborhood"),
-                     hint: t("offers.form.geozone_help", default: "Where is this resource available? Leave blank if city-wide or remote."),
-                     include_blank: t("geozones.none") %>
-      </div>
-    <% end %>
-
-    <%#= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
-
-    <div>
-      <%= f.label :tag_list, t("offers.form.tags_label", default: "Tags") %>
-      <p class="help-text" id="tag-list-help-text"><%= t("offers.form.tags_instructions", default: "Tags help match your offer to relevant proposals.") %></p>
-
-      <div id="category_tags" class="tags">
-        <%= f.label :category_tag_list, t("proposals.form.tag_category_label", default: "Categories") %>
-        <% categories.each do |tag| %>
-          <a class="js-add-tag-link"><%= tag.name %></a>
+        <% if feature?(:allow_images) %>
+          <%= render Images::NestedComponent.new(f) %>
         <% end %>
-      </div>
 
-      <br>
-      <%= f.text_field :tag_list, value: offer.tag_list.to_s,
-                       label: false,
-                       placeholder: t("offers.form.tags_placeholder", default: "e.g., Environment, Legal, Labor"),
-                       class: "js-tag-list tag-autocomplete",
-                       aria: { describedby: "tag-list-help-text" },
-                       data: { js_url: suggest_tags_path } %>
-    </div>
-  </fieldset>
+        <% if Geozone.any? %>
+          <div class="margin-bottom">
+            <%= f.label :geozone_id, t("offers.form.geozone", default: "District / Neighborhood") %>
+            <%= f.select :geozone_id, geozone_select_options,
+                         { include_blank: t("geozones.none") },
+                         label: false %>
+            <p class="help-text"><%= t("offers.form.geozone_help", default: "Where is this available? Leave blank if city-wide or remote.") %></p>
+          </div>
+        <% end %>
 
-  <div class="actions">
-    <% if offer.new_record? %>
-      <div>
-        <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+        <div class="margin-bottom">
+          <%= f.label :tag_list, t("offers.form.tags_label", default: "Tags") %>
+          <p class="help-text" id="tag-list-help-text">
+            <%= t("offers.form.tags_instructions", default: "Tags help match your offer to relevant proposals.") %>
+          </p>
+
+          <div id="category_tags" class="tags margin-bottom">
+            <span class="small"><strong><%= t("proposals.form.tag_category_label", default: "Categories") %>
+              :</strong></span>
+            <% categories.each do |tag| %>
+              <a class="js-add-tag-link label secondary"><%= tag.name %></a>
+            <% end %>
+          </div>
+
+          <%= f.text_field :tag_list, value: offer.tag_list.to_s,
+                           label: false,
+                           placeholder: t("offers.form.tags_placeholder", default: "e.g., Environment, Legal, Labor"),
+                           class: "js-tag-list tag-autocomplete",
+                           aria: { describedby: "tag-list-help-text" },
+                           data: { js_url: suggest_tags_path } %>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <% if offer.new_record? %>
+          <div class="margin-bottom">
+            <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+          </div>
+        <% end %>
+
+        <%= f.submit class: "button success",
+                     value: t("offers.#{action_name}.form.submit_button", default: "Publish Offer") %>
       </div>
     <% end %>
-
-    <%= f.submit(class: "button primary", value: t("offers.#{action_name}.form.submit_button", default: "Publish Offer")) %>
   </div>
-<% end %>
+</div>
