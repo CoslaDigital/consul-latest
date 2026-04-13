@@ -252,6 +252,10 @@ en:
       mark_as_read: Mark as read
       mark_as_unread: Mark as unread
       notifiable_hidden: This resource is not available anymore.
+      proposal_match:
+        create:
+          title: "New collaboration request"
+          body: "Someone has requested a match between an offer and a proposal."
   map:
     title: "Administrative Areas"
     proposal_for_district: "Start a proposal for your area"
@@ -448,6 +452,8 @@ en:
       title_video_url: "External video"
       author: Author
       draft: Proposal in draft. Cannot yet get supports, nor does it appear in the list of proposals.
+      select_offer_prompt: Select an available offer
+      propose_button: "Make an Offer"
     update:
       form:
         submit_button: Save changes

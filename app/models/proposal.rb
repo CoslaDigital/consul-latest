@@ -42,6 +42,10 @@ class Proposal < ApplicationRecord
   has_many :polls, as: :related, inverse_of: :related
   has_one :summary_comment, as: :commentable, class_name: "MlSummaryComment", dependent: :destroy
 
+  # NEW: Mutual Aid / Matchmaking Associations
+  has_many :proposal_matches, dependent: :destroy
+  has_many :matched_offers, through: :proposal_matches, source: :offer
+
   validates_translation :title, presence: true, length: { in: 4..Proposal.title_max_length }
   validates_translation :description, length: { maximum: Proposal.description_max_length }
   validates_translation :summary, presence: true
@@ -90,6 +94,14 @@ class Proposal < ApplicationRecord
 
   scope :not_supported_by_user, ->(user) { where.not(id: user.find_voted_items(votable_type: "Proposal")) }
   scope :created_by, ->(author) { where(author: author) }
+
+  def active_collaborations
+    matched_offers.where(proposal_matches: { status: [:accepted, :fulfilled] })
+  end
+
+  def pending_requests
+    proposal_matches.pending
+  end
 
   def publish
     update!(published_at: Time.current)

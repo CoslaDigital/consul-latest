@@ -71,6 +71,8 @@
                   <%= t("proposals.show.budget_investment_link") %>
               <% end %>
 
+              <%= render Proposals::CollaborationComponent.new(@proposal, current_user) %>
+
             </div>
           <% end %>
 

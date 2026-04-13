@@ -1,0 +1,15 @@
+<% if @offer.image.present? %>
+  <div class="margin-bottom">
+    <%= render_image(@offer.image, :large, true) %>
+  </div>
+<% end %>
+
+<div class="offer-description margin-bottom">
+  <%= auto_link_already_sanitized_html wysiwyg(@offer.description) %>
+</div>
+
+<% if feature?(:allow_attached_documents) && @offer.documents.any? %>
+  <%= render Documents::DocumentsComponent.new(@offer.documents) %>
+<% end %>
+
+<%= render "shared/tags", taggable: @offer %>

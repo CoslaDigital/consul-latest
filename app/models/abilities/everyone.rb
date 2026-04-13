@@ -37,6 +37,7 @@ module Abilities
       can :read, Sensemaker::Job, published: true
       can [:read, :help], ::SDG::Goal
       can :read, ::SDG::Phase
+      can [:read], Offer, hidden_at: nil
     end
   end
 end

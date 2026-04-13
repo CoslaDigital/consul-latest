@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_13_105638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1055,6 +1055,28 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
     t.jsonb "sentiment_analysis"
   end
 
+  create_table "models", force: :cascade do |t|
+    t.string "model_id", null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "family"
+    t.datetime "model_created_at"
+    t.integer "context_window"
+    t.integer "max_output_tokens"
+    t.date "knowledge_cutoff"
+    t.jsonb "modalities", default: {}
+    t.jsonb "capabilities", default: []
+    t.jsonb "pricing", default: {}
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
+    t.index ["family"], name: "index_models_on_family"
+    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
+    t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
+    t.index ["provider"], name: "index_models_on_provider"
+  end
+
   create_table "moderators", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.index ["user_id"], name: "index_moderators_on_user_id"
@@ -1079,6 +1101,25 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
     t.datetime "emailed_at", precision: nil
     t.datetime "read_at", precision: nil
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "offers", force: :cascade do |t|
+    t.bigint "author_id", null: false
+    t.bigint "geozone_id"
+    t.string "title", limit: 150, null: false
+    t.text "description"
+    t.integer "status", default: 0, null: false
+    t.integer "comments_count", default: 0
+    t.tsvector "tsv"
+    t.datetime "hidden_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id", "hidden_at"], name: "index_offers_on_author_id_and_hidden_at"
+    t.index ["author_id"], name: "index_offers_on_author_id"
+    t.index ["geozone_id"], name: "index_offers_on_geozone_id"
+    t.index ["hidden_at"], name: "index_offers_on_hidden_at"
+    t.index ["status"], name: "index_offers_on_status"
+    t.index ["tsv"], name: "index_offers_on_tsv", using: :gin
   end
 
   create_table "organizations", id: :serial, force: :cascade do |t|
@@ -1349,6 +1390,21 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
     t.integer "progressable_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+  end
+
+  create_table "proposal_matches", force: :cascade do |t|
+    t.bigint "proposal_id", null: false
+    t.bigint "offer_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "accepted_at"
+    t.datetime "confirmed_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id"], name: "index_proposal_matches_on_offer_id"
+    t.index ["proposal_id", "offer_id"], name: "index_proposal_matches_on_proposal_id_and_offer_id", unique: true
+    t.index ["proposal_id"], name: "index_proposal_matches_on_proposal_id"
+    t.index ["status"], name: "index_proposal_matches_on_status"
   end
 
   create_table "proposal_notifications", id: :serial, force: :cascade do |t|
@@ -1657,6 +1713,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
     t.integer "budget_investments_count", default: 0
     t.integer "legislation_proposals_count", default: 0
     t.integer "legislation_processes_count", default: 0
+    t.integer "offers_count", default: 0
     t.index ["debates_count"], name: "index_tags_on_debates_count"
     t.index ["legislation_processes_count"], name: "index_tags_on_legislation_processes_count"
     t.index ["legislation_proposals_count"], name: "index_tags_on_legislation_proposals_count"
@@ -1919,6 +1976,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
   add_foreign_key "managers", "users"
   add_foreign_key "moderators", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "offers", "geozones"
+  add_foreign_key "offers", "users", column: "author_id"
   add_foreign_key "organizations", "users"
   add_foreign_key "poll_answers", "poll_question_answers", column: "option_id"
   add_foreign_key "poll_answers", "poll_questions", column: "question_id"
@@ -1939,6 +1998,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_17_112809) do
   add_foreign_key "poll_voters", "polls"
   add_foreign_key "polls", "budgets"
   add_foreign_key "process_managers", "users"
+  add_foreign_key "proposal_matches", "offers"
+  add_foreign_key "proposal_matches", "proposals"
   add_foreign_key "proposals", "communities"
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"
