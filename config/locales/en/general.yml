@@ -452,6 +452,8 @@ en:
       title_video_url: "External video"
       author: Author
       draft: Proposal in draft. Cannot yet get supports, nor does it appear in the list of proposals.
+      select_offer_prompt: Select an available offer
+      propose_button: "Make an Offer"
     update:
       form:
         submit_button: Save changes

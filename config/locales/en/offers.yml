@@ -76,6 +76,9 @@ en:
     fulfill:
       success: "Collaboration marked as completed! Thank you for supporting the community."
     error: "There was an error updating the collaboration."
+    create:
+      success: "Collaboration requested successfully!"
+      error_duplicate: "You have already requested a collaboration for this resource."
 
   proposals:
     show:

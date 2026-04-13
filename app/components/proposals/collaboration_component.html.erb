@@ -1,17 +1,23 @@
 <div class="sidebar-divider"></div>
+
 <div class="collaboration-status-box">
   <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status", default: "Collaborations") %></h2>
 
   <%# 1. SUCCESS STORIES: Fulfilled Collaborations (Visible to everyone) %>
   <% if @proposal.proposal_matches.fulfilled.any? %>
-    <div class="callout success tiny" style="border-color: #28a745; background-color: #f1fcf4;">
+    <div class="callout secondary tiny">
       <h6 class="margin-bottom-s">
-        <i class="fa fa-certificate"></i> <%= t("proposals.show.fulfilled_collabs", default: "Support History") %></h6>
+        <i class="fa fa-certificate text-success"></i>
+        <%= t("proposals.show.fulfilled_collabs", default: "Support History") %>
+      </h6>
       <ul class="no-bullet margin-bottom-0">
         <% @proposal.proposal_matches.fulfilled.each do |match| %>
           <li class="margin-bottom-s">
-            <strong><%= t("shared.completed") %>:</strong> <%= match.offer.title %>
-            <br><small>Supported by <%= match.offer.author.name %></small>
+            <span class="text-success"><strong><%= t("shared.completed") %>:</strong></span> <%= match.offer.title %>
+            <br>
+            <small class="text-muted">
+              <%= t("proposals.show.supported_by", default: "Supported by") %> <%= match.offer.author.name %>
+            </small>
           </li>
         <% end %>
       </ul>
@@ -27,17 +33,18 @@
       <ul class="no-bullet margin-bottom-0">
         <% @proposal.proposal_matches.confirmed.each do |match| %>
           <li class="margin-bottom-s">
-            <strong><%= match.offer.author.name %></strong> is providing:<br>
+            <strong><%= match.offer.author.name %></strong> <%= t("proposals.show.is_providing", default: "is providing") %>
+            :<br>
             <%= link_to match.offer.title, match.offer %>
 
             <%# AUTHOR ONLY: Can mark as fulfilled %>
             <% if @proposal.author == current_user %>
               <div class="margin-top-s">
-                <%= button_to t("proposals.show.fulfill_button", default: "Mark as Completed"),
+                <%= button_to t("proposals.show.fulfill_button"),
                               fulfill_proposal_match_path(match),
                               method: :patch,
                               class: "button hollow success expanded tiny margin-bottom-0",
-                              data: { confirm: t("proposals.show.confirm_fulfillment_check", default: "Confirm that this help has been received and the task is complete?") } %>
+                              data: { confirm: t("proposals.show.confirm_fulfillment_check") } %>
               </div>
             <% end %>
           </li>
@@ -49,15 +56,16 @@
   <%# 3. THE SECOND HANDSHAKE: Needs Confirmation (Visible to Proposal Author) %>
   <% if @proposal.author == current_user && @proposal.proposal_matches.accepted.any? %>
     <div class="callout primary tiny">
-      <h6><i class="fa fa-handshake-o"></i> <%= t("proposals.show.awaiting_confirmation", default: "Finalize Help") %>
+      <h6 class="margin-bottom-s">
+        <i class="fa fa-handshake-o"></i> <%= t("proposals.show.awaiting_confirmation", default: "Finalize Help") %>
       </h6>
       <ul class="no-bullet margin-bottom-0">
         <% @proposal.proposal_matches.accepted.each do |match| %>
           <li class="margin-bottom">
             <p class="small margin-bottom-s">
-              <strong><%= match.offer.author.name %></strong> agreed to help! Finalize this to start working together.
+              <strong><%= match.offer.author.name %></strong> <%= t("proposals.show.agreed_to_help", default: "agreed to help! Finalize this to start working together.") %>
             </p>
-            <%= button_to t("proposals.show.confirm_button", default: "Confirm & Start"),
+            <%= button_to t("proposals.show.confirm_button"),
                           confirm_proposal_match_path(match),
                           method: :patch,
                           class: "button success expanded small margin-bottom-0" %>
@@ -84,7 +92,7 @@
             <%= link_to match.offer.title, match.offer %>
 
             <% if @proposal.author == current_user %>
-              <br><%= link_to "Review Request", match.offer, class: "button success tiny margin-top-s" %>
+              <br><%= link_to t("proposals.show.review_request", default: "Review Request"), match.offer, class: "button success tiny margin-top-s expanded" %>
             <% end %>
           </li>
         <% end %>
@@ -92,54 +100,52 @@
     </div>
   <% end %>
 
-  <%# 5. REJECTED LOG (Author Only) %>
+  <%# 5. REJECTED LOG (Author Only) - Hidden in details to save space %>
   <% if @proposal.author == current_user && @proposal.proposal_matches.rejected.any? %>
-    <details>
+    <details class="margin-top">
       <summary class="help-text"><%= t("proposals.show.declined_offers", default: "Declined Offers") %></summary>
-      <ul class="no-bullet">
+      <ul class="no-bullet margin-top-s">
         <% @proposal.proposal_matches.rejected.each do |match| %>
-          <li class="help-text"><strike><%= match.offer.title %></strike></li>
+          <li class="help-text small"><strike><%= match.offer.title %></strike></li>
         <% end %>
       </ul>
     </details>
   <% end %>
 
-  <%# 6. PROACTIVE OFFER FORM %>
+  <%# 6. PROACTIVE OFFER FORM / STATUS %>
   <% if current_user && current_user != @proposal.author %>
+    <div class="sidebar-divider"></div>
+
     <% user_match = @proposal.proposal_matches.where(offer_id: current_user.offers.pluck(:id)).first %>
 
     <% if user_match %>
-      <div class="sidebar-divider"></div>
       <div class="callout secondary tiny text-center">
         <p class="help-text margin-bottom-0">
           <%= t("proposals.show.your_link_status", default: "Your Offer Status:") %><br>
-          <span class="label <%= user_match.status %>"><%= user_match.status.titleize %></span>
+          <span class="label <%= user_match.status %>"><%= t("proposal_matches.status.#{user_match.status}") %></span>
         </p>
       </div>
     <% elsif current_user.offers.active.any? %>
-      <div class="sidebar-divider"></div>
-      <div class="offer-to-help-form margin-top">
-        <p class="small"><strong><%= t("proposals.show.offer_help_title", default: "I can help with this!") %></strong>
-        </p>
+      <div class="offer-to-help-form">
+        <h3 class="sidebar-title"><%= t("proposals.show.offer_help_title", default: "I can help with this!") %></h3>
 
         <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
           <%= f.hidden_field :proposal_id, value: @proposal.id %>
-          <div class="field margin-bottom">
+          <div class="margin-bottom">
             <%= f.collection_select :offer_id, current_user.offers.active, :id, :title,
-                                    { prompt: t("proposals.show.select_offer_prompt") },
+                                    { prompt: t("proposals.show.select_offer_prompt", default: "Select one of your offers...") },
                                     class: "full-width" %>
           </div>
-          <div class="actions">
-            <%= f.submit t("proposals.show.propose_button"), class: "button success expanded small" %>
-          </div>
+          <%= f.submit t("proposals.show.propose_button", default: "Propose Collaboration"), class: "button success expanded small margin-bottom-0" %>
         <% end %>
       </div>
     <% else %>
-      <div class="sidebar-divider"></div>
       <div class="text-center">
-        <p class="help-text small"><%= t("proposals.show.no_offers_to_link") %></p>
-        <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded small" %>
+        <p class="help-text small"><%= t("proposals.show.no_offers_to_link", default: "You haven't created any offers yet.") %></p>
+        <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded small margin-bottom-0" %>
       </div>
     <% end %>
   <% end %>
 </div>
+
+<div class="sidebar-divider"></div>

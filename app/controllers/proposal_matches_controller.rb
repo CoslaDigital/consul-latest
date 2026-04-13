@@ -5,6 +5,7 @@ class ProposalMatchesController < ApplicationController
 
   def create
     @proposal_match = ProposalMatch.new(proposal_match_params)
+    authorize! :create, @proposal_match
     if @proposal_match.save
       # Notify the receiver (dynamic based on who initiated)
       recipient = (@proposal_match.proposal.author == current_user) ? @proposal_match.offer.author : @proposal_match.proposal.author

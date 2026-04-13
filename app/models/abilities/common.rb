@@ -118,17 +118,25 @@ module Abilities
         # NEW: Mutual Aid / Offer Matching Abilities
         # ==========================================
 
-        # Offers CRUD
-        can [:create, :mine], Offer
+        # 1. Offers CRUD
+        can [:read, :mine], Offer
+        can :create, Offer
         can [:update, :destroy], Offer, author_id: user.id, hidden_at: nil
-        can :confirm, ProposalMatch, proposal: { author_id: user.id }
-        # Matchmaking (The Handshake)
+
+        # 2. Matchmaking (The Handshake Lifecycle)
+
+        # Anyone can initiate a match (Request help or Offer help)
         can :create, ProposalMatch
 
-        # A user can only accept/reject/fulfill a match if they own EITHER
-        # the originating Offer or the originating Proposal.
-        can [:accept, :reject, :fulfill], ProposalMatch do |match|
-          match.offer.author_id == user.id || match.proposal.author_id == user.id
+        # Only the person PROVIDING the resource can Accept or Reject the initial request
+        can [:accept, :reject], ProposalMatch do |match|
+          match.offer.author_id == user.id
+        end
+
+        # Only the person RECEIVING the resource (Proposal Author) can Confirm
+        # the handshake to start, or Fulfill it when finished.
+        can [:confirm, :fulfill], ProposalMatch do |match|
+          match.proposal.author_id == user.id
         end
         # ==========================================
       end
