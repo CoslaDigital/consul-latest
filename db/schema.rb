@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_13_092139) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_13_105638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1109,11 +1109,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_13_092139) do
     t.string "title", limit: 150, null: false
     t.text "description"
     t.integer "status", default: 0, null: false
+    t.integer "comments_count", default: 0
+    t.tsvector "tsv"
     t.datetime "hidden_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.tsvector "tsv"
-    t.integer "comments_count", default: 0
     t.index ["author_id", "hidden_at"], name: "index_offers_on_author_id_and_hidden_at"
     t.index ["author_id"], name: "index_offers_on_author_id"
     t.index ["geozone_id"], name: "index_offers_on_geozone_id"
@@ -1397,10 +1397,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_13_092139) do
     t.bigint "offer_id", null: false
     t.integer "status", default: 0, null: false
     t.datetime "accepted_at"
+    t.datetime "confirmed_at"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "confirmed_at"
     t.index ["offer_id"], name: "index_proposal_matches_on_offer_id"
     t.index ["proposal_id", "offer_id"], name: "index_proposal_matches_on_proposal_id_and_offer_id", unique: true
     t.index ["proposal_id"], name: "index_proposal_matches_on_proposal_id"
@@ -1713,7 +1713,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_13_092139) do
     t.integer "budget_investments_count", default: 0
     t.integer "legislation_proposals_count", default: 0
     t.integer "legislation_processes_count", default: 0
-    t.integer "offers_count"
+    t.integer "offers_count", default: 0
     t.index ["debates_count"], name: "index_tags_on_debates_count"
     t.index ["legislation_processes_count"], name: "index_tags_on_legislation_processes_count"
     t.index ["legislation_proposals_count"], name: "index_tags_on_legislation_proposals_count"
