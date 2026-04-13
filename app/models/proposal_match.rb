@@ -31,11 +31,14 @@ class ProposalMatch < ApplicationRecord
     def set_lifecycle_timestamps
       if accepted? && accepted_at.nil?
         self.accepted_at = Time.current
+      elsif confirmed? && confirmed_at.nil?
+        self.confirmed_at = Time.current
       elsif fulfilled? && completed_at.nil?
         self.completed_at = Time.current
 
-        # Optional: Automatically close the Offer if it's fully consumed
-        offer.claimed!
+        # We update the OFFER to 'claimed' because this specific
+        # MATCH has been 'fulfilled'.
+        offer.update(status: :claimed)
       end
     end
 end

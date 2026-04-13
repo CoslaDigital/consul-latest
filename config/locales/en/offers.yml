@@ -1,9 +1,36 @@
 en:
   offers:
-    index:
-      search_form:
-        label: "Search Offers"
-        placeholder: "Search by title, description, or location..."
-        button: "Search"
-      section_header:
-        title: "Help being Offered"
+    status:
+      available: "Available"
+      pending: "In Discussion"
+      claimed: "Claimed"
+      withdrawn: "Withdrawn"
+    mine:
+      title: "My Mutual Aid Dashboard"
+      offered_by_me: "Resources I'm Offering"
+      offered_to_me: "Help Offered to My Projects"
+      active_count: "active collaborations"
+
+  proposal_matches:
+    status:
+      pending: "Pending Review"
+      accepted: "Offer Accepted"
+      confirmed: "In Progress"
+      rejected: "Declined"
+      withdrawn: "Cancelled"
+      fulfilled: "Completed"
+    confirm:
+      success: "Collaboration is now officially active!"
+    fulfill:
+      success: "Collaboration marked as completed! Thank you for supporting the community."
+    error: "There was an error updating the collaboration."
+
+  proposals:
+    show:
+      collaboration_status: "Collaborations"
+      active_collabs: "Active Support"
+      fulfilled_collabs: "Successfully Completed"
+      awaiting_confirmation: "Action Required: Finalize Help"
+      confirm_button: "Confirm & Start"
+      fulfill_button: "Mark as Received/Completed"
+      confirm_fulfillment_check: "Confirm that this help has been received and the task is complete?"
