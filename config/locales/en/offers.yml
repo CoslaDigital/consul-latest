@@ -1,5 +1,10 @@
 en:
   offers:
+    index:
+      search_form:
+        label: "Search offers"
+        placeholder: "Search offers by keyword, district, or resource..."
+        button: "Search"
     status:
       available: "Available"
       pending: "In Discussion"

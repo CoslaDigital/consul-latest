@@ -19,16 +19,7 @@
     <%= render Shared::BannerComponent.new("offers") %>
 
     <%# 2. Sorting Tabs (Newest / Most Active) %>
-    <ul class="menu-tabs">
-      <li class="<%= "is-active" if @current_order == "newest" %>">
-        <%= link_to t("offers.index.tabs.newest", default: "Newest"),
-                    offers_path(order: "newest", status: params[:status], search: params[:search]) %>
-      </li>
-      <li class="<%= "is-active" if @current_order == "most_active" %>">
-        <%= link_to t("offers.index.tabs.most_active", default: "Most Active"),
-                    offers_path(order: "most_active", status: params[:status], search: params[:search]) %>
-      </li>
-    </ul>
+    <%= render "shared/order_links", i18n_namespace: "offers.index" %>
 
     <%# 3. Main List Content %>
     <div id="offers-list" class="margin-top">
