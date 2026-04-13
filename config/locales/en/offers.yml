@@ -15,7 +15,7 @@ en:
         most_active: "Most Active"
       orders_label: "Order by"
       section_header:
-        title: "Mutual Aid - Offers of assitance"
+        title: "Mutual Aid - Offers of assistance"
 
     new:
       title: "Create an Offer"
