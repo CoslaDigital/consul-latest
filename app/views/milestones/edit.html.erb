@@ -1,0 +1,10 @@
+<div class="milestone-edit row">
+  <div class="small-12 column">
+    <%= back_link_to milestoneable_path %>
+
+    <h1><%= t("admin.milestones.edit.title", default: "Edit Milestone") %></h1>
+
+    <%# Use the shared form partial %>
+    <%= render "form", milestone: @milestone %>
+  </div>
+</div>

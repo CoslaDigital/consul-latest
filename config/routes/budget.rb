@@ -5,6 +5,7 @@ resources :budgets, only: [:show, :index] do
     get :budget_headings, defaults: { format: :json }
   end
   resources :groups, controller: "budgets/groups", only: [:show, :index]
+
   resources :investments, controller: "budgets/investments" do
     member do
       put :flag
@@ -12,7 +13,7 @@ resources :budgets, only: [:show, :index] do
     end
 
     collection { get :suggest }
-
+    resources :milestones, only: [:new, :create, :edit, :update, :destroy]
     resources :votes, controller: "budgets/investments/votes", only: [:create, :destroy]
   end
 

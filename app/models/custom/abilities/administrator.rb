@@ -160,6 +160,8 @@ module Abilities
       can [:read, :enable, :manage, :show], :two_factor_authentication
       can [:manage, :publish, :unpublish], Sensemaker::Job
 
+      can :manage, Milestone
+
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant
       end

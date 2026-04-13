@@ -144,6 +144,8 @@ en:
       demographics_description: "Enable users to manage gender DOB and Geozone"
       restrict_debate_creation: "Restrict Debate Questions"
       restrict_debate_creation_description: "Debate questions can only be created by admins when this setting is enabled"
+      user_milestones: "Allow authors to update milestones"
+      user_milestones_description: "Authors of Proposals or Budget Investments may create new milestones or update existing milestones ofn processes they own"
     remote_census:
       general:
         endpoint: "Endpoint"

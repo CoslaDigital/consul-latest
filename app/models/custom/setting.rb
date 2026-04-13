@@ -28,7 +28,8 @@ class Setting
           "feature.hide_votes": false,
           "feature.hide_local_login": false,
           "feature.demographics": false,
-          "feature.restrict_debate_creation": false
+          "feature.restrict_debate_creation": false,
+          "feature.user_milestones": false
         })
       end
     end
@@ -52,5 +53,10 @@ class Setting
     def restrict_debate_creation?
       Setting["feature.restrict_debate_creation"] == "active"
     end
+
+    def can_edit_milestones?
+      Setting["feature.user_milestones"] == "active"
+    end
+
   end
 end
