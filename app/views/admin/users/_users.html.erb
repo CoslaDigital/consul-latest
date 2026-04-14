@@ -34,7 +34,16 @@
             <td><%= user.document_number %></td>
             <td><%= display_user_roles(user) %></td>
             <td><%= user.user_type %></td>
-            <td><%= user.confirmed_at? ? t("admin.users.account.active_status") : t("admin.users.account.inactive_status") %></td>
+            <td>
+              <div class="table-actions" style="justify-content: center;">
+
+                <% if user.confirmed_at? %>
+                  <%= content_tag :span, "", class: "active-icon", aria: { label: t('admin.users.account.active_status') } %>
+                <% else %>
+                  <%= content_tag :span, "", class: "inactive-icon", aria: { label: t('admin.users.account.active_status') } %>
+                <% end %>
+              </div>
+            </td>
             <td>
               <%= render Admin::Users::TableActionsComponent.new(user) %>
             </td>

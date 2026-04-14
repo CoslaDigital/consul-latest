@@ -1641,4 +1641,14 @@ $font-awesome-icons: (
     @include has-fa-icon(lock-open, solid);
     color: $color-success;
   }
+
+  .active-icon {
+    @include has-fa-icon(check-circle, solid);
+    color: $color-success;
+  }
+
+  .inactive-icon {
+    @include has-fa-icon(clock, regular);
+    color: $warning-color;
+  }
 }
