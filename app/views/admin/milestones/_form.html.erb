@@ -1,7 +1,27 @@
+<%# app/views/admin/milestones/_form.html.erb %>
+<%
+  # Guard: ensure we have the milestone object
+  milestone ||= @milestone
+
+  # Detect the parent (milestoneable)
+  parent = milestone.milestoneable || @milestoneable
+
+  # Build the Admin Namespace target array
+  target = if parent.is_a?(Budget::Investment)
+             # Admin route: [:admin, budget, investment, milestone]
+             [:admin, parent.budget, parent, milestone]
+           else
+             # Admin route: [:admin, parent, milestone] (Works for Proposals/Legislation)
+             [:admin, parent, milestone]
+           end
+%>
+
 <%= render "shared/globalize_locales", resource: milestone %>
 
-<%# Create the form tag with the explicit nested path for users %>
-<%= translatable_form_for [@budget, @investment, milestone] do |f| %>
-  <%# Render the shared fields, passing in the form builder object 'f' %>
-  <%= render 'shared/milestones/form_fields', form: f %>
+<%= translatable_form_for target do |f| %>
+  <%= render "shared/milestones/form_fields", form: f %>
+
+  <div class="actions margin-top">
+    <%= f.submit nil, class: "button" %>
+  </div>
 <% end %>
