@@ -1,44 +1,50 @@
 class ProposalMatch < ApplicationRecord
-  # Associations
-  belongs_to :proposal # The Ask
-  belongs_to :offer # The Resource
+  include Notifiable
 
-  # State Machine for the Match
-  enum :status, {
-    pending: 0,
-    accepted: 10,
-    confirmed: 15,
-    rejected: 20,
-    withdrawn: 25,
-    fulfilled: 30
-  }, default: :pending
+  belongs_to :proposal
+  belongs_to :offer
 
-  scope :confirmed, -> { where(status: :confirmed) }
-  scope :pending, -> { where(status: :pending) }
-  scope :fulfilled, -> { where(status: :fulfilled) }
+  # Status Lifecycle
+  enum :status, { pending: 0, accepted: 10, confirmed: 20, fulfilled: 30, rejected: 40 }
 
-  # Validations
-  validates :proposal, presence: true
-  validates :offer, presence: true
-  # Prevent duplicate pending/active requests between the same two items
-  validates :proposal_id, uniqueness: { scope: :offer_id, message: "has already requested this offer" }
+  validates :proposal_id, uniqueness: { scope: :offer_id, message: "Collaboration already requested" }
 
-  # Callbacks to handle timestamping based on state changes
-  before_update :set_lifecycle_timestamps, if: :status_changed?
+  # Explicit lifecycle methods (The "Proposal#publish" approach)
 
-  private
-
-    def set_lifecycle_timestamps
-      if accepted? && accepted_at.nil?
-        self.accepted_at = Time.current
-      elsif confirmed? && confirmed_at.nil?
-        self.confirmed_at = Time.current
-      elsif fulfilled? && completed_at.nil?
-        self.completed_at = Time.current
-
-        # We update the OFFER to 'claimed' because this specific
-        # MATCH has been 'fulfilled'.
-        offer.update(status: :claimed)
-      end
+  def accept!
+    transaction do
+      update!(status: :accepted, accepted_at: Time.current)
+      offer.pending! # Move parent offer to pending to hide it from others
+      Mailer.proposal_match_accepted(self).deliver_later
     end
+  rescue ActiveRecord::RecordInvalid
+    false
+  end
+
+  def confirm!
+    transaction do
+      update!(status: :confirmed, confirmed_at: Time.current)
+      Mailer.proposal_match_confirmed(self).deliver_later
+    end
+  rescue ActiveRecord::RecordInvalid
+    false
+  end
+
+  def fulfill!
+    transaction do
+      update!(status: :fulfilled, completed_at: Time.current)
+      # Logic: if this was the last active match, we might leave offer as is,
+      # or provide a prompt to the user to mark the Offer as 'Claimed'.
+    end
+  rescue ActiveRecord::RecordInvalid
+    false
+  end
+
+  def notify_admin(action_type)
+    Mailer.proposal_match_admin_notification(self, action_type).deliver_later
+  end
+
+  def reject!
+    update(status: :rejected, rejected_at: Time.current)
+  end
 end

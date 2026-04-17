@@ -1,0 +1,39 @@
+<td style="<%= css_for_mailer_content %>">
+
+  <h1 style="<%= css_for_mailer_heading %>">
+    <%= t("mailers.proposal_match_confirmed.title", default: "It's Official!") %>
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_confirmed.hi", name: @recipient.name) %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= sanitize(
+          t("mailers.proposal_match_confirmed.text",
+            receiver: tag.strong(@match.proposal.author.name),
+            proposal: tag.strong(@match.proposal.title),
+            offer: tag.strong(@match.offer.title))
+        ) %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_confirmed.next_steps", default: "The handshake is complete. You can now coordinate with the project lead to deliver the resource.") %>
+  </p>
+
+  <table style="width: 100%;">
+    <tbody>
+    <tr>
+      <td style="padding-bottom: 12px; text-align: center;">
+        <%= link_to mine_offers_url, style: css_for_mailer_button do %>
+          <%= t("mailers.proposal_match_confirmed.view_dashboard", default: "Go to My Dashboard") %>
+        <% end %>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_confirmed.sincerely", default: "The Community Team") %>
+  </p>
+</td>

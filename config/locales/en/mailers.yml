@@ -137,3 +137,20 @@ en:
       text_9: "You will also find this new recommended dissemination action..."
       text_10: "You sure have more resources to use!"
       dashboard_button: "Go ahead, discover them!"
+    proposal_match_accepted:
+      subject: "Collaboration Accepted: Time to start!"
+      title: "Your request has been accepted!"
+      hi: "Hi %{name},"
+      text: "%{provider} has accepted your request to help '%{proposal}' with: %{offer}."
+      instruction: "Please confirm the collaboration on your dashboard to exchange contact details."
+      go_to_dashboard: "Confirm & Start"
+      sincerely: "The Community Team"
+    proposal_match_created:
+      subject: "New Mutual Aid Request"
+    proposal_match_confirmed:
+      subject: "Collaboration Confirmed: Time to start!"
+      title: "Handshake Complete!"
+      hi: "Hi %{name},"
+      text: "The lead for '%{proposal}' has confirmed your offer of %{offer}. You are now officially collaborating!"
+      next_steps: "Check your dashboard to coordinate the final steps."
+      view_dashboard: "View My Dashboard"
