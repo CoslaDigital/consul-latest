@@ -1,26 +1,27 @@
 class CommentsController < ApplicationController
   include SettingsHelper
-  
+  include FlagActions
+
   before_action :authenticate_user!, only: [:create, :hide, :vote]
   before_action :load_commentable, only: :create
   before_action :verify_resident_for_commentable!, only: :create
   before_action :verify_comments_open!, only: [:create, :vote]
   before_action :build_comment, only: :create
   load_and_authorize_resource
-  respond_to :html, :js 
+  respond_to :html, :js
 
   def create
     if @comment.save
       CommentNotifier.new(comment: @comment).process
       add_notification @comment
-      EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?  
+      EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?
       results=moderate
       if results[:flagged] || results[:hidden]
          flash[:error] = "Your comment is being moderated. Please come back later."
          redirect_back(fallback_location: root_path)
       end
     else
-     render :new 
+      render :new
     end
   end
 
@@ -63,23 +64,23 @@ def openaimoderate(text_string)
   flag_score = 0
   flag_cat = ""
   puts "openaikey is #{openai_key}"
-  
+
   if openai_key.nil? || openai_key.strip.empty?
     return { hidden: is_hidden, flagged: is_flagged, flags: flag_score, category: "missing api key" }
   end
-  
+
   client = OpenAI::Client.new(access_token: openai_key)
   body = text_string
   response = client.moderations(parameters: { input: body })
   is_hidden = response["results"][0]["flagged"] == true ? true : false
   scores = response["results"][0]["category_scores"]
   puts scores
-  total_score = 0 
-  
+  total_score = 0
+
   scores.each do |cat, score|
     total_score += score
     if score > thresh
-      flag_score += 2       
+      flag_score += 2
       flag_cat += cat
     end
   end
@@ -90,7 +91,7 @@ def openaimoderate(text_string)
 end
 
  def moderate
-    # setup       
+   # setup
     is_flagged = false
     is_hidden = false
     flag_score = 0
@@ -107,18 +108,17 @@ end
 
     #test code to avoid using openai
     if body == "Bad Bad Bad Comment"
-      is_flagged = "true" 
+      is_flagged = "true"
       total_score = 300
       flag_score = 300
-    elsif openai_key && !openai_key.strip.empty? 
+    elsif openai_key && !openai_key.strip.empty?
        response = openaimoderate(body)
        is_hidden = response[:hidden]
        is_flagged = response[:flagged]
-       flag_score = response[:flags] || 0    
+       flag_score = response[:flags] || 0
     end
-    
 
-    if is_flagged
+   if is_flagged
          @comment.flags_count = flag_score
          @comment.save
     end
@@ -204,6 +204,5 @@ end
     def send_evaluation_notification?
       @comment.valuation && Setting["feature.valuation_comment_notification"]
     end
-   
-   
+
 end
