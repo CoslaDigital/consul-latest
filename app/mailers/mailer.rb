@@ -173,6 +173,49 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def proposal_match_created(match)
+    @match = match
+    # Notify the "other" party (the one who didn't initiate the match)
+    # If the offer author initiated it, notify the proposal author and vice-versa
+    @recipient = @match.proposal.author # Default to proposal author for notification
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_created.subject"))
+    end
+  end
+
+  def proposal_match_accepted(match)
+    @match = match
+    @recipient = @match.proposal.author
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_accepted.subject"))
+    end
+  end
+
+  def proposal_match_confirmed(match)
+    @match = match
+    @recipient = @match.offer.author
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_confirmed.subject"))
+    end
+  end
+
+  def proposal_match_admin_notification(match, action_type)
+    @match = match
+    @action_type = action_type
+    @email_to = Setting["admin_email"]
+
+    # We use the system default locale for admin notifications
+    I18n.with_locale(Setting.default_locale) do
+      mail(to: @email_to, subject: "MUTUAL AID: Collaboration #{@action_type.titleize}") if @email_to.present?
+    end
+  end
+
   private
 
     def with_user(user, &)
@@ -189,4 +232,5 @@ class Mailer < ApplicationMailer
       user.add_subscriptions_token
       @token = user.subscriptions_token
     end
+
 end
