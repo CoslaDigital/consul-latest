@@ -210,7 +210,6 @@ class Mailer < ApplicationMailer
     @action_type = action_type
     @email_to = Setting["admin_email"]
 
-    # We use the system default locale for admin notifications
     I18n.with_locale(Setting.default_locale) do
       mail(to: @email_to, subject: "MUTUAL AID: Collaboration #{@action_type.titleize}") if @email_to.present?
     end

@@ -1,0 +1,59 @@
+<div class="admin-dashboard">
+  <h1><%= t("admin.collaborations.index.title") %></h1>
+
+  <section class="margin-bottom">
+    <h3>Active Collaborations</h3>
+    <table class="stack">
+      <thead>
+      <tr>
+        <th>Proposal</th>
+        <th>Offer</th>
+        <th>Status</th>
+        <th class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @matches.each do |match| %>
+        <tr>
+          <td><%= link_to match.proposal.title, proposal_path(match.proposal) %></td>
+          <td><%= link_to match.offer.title, offer_path(match.offer) %></td>
+          <td><span class="label <%= match.status %>"><%= match.status %></span></td>
+          <td class="text-center">
+            <% unless match.fulfilled? %>
+              <%= link_to "Force Fulfill", update_match_admin_collaboration_path(match, status: :fulfilled),
+                          method: :patch, class: "button tiny success" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <%= paginate @matches, param_name: :match_page %>
+  </section>
+
+  <section>
+    <h3>All Community Offers</h3>
+    <table class="stack">
+      <thead>
+      <tr>
+        <th>Author</th>
+        <th>Title</th>
+        <th class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @offers.each do |offer| %>
+        <tr>
+          <td><%= offer.author.name %></td>
+          <td><%= offer.title %></td>
+          <td class="text-center">
+            <%= link_to "Hide", hide_offer_admin_collaboration_path(offer),
+                        method: :patch, class: "button tiny alert" unless offer.hidden? %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <%= paginate @offers, param_name: :offer_page %>
+  </section>
+</div>

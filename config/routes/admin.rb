@@ -141,6 +141,13 @@ namespace :admin do
 
     resources :comments, only: :index
 
+    resources :collaborations, only: [:index] do
+      member do
+        patch :update_match
+        patch :hide_offer
+      end
+    end
+
     resources :tags, only: [:index, :create, :destroy]
 
     resources :officials, only: [:index, :edit, :update, :destroy] do
