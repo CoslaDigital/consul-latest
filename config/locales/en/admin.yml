@@ -589,6 +589,26 @@ en:
         new_event: "New event"
         title: "Manage Events"
         view_calendar: "View Calendar"
+    collaborations:
+      index:
+        title: "Mutual Aid Management"
+        active_matches: "Active Collaborations"
+        all_offers: "All Community Offers"
+        proposal: "Proposal"
+        offer: "Offer"
+        status: "Status"
+        actions: "Actions"
+        author: "Author"
+        created_at: "Date Created"
+        force_fulfill: "Force Fulfill"
+        hide: "Hide"
+        confirm_hide: "Are you sure you want to hide this offer? This cannot be undone."
+      update:
+        success: "Collaboration status updated successfully."
+        error: "There was an error updating the collaboration."
+      hide:
+        success: "Offer has been hidden from the public gallery."
+        error: "There was an error hiding the offer."
     hidden_users:
       index:
         filter: Filter
@@ -784,6 +804,7 @@ en:
       activity: Moderator activity
       admin: Admin menu
       banner: Banners
+      collaborations: "Mutual Aid"
       proposals: Proposals
       proposals_topics: Proposals topics
       budgets: Participatory budgets

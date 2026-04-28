@@ -118,6 +118,10 @@
       @include icon(calendar, solid);
     }
 
+    &.collaborations-link {
+      @include icon(handshake, solid);
+    }
+
     &.administrators-link {
       @include icon(user, solid);
     }

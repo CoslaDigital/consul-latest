@@ -1,0 +1,76 @@
+<div class="collaborations-admin-index">
+  <header class="margin-bottom">
+    <h2><%= t("admin.collaborations.index.title", default: "Mutual Aid Management") %></h2>
+  </header>
+
+  <section class="matches-section margin-bottom">
+    <h3><%= t("admin.collaborations.index.active_matches") %></h3>
+    <table class="stack">
+      <thead>
+      <tr>
+        <th><%= t("admin.collaborations.index.proposal") %></th>
+        <th><%= t("admin.collaborations.index.offer") %></th>
+        <th><%= t("admin.collaborations.index.status") %></th>
+        <th class="text-center"><%= t("admin.collaborations.index.actions") %></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% matches.each do |match| %>
+        <tr id="<%= dom_id(match) %>">
+          <td><%= link_to match.proposal.title, proposal_path(match.proposal) %></td>
+          <td><%= link_to match.offer.title, offer_path(match.offer) %></td>
+          <td>
+              <span class="label <%= status_label_class(match.status) %>">
+                <%= t("collaborations.status.#{match.status}") %>
+              </span>
+          </td>
+          <td class="text-center">
+            <% if can_force_fulfill?(match) %>
+              <%= link_to t("admin.collaborations.index.force_fulfill"),
+                          update_match_admin_collaboration_path(match, status: :fulfilled),
+                          method: :patch,
+                          class: "button tiny success success-light" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <%= paginate matches, param_name: :match_page %>
+  </section>
+
+  <hr>
+
+  <section class="offers-section">
+    <h3><%= t("admin.collaborations.index.all_offers") %></h3>
+    <table class="stack">
+      <thead>
+      <tr>
+        <th><%= t("admin.collaborations.index.author") %></th>
+        <th><%= t("admin.collaborations.index.title") %></th>
+        <th><%= t("admin.collaborations.index.created_at") %></th>
+        <th class="text-center"><%= t("admin.collaborations.index.actions") %></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% offers.each do |offer| %>
+        <tr id="<%= dom_id(offer) %>">
+          <td><%= offer.author.name %></td>
+          <td><%= link_to offer.title, offer_path(offer) %></td>
+          <td><%= l offer.created_at.to_date %></td>
+          <td class="text-center">
+            <% if can_hide_offer?(offer) %>
+              <%= link_to t("admin.collaborations.index.hide"),
+                          hide_offer_admin_collaboration_path(offer),
+                          method: :patch,
+                          data: { confirm: t("admin.collaborations.index.confirm_hide") },
+                          class: "button tiny alert" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <%= paginate offers, param_name: :offer_page %>
+  </section>
+</div>
