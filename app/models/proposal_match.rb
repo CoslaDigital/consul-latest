@@ -47,4 +47,13 @@ class ProposalMatch < ApplicationRecord
   def reject!
     update(status: :rejected, rejected_at: Time.current)
   end
+
+  def notifiable_title
+    proposal.title
+  end
+
+  def notifiable_body
+    I18n.t("collaborations.notifications.new_match_body",
+           offer_title: offer.title)
+  end
 end
