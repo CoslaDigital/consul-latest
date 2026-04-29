@@ -7,7 +7,7 @@ describe Sensemaker::JobsController do
 
   def create_publishable_job_with_output(attributes = {})
     job = create(:sensemaker_job, :publishable, attributes)
-    output_path = job.default_output_path
+    output_path = job.artefacts.default_output_path
     FileUtils.mkdir_p(File.dirname(output_path))
     File.write(output_path, "<html><body>Test Report</body></html>")
     job.update!(published: true)
@@ -16,8 +16,8 @@ describe Sensemaker::JobsController do
 
   after do
     Sensemaker::Job.find_each do |job|
-      if job.default_output_path && File.exist?(job.default_output_path)
-        FileUtils.rm_f(job.default_output_path)
+      if job.artefacts.default_output_path && File.exist?(job.artefacts.default_output_path)
+        FileUtils.rm_f(job.artefacts.default_output_path)
       end
     end
   end
@@ -48,7 +48,7 @@ describe Sensemaker::JobsController do
 
     context "when job exists but has no output" do
       before do
-        FileUtils.rm_f(job.default_output_path)
+        FileUtils.rm_f(job.artefacts.default_output_path)
       end
 
       it "returns 404" do
@@ -201,7 +201,6 @@ describe Sensemaker::JobsController do
         it "returns 404" do
           get :index, params: { resource_type: "debates", resource_id: 99999 }
 
-          expect(Debate.find_by(id: 99999)).to be(nil)
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -212,7 +211,7 @@ describe Sensemaker::JobsController do
       let!(:unpublished_job) do
         job = create(:sensemaker_job, :publishable, analysable_type: "Debate", analysable_id: debate.id,
                                                     published: false)
-        output_path = job.default_output_path
+        output_path = job.artefacts.default_output_path
         FileUtils.mkdir_p(File.dirname(output_path))
         File.write(output_path, "<html><body>Test Report</body></html>")
         job
@@ -398,7 +397,7 @@ describe Sensemaker::JobsController do
 
     context "when job exists but has no output" do
       before do
-        FileUtils.rm_f(job.default_output_path)
+        FileUtils.rm_f(job.artefacts.default_output_path)
       end
 
       it "returns 404" do
