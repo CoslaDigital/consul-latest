@@ -3,7 +3,7 @@ class Widget::Feed < ApplicationRecord
 
   def active?
     # Return true if this is the "upcoming" feed (Events)
-    return true if kind == "upcoming"
+    # return true if kind == "upcoming"
     setting.value.present?
   end
 
