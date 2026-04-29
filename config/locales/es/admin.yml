@@ -1892,7 +1892,6 @@ es:
         segment_by_option: "Segmentar por opción"
         no_free_text_to_analyse: "No hay texto libre para analizar en esta pregunta"
         or_analyse_all_proposals: "o analizar todas las propuestas"
-        analyse_all_questions: "Analizar todas las preguntas"
         search_placeholder: "Buscar %{model_label}..."
         clear_search: "Limpiar búsqueda"
         select_script_blank: "Seleccionar un script..."
@@ -1916,15 +1915,18 @@ es:
         job_spawned_by: "Trabajo generado por"
         target_type: "Tipo de objetivo"
         target_title: "Título del objetivo"
+        additional_context: "Contexto adicional"
         error_report: "Informe de error"
         error_log: "Registro de errores"
         prerequisite_jobs: "Trabajos prerrequisito"
         prerequisite_jobs_help: "Estos trabajos se crearon como prerrequisitos para este trabajo"
         actions: "Acciones"
+        files: "Archivos"
+        input_files: "Archivos de entrada"
         output_files: "Archivos de salida"
+        none_available: "Ninguno disponible"
         select_file_download: "Selecciona un archivo para descargar."
         back_to_jobs: "Volver a trabajos"
-        published_reports_link: "Informe(s) publicado(s)"
         analysable_all_proposals: "Todas las propuestas"
         analysable_deleted: "(eliminado)"
         status_completed_at: "Completado el %{time}"
@@ -1969,14 +1971,6 @@ es:
         single_html_build_js:
           title: "Informe"
           description: "Analizar y generar un informe en formato HTML"
-      tags_description: "Genera etiquetas automáticas en todos los elementos que pueden ser etiquetados."
-      title: "Machine learning"
-      script_selection_help: "Selecciona un script para procesar contenido y generar etiquetas o resúmenes por IA."
-      execution_options:
-        force_update_label: "Forzar actualización"
-        force_update_help: "Procesa todos los registros independientemente de su antigüedad."
-        dry_run_label: "Simulacro (Dry Run)"
-        dry_run_help: "Prueba la lógica sin guardar en la base de datos."
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros
