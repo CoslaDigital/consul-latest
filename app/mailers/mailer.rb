@@ -215,6 +215,15 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def new_offer_admin_notification(offer)
+    @offer = offer
+    @email_to = Setting["admin_email"]
+
+    I18n.with_locale(Setting.default_locale) do
+      mail(to: @email_to, subject: "MUTUAL AID: New Resource Offer Published") if @email_to.present?
+    end
+  end
+
   private
 
     def with_user(user, &)
