@@ -7,14 +7,12 @@ describe Sensemaker::ReportViewComponent do
   let(:component) { Sensemaker::ReportViewComponent.new(sensemaker_job) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
-    Setting["llm.use_sensemaker"] = true
+    Setting["feature.sensemaker"] = true
   end
 
   def create_publishable_job_with_output(attributes = {})
     job = create(:sensemaker_job, :publishable, attributes)
-    output_path = job.default_output_path
+    output_path = job.artefacts.default_output_path
     FileUtils.mkdir_p(File.dirname(output_path))
     File.write(output_path, "<html><body>Test Report</body></html>")
     job.update!(published: true)
@@ -22,9 +20,9 @@ describe Sensemaker::ReportViewComponent do
   end
 
   after do
-    if defined?(sensemaker_job) && sensemaker_job&.default_output_path &&
-       File.exist?(sensemaker_job.default_output_path)
-      FileUtils.rm_f(sensemaker_job.default_output_path)
+    if defined?(sensemaker_job) && sensemaker_job&.artefacts&.default_output_path &&
+       File.exist?(sensemaker_job.artefacts.default_output_path)
+      FileUtils.rm_f(sensemaker_job.artefacts.default_output_path)
     end
   end
 

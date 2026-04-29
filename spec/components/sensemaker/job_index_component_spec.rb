@@ -16,9 +16,7 @@ describe Sensemaker::JobIndexComponent do
   let(:resource) { debate }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
-    Setting["llm.use_sensemaker"] = true
+    Setting["feature.sensemaker"] = true
   end
 
   describe "#has_jobs?" do
@@ -149,7 +147,7 @@ describe Sensemaker::JobIndexComponent do
       let(:jobs) { [job] }
 
       it "renders the jobs as cards" do
-        allow(job).to receive(:has_outputs?).and_return(true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
         render_inline component
 
         expected_title = I18n.t("sensemaker.job_index.hero_title_with_resource",
@@ -172,7 +170,7 @@ describe Sensemaker::JobIndexComponent do
       let(:jobs) { [job] }
 
       it "renders the jobs as cards with View Summary link" do
-        allow(job).to receive(:has_outputs?).and_return(true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
         render_inline component
 
         expect(page).to have_link(I18n.t("sensemaker.job_index.view_summary"),

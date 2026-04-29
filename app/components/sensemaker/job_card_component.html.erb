@@ -6,7 +6,7 @@
           <%= script_type_tag(job) %>
         </span>
         <h4>
-          <% if job.has_outputs? %>
+          <% if job.artefacts.complete? %>
             <%= link_to view_job_text(job), job_artefact_path(job), class: "report-link", target: "_blank", rel: "noopener" %>
           <% else %>
             <%= content_tag :span, view_job_text(job), class: "report-unavailable" %>

@@ -14,14 +14,12 @@ describe Sensemaker::JobCardComponent do
   let(:component) { Sensemaker::JobCardComponent.new(job) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
-    Setting["llm.use_sensemaker"] = true
+    Setting["feature.sensemaker"] = true
   end
 
   describe "rendering" do
     it "renders a card with report link when job has outputs" do
-      allow(job).to receive(:has_outputs?).and_return(true)
+      allow(job.artefacts).to receive(:complete?).and_return(true)
       render_inline component
 
       expect(page).to have_link(I18n.t("sensemaker.job_index.view_report"),
@@ -30,7 +28,7 @@ describe Sensemaker::JobCardComponent do
     end
 
     it "does not show report link when job has no outputs" do
-      allow(job).to receive(:has_outputs?).and_return(false)
+      allow(job.artefacts).to receive(:complete?).and_return(false)
       render_inline component
 
       expect(page).not_to have_link(href: serve_report_sensemaker_job_path(job))
@@ -56,7 +54,7 @@ describe Sensemaker::JobCardComponent do
       end
 
       it "renders View Summary link when job has outputs" do
-        allow(job).to receive(:has_outputs?).and_return(true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
         render_inline component
 
         expect(page).to have_link(I18n.t("sensemaker.job_index.view_summary"),

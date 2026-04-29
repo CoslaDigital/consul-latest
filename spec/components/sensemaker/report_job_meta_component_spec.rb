@@ -14,9 +14,7 @@ describe Sensemaker::ReportJobMetaComponent do
   let(:component) { Sensemaker::ReportJobMetaComponent.new(job) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
-    Setting["llm.use_sensemaker"] = true
+    Setting["feature.sensemaker"] = true
   end
 
   describe "#run_timestamp" do
@@ -70,7 +68,7 @@ describe Sensemaker::ReportJobMetaComponent do
 
   describe "rendering" do
     it "renders the view report link when job has outputs" do
-      allow(job).to receive(:has_outputs?).and_return(true)
+      allow(job.artefacts).to receive(:complete?).and_return(true)
       render_inline component
 
       expect(page).to have_link(I18n.t("sensemaker.report_view.view_report"),
@@ -78,7 +76,7 @@ describe Sensemaker::ReportJobMetaComponent do
     end
 
     it "does not render the view report link when job has no outputs" do
-      allow(job).to receive(:has_outputs?).and_return(false)
+      allow(job.artefacts).to receive(:complete?).and_return(false)
       render_inline component
 
       expect(page).not_to have_link(I18n.t("sensemaker.report_view.view_report"))

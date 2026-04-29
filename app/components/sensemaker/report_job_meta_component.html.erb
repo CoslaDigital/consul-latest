@@ -8,7 +8,7 @@
     <dd><%= comments_analysed_count %></dd>
   </dl>
 
-  <% if job.has_outputs? %>
+  <% if job.artefacts.complete? %>
     <%= link_to view_report_text, report_url, class: "button", target: "_blank" %>
   <% end %>
 </section>
