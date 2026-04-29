@@ -489,14 +489,14 @@ describe Sensemaker::JobRunner do
         allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
       end
 
-      it "calls CsvExporter.provide_defaults_for_zero_vote_comments" do
-        expect(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
+      it "calls CsvExporter.filter_zero_vote_comments_from_csv" do
+        expect(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
                                              .with(job.artefacts.input_path).and_return(3)
         service.send(:prepare_input_data)
       end
 
-      it "returns the comments count from provide_defaults_for_zero_vote_comments" do
-        allow(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
+      it "returns the filtered count from filter_zero_vote_comments_from_csv" do
+        allow(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
                                             .with(job.artefacts.input_path).and_return(3)
         result = service.send(:prepare_input_data)
 
@@ -514,15 +514,15 @@ describe Sensemaker::JobRunner do
         allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
       end
 
-      it "calls prepare_with_categorization_job and then applies zero-vote defaults" do
+      it "calls prepare_with_categorization_job and then filters the CSV" do
         allow(service).to receive(:prepare_with_categorization_job).and_return(10)
-        allow(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
-                                            .with(job.artefacts.input_path).and_return(10)
+        allow(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
+                                            .with(job.artefacts.input_path).and_return(8)
 
         result = service.send(:prepare_input_data)
 
-        expect(result).to eq(10)
-        expect(Sensemaker::CsvExporter).to have_received(:provide_defaults_for_zero_vote_comments)
+        expect(result).to eq(8)
+        expect(Sensemaker::CsvExporter).to have_received(:filter_zero_vote_comments_from_csv)
                                              .with(job.artefacts.input_path)
       end
     end
