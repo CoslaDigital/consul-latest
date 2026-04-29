@@ -7,17 +7,11 @@ module Sensemaker
       "Proposal",
       "Poll",
       "Poll::Question",
-      "Legislation::Process",
       "Legislation::Question",
       "Legislation::Proposal",
       "Legislation::QuestionOption",
       "Budget",
       "Budget::Group"
-    ].freeze
-
-    PUBLISHABLE_SCRIPTS = [
-      "sensemaking-report-ui",
-      "runner.ts"
     ].freeze
 
     validates :analysable_type, inclusion: { in: ANALYSABLE_TYPES }
@@ -28,13 +22,9 @@ module Sensemaker
                         dependent: :nullify
 
     validates :analysable_type, presence: true
-    validates :analysable_id, presence: true, unless: -> { analysable_type == "Proposal" }
-    validate :publishing_is_allowed
+    validates :analysable_id, presence: true
 
     belongs_to :analysable, polymorphic: true, optional: true
-
-    before_save :set_persisted_output_if_successful
-    after_destroy :cleanup_associated_files
 
     scope :published, -> { where(published: true) }
     scope :unpublished, -> { where(published: false) }
@@ -93,301 +83,25 @@ module Sensemaker
       update!(finished_at: Time.current, error: "Cancelled")
     end
 
-    def conversation
-      @conversation ||= Sensemaker::Conversation.new(analysable_type, analysable_id)
-    end
-
-    def analysable
-      return Proposal if analysable_type == "Proposal" && analysable_id.nil?
-
-      super
-    end
-
-    def output_file_name
-      case script
-      when "health_check_runner.ts"
-        "health-check-#{id}.txt"
-      when "advanced_runner.ts", "runner.ts"
-        "output-#{id}"
-      when "categorization_runner.ts"
-        "categorization-output-#{id}.csv"
-      when "sensemaking-report-ui"
-        "report-#{id}.html"
-      else
-        "output-#{id}.csv"
-      end
-    end
-
-    def has_multiple_outputs?
-      ["advanced_runner.ts", "runner.ts"].include?(script)
-    end
-
-    def default_output_path
-      File.join(Sensemaker::Paths.sensemaker_data_folder, output_file_name)
-    end
-
-    def relative_output_path
-      File.join(Sensemaker::Paths.sensemaker_relative_data_folder, output_file_name)
-    end
-
-    def persisted_output_path
-      p = read_attribute(:persisted_output)
-      return nil if p.blank?
-
-      Rails.root.join(p)
-    end
-
-    def output_artefact_paths
-      if persisted_output.present?
-        base_path = persisted_output_path.to_s
-      else
-        base_path = default_output_path
-      end
-
-      case script
-      when "advanced_runner.ts"
-        [
-          "#{base_path}-summary.json",
-          "#{base_path}-topic-stats.json",
-          "#{base_path}-comments-with-scores.json"
-        ]
-      when "runner.ts"
-        [
-          "#{base_path}-summary.json",
-          "#{base_path}-summary.html",
-          "#{base_path}-summary.md",
-          "#{base_path}-summaryAndSource.csv"
-        ]
-      else
-        [base_path]
-      end
-    end
-
-    def existing_output_artefact_paths
-      output_artefact_paths.select { |path| File.exist?(path) }
-    end
-
-    def input_file
-      current_input_file = read_attribute(:input_file)
-      if current_input_file.present?
-        current_input_file
-      elsif script == "advanced_runner.ts"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/categorization-output-#{id}.csv"
-      elsif script == "sensemaking-report-ui"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/advanced-output"
-      else
-        "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{id}.csv"
-      end
-    end
-
-    def input_artefact_paths
-      base_path = input_file.to_s
-      return [] if base_path.blank?
-
-      case script
-      when "sensemaking-report-ui"
-        [
-          "#{base_path}-topic-stats.json",
-          "#{base_path}-summary.json",
-          "#{base_path}-comments-with-scores.json",
-          "#{base_path}-metadata.json"
-        ]
-      else
-        [base_path]
-      end
-    end
-
-    def existing_input_artefact_paths
-      input_artefact_paths.select { |path| File.exist?(path) }
-    end
-
-    def has_outputs?
-      existing_output_artefact_paths.size == output_artefact_paths.size
-    end
-
-    def publishable?
-      PUBLISHABLE_SCRIPTS.include?(script) && finished? && !errored? && has_outputs?
-    end
-
-    def self.budget_related
-      where(analysable_type: "Budget").or(
-        where(analysable_type: "Budget::Group")
-      )
-    end
-
-    def self.for_budget_any_status(budget)
-      group_subquery = budget.groups.select(:id)
-      where(analysable_type: "Budget", analysable_id: budget.id).or(
-        where(analysable_type: "Budget::Group", analysable_id: group_subquery)
-      )
-    end
-
     def self.for_budget(budget)
-      published.merge(for_budget_any_status(budget))
-    end
-
-    def self.process_related
-      where(analysable_type: "Legislation::Process").or(
-        where(analysable_type: "Legislation::Proposal").or(
-          where(analysable_type: "Legislation::Question").or(
-            where(analysable_type: "Legislation::QuestionOption")
-          )
-        )
+      group_subquery = budget.groups.select(:id)
+      published.where(analysable_type: "Budget", analysable_id: budget.id).or(
+        published.where(analysable_type: "Budget::Group", analysable_id: group_subquery)
       )
     end
 
-    def self.for_process_any_status(process)
+    def self.for_process(process)
       proposals_subquery = process.proposals.select(:id)
       questions_subquery = process.questions.select(:id)
       question_options_subquery = Legislation::QuestionOption
                                   .where(legislation_question_id: questions_subquery)
                                   .select(:id)
 
-      where(analysable_type: "Legislation::Proposal", analysable_id: proposals_subquery)
-        .or(where(analysable_type: "Legislation::Question", analysable_id: questions_subquery))
-        .or(where(analysable_type: "Legislation::QuestionOption",
-                  analysable_id: question_options_subquery))
+      published
+        .where(analysable_type: "Legislation::Proposal", analysable_id: proposals_subquery)
+        .or(published.where(analysable_type: "Legislation::Question", analysable_id: questions_subquery))
+        .or(published.where(analysable_type: "Legislation::QuestionOption",
+                            analysable_id: question_options_subquery))
     end
-
-    def self.for_process(process)
-      published.merge(for_process_any_status(process))
-    end
-
-    def self.poll_related
-      where(analysable_type: "Poll").or(
-        where(analysable_type: "Poll::Question")
-      )
-    end
-
-    def self.for_poll_any_status(poll)
-      questions_subquery = poll.questions.select(:id)
-      where(analysable_type: "Poll", analysable_id: poll.id).or(
-        where(analysable_type: "Poll::Question", analysable_id: questions_subquery)
-      )
-    end
-
-    def self.for_poll(poll)
-      published.merge(for_poll_any_status(poll))
-    end
-
-    def self.legislation_question_related
-      where(analysable_type: "Legislation::Question").or(
-        where(analysable_type: "Legislation::QuestionOption")
-      )
-    end
-
-    def self.for_legislation_question_any_status(question)
-      options_subquery = question.question_options.select(:id)
-      where(analysable_type: "Legislation::Question", analysable_id: question.id).or(
-        where(analysable_type: "Legislation::QuestionOption", analysable_id: options_subquery)
-      )
-    end
-
-    def self.for_legislation_question(question)
-      published.merge(for_legislation_question_any_status(question))
-    end
-
-    def self.for_analysable(record, published_only: true)
-      if record == Proposal
-        base = where(analysable_type: "Proposal", analysable_id: nil)
-        return published_only ? base.merge(published) : base
-      end
-
-      case record
-      when Budget
-        published_only ? for_budget(record) : for_budget_any_status(record)
-      when Legislation::Process
-        published_only ? for_process(record) : for_process_any_status(record)
-      when Poll
-        published_only ? for_poll(record) : for_poll_any_status(record)
-      when Legislation::Question
-        published_only ? for_legislation_question(record) : for_legislation_question_any_status(record)
-      else
-        base = where(analysable: record)
-        published_only ? base.merge(published) : base
-      end
-    end
-
-    def self.by_analysable_type(type)
-      case type
-      when "Budget"
-        budget_related
-      when "Legislation::Process"
-        process_related
-      when "Poll"
-        poll_related
-      when "Legislation::Question"
-        legislation_question_related
-      else
-        where(analysable_type: type)
-      end
-    end
-
-    private
-
-      def publishing_is_allowed
-        return unless published? && published_changed? && !published_was
-
-        unless publishable?
-          errors.add(:published, :not_publishable, message: "cannot be published")
-        end
-      end
-
-      def set_persisted_output_if_successful
-        return unless finished_at.present? && error.nil?
-        return if persisted_output.present?
-
-        if has_outputs?
-          self.persisted_output = relative_output_path
-        end
-      end
-
-      def cleanup_associated_files
-        data_folder = Sensemaker::Paths.sensemaker_data_folder
-        result = []
-        result << cleanup_input_files(data_folder)
-        result << cleanup_output_files(data_folder)
-        result << cleanup_persisted_output()
-        result.flatten!
-        result.compact!
-        Rails.logger.info("Cleaned up files for job #{id}: #{result.inspect}")
-        result
-      rescue => e
-        Rails.logger.warn("Failed to cleanup files for job #{id}: #{e.message}")
-        nil
-      end
-
-      def cleanup_input_files(data_folder)
-        input_file = "#{data_folder}/input-#{id}.csv"
-        result = []
-        result << FileUtils.rm_f(input_file)
-        result << FileUtils.rm_f("#{input_file}.unfiltered")
-        result
-      end
-
-      def cleanup_output_files(data_folder)
-        result = []
-        case script
-        when "advanced_runner.ts"
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-summary.json")
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-topic-stats.json")
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-comments-with-scores.json")
-        when "runner.ts"
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-summary.json")
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-summary.html")
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-summary.md")
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}-summaryAndSource.csv")
-        else
-          result << FileUtils.rm_f("#{data_folder}/#{output_file_name}")
-        end
-        result
-      end
-
-      def cleanup_persisted_output
-        path = persisted_output_path
-        return unless path.present? && File.exist?(path)
-
-        [FileUtils.rm_f(path)]
-      end
   end
 end
