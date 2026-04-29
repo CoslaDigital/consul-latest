@@ -52,14 +52,9 @@ describe Abilities::Everyone do
   it { should_not be_able_to(:read_results, create(:budget, :finished, results_enabled: false)) }
   it { should_not be_able_to(:read_results, create(:budget, :reviewing_ballots, results_enabled: true)) }
 
-  describe "read_sensemaking (when sensemaker is enabled)" do
-    before do
-      Setting["llm.provider"] = "OpenAI"
-      Setting["llm.model"] = "gpt-4o"
-      Setting["llm.use_sensemaker"] = true
-    end
-
-    after { Setting["llm.use_sensemaker"] = false }
+  describe "read_sensemaking (when sensemaker feature is enabled)" do
+    before { Setting["feature.sensemaker"] = true }
+    after { Setting["feature.sensemaker"] = nil }
 
     it { should be_able_to(:read_sensemaking, create(:budget, :finished, sensemaking_enabled: true)) }
     it { should_not be_able_to(:read_sensemaking, create(:budget, :finished, sensemaking_enabled: false)) }
@@ -69,10 +64,8 @@ describe Abilities::Everyone do
     }
   end
 
-  it "does not allow read_sensemaking when sensemaker is disabled" do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
-    Setting["llm.use_sensemaker"] = false
+  it "does not allow read_sensemaking when sensemaker feature is disabled" do
+    Setting["feature.sensemaker"] = nil
     budget = create(:budget, :finished, sensemaking_enabled: true)
 
     expect(Ability.new(nil)).not_to be_able_to(:read_sensemaking, budget)
