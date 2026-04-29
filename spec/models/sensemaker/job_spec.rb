@@ -42,11 +42,183 @@ describe Sensemaker::Job do
       job.analysable_id = nil
       expect(job).to be_valid
     end
+
+    describe "#publishing_is_allowed" do
+      let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
+      let(:job_dir) { "#{data_folder}/job-#{job.id}" }
+
+      before do
+        allow(Sensemaker::Paths).to receive(:sensemaker_data_folder).and_return(data_folder)
+        allow(File).to receive(:exist?).and_return(false)
+        job.published = false
+      end
+
+      context "when job is publishable" do
+        before do
+          job.script = "sensemaking-report-ui"
+          job.finished_at = Time.current
+          job.error = nil
+          output_path = "#{job_dir}/report.html"
+          allow(File).to receive(:exist?).with(output_path).and_return(true)
+        end
+
+        it "allows publishing when changing from false to true" do
+          job.published = true
+          expect(job).to be_valid
+        end
+      end
+
+      context "when job is not publishable" do
+        it "adds validation error when published is changed to true" do
+          # Set up a job that is not publishable (any condition fails)
+          job.script = "categorization_runner.ts"
+          job.finished_at = Time.current
+          job.error = nil
+          job.published = true
+
+          expect(job).not_to be_valid
+          expect(job.errors[:published]).to be_present
+        end
+      end
+
+      context "when job is already published" do
+        before do
+          job.published = true
+          job.save!(validate: false) # Save without validation to set initial state
+        end
+
+        it "does not validate when already published" do
+          job.script = "categorization_runner.ts" # Make it unpublishable
+          job.finished_at = nil
+          expect(job).to be_valid
+        end
+      end
+
+      context "when job is not published" do
+        it "does not validate publishable status" do
+          job.script = "categorization_runner.ts"
+          job.finished_at = nil
+          job.published = false
+          expect(job).to be_valid
+        end
+      end
+    end
   end
 
   describe "associations" do
     it "belongs to a user" do
       expect(job.user).to eq(user)
+    end
+  end
+
+  describe ".for_analysable" do
+    context "when record is a Budget" do
+      let(:budget) { create(:budget) }
+      let!(:published_budget_job) do
+        j = create(:sensemaker_job, analysable_type: "Budget", analysable_id: budget.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_budget_job) do
+        create(:sensemaker_job, analysable_type: "Budget", analysable_id: budget.id, published: false)
+      end
+      let!(:other_budget_job) do
+        j = create(:sensemaker_job,
+                   analysable_type: "Budget",
+                   analysable_id: create(:budget).id,
+                   published: false)
+        j.update_column(:published, true)
+        j
+      end
+
+      it "with published_only: true returns only published jobs for that budget" do
+        scope = Sensemaker::Job.for_analysable(budget, published_only: true)
+        expect(scope).to include(published_budget_job)
+        expect(scope).not_to include(unpublished_budget_job)
+        expect(scope).not_to include(other_budget_job)
+      end
+
+      it "with published_only: false returns all jobs for that budget" do
+        scope = Sensemaker::Job.for_analysable(budget, published_only: false)
+        expect(scope).to include(published_budget_job)
+        expect(scope).to include(unpublished_budget_job)
+        expect(scope).not_to include(other_budget_job)
+      end
+    end
+
+    context "when record is a Debate (else branch)" do
+      let(:debate) { create(:debate) }
+      let!(:published_debate_job) do
+        j = create(:sensemaker_job, analysable_type: "Debate", analysable_id: debate.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_debate_job) do
+        create(:sensemaker_job, analysable_type: "Debate", analysable_id: debate.id, published: false)
+      end
+
+      it "with published_only: true returns only published jobs for that record" do
+        scope = Sensemaker::Job.for_analysable(debate, published_only: true)
+        expect(scope).to include(published_debate_job)
+        expect(scope).not_to include(unpublished_debate_job)
+      end
+
+      it "with published_only: false returns all jobs for that record" do
+        scope = Sensemaker::Job.for_analysable(debate, published_only: false)
+        expect(scope).to include(published_debate_job)
+        expect(scope).to include(unpublished_debate_job)
+      end
+    end
+
+    context "when record is Proposal (all proposals)" do
+      let!(:all_proposals_job) do
+        j = create(:sensemaker_job, analysable_type: "Proposal", analysable_id: nil, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:specific_proposal_job) do
+        j = create(:sensemaker_job,
+                   analysable_type: "Proposal",
+                   analysable_id: create(:proposal).id,
+                   published: false)
+        j.update_column(:published, true)
+        j
+      end
+
+      it "with published_only: true returns only published jobs with nil analysable_id" do
+        scope = Sensemaker::Job.for_analysable(Proposal, published_only: true)
+        expect(scope).to include(all_proposals_job)
+        expect(scope).not_to include(specific_proposal_job)
+      end
+
+      it "with published_only: false returns all jobs with nil analysable_id" do
+        unpublished = create(:sensemaker_job,
+                             analysable_type: "Proposal",
+                             analysable_id: nil,
+                             published: false)
+        scope = Sensemaker::Job.for_analysable(Proposal, published_only: false)
+        expect(scope).to include(all_proposals_job)
+        expect(scope).to include(unpublished)
+        expect(scope).not_to include(specific_proposal_job)
+      end
+    end
+
+    context "when record is a Poll" do
+      let(:poll) { create(:poll) }
+      let!(:published_poll_job) do
+        j = create(:sensemaker_job, analysable_type: "Poll", analysable_id: poll.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_poll_job) do
+        create(:sensemaker_job, analysable_type: "Poll", analysable_id: poll.id, published: false)
+      end
+
+      it "with published_only: false returns all jobs for that poll" do
+        scope = Sensemaker::Job.for_analysable(poll, published_only: false)
+        expect(scope).to include(published_poll_job)
+        expect(scope).to include(unpublished_poll_job)
+      end
     end
   end
 
@@ -119,6 +291,46 @@ describe Sensemaker::Job do
 
       it "returns false when error is nil" do
         expect(job.errored?).to be false
+      end
+    end
+
+    describe "#publishable?" do
+      include_context "sensemaker paths stubbed"
+
+      before do
+        allow(File).to receive(:exist?).and_return(false)
+        job.script = "sensemaking-report-ui"
+        job.finished_at = Time.current
+        job.error = nil
+      end
+
+      it "returns true for a finished successful job with complete outputs" do
+        output_path = "#{job_dir}/report.html"
+        allow(File).to receive(:exist?).with(output_path).and_return(true)
+
+        expect(job.publishable?).to be true
+      end
+
+      it "returns false when the script is not publishable" do
+        job.script = "categorization_runner.ts"
+
+        expect(job.publishable?).to be false
+      end
+
+      it "returns false when the job is not finished" do
+        job.finished_at = nil
+
+        expect(job.publishable?).to be false
+      end
+
+      it "returns false when the job has an error" do
+        job.error = "Something went wrong"
+
+        expect(job.publishable?).to be false
+      end
+
+      it "returns false when output artefacts are incomplete" do
+        expect(job.publishable?).to be false
       end
     end
   end
