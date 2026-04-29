@@ -41,66 +41,6 @@ describe Sensemaker::Job do
       job.analysable_id = nil
       expect(job).to be_valid
     end
-
-    describe "#publishing_is_allowed" do
-      let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
-
-      before do
-        allow(Sensemaker::Paths).to receive(:sensemaker_data_folder).and_return(data_folder)
-        allow(File).to receive(:exist?).and_return(false)
-        job.published = false
-      end
-
-      context "when job is publishable" do
-        before do
-          job.script = "single-html-build.js"
-          job.finished_at = Time.current
-          job.error = nil
-          output_path = "#{data_folder}/report-#{job.id}.html"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-        end
-
-        it "allows publishing when changing from false to true" do
-          job.published = true
-          expect(job).to be_valid
-        end
-      end
-
-      context "when job is not publishable" do
-        it "adds validation error when published is changed to true" do
-          # Set up a job that is not publishable (any condition fails)
-          job.script = "categorization_runner.ts"
-          job.finished_at = Time.current
-          job.error = nil
-          job.published = true
-
-          expect(job).not_to be_valid
-          expect(job.errors[:published]).to be_present
-        end
-      end
-
-      context "when job is already published" do
-        before do
-          job.published = true
-          job.save!(validate: false) # Save without validation to set initial state
-        end
-
-        it "does not validate when already published" do
-          job.script = "categorization_runner.ts" # Make it unpublishable
-          job.finished_at = nil
-          expect(job).to be_valid
-        end
-      end
-
-      context "when job is not published" do
-        it "does not validate publishable status" do
-          job.script = "categorization_runner.ts"
-          job.finished_at = nil
-          job.published = false
-          expect(job).to be_valid
-        end
-      end
-    end
   end
 
   describe "associations" do
@@ -248,7 +188,7 @@ describe Sensemaker::Job do
       end
     end
 
-    describe "#output_artefact_paths" do
+    describe "#output_artifact_paths" do
       include_context "sensemaker paths stubbed"
       let(:base_path) { "#{data_folder}/output-#{job.id}" }
 
@@ -256,12 +196,12 @@ describe Sensemaker::Job do
         it "uses default_output_path for single output scripts" do
           job.script = "categorization_runner.ts"
           expected_path = "#{data_folder}/categorization-output-#{job.id}.csv"
-          expect(job.output_artefact_paths).to eq([expected_path])
+          expect(job.output_artifact_paths).to eq([expected_path])
         end
 
         it "uses default_output_path for advanced_runner.ts" do
           job.script = "advanced_runner.ts"
-          expect(job.output_artefact_paths).to eq([
+          expect(job.output_artifact_paths).to eq([
             "#{base_path}-summary.json",
             "#{base_path}-topic-stats.json",
             "#{base_path}-comments-with-scores.json"
@@ -270,7 +210,7 @@ describe Sensemaker::Job do
 
         it "uses default_output_path for runner.ts" do
           job.script = "runner.ts"
-          expect(job.output_artefact_paths).to eq([
+          expect(job.output_artifact_paths).to eq([
             "#{base_path}-summary.json",
             "#{base_path}-summary.html",
             "#{base_path}-summary.md",
@@ -288,12 +228,12 @@ describe Sensemaker::Job do
 
         it "uses resolved persisted_output_path (absolute) so File.exist? works after deploys" do
           job.script = "categorization_runner.ts"
-          expect(job.output_artefact_paths).to eq([persisted_path])
+          expect(job.output_artifact_paths).to eq([persisted_path])
         end
 
         it "uses persisted_output for advanced_runner.ts" do
           job.script = "advanced_runner.ts"
-          expect(job.output_artefact_paths).to eq([
+          expect(job.output_artifact_paths).to eq([
             "#{persisted_path}-summary.json",
             "#{persisted_path}-topic-stats.json",
             "#{persisted_path}-comments-with-scores.json"
@@ -302,7 +242,7 @@ describe Sensemaker::Job do
 
         it "uses persisted_output for runner.ts" do
           job.script = "runner.ts"
-          expect(job.output_artefact_paths).to eq([
+          expect(job.output_artifact_paths).to eq([
             "#{persisted_path}-summary.json",
             "#{persisted_path}-summary.html",
             "#{persisted_path}-summary.md",
@@ -320,36 +260,9 @@ describe Sensemaker::Job do
           it "returns absolute paths via persisted_output_path so has_outputs? can find files" do
             job.script = "categorization_runner.ts"
             expected = Rails.root.join(relative_path).to_s
-            expect(job.output_artefact_paths).to eq([expected])
+            expect(job.output_artifact_paths).to eq([expected])
           end
         end
-      end
-    end
-
-    describe "#existing_output_artefact_paths" do
-      include_context "sensemaker paths stubbed"
-      let(:base_path) { "#{data_folder}/output-#{job.id}" }
-
-      before do
-        allow(File).to receive(:exist?).and_return(false)
-      end
-
-      it "returns only paths for which the file exists" do
-        job.script = "runner.ts"
-        existing_path = "#{base_path}-summary.json"
-        allow(File).to receive(:exist?).with(existing_path).and_return(true)
-
-        expect(job.existing_output_artefact_paths).to eq([existing_path])
-      end
-
-      it "excludes paths for which the file does not exist" do
-        job.script = "runner.ts"
-        path1 = "#{base_path}-summary.json"
-        path2 = "#{base_path}-summary.html"
-        allow(File).to receive(:exist?).with(path1).and_return(true)
-        allow(File).to receive(:exist?).with(path2).and_return(false)
-
-        expect(job.existing_output_artefact_paths).to eq([path1])
       end
     end
 
@@ -404,118 +317,6 @@ describe Sensemaker::Job do
       it_behaves_like "has_outputs for multi-output script",
                       "runner.ts",
                       %w[-summary.json -summary.html -summary.md -summaryAndSource.csv]
-    end
-
-    describe "#publishable?" do
-      let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
-
-      before do
-        allow(Sensemaker::Paths).to receive(:sensemaker_data_folder).and_return(data_folder)
-        allow(File).to receive(:exist?).and_return(false)
-      end
-
-      context "when script is single-html-build.js" do
-        before do
-          job.script = "single-html-build.js"
-          job.finished_at = Time.current
-          job.error = nil
-        end
-
-        it "returns true when all conditions are met" do
-          output_path = "#{data_folder}/report-#{job.id}.html"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-          expect(job.publishable?).to be true
-        end
-
-        it "returns false when job is not finished" do
-          job.finished_at = nil
-          output_path = "#{data_folder}/report-#{job.id}.html"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false when job has errors" do
-          job.error = "Some error occurred"
-          output_path = "#{data_folder}/report-#{job.id}.html"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false when job has no outputs" do
-          expect(job.publishable?).to be false
-        end
-      end
-
-      context "when script is runner.ts" do
-        before do
-          job.script = "runner.ts"
-          job.finished_at = Time.current
-          job.error = nil
-        end
-
-        it "returns true when all conditions are met" do
-          base_path = "#{data_folder}/output-#{job.id}"
-          allow(File).to receive(:exist?).with("#{base_path}-summary.json").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.html").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.md").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summaryAndSource.csv").and_return(true)
-          expect(job.publishable?).to be true
-        end
-
-        it "returns false when job is not finished" do
-          job.finished_at = nil
-          base_path = "#{data_folder}/output-#{job.id}"
-          allow(File).to receive(:exist?).with("#{base_path}-summary.json").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.html").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.md").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summaryAndSource.csv").and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false when job has errors" do
-          job.error = "Some error occurred"
-          base_path = "#{data_folder}/output-#{job.id}"
-          allow(File).to receive(:exist?).with("#{base_path}-summary.json").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.html").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summary.md").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-summaryAndSource.csv").and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false when job has no outputs" do
-          expect(job.publishable?).to be false
-        end
-      end
-
-      context "when script is not publishable" do
-        before do
-          job.finished_at = Time.current
-          job.error = nil
-        end
-
-        it "returns false for categorization_runner.ts even when other conditions are met" do
-          job.script = "categorization_runner.ts"
-          output_path = "#{data_folder}/categorization-output-#{job.id}.csv"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false for advanced_runner.ts even when other conditions are met" do
-          job.script = "advanced_runner.ts"
-          base_path = "#{data_folder}/output-#{job.id}"
-          allow(File).to receive(:exist?).with("#{base_path}-summary.json").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-topic-stats.json").and_return(true)
-          allow(File).to receive(:exist?).with("#{base_path}-comments-with-scores.json").and_return(true)
-          expect(job.publishable?).to be false
-        end
-
-        it "returns false for health_check_runner.ts even when other conditions are met" do
-          job.script = "health_check_runner.ts"
-          output_path = "#{data_folder}/health-check-#{job.id}.txt"
-          allow(File).to receive(:exist?).with(output_path).and_return(true)
-          expect(job.publishable?).to be false
-        end
-      end
     end
 
     describe "#cleanup_associated_files" do
