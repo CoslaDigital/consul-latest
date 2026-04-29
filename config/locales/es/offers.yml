@@ -1,0 +1,93 @@
+es:
+  offers:
+    index:
+      title: "Ofertas de la Comunidad"
+      start_offer: "Crear una Oferta"
+      my_offers: "Mi Panel de Ayuda Mutua"
+      status_filter_title: "Listas de ofertas"
+      empty: "No se han encontrado ofertas que coincidan con tus criterios."
+      search_form:
+        label: "Buscar ofertas"
+        placeholder: "Busca ofertas por palabra clave, distrito o recurso..."
+        button: "Buscar"
+      orders:
+        newest: "Más recientes"
+        most_active: "Más activas"
+      orders_label: "Ordenar por"
+      section_header:
+        title: "Ayuda Mutua - Ofertas de asistencia"
+    new:
+      title: "Crear una Oferta"
+      subtitle: "Ofrece tus habilidades, tiempo o recursos para ayudar a que las propuestas ciudadanas tengan éxito."
+      recommendations_title: "Consejos para una buena oferta"
+      recommendation_one: "Sé específico con lo que ofreces (ej. '10 horas de diseño gráfico' en lugar de solo 'diseño')."
+      recommendation_two: "Especifica tu disponibilidad y plazos de tiempo."
+      recommendation_three: "Etiqueta tu oferta correctamente para que las propuestas puedan encontrarte."
+      form:
+        submit_button: "Publicar Oferta"
+
+    edit:
+      title: "Editar Oferta"
+      form:
+        submit_button: "Actualizar Oferta"
+
+    form:
+      status_label: "Estado de disponibilidad"
+      status_help: "Cámbialo a 'Pendiente' o 'Adjudicado' si quieres dejar de recibir nuevas solicitudes temporalmente."
+      title_label: "¿Qué recurso estás proporcionando?"
+      title_placeholder: "ej. 5 horas de consultoría web"
+      description_label: "Explica los detalles, limitaciones y disponibilidad de tu oferta."
+      geozone: "Distrito / Barrio"
+      geozone_help: "Donde está disponible? Deja en blanco si es para toda la ciudad o remoto."
+      tags_label: "Etiquetas"
+      tags_instructions: "Las etiquetas ayudan a emparejar tu oferta con propuestas relevantes."
+      tags_placeholder: "ej. Medio Ambiente, Legal, Trabajo"
+
+    status:
+      available: "Disponible"
+      pending: "En discusión"
+      claimed: "Adjudicada"
+      withdrawn: "Retirada"
+
+    create:
+      success: "¡Tu oferta ha sido publicada para la comunidad!"
+    update:
+      success: "Oferta actualizada correctamente."
+    destroy:
+      success: "Oferta eliminada."
+    mine:
+      title: "Mi Panel de Ayuda Mutua"
+      offered_by_me: "Recursos que ofrezco"
+      offered_by_me_help: "Gestiona las solicitudes de tus ofertas"
+      offered_to_me: "Recursos ofrecidos a mis proyectos"
+      offered_to_me_help: "Ver ofertas de asistencia y colaboración"
+      active_count: "colaboraciones activas"
+      no_offers: "Aún no has creado ninguna oferta de recursos."
+      inbound_requests: "Solicitudes para mis propuestas"
+
+  proposal_matches:
+    status:
+      pending: "Pendiente de revisión"
+      accepted: "Oferta aceptada"
+      confirmed: "En curso"
+      rejected: "Rechazada"
+      withdrawn: "Cancelada"
+      fulfilled: "Completada"
+    confirm:
+      success: "¡La colaboración ya está oficialmente activa!"
+    fulfill:
+      success: "¡Colaboración marcada como completada! Gracias por apoyar a la comunidad."
+    error: "Hubo un error al actualizar la colaboración."
+    create:
+      success: "¡Solicitud de colaboración enviada correctamente!"
+      error_duplicate: "Ya has solicitado una colaboración para este recurso."
+
+  proposals:
+    show:
+      collaboration_status: "Colaboraciones"
+      active_collabs: "Apoyo activo"
+      fulfilled_collabs: "Completadas con éxito"
+      awaiting_confirmation: "Acción requerida: Finalizar ayuda"
+      confirm_button: "Confirmar y Empezar"
+      fulfill_button: "Marcar como Recibido/Completado"
+      confirm_fulfillment_check: "¿Confirmas que esta ayuda ha sido recibida y la tarea está terminada?"

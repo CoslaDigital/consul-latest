@@ -16,7 +16,6 @@ en:
       orders_label: "Order by"
       section_header:
         title: "Mutual Aid - Offers of assistance"
-
     new:
       title: "Create an Offer"
       subtitle: "Offer your skills, time, or resources to help citizen proposals succeed."
@@ -63,6 +62,8 @@ en:
       offered_to_me: "Resources Offered to My Projects"
       offered_to_me_help: "view offers of assistance and collaboration"
       active_count: "active collaborations"
+      no_offers: "You haven't created any resource offers yet."
+      inbound_requests: "Requests for my Proposals"
 
   proposal_matches:
     status:
