@@ -13,11 +13,6 @@ class Offer < ApplicationRecord
   include Documentable
   include SDG::Relatable
 
-  # Optional (Uncomment if needed)
-  # include Videoable
-  # include Communitable
-  # include Graphqlable
-
   acts_as_paranoid column: :hidden_at
   include ActsAsParanoidAliases
 
@@ -62,6 +57,8 @@ class Offer < ApplicationRecord
 
   scope :last_week, -> { where(created_at: 7.days.ago..) }
 
+  after_create :notify_admin_new_offer
+
   def self.search(terms)
     pg_search(terms)
   end
@@ -86,4 +83,10 @@ class Offer < ApplicationRecord
   def active?
     status == "available" && hidden_at.nil?
   end
+
+  private
+
+    def notify_admin_new_offer
+      Mailer.new_offer_admin_notification(self).deliver_later
+    end
 end

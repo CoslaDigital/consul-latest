@@ -154,3 +154,5 @@ en:
       text: "The lead for '%{proposal}' has confirmed your offer of %{offer}. You are now officially collaborating!"
       next_steps: "Check your dashboard to coordinate the final steps."
       view_dashboard: "View My Dashboard"
+    new_offer_admin_notification:
+      subject: "MUTUAL AID: New Resource Offer Published"
