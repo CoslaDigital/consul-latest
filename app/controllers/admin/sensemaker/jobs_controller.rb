@@ -43,12 +43,6 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
       processes.each do |process|
         collection = []
 
-        collection << { title: I18n.t("admin.sensemaker.new.analyse_all_questions",
-                                      model_label: I18n.t("activerecord.models.legislation/question.other"),
-                                      default: "Analyse all questions"),
-                        object: process }
-        @result_count += 1
-
         unless process.proposals.empty?
           collection << {
             title: I18n.t("activerecord.models.legislation/proposal.other"),
@@ -226,7 +220,7 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
   def download
     @sensemaker_job = Sensemaker::Job.find(params[:id])
-    artefacts = @sensemaker_job.existing_output_artefact_paths
+    artefacts = @sensemaker_job.existing_input_artefact_paths + @sensemaker_job.existing_output_artefact_paths
 
     if params[:artefact].present?
       requested = File.join(Sensemaker::Paths.sensemaker_data_folder, params[:artefact])
@@ -238,10 +232,9 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
       end
     end
 
-    path = @sensemaker_job.persisted_output_path
-    if path.present? && File.exist?(path)
-      return send_file path,
-                       filename: File.basename(path)
+    if @sensemaker_job.persisted_output.present? && File.exist?(@sensemaker_job.persisted_output)
+      return send_file @sensemaker_job.persisted_output,
+                       filename: File.basename(@sensemaker_job.persisted_output)
     end
 
     redirect_to admin_sensemaker_jobs_path,
