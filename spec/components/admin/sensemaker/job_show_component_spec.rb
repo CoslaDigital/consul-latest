@@ -38,23 +38,32 @@ describe Admin::Sensemaker::JobShowComponent do
     end
 
     context "when job can be downloaded" do
+      let(:input_path) do
+        File.join(Sensemaker::Paths.sensemaker_data_folder, "input-#{sensemaker_job.id}.csv")
+      end
       let(:artefact_path) do
         File.join(Sensemaker::Paths.sensemaker_data_folder, sensemaker_job.output_file_name)
       end
       before do
         sensemaker_job.update!(
           finished_at: Time.current,
-          error: nil
+          error: nil,
+          input_file: input_path
         )
 
         data_folder = Sensemaker::Paths.sensemaker_data_folder
         FileUtils.mkdir_p(data_folder)
+        File.write(input_path, "comment-id,comment_text\n1,test")
         File.write(artefact_path, "test")
       end
 
-      it "renders a download link for the output file" do
+      it "renders grouped download links for input and output files" do
         render_inline(component)
 
+        expect(page).to have_content("Files")
+        expect(page).to have_content("Input files")
+        expect(page).to have_content("Output files")
+        expect(page).to have_link(File.basename(input_path))
         expect(page).to have_link(File.basename(artefact_path))
       end
     end

@@ -29,9 +29,9 @@ describe Admin::Sensemaker::JobsController do
 
   describe "GET #download" do
     let(:job) { sensemaker_job }
+    let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
 
     context "when artefact param is provided and valid" do
-      let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
       let(:basename) { "artefact-#{SecureRandom.hex}.json" }
       let(:tmp_file) { File.join(data_folder, basename) }
 
@@ -54,6 +54,28 @@ describe Admin::Sensemaker::JobsController do
       end
     end
 
+    context "when input artefact param is provided and valid" do
+      let(:basename) { "input-#{SecureRandom.hex}.csv" }
+      let(:tmp_file) { File.join(data_folder, basename) }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(tmp_file))
+        File.write(tmp_file, "comment-id,comment_text\n1,test")
+        job.update!(input_file: tmp_file)
+      end
+
+      after do
+        FileUtils.rm_f(tmp_file)
+      end
+
+      it "sends the requested input artefact file" do
+        get :download, params: { id: job.id, artefact: basename }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.header["Content-Disposition"]).to include(basename)
+      end
+    end
+
     context "when artefact param is invalid" do
       it "redirects to show with alert" do
         allow_any_instance_of(Sensemaker::Job).to receive(:output_artefact_paths)
@@ -66,25 +88,24 @@ describe Admin::Sensemaker::JobsController do
       end
     end
 
-    context "when no artefact param and persisted_output exists (relative path for deploy safety)" do
-      let(:relative_path) { "tmp/persisted-#{SecureRandom.hex}.html" }
-      let(:resolved_path) { Rails.root.join(relative_path) }
+    context "when no artefact param and persisted_output exists" do
+      let(:tmp_file) { Rails.root.join("tmp", "persisted-#{SecureRandom.hex}.html").to_s }
 
       before do
-        FileUtils.mkdir_p(File.dirname(resolved_path))
-        File.write(resolved_path, "<html></html>")
-        job.update!(persisted_output: relative_path)
+        FileUtils.mkdir_p(File.dirname(tmp_file))
+        File.write(tmp_file, "<html></html>")
+        job.update!(persisted_output: tmp_file)
       end
 
       after do
-        FileUtils.rm_f(resolved_path)
+        FileUtils.rm_f(tmp_file)
       end
 
-      it "sends the file using persisted_output_path (resolved from Rails.root)" do
+      it "sends the persisted_output file" do
         get :download, params: { id: job.id }
 
         expect(response).to have_http_status(:ok)
-        expect(response.header["Content-Disposition"]).to include(File.basename(relative_path))
+        expect(response.header["Content-Disposition"]).to include(File.basename(tmp_file))
       end
     end
 
