@@ -1,14 +1,10 @@
 class OffersController < ApplicationController
-  # 1. Devise Authentication
   before_action :authenticate_user!, except: [:index, :show]
 
-  # 2. Authorization & Resource Loading
-  # This handles @offer = Offer.find(params[:id]) for member actions automatically
   load_and_authorize_resource except: [:mine]
 
   # GET /offers
   def index
-    # Define valid sorting orders for the shared/order_links partial
     @valid_orders = %w[newest most_active]
     @current_order = @valid_orders.include?(params[:order]) ? params[:order] : "newest"
 
@@ -62,7 +58,7 @@ class OffersController < ApplicationController
     @offer.author = current_user
 
     if @offer.save
-      redirect_to @offer, notice: t("offers.create.success", default: "Your offer has been published!")
+      redirect_to @offer, notice: t("offers.create.success")
     else
       render :new, status: :unprocessable_entity
     end
@@ -84,7 +80,7 @@ class OffersController < ApplicationController
 
   # DELETE /offers/:id
   def destroy
-    @offer.destroy
+    @offer.destroy!
     redirect_to offers_url, notice: t("offers.destroy.success", default: "Offer removed.")
   end
 
