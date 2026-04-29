@@ -26,22 +26,6 @@ module Sensemaker
       execute_job_workflow
     end
 
-    def max_attempts
-      1
-    end
-
-    def input_file
-      if job.input_file.present?
-        job.input_file
-      elsif job.script == "advanced_runner.ts"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/categorization-output-#{job.id}.csv"
-      elsif job.script == "single-html-build.js"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/advanced-output"
-      else
-        "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{job.id}.csv"
-      end
-    end
-
     def output_file_name
       job.output_file_name
     end
@@ -58,8 +42,20 @@ module Sensemaker
       end
     end
 
-    def project_id
-      llm_context.config.vertexai_project_id.to_s
+    def sensemaker_adapter
+      runtime_config.adapter
+    end
+
+    def sensemaker_provider
+      runtime_config.compat_provider
+    end
+
+    def sensemaker_api_key
+      runtime_config.api_key
+    end
+
+    def sensemaker_base_url
+      runtime_config.base_url
     end
 
     def self.enabled?
@@ -72,21 +68,36 @@ module Sensemaker
         target_label = conversation.target_label(format: :full)
 
         return %Q(npx ts-node site-build.ts \
-                 --topics #{input_file}-topic-stats.json \
-                 --summary #{input_file}-summary.json \
-                 --comments #{input_file}-comments-with-scores.json \
+                 --topics #{job.input_file}-topic-stats.json \
+                 --summary #{job.input_file}-summary.json \
+                 --comments #{job.input_file}-comments-with-scores.json \
                  --reportTitle "Report for #{target_label}" && \
                  npx ts-node single-html-build.js --outputFile #{output_file})
       end
 
-      model_name = Setting["llm.model"]
+      model_name = runtime_config.model
       additional_context = nil
       additional_context = job.additional_context.presence unless job.script == "health_check_runner.ts"
 
-      command = %Q(npx ts-node #{script_file} \
-                 --vertexProject #{project_id} \
-                 --modelName #{model_name})
-      command += " --inputFile #{input_file}" unless job.script == "health_check_runner.ts"
+      command_parts = ["npx ts-node #{script_file}"]
+      command_parts << "--modelName #{Shellwords.escape(model_name)}" if model_name.present?
+
+      case sensemaker_adapter
+      when "vertex"
+        command_parts << "--adapter vertex"
+        command_parts << "--vertexProject #{Shellwords.escape(runtime_config.vertex_project_id)}"
+        command_parts << "--vertexLocation #{Shellwords.escape(runtime_config.vertex_location)}"
+      when "openai-compatible"
+        command_parts << "--adapter openai-compatible"
+        command_parts << "--provider #{Shellwords.escape(sensemaker_provider)}"
+        command_parts << "--apiKey #{Shellwords.escape(sensemaker_api_key)}" if sensemaker_api_key.present?
+      when "ollama"
+        command_parts << "--adapter ollama"
+      end
+      command_parts << "--baseUrl #{Shellwords.escape(sensemaker_base_url)}" if sensemaker_base_url.present?
+
+      command = command_parts.join(" ")
+      command += " --inputFile #{job.input_file}" unless job.script == "health_check_runner.ts"
       if additional_context.present?
         command += " --additionalContext #{Shellwords.escape(additional_context.to_s)}"
       end
@@ -103,6 +114,10 @@ module Sensemaker
 
       def llm_context
         @llm_context ||= Llm::Config.context
+      end
+
+      def runtime_config
+        @runtime_config ||= Sensemaker::RuntimeConfig.new(setting: Setting, llm_context: llm_context)
       end
 
       def execute_job_workflow
@@ -173,23 +188,26 @@ module Sensemaker
       def prepare_input_data
         conversation = job.conversation
         comments_prepared_count = 0
+        persisted_input_missing = job.read_attribute(:input_file).blank?
 
         if job.additional_context.blank?
           job.update!(additional_context: conversation.compile_context)
         end
 
-        if job.input_file.blank? && job.script.eql?("advanced_runner.ts")
+        if persisted_input_missing && job.script.eql?("advanced_runner.ts")
           comments_prepared_count = prepare_with_categorization_job
-        elsif job.input_file.blank? && job.script.eql?("single-html-build.js")
+        elsif persisted_input_missing && job.script.eql?("single-html-build.js")
           comments_prepared_count = prepare_with_advanced_runner_job
-        elsif job.input_file.blank?
+        elsif persisted_input_missing
           comments_prepared_count = conversation.comments.size
+          generated_input_path = job.input_file
           exporter = Sensemaker::CsvExporter.new(conversation)
-          exporter.export_to_csv(input_file)
+          exporter.export_to_csv(generated_input_path)
+          job.update!(input_file: generated_input_path)
         end
 
         if job.script.eql?("advanced_runner.ts")
-          comments_prepared_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(input_file)
+          comments_prepared_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(job.input_file)
         end
 
         comments_prepared_count
@@ -203,7 +221,7 @@ module Sensemaker
           return false
         end
 
-        if llm_context.config.vertexai_project_id.blank?
+        if sensemaker_adapter == "vertex" && runtime_config.vertex_project_id.blank?
           message = "Vertex AI is not configured. Set tenant secrets llm.vertexai_project_id " \
                     "(and optionally vertexai_location)."
           job.update!(finished_at: Time.current, error: message)
@@ -211,17 +229,24 @@ module Sensemaker
           return false
         end
 
-        provider = Setting["llm.provider"].to_s
-        unless provider.downcase.include?("vertex")
-          message = "Sensemaker requires Vertex AI as the LLM provider. " \
-                    "Current provider: #{provider.presence || "(not set)"}. Set it in Admin → Settings → LLM."
+        if sensemaker_adapter.blank?
+          message = "Sensemaker LLM provider is not supported. Current provider: " \
+            "#{runtime_config.provider.presence || "(not set)"}."
           job.update!(finished_at: Time.current, error: message)
           Rails.logger.error(message)
           return false
         end
 
-        if Setting["llm.model"].blank?
+        if runtime_config.model.blank?
           message = "Sensemaker requires an LLM model to be selected. Set it in Admin → Settings → LLM."
+          job.update!(finished_at: Time.current, error: message)
+          Rails.logger.error(message)
+          return false
+        end
+
+        if sensemaker_adapter == "openai-compatible" && sensemaker_api_key.blank?
+          message = "Sensemaker requires an API key for provider '#{sensemaker_provider}'. " \
+            "Set tenant secret llm.#{sensemaker_provider}_api_key."
           job.update!(finished_at: Time.current, error: message)
           Rails.logger.error(message)
           return false
@@ -258,14 +283,14 @@ module Sensemaker
         if job.script == "single-html-build.js"
           return false unless file_exists?(Sensemaker::Paths.visualization_folder,
                                            description: "Visualization folder")
-          return false unless file_exists?(input_file + "-topic-stats.json",
+          return false unless file_exists?(job.input_file + "-topic-stats.json",
                                            description: "Input file - topic stats")
-          return false unless file_exists?(input_file + "-summary.json",
+          return false unless file_exists?(job.input_file + "-summary.json",
                                            description: "Input file - summary")
-          return false unless file_exists?(input_file + "-comments-with-scores.json",
+          return false unless file_exists?(job.input_file + "-comments-with-scores.json",
                                            description: "Input file - comments with scores")
         else
-          return false unless file_exists?(input_file, description: "Input file")
+          return false unless file_exists?(job.input_file, description: "Input file")
         end
 
         return false unless file_exists?(script_file, description: "Script file")
@@ -278,7 +303,7 @@ module Sensemaker
         target_folder = Sensemaker::Paths.visualization_folder if job.script == "single-html-build.js"
 
         command = "cd #{target_folder} && timeout #{TIMEOUT} #{build_command}"
-        Rails.logger.debug("Executing script: #{command}")
+        Rails.logger.debug("Executing script: #{redact_command(command)}")
         output = `#{command} 2>&1`
 
         result = process_exit_status
@@ -288,7 +313,7 @@ module Sensemaker
         else
           output = "Timeout: #{TIMEOUT} seconds\n#{output}" if result.eql?(124)
           output = output.truncate(20000)
-          message = "Command: #{command}\n\n#{output}"
+          message = "Command: #{redact_command(command)}\n\n#{output}"
           job.update!(finished_at: Time.current, error: message)
           Rails.logger.error("Sensemaker::JobRunner error: #{output}")
           nil
@@ -313,6 +338,10 @@ module Sensemaker
         job.update!(finished_at: Time.current, error: message)
         Rails.logger.error(message)
         false
+      end
+
+      def redact_command(command)
+        command.to_s.gsub(/--apiKey\s+\S+/, "--apiKey [REDACTED]")
       end
   end
 end
