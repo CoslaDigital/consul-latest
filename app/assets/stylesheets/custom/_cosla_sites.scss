@@ -50,8 +50,8 @@
   --main-header: var(--brand);
   --brand-contrast: #da95a7;
   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-dev {
@@ -60,7 +60,7 @@
   --brand: #153;
   --brand-secondary: #134a00;
   --button-background-hover: #fa0;
-  --button-background-hover-contrast: #{$black};
+  --button-background-hover-contrast: #FFF;
   --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
@@ -69,17 +69,16 @@
   --subnavigation: #ffd;
   --background-color: var(--brand-secondary);
   --text-color: var(--brand-contrast);
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-dev2 {
   --brand: #FF3366;
-  --main-header: #EC407A;
   --footer: #FCE4EC;
   --top-links: var(--footer);
-  --top-links-contrast: var({$black});
+  --top-links-contrast: #FFF;
   --brand-secondary: #f4b56e;
   --footer: var(--brand-secondary);
   --main-header: var(--brand);
@@ -87,9 +86,9 @@
   --main-header-contrast: #FFFFFF;
   --background-color: var(--brand-secondary);
   --text-color: var(--brand-contrast);
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-jdev {
@@ -100,92 +99,92 @@
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
   --footer: var(--top-links);
-   // Import shared styles
-   @import "cosla_shared";
-   @include shared-styles;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
 
 }
 
 
 .site-glasgow {
-  --brand:     #2f7276;
+  --brand: #2f7276;
   --brand-secondary: #83a8ab;
   --footer: var(--brand-secondary);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-  @import "cosla_shared"; 
+  @import "cosla_shared";
   @include shared-styles;
 }
 
 .site-perthandkinross {
-  --brand:     #001489;
+  --brand: #001489;
   --brand-secondary: #000853;
-   --brand-contrast: #FFFFFF;
+  --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 .site-eastlothian {
-  --brand:     #005293;
-  --brand-secondary: #002F59;
-  --footer: #CEDBEA;
-   --brand-contrast: #FFFFFF;
-  --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
-  --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-   @include shared-styles;
-}
-
-.site-southayrshire {
-  --brand:     #005293;
+  --brand: #005293;
   --brand-secondary: #002F59;
   --footer: #CEDBEA;
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared"; 
+  @import "cosla_shared";
+  @include shared-styles;
+}
+
+.site-southayrshire {
+  --brand: #005293;
+  --brand-secondary: #002F59;
+  --footer: #CEDBEA;
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  @import "cosla_shared";
   @include shared-styles;
 }
 
 .site-northayrshire {
-  --brand:     #0065BD;
+  --brand: #0065BD;
   --brand-secondary: #0057A4;
   --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-edinburgh {
-  --brand:     #6D3465;
+  --brand: #6D3465;
   --brand-secondary: #492445;
   --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 
 .site-orkney {
-  --brand:     #000000;
+  --brand: #000000;
   --brand-secondary: #f10505;
   --brand-contrast: #FFFFFF;
   --footer: #cacaca;
   --main-header-contrast: #FFFFFF;
-   --top-links: #222222fc;
+  --top-links: #222222fc;
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 .site-inverclyde {
@@ -194,10 +193,10 @@
   --brand-contrast: #FFFFFF;
   --footer: #d7e5e7;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-arb {
@@ -207,10 +206,10 @@
   --footer: #023C19;
   --footer-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
 .site-wdn {
@@ -219,11 +218,12 @@
   --brand-contrast: #FFFFFF;
   --footer: #009a49;
   --main-header-contrast: #FFFFFF;
-   --top-links: #009a49;
+  --top-links: #009a49;
   --top-links-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
+
 .site-dundee {
   --brand: #593F73;
   --main-header: var(--brand);
@@ -233,21 +233,21 @@
   --main-header-contrast: #FFFFFF;
   --footer: var(--top-links);
   --footer-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-aberdeen {
-    --main-header: #EC008B;
-    --brand: #55366B;
-    --brand-secondary: #EE7522;
-    --brand-contrast: #FFFFFF;
-    --footer: #eee6db;
-    --main-header-contrast: #FFFFFF;
-    --top-links: #a9c731;
-    --top-links-contrast: #FFFFFF;
-   @import "cosla_shared";
-   @include shared-styles;
+  --main-header: #EC008B;
+  --brand: #55366B;
+  --brand-secondary: #EE7522;
+  --brand-contrast: #FFFFFF;
+  --footer: #eee6db;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #a9c731;
+  --top-links-contrast: #FFFFFF;
+  @import "cosla_shared";
+  @include shared-styles;
 }
 
 .site-ren {
@@ -257,23 +257,23 @@
   --footer: #023C19;
   --footer-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   --top-links: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
-   @include shared-styles;
+  @include shared-styles;
 }
 
- .site-highland {
+.site-highland {
   --brand: #522e91;
   --brand-secondary: #00833e;
   --brand-contrast: #FFFFFF;
   --footer: #0069aa;
   --footer-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-   --top-links: #00833e;
+  --top-links: #00833e;
   --top-links-contrast: #FFFFFF;
   @import "cosla_shared";
   @include shared-styles;
-  }
+}
 
 

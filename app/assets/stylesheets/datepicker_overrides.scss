@@ -23,14 +23,23 @@
 
   tr {
     border-bottom: 1px solid $border;
-    &:last-child { border-bottom: 0; }
-    &:nth-child(odd) { background: none; }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    &:nth-child(odd) {
+      background: none;
+    }
   }
 
   td, th {
     border-right: 1px solid $border;
     padding: 0;
-    &:last-child { border-right: 0; }
+
+    &:last-child {
+      border-right: 0;
+    }
   }
 
   // 2. The Cells (Days)
@@ -95,7 +104,9 @@
   justify-content: center;
   align-items: center;
 
-  &:hover { text-decoration: none; }
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .ui-datepicker {
@@ -113,7 +124,7 @@
     overflow: hidden;
 
     &:hover {
-      background-color: rgba(255,255,255,0.1); // Subtle hover effect
+      background-color: rgba(255, 255, 255, 0.1); // Subtle hover effect
       border-radius: 50%;
     }
 
@@ -136,6 +147,7 @@
   // Previous Arrow (Left)
   a:first-child {
     left: 4px;
+
     &::after {
       content: "\62"; // Your "Left Arrow" character
     }
@@ -144,6 +156,7 @@
   // Next Arrow (Right)
   a:last-child {
     right: 4px;
+
     &::after {
       content: "\63"; // Your "Right Arrow" character
     }
@@ -236,20 +249,52 @@
   // --- BUDGET PHASE COLORS ---
   // Note: We use '&.phase-x' to attach to the same element, not a child.
 
-  &.phase-drafting { background-color: #78909c; } /* Blue Grey */
-  &.phase-informing { background-color: #42a5f5; } /* Blue */
-  &.phase-accepting { background-color: #66bb6a; } /* Green */
-  &.phase-reviewing { background-color: #ffa726; } /* Orange */
-  &.phase-selecting { background-color: #ab47bc; } /* Purple */
-  &.phase-valuating { background-color: #ec407a; } /* Pink */
-  &.phase-publishing_prices { background-color: #8d6e63; } /* Brown */
+  &.phase-drafting {
+    background-color: #78909c;
+  }
+
+  /* Blue Grey */
+  &.phase-informing {
+    background-color: #42a5f5;
+  }
+
+  /* Blue */
+  &.phase-accepting {
+    background-color: #66bb6a;
+  }
+
+  /* Green */
+  &.phase-reviewing {
+    background-color: #ffa726;
+  }
+
+  /* Orange */
+  &.phase-selecting {
+    background-color: #ab47bc;
+  }
+
+  /* Purple */
+  &.phase-valuating {
+    background-color: #ec407a;
+  }
+
+  /* Pink */
+  &.phase-publishing_prices {
+    background-color: #8d6e63;
+  }
+
+  /* Brown */
 
   &.phase-balloting,
   &.phase-Balloting {
     background-color: #ef5350; /* Red */
   }
 
-  &.phase-reviewing_ballots { background-color: #ff7043; } /* Deep Orange */
+  &.phase-reviewing_ballots {
+    background-color: #ff7043;
+  }
+
+  /* Deep Orange */
 
   &.phase-finished {
     background-color: #b0bec5;
@@ -257,10 +302,10 @@
     opacity: 0.7;
   }
 
-  &.phase-Information { background-color: #90a4ae; }
+  &.phase-Information {
+    background-color: #90a4ae;
+  }
 
-  // --- ACTION BUTTONS (Edit/Delete) ---
-  // These float right inside the bar
   .event-actions {
     position: absolute;
     right: 4px;
@@ -272,7 +317,10 @@
       text-decoration: none;
       margin-left: 4px;
       opacity: 0.8;
-      &:hover { opacity: 1; }
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 
