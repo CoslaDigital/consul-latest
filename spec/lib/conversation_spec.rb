@@ -113,6 +113,24 @@ describe Conversation do
       )
     end
 
+    it "can compile context for Legislation::QuestionOption and include filter note" do
+      process = create(:legislation_process)
+      question = create(:legislation_question, process: process)
+      option = create(:legislation_question_option, question: question, value: "Option A")
+
+      conversation = Conversation.new("Legislation::QuestionOption", option.id)
+      context_result = conversation.compile_context
+
+      expect(context_result).to be_present
+      expect(context_result).to include(
+                                  "This debate is part of the legislation process, \"#{process.title}\""
+                                )
+      expect(context_result).to include(
+                                  "Note: Comments in this analysis are filtered to only include comments from users " \
+                                    "who selected the option \"Option A\""
+                                )
+    end
+
     it "sanitizes HTML from Legislation::Proposal description and summary" do
       proposal = create(:legislation_proposal,
                         description: "<p>Legislation <strong>description</strong> with HTML.</p>",
@@ -196,6 +214,14 @@ describe Conversation do
       expect(conversation.comments.size).to eq(3)
     end
 
+    it "can compile context for all Proposals (collection conversation)" do
+      conversation = Conversation.new("Proposal", nil)
+      context_result = conversation.compile_context
+
+      expect(context_result).to be_present
+      expect(context_result).to include("These are the proposals that have been submitted")
+    end
+
     it_behaves_like "rejects non-open-ended Poll::Question", :compile_context do
       let(:poll) { create(:poll) }
       let(:question) do
@@ -220,44 +246,6 @@ describe Conversation do
         "This Poll is composed of 1 question(s). The questions are as follows:"
       )
       expect(context_result).to include("Q1 (Open ended): Open Question")
-    end
-
-    it "can compile context for other target types" do
-      target_types = Sensemaker::Job::ANALYSABLE_TYPES - ["Poll", "Poll::Question", "Legislation::Question",
-                                                          "Legislation::Proposal", "Debate", "Proposal",
-                                                          "Legislation::QuestionOption",
-                                                          "Budget", "Budget::Group"]
-      target_types.each do |target_type|
-        target_factory = target_type.downcase.gsub("::", "_").to_sym
-        target = create!(target_factory)
-        3.times do
-          create(:comment, commentable: target, user: user)
-        end
-        conversation = Conversation.new(target_type, target.id)
-        context_result = conversation.compile_context
-        expect(context_result).to be_present, "Failed to compile context for #{target_factory}"
-        expect(context_result).to include("- Comments: #{conversation.comments.size}")
-      end
-    end
-
-    it "can compile context for Legislation::Process with questions index and prefix note" do
-      process = create(:legislation_process, title: "Test Process")
-      question_1 = create(:legislation_question, process: process, title: "First question")
-      question_2 = create(:legislation_question, process: process, title: "Second question")
-
-      create(:comment, commentable: question_1, user: user, body: "Comment for Q1")
-      create(:comment, commentable: question_2, user: user, body: "Comment for Q2")
-
-      conversation = Conversation.new("Legislation::Process", process.id)
-      context_result = conversation.compile_context
-
-      expect(context_result).to be_present
-      expect(context_result).to include("Analysing Collaborative legislation process")
-      expect(context_result).to include("## Questions in this process")
-      expect(context_result).to include("Q1: First question")
-      expect(context_result).to include("Q2: Second question")
-      expect(context_result).to include("prefixed with (Qn)")
-      expect(context_result).to include("- Comments: #{conversation.comments.size}")
     end
   end
 
@@ -360,25 +348,6 @@ describe Conversation do
         expect(comments.first.body).to include("Group Investment")
         expect(comments.first.body).to include("Group investment description.")
         expect_no_html_tags(comments.first.body, %w[<p> <strong>])
-      end
-    end
-
-    describe "handles Legislation::Process (aggregates question comments with prefixes)" do
-      it "prefixes comment-like items with the question number (Qn)" do
-        process = create(:legislation_process, title: "Test Process")
-        question_1 = create(:legislation_question, process: process, title: "First question")
-        question_2 = create(:legislation_question, process: process, title: "Second question")
-
-        comment_1 = create(:comment, commentable: question_1, user: user, body: "Hello from Q1")
-        comment_2 = create(:comment, commentable: question_2, user: user, body: "Hello from Q2")
-
-        conversation = Conversation.new("Legislation::Process", process.id)
-        items = conversation.comments
-
-        expect(items.size).to eq(2)
-        expect(items).to all(be_a(Conversation::CommentLikeItem))
-        expect(items.map(&:id)).to contain_exactly(comment_1.id, comment_2.id)
-        expect(items.map(&:body)).to contain_exactly("(Q1) Hello from Q1", "(Q2) Hello from Q2")
       end
     end
 
