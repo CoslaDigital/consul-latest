@@ -12,6 +12,8 @@ module Admin
 
       # Public methods are accessible to the template
       def status_label_class(status)
+        return if status.blank?
+
         case status.to_sym
         when :fulfilled then "success"
         when :confirmed then "info"
