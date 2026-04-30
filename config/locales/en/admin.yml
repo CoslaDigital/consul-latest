@@ -703,6 +703,8 @@ en:
           back: Back
           id: Id
           supports: Total supports
+          draft: Draft
+          published: Published
         form:
           custom_categories: Categories
           custom_categories_description: Categories that users can select creating the proposal. Max 160 characteres.
