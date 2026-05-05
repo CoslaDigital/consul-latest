@@ -2,8 +2,9 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
+
 ## What's Changed
-## [2.4.1-local.2](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.2) (2026-5-5)
 
 ### Added
 * Add pexel image suggestions
