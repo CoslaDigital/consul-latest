@@ -1,3 +1,4 @@
+load Rails.root.join("app", "controllers", "comments_controller.rb")
 class CommentsController < ApplicationController
   include SettingsHelper
   include FlagActions
