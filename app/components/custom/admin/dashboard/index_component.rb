@@ -77,7 +77,7 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
       File.open(changelog_path, 'r') do |file|
         file.each_line.lazy.first(20).each do |line|
           cleaned_line = line.sub(/^\xEF\xBB\xBF/, '').strip
-          regex = /^##\s+\[(?<version>[^\]]+)\]\((?<url>[^)]+)\)\s+\((?<date>\d{4}-\d{2}-\d{2})\)/
+          regex = /^##\s+\[(?<version>[^\]]+)\]\((?<url>[^)]+)\)\s+\((?<date>\d{4}-\d{1,2}-\d{1,2})\)/
           match = cleaned_line.match(regex)
           return match if match
         end
