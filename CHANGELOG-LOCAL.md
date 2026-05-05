@@ -2,7 +2,31 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
+
 ## What's Changed
+
+### Added
+* Add pexel image suggestions
+* Milestones: Allow proposal owners to manage Milestones
+* Mutual Aid: Mutual Aid module in https://github.com/CoslaDigital/consul-latest/pull/150
+* Sentiment Analysis: Added Sentiment analysis to comments in Machine Learning code
+* Sensemaking: added experimental sensemaking code to analyse processes using AI
+* Security:  obfuscate usernames in comments 
+* Security: allow use of 2 Factor Authentication and add feature switch to force for admins
+* Feature: Add feature setting to restrict debate creation to Admin only
+* Feature: Give users ability to make documents private
+* Add user lock/unlock functionality to admin users index
+* Feature: add voter density auditing and spatial analysis for budget balloting
+### Changed
+* Display results on Admin poll results page
+* Replace python Machine Learning scripts with integrated ruby code using RubyLLM
+* Proposals: add published/draft to Admin view 
+### Fixed
+* restore custom proposals download
+*  make invalid geozone error user friendly
+
+**Full Changelog**: https://github.com/CoslaDigital/consul-latest/commits/v2.4.1-local.2
 
 ## [2.4.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.1) (2025-12-23)
 
