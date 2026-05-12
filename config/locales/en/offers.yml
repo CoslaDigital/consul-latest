@@ -16,6 +16,7 @@ en:
       orders_label: "Order by"
       section_header:
         title: "Mutual Aid - Offers of assistance"
+
     new:
       title: "Create an Offer"
       subtitle: "Offer your skills, time, or resources to help citizen proposals succeed."
@@ -64,6 +65,19 @@ en:
       active_count: "active collaborations"
       no_offers: "You haven't created any resource offers yet."
       inbound_requests: "Requests for my Proposals"
+      column:
+        resource: "Resource Title"
+        status: "Current Status"
+        stats: "Activity"
+        pending_requests_count:
+          one: "1 request pending"
+          other: "%{count} requests pending"
+        active_count: "Active"
+        completed_count: "Completed"
+  admin:
+    actions:
+      actions: "Actions"
+      edit: "Edit"
 
   proposal_matches:
     status:
@@ -74,10 +88,12 @@ en:
       withdrawn: "Cancelled"
       fulfilled: "Completed"
     accept:
+      button: "Accept"
       success: "Collaboration request accepted"
     confirm:
       success: "Collaboration confirmed successfully!"
     reject:
+      button: "Decline"
       success: "Collaboration rejected successfully!"
     fulfill:
       success: "Collaboration marked as completed! Thank you for supporting the community."
