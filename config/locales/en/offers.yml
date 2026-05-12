@@ -76,7 +76,9 @@ en:
     accept:
       success: "Collaboration request accepted"
     confirm:
-      success: "Collaboration is now officially active!"
+      success: "Collaboration confirmed successfully!"
+    reject:
+      success: "Collaboration rejected successfully!"
     fulfill:
       success: "Collaboration marked as completed! Thank you for supporting the community."
     error: "There was an error updating the collaboration."

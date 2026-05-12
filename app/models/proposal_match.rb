@@ -41,12 +41,12 @@ class ProposalMatch < ApplicationRecord
     false
   end
 
-  def notify_admin(action_type)
-    Mailer.proposal_match_admin_notification(self, action_type).deliver_later
+  def reject!
+    update!(status: :rejected, rejected_at: Time.current)
   end
 
-  def reject!
-    update(status: :rejected, rejected_at: Time.current)
+  def notify_admin(action_type)
+    Mailer.proposal_match_admin_notification(self, action_type).deliver_later
   end
 
   def notifiable_title

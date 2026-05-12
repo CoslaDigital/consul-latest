@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_13_105638) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1401,6 +1401,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_13_105638) do
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "rejected_at"
     t.index ["offer_id"], name: "index_proposal_matches_on_offer_id"
     t.index ["proposal_id", "offer_id"], name: "index_proposal_matches_on_proposal_id_and_offer_id", unique: true
     t.index ["proposal_id"], name: "index_proposal_matches_on_proposal_id"
