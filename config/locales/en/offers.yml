@@ -73,6 +73,8 @@ en:
       rejected: "Declined"
       withdrawn: "Cancelled"
       fulfilled: "Completed"
+    accept:
+      success: "Collaboration request accepted"
     confirm:
       success: "Collaboration is now officially active!"
     fulfill:
