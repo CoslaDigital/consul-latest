@@ -9,6 +9,7 @@ class ProposalMatch < ApplicationRecord
 
   validates :proposal_id, uniqueness: { scope: :offer_id, message: "Collaboration already requested" }
 
+  after_update :send_introduction_emails, if: :saved_change_to_confirmed?
   # Explicit lifecycle methods (The "Proposal#publish" approach)
 
   def accept!
@@ -56,4 +57,18 @@ class ProposalMatch < ApplicationRecord
     I18n.t("collaborations.notifications.new_match_body",
            offer_title: offer.title)
   end
+
+  private
+
+    def saved_change_to_confirmed?
+      saved_change_to_status? && status == "confirmed"
+    end
+
+    def send_introduction_emails
+      # Send to the Proposal Author
+      Mailer.collaboration_introduction(self, proposal.author).deliver_later
+
+      # Send to the Offer Author
+      Mailer.collaboration_introduction(self, offer.author).deliver_later
+    end
 end

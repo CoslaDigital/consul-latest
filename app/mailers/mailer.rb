@@ -224,6 +224,24 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def collaboration_introduction(match, recipient)
+    @match = match
+    @recipient = recipient
+    @proposal = match.proposal
+    @offer = match.offer
+
+    # The "Other Party" logic
+    @other_party = (recipient == @proposal.author) ? @offer.author : @proposal.author
+
+    I18n.with_locale(recipient.locale || I18n.default_locale) do
+      mail(
+        to: @recipient.email,
+        subject: t("mailers.collaboration_introduction.subject",
+                   title: @proposal.title)
+      )
+    end
+  end
+
   private
 
     def with_user(user, &)
