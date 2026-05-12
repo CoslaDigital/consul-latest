@@ -8,7 +8,7 @@ class ProposalMatch < ApplicationRecord
   enum :status, { pending: 0, accepted: 10, confirmed: 20, fulfilled: 30, rejected: 40 }
 
   validates :proposal_id, uniqueness: { scope: :offer_id, message: "Collaboration already requested" }
-
+  after_create :notify_provider_of_request
   after_update :send_introduction_emails, if: :saved_change_to_confirmed?
   # Explicit lifecycle methods (The "Proposal#publish" approach)
 
@@ -62,6 +62,10 @@ class ProposalMatch < ApplicationRecord
 
     def saved_change_to_confirmed?
       saved_change_to_status? && status == "confirmed"
+    end
+
+    def notify_provider_of_request
+      Mailer.collaboration_request_notification(self).deliver_later
     end
 
     def send_introduction_emails

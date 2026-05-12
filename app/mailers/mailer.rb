@@ -224,6 +224,21 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def collaboration_request_notification(match)
+    @match = match
+    @offer = match.offer
+    @proposal = match.proposal
+    @provider = @offer.author
+    @requester = @proposal.author
+
+    I18n.with_locale(@provider.locale || I18n.default_locale) do
+      mail(
+        to: @provider.email,
+        subject: t("mailers.collaboration_request.subject", requester_name: @requester.name)
+      )
+    end
+  end
+
   def collaboration_introduction(match, recipient)
     @match = match
     @recipient = recipient
