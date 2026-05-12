@@ -106,6 +106,13 @@ en:
       subject: "Machine Learning - Content has been generated successfully"
       text: "Content has been generated successfully."
       title: "Machine Learning script"
+    collaboration_introduction:
+      subject: "Introduction: Collaboration for %{title}"
+      title: "It's a Match!"
+      intro: "Great news! You are now connected with %{other_name} regarding the proposal '%{proposal_title}'."
+      contact_details: "You can now coordinate directly via email:"
+      summary_title: "Collaboration Summary"
+      next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"
