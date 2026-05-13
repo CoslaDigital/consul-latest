@@ -402,7 +402,7 @@
 
   .flex-between {
     @include flex-between;
-    button { margin-bottom: 0; }
+    button, .button { margin-bottom: 0; }
   }
   .flex-row { @include flex-row; }
   .fit-content { width: fit-content; }
