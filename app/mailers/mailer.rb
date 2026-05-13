@@ -245,10 +245,14 @@ class Mailer < ApplicationMailer
     @proposal = match.proposal
     @offer = match.offer
 
-    # The "Other Party" logic
-    @other_party = (recipient == @proposal.author) ? @offer.author : @proposal.author
+    # Compare IDs instead of the objects themselves
+    if @recipient.id == @proposal.author_id
+      @other_party = @offer.author
+    else
+      @other_party = @proposal.author
+    end
 
-    I18n.with_locale(recipient.locale || I18n.default_locale) do
+    I18n.with_locale(@recipient.locale || I18n.default_locale) do
       mail(
         to: @recipient.email,
         subject: t("mailers.collaboration_introduction.subject",
