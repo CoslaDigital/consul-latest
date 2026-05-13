@@ -245,16 +245,15 @@ class Mailer < ApplicationMailer
     @proposal = match.proposal
     @offer = match.offer
 
-    # 1. Use ID comparison (much more reliable)
-    # 2. Add '|| @proposal.author' as a safety net fallback
-    if @recipient.id == @proposal.author_id
-      @other_party = @offer.author
-    else
-      @other_party = @proposal.author || @offer.author
-    end
+    # Ensure associations are loaded to avoid nil during assignment
+    proposal_author = @proposal.author
+    offer_author = @offer.author
 
-    # Log an error if we still can't find the other person
-    Rails.logger.error "Mailer Error: Other party nil for Match #{match.id}" if @other_party.nil?
+    if @recipient.id == proposal_author.id
+      @other_party = offer_author
+    else
+      @other_party = proposal_author
+    end
 
     I18n.with_locale(@recipient.locale || I18n.default_locale) do
       mail(
