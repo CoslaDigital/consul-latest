@@ -245,18 +245,21 @@ class Mailer < ApplicationMailer
     @proposal = match.proposal
     @offer = match.offer
 
-    # Compare IDs instead of the objects themselves
+    # 1. Use ID comparison (much more reliable)
+    # 2. Add '|| @proposal.author' as a safety net fallback
     if @recipient.id == @proposal.author_id
       @other_party = @offer.author
     else
-      @other_party = @proposal.author
+      @other_party = @proposal.author || @offer.author
     end
+
+    # Log an error if we still can't find the other person
+    Rails.logger.error "Mailer Error: Other party nil for Match #{match.id}" if @other_party.nil?
 
     I18n.with_locale(@recipient.locale || I18n.default_locale) do
       mail(
         to: @recipient.email,
-        subject: t("mailers.collaboration_introduction.subject",
-                   title: @proposal.title)
+        subject: t("mailers.collaboration_introduction.subject", title: @proposal.title)
       )
     end
   end
