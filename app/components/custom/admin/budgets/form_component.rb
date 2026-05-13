@@ -6,33 +6,33 @@ class Admin::Budgets::FormComponent < ApplicationComponent
   include GlobalizeHelper
   include Admin::Namespace
 
-  use_helpers :custom_t
+  delegate :can?, :custom_t, to: :helpers
 
   attr_reader :budget, :wizard
   alias_method :wizard?, :wizard
-  
+
   VOTING_STYLES = {
     "budget"   => [["Knapsack", "knapsack"], ["Approval", "approval"]],
     "election" => [["Approval (for STV)", "approval"]]
   }.freeze
-  
+
   def initialize(budget, wizard: false)
     @budget = budget
     @wizard = wizard
   end
-  
+
   def voting_styles_for_js
     VOTING_STYLES.to_json
   end
-    
-   def kind_select_options
+
+  def kind_select_options
     Budget.kinds.keys.map do |kind|
       [kind.humanize, kind]
     end
   end
 
   def voting_styles_select_options
-    VOTING_STYLES[budget.kind] || []    
+    VOTING_STYLES[budget.kind] || []
   end
 
   def currency_symbol_select_options

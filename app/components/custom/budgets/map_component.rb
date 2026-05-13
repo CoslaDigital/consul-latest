@@ -4,8 +4,8 @@ load Rails.root.join("app","components","budgets","map_component.rb")
 
 class Budgets::MapComponent < ApplicationComponent
   delegate :render_map, to: :helpers
-  use_helpers :custom_t
-  
+  delegate :custom_t, to: :helpers
+
   attr_reader :budget
 
   def initialize(budget)

@@ -4,9 +4,8 @@ load Rails.root.join("app","components","budgets","investments_list_component.rb
 
 class Budgets::InvestmentsListComponent < ApplicationComponent
   attr_reader :budget
-  use_helpers :custom_t
-  
-  
+  delegate :custom_t, to: :helpers
+
   def initialize(budget)
     @budget = budget
   end

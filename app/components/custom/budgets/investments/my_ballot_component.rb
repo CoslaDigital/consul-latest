@@ -4,7 +4,7 @@ load Rails.root.join("app", "components", "budgets", "investments", "my_ballot_c
 
 class Budgets::Investments::MyBallotComponent < ApplicationComponent
   attr_reader :ballot, :heading, :investment_ids, :assigned_heading
-  use_helpers :can?, :heading_link, :custom_t
+  delegate :can?, :heading_link, :custom_t, to: :helpers
 
   def initialize(ballot:, heading:, investment_ids:, assigned_heading: nil)
     @ballot = ballot
@@ -28,9 +28,9 @@ class Budgets::Investments::MyBallotComponent < ApplicationComponent
        ballot.investments
             .where(budget_ballot_lines: { heading_id: heading.id })
             .order("budget_ballot_lines.position ASC")
- 
+
     end
-    
+
     def voting_style_name
       ballot.voting_style.name
     end

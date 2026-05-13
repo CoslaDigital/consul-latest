@@ -964,6 +964,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts-as-taggable-on (~> 13.0.0)
+  acts_as_list
   acts_as_votable (~> 0.14.0)
   ahoy_matey (~> 5.4.1)
   airbrake (~> 13.0.5)

@@ -4,8 +4,8 @@ load Rails.root.join("app","components","budgets","ballot", "ballot_component.rb
 
 class Budgets::Ballot::BallotComponent < ApplicationComponent
   attr_reader :ballot
-  use_helpers :custom_t
-  
+  delegate :custom_t, to: :helpers
+
   def initialize(ballot)
     @ballot = ballot
   end

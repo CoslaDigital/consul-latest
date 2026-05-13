@@ -4,9 +4,8 @@ load Rails.root.join("app","components","admin","budgets","links_component.rb")
 
 class Admin::Budgets::LinksComponent < ApplicationComponent
   attr_reader :budget
-  use_helpers :can?
-  use_helpers :custom_t
-  
+  delegate :can?, :custom_t, to: :helpers
+
   def initialize(budget)
     @budget = budget
   end

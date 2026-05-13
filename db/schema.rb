@@ -433,9 +433,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.string "voting_style", default: "knapsack"
     t.boolean "published"
     t.boolean "hide_money", default: false
+    t.boolean "part_fund"
     t.boolean "stv"
     t.integer "stv_winners"
-    t.boolean "part_fund"
     t.boolean "stv_dynamic_quota"
     t.string "kind", default: "budget", null: false
   end
@@ -2007,7 +2007,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
   add_foreign_key "process_managers", "users"
   add_foreign_key "proposal_matches", "offers"
   add_foreign_key "proposal_matches", "proposals"
-  add_foreign_key "process_managers", "users"
   add_foreign_key "proposals", "communities"
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"

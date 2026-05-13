@@ -23,7 +23,6 @@ module Abilities
       can :read_executions, Budget, phase: "finished"
       can :read, Budget::Question, is_private: false
       can :read, Budget::Investment::Answer, budget_question: { is_private: false }
-      can [:read, :debate, :draft_publication, :allegations, :result_publication,
       can [:index, :read, :debate, :draft_publication, :allegations, :result_publication,
            :proposals, :milestones], Legislation::Process, published: true
 

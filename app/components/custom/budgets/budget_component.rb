@@ -1,9 +1,8 @@
 Rails.root.join("app","components","budegets","budget_component.rb")
 class Budgets::BudgetComponent < ApplicationComponent
   attr_reader :budget
-  use_helpers :attached_background_css
-  use_helpers :custom_t
-  
+  delegate :attached_background_css, :custom_t, to: :helpers
+
   def initialize(budget)
     @budget = budget
   end

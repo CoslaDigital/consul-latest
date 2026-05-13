@@ -86,58 +86,58 @@
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) do %>
         <%= render Images::SuggestImagesComponent.new(f) %>
+      <% end %>
     <% end %>
-<% end %>
 
-<% if feature?(:allow_attached_documents) %>
-  <%= render Documents::NestedComponent.new(f) %>
-<% end %>
-
-<% if feature?(:map) %>
-  <div>
-    <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
-  </div>
-<% end %>
-
-<div id="location">
-  <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
-</div>
-
-<div id="org_name">
-  <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
-</div>
-
-<div id="tags">
-  <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
-  <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
-
-  <div id="category_tags" class="tags">
-    <%= f.label :category_tag_list, t("budgets.investments.form.tag_category_label") %>
-    <% categories.each do |tag| %>
-      <a class="js-add-tag-link"><%= tag.name %></a>
+    <% if feature?(:allow_attached_documents) %>
+      <%= render Documents::NestedComponent.new(f) %>
     <% end %>
-  </div>
 
-  <br>
-  <%= f.text_field :tag_list, value: investment.tag_list.to_s,
-                   label: false,
-                   placeholder: t("budgets.investments.form.tags_placeholder"),
-                   aria: { describedby: "tags-list-help-text" },
-                   class: "js-tag-list tag-autocomplete",
-                   data: { js_url: suggest_tags_path } %>
-</div>
+    <% if feature?(:map) %>
+      <div>
+        <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
+      </div>
+    <% end %>
 
-<%= render SDG::RelatedListSelectorComponent.new(f) %>
-</fieldset>
-
-<div class="actions">
-  <% unless current_user.manager? || investment.persisted? %>
-    <div>
-      <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+    <div id="location">
+      <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
-  <% end %>
-  <p>I confirm that I have read, understand and agree to the application criteria and have all relevant policies and
-    processes in place.</p>
-  <%= f.submit t("budgets.investments.form.submit_button") %>
-</div>
+
+    <div id="org_name">
+      <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
+    </div>
+
+    <div id="tags">
+      <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
+      <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
+
+      <div id="category_tags" class="tags">
+        <%= f.label :category_tag_list, t("budgets.investments.form.tag_category_label") %>
+        <% categories.each do |tag| %>
+          <a class="js-add-tag-link"><%= tag.name %></a>
+        <% end %>
+      </div>
+
+      <br>
+      <%= f.text_field :tag_list, value: investment.tag_list.to_s,
+                       label: false,
+                       placeholder: t("budgets.investments.form.tags_placeholder"),
+                       aria: { describedby: "tags-list-help-text" },
+                       class: "js-tag-list tag-autocomplete",
+                       data: { js_url: suggest_tags_path } %>
+    </div>
+
+    <%= render SDG::RelatedListSelectorComponent.new(f) %>
+  </fieldset>
+
+  <div class="actions">
+    <% unless current_user.manager? || investment.persisted? %>
+      <div>
+        <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+      </div>
+    <% end %>
+    <p>I confirm that I have read, understand and agree to the application criteria and have all relevant policies and
+      processes in place.</p>
+    <%= f.submit t("budgets.investments.form.submit_button") %>
+  </div>
 <% end %>

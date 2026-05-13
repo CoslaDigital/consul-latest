@@ -5,7 +5,6 @@ class Budget
                         ballot_lines_count: "ballot_lines_count" }.freeze
 
     include Measurable
-    include Sanitizable
     include Taggable
     include Searchable
     include Reclassification
