@@ -245,21 +245,14 @@ class Mailer < ApplicationMailer
     @proposal = match.proposal
     @offer = match.offer
 
-    # Ensure associations are loaded to avoid nil during assignment
-    proposal_author = @proposal.author
-    offer_author = @offer.author
+    # Set @email_to to satisfy the prevent_delivery filter
+    @email_to = recipient.email
 
-    if @recipient.id == proposal_author.id
-      @other_party = offer_author
-    else
-      @other_party = proposal_author
-    end
+    # Determine other party
+    @other_party = (recipient.id == @proposal.author_id) ? @offer.author : @proposal.author
 
-    I18n.with_locale(@recipient.locale || I18n.default_locale) do
-      mail(
-        to: @recipient.email,
-        subject: t("mailers.collaboration_introduction.subject", title: @proposal.title)
-      )
+    with_user(recipient) do
+      mail(to: @email_to, subject: t("mailers.collaboration_introduction.subject", title: @proposal.title))
     end
   end
 

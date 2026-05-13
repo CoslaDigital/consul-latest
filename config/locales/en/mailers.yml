@@ -114,8 +114,12 @@ en:
       summary_title: "Collaboration Summary"
       next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
     collaboration_request:
-      subject: "New Collaboration Request from %{requester_name}"
-      title: "Someone needs your help!"
+      subject: "Someone wants to collaborate on %{requester_name}'s project"
+      hi: "Hi %{name},"
+      main_text: "%{requester_name} has requested your help for their project '%{proposal_title}'"
+      action_text: "You can review this request and accept or decline it from your dashboard."
+      button: "Go to my dashboard"
+      footer_text: "Thank you for participating in the Mutual Aid network!"
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"
