@@ -69,11 +69,16 @@ en:
         resource: "Resource Title"
         status: "Current Status"
         stats: "Activity"
+        pending_requests: "Pending Requests"
         pending_requests_count:
           one: "1 request pending"
           other: "%{count} requests pending"
         active_count: "Active"
         completed_count: "Completed"
+      no_inbound: "No current offers of help"
+      completed_count: "Completed"
+      no_pending_requests: "No Pending Requests"
+      for_project: "For project"
   admin:
     actions:
       actions: "Actions"

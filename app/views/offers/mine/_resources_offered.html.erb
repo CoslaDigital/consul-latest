@@ -1,83 +1,82 @@
-<% if offers.any? %>
-  <table class="offers-table table-fixed margin-top">
-    <thead>
-    <tr>
-      <th width="25%"><%= t("offers.mine.column.resource") %></th>
-      <th width="45%"><%= t("offers.mine.column.pending_actions") %></th>
-      <th width="15%"><%= t("offers.mine.column.stats") %></th>
-      <th width="15%" class="text-right"><%= t("admin.actions.actions") %></th>
-    </tr>
-    </thead>
-    <tbody>
-    <% offers.each do |offer| %>
-      <tr id="<%= dom_id(offer) %>" class="offer-row <%= 'has-pending' if offer.proposal_matches.pending.any? %>">
+<%# app/views/offers/_mine.html.erb %>
 
-        <%# 1. Resource Information %>
-        <td class="vertical-top">
-            <span class="label <%= status_label_class(offer.status) %> margin-bottom-s">
-              <%= t("offers.status.#{offer.status}") %>
-            </span>
-          <br>
-          <strong><%= link_to offer.title, offer %></strong>
-        </td>
-
-        <%# 2. Requests Area %>
-        <td class="vertical-top">
-          <% if offer.proposal_matches.pending.any? %>
-            <% offer.proposal_matches.pending.each do |match| %>
-              <div class="collaboration-request-item padding-bottom-s margin-bottom-s border-bottom">
-                <div class="row collapse">
-                  <div class="small-12 columns">
-                    <i class="fa fa-user-circle text-muted"></i>
-                    <strong><%= match.proposal.author.name %></strong>
-                  </div>
-                  <div class="small-12 columns margin-top-s">
-                    <span class="help-text"><%= t("offers.mine.for_project") %></span>
-                    <%= link_to match.proposal.title, match.proposal, class: "small" %>
-                  </div>
-                  <div class="small-12 columns margin-top-s">
-                    <div class="button-group no-margin">
-                      <%= button_to accept_proposal_match_path(match), method: :patch,
-                                    class: "button success tiny no-margin" do %>
-                        <i class="fa fa-check"></i> <%= t("proposal_matches.accept.button") %>
-                      <% end %>
-                      <%= button_to reject_proposal_match_path(match), method: :patch,
-                                    class: "button alert hollow tiny no-margin" do %>
-                        <i class="fa fa-times"></i> <%= t("proposal_matches.reject.button") %>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          <% else %>
-            <span class="text-muted small"><em><%= t("offers.mine.no_pending_requests") %></em></span>
-          <% end %>
-        </td>
-
-        <%# 3. Stats Column %>
-        <td class="vertical-top small">
-          <div class="stat-item">
-            <i class="fa fa-handshake-o"></i> <%= offer.proposal_matches.confirmed.count %> <%= t("offers.mine.active_count") %>
-          </div>
-          <div class="stat-item">
-            <i class="fa fa-check-square-o"></i> <%= offer.proposal_matches.fulfilled.count %> <%= t("offers.mine.completed_count") %>
-          </div>
-        </td>
-
-        <%# 4. Global Actions - Now Styled to match %>
-        <td class="text-right vertical-top">
-          <%# Used 'hollow secondary tiny' to match the Accept/Decline button scale %>
-          <%= link_to edit_offer_path(offer), class: "button hollow secondary tiny no-margin" do %>
-            <i class="fa fa-pencil"></i> <%= t("admin.actions.edit") %>
-          <% end %>
-        </td>
+<div class="admin">
+  <% if offers.any? %>
+    <table>
+      <thead>
+      <tr>
+        <th scope="col"><%= t("offers.mine.column.resource") %></th>
+        <th scope="col"><%= t("offers.mine.column.pending_requests") %></th>
+        <th scope="col"><%= t("offers.mine.column.stats") %></th>
+        <th scope="col" class="text-center"><%= t("offers.mine.column.status") %></th>
+        <th scope="col" class="text-center"><%= t("admin.actions.actions") %></th>
       </tr>
-    <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <div class="callout primary">
-    <%= t("offers.mine.no_offers") %>
-  </div>
-<% end %>
+      </thead>
+      <tbody>
+      <% offers.each do |offer| %>
+        <tr id="<%= dom_id(offer) %>" class="offer-row <%= 'has-pending' if offer.proposal_matches.pending.any? %>">
+
+          <%# 1. Resource Information %>
+          <td>
+            <strong><%= link_to offer.title, offer %></strong>
+          </td>
+
+          <%# 2. Requests Area %>
+          <td>
+            <% if offer.proposal_matches.pending.any? %>
+              <% offer.proposal_matches.pending.each do |match| %>
+                <div class="collaboration-request-info padding-bottom-s margin-bottom-s border-bottom">
+                  <i class="fa fa-user-circle text-muted"></i>
+                  <strong><%= match.proposal.author.name %></strong>
+                  <br>
+                  <span class="help-text text-muted small"><%= t("offers.mine.for_project") %></span>
+                  <%= link_to match.proposal.title, match.proposal, class: "small" %>
+                </div>
+              <% end %>
+            <% else %>
+              <span class="text-muted small"><em><%= t("offers.mine.no_pending_requests") %></em></span>
+            <% end %>
+          </td>
+
+          <%# 3. Stats Column %>
+          <td class="small">
+            <div class="stat-item">
+              <i class="fa fa-handshake-o"></i> <%= offer.proposal_matches.confirmed.count %> <%= t("offers.mine.active_count") %>
+            </div>
+            <div class="stat-item">
+              <i class="fa fa-check-square-o"></i> <%= offer.proposal_matches.fulfilled.count %> <%= t("offers.mine.completed_count") %>
+            </div>
+          </td>
+
+          <%# 4. Status Column %>
+          <td class="text-center">
+              <span class="label <%= status_label_class(offer.status) %>">
+                <%= t("offers.status.#{offer.status}") %>
+              </span>
+          </td>
+
+          <%# 5. Actions Column %>
+          <td class="text-center">
+            <% if offer.proposal_matches.pending.any? %>
+              <% offer.proposal_matches.pending.each do |match| %>
+                <%= render Admin::TableActionsComponent.new(match,
+                                                            actions: [:accept, :reject, :edit],
+                                                            accept_path: accept_proposal_match_path(match),
+                                                            reject_path: reject_proposal_match_path(match),
+                                                            edit_path: edit_offer_path(offer)
+                ) %>
+              <% end %>
+            <% else %>
+              <%= render Admin::TableActionsComponent.new(offer, actions: [:edit], edit_path: edit_offer_path(offer)) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="callout primary">
+      <p><%= t("offers.mine.no_offers") %></p>
+    </div>
+  <% end %>
+</div>

@@ -58,6 +58,10 @@ class ProposalMatch < ApplicationRecord
            offer_title: offer.title)
   end
 
+  def human_name
+    proposal.title
+  end
+
   private
 
     def saved_change_to_confirmed?

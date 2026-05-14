@@ -1,0 +1,20 @@
+<div class="table-actions">
+  <%# 1. Render custom buttons passed into the component block %>
+  <%= content %>
+
+  <%# 2. Render standard Edit action if specified in the 'actions' array %>
+  <% if actions.include?(:edit) %>
+    <%= action(:edit,
+               **edit_options,
+               text: edit_text,
+               path: edit_path) %>
+  <% end %>
+
+  <%# 3. Render standard Destroy action if specified %>
+  <% if actions.include?(:destroy) %>
+    <%= action(:destroy,
+               **destroy_options,
+               text: destroy_text,
+               path: destroy_path) %>
+  <% end %>
+</div>

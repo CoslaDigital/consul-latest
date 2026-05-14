@@ -21,6 +21,10 @@ en:
       select: Select
       show_to_valuators: "Show %{name} to valuators"
       mark_as_winner: "Mark as winner"
+      accept: "Accept"
+      reject: "Decline"
+      confirm: "Confirm"
+      fulfill: "Complete"
     officing_booth:
       title: "You are officing the booth located at %{booth}. If this is not correct, do not continue and call the help phone number. Thank you."
     banners:
