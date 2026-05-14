@@ -1,9 +1,13 @@
 class Proposals::CollaborationComponent < ApplicationComponent
   attr_reader :proposal, :current_user
-
+  delegate :status_label_class, :dom_id, to: :helpers
   def initialize(proposal, current_user)
     @proposal = proposal
     @current_user = current_user
+  end
+
+  def author?
+    @current_user == @proposal.author
   end
 
   def render?
