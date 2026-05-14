@@ -127,7 +127,7 @@
 </fieldset>
 
 <div class="actions">
-  <% unless current_user.manager? || investment.persisted? %>
+  <% unless investment.persisted? %>
     <div>
       <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
     </div>
