@@ -13,4 +13,8 @@ class Shared::AgreeWithTermsOfServiceFieldComponent < ApplicationComponent
         policy: new_window_link_to(t("form.policy"), "/privacy"),
         conditions: new_window_link_to(t("form.conditions"), "/conditions"))
     end
+
+    def rider
+      "I confirm that I have read, understand and agree to the application criteria and have all relevant policies and processes in place."
+    end
 end

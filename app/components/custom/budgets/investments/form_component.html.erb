@@ -6,8 +6,10 @@
     <legend><%= t("shared.required") %></legend>
 
     <% unless budget.single_heading? %>
-      <div>
-        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: custom_t("budgets.investments.form.heading_note"), class: "html-area" } %>
+      <div id="heading-selection">
+        <%= f.label :heading_id %>
+        <p class="help-text"><%= t("budgets.investments.form.heading_note") %></p>
+        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, label: false }, { class: "js-heading-select" } %>
       </div>
     <% end %>
 
@@ -46,17 +48,15 @@
         </div>
       <% end %>
     <% end %>
-    <%= f.fields_for :answers do |builder| %>
-      <%# Get the corresponding question for this answer %>
-      <% budget_question = budget.questions.order(:id)[builder.index] %>
-      <% if budget_question.enabled? %>
-        <%# Conditionally add "(Private)" to the label text %>
-        <% label_text = budget_question.text %>
-        <% if budget_question.is_private? %>
-          <% label_text += " (#{t("budgets.investments.form.private", default: "Private")})" %>
-        <% end %>
 
-        <p>
+    <%# Dynamic Questions Section %>
+    <%= f.fields_for :answers do |builder| %>
+      <% budget_question = budget.questions.order(:id)[builder.index] %>
+      <% if budget_question&.enabled? %>
+        <% label_text = budget_question.text %>
+        <% label_text += " (#{t("budgets.investments.form.private", default: "Private")})" if budget_question.is_private? %>
+
+        <div>
           <%= builder.text_area :text,
                                 label: label_text,
                                 rows: 5,
@@ -65,10 +65,10 @@
           <%= builder.hidden_field :budget_id %>
           <%= builder.hidden_field :budget_question_id %>
 
-          <% if investment.errors[:answers].count > 0 && params[:budget_investment][:answers_attributes][builder.index.to_s][:text].strip == "" %>
+          <% if investment.errors[:answers].count > 0 && params.dig(:budget_investment, :answers_attributes, builder.index.to_s, :text).blank? %>
             <span class="form-error is-visible"><%= t("custom.errors.no_answer") %></span>
           <% end %>
-        </p>
+        </div>
       <% end %>
     <% end %>
   </fieldset>
