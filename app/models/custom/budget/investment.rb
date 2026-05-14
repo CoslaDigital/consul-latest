@@ -21,11 +21,6 @@ class Budget
                                      .where(is_mandatory: true, enabled: true)
                                      .pluck(:id)
 
-  # --- BEGIN DEBUG ---
-      Rails.logger.debug "--- Validating all_answers for Investment ID: #{id || "new"} ---"
-      Rails.logger.debug "Mandatory Question IDs for Budget ID #{budget.id}: #{mandatory_question_ids}"
-  # --- END DEBUG ---
-
   # 2. Count the answers currently in memory that are for a mandatory question
   #    and have non-blank text. This avoids querying the database for unsaved records.
       answered_mandatory_count = answers.count do |answer|
@@ -36,14 +31,6 @@ class Budget
         mandatory_question_ids.include?(answer.budget_question_id)
       end
 
-  # --- BEGIN DEBUG ---
-      Rails.logger.debug "In-memory answers being considered: #{answers.map do |a|
-        a.attributes.slice("budget_question_id", "text")
-      end}"
-      Rails.logger.debug "Count of valid in-memory answers for mandatory questions: #{answered_mandatory_count}"
-      result = (answered_mandatory_count == mandatory_question_ids.count)
-      Rails.logger.debug "Comparison Result: #{answered_mandatory_count} == #{mandatory_question_ids.count} is #{result}"
-  # --- END DEBUG ---
 
   # 3. The validation passes if the counts are equal.
       result

@@ -6,8 +6,10 @@
     <legend><%= t("shared.required") %></legend>
 
     <% unless budget.single_heading? %>
-      <div>
-        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, hint: t("budgets.investments.form.heading_note"), class: "html-area" } %>
+      <div id="heading-selection">
+        <%= f.label :heading_id %>
+        <p class="help-text"><%= t("budgets.investments.form.heading_note") %></p>
+        <%= f.select :heading_id, budget_heading_select_options(budget), { include_blank: true, label: false }, { class: "js-heading-select" } %>
       </div>
     <% end %>
 
@@ -23,7 +25,9 @@
                                          data: suggest_data(investment) %>
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
+
       <div>
+        <%# If summary is translatable, change 'f' to 'translations_form' below %>
         <%= f.text_area :summary,
                         label: t("budgets.investments.form.summary"),
                         rows: 4, maxlength: 500,
@@ -36,23 +40,16 @@
                                         maxlength: Budget::Investment.description_max_length,
                                         class: "html-area" %>
       </div>
-      <div>
-        <h2> Estimated Cost of Project </h2>
-        <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
-      </div>
-
     <% end %>
-    <%= f.fields_for :answers do |builder| %>
-      <%# Get the corresponding question for this answer %>
-      <% budget_question = budget.questions.order(:id)[builder.index] %>
-      <% if budget_question.enabled? %>
-        <%# Conditionally add "(Private)" to the label text %>
-        <% label_text = budget_question.text %>
-        <% if budget_question.is_private? %>
-          <% label_text += " (#{t("budgets.investments.form.private", default: "Private")})" %>
-        <% end %>
 
-        <p>
+    <%# Dynamic Questions Section %>
+    <%= f.fields_for :answers do |builder| %>
+      <% budget_question = budget.questions.order(:id)[builder.index] %>
+      <% if budget_question&.enabled? %>
+        <% label_text = budget_question.text %>
+        <% label_text += " (#{t("budgets.investments.form.private", default: "Private")})" if budget_question.is_private? %>
+
+        <div>
           <%= builder.text_area :text,
                                 label: label_text,
                                 rows: 5,
@@ -61,10 +58,10 @@
           <%= builder.hidden_field :budget_id %>
           <%= builder.hidden_field :budget_question_id %>
 
-          <% if investment.errors[:answers].count > 0 && params[:budget_investment][:answers_attributes][builder.index.to_s][:text].strip == "" %>
+          <% if investment.errors[:answers].count > 0 && params.dig(:budget_investment, :answers_attributes, builder.index.to_s, :text).blank? %>
             <span class="form-error is-visible"><%= t("custom.errors.no_answer") %></span>
           <% end %>
-        </p>
+        </div>
       <% end %>
     <% end %>
   </fieldset>
@@ -74,7 +71,15 @@
   <fieldset>
     <legend><%= t("shared.optional") %></legend>
     <p class="help-text"><%= t("shared.optional_note") %></p>
-    <br>
+
+    <%# Moved Estimated Cost Here %>
+    <div id="estimated_cost">
+      <h2><%= t("budgets.investments.form.estimated_cost_title") %></h2>
+      <%= f.number_field :estimated_price,
+                         label: t("budgets.investments.form.estimated_price_label", default: "Estimated Price"),
+                         hint: t("budgets.investments.form.estimated_price_note") %>
+    </div>
+
     <div id="video_url">
       <%= f.text_field :video_url, hint: t("proposals.form.proposal_video_url_note") %>
     </div>
@@ -82,58 +87,58 @@
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) do %>
         <%= render Images::SuggestImagesComponent.new(f) %>
+      <% end %>
     <% end %>
-<% end %>
 
-<% if feature?(:allow_attached_documents) %>
-  <%= render Documents::NestedComponent.new(f) %>
-<% end %>
-
-<% if feature?(:map) %>
-  <div>
-    <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
-  </div>
-<% end %>
-
-<div id="location">
-  <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
-</div>
-
-<div id="org_name">
-  <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
-</div>
-
-<div id="tags">
-  <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
-  <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
-
-  <div id="category_tags" class="tags">
-    <%= f.label :category_tag_list, t("budgets.investments.form.tag_category_label") %>
-    <% categories.each do |tag| %>
-      <a class="js-add-tag-link"><%= tag.name %></a>
+    <% if feature?(:allow_attached_documents) %>
+      <%= render Documents::NestedComponent.new(f) %>
     <% end %>
-  </div>
 
-  <br>
-  <%= f.text_field :tag_list, value: investment.tag_list.to_s,
-                   label: false,
-                   placeholder: t("budgets.investments.form.tags_placeholder"),
-                   aria: { describedby: "tags-list-help-text" },
-                   class: "js-tag-list tag-autocomplete",
-                   data: { js_url: suggest_tags_path } %>
-</div>
+    <% if feature?(:map) %>
+      <div>
+        <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
+      </div>
+    <% end %>
 
-<%= render SDG::RelatedListSelectorComponent.new(f) %>
-</fieldset>
-
-<div class="actions">
-  <% unless investment.persisted? %>
-    <div>
-      <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+    <div id="location">
+      <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
-  <% end %>
-  <p>I confirm that I have read, understand and agree to the application criteria and have all relevant policies and
-    processes in place.</p>
-  <%= f.submit t("budgets.investments.form.submit_button") %>
-</div>
+
+    <div id="org_name">
+      <%= f.text_field :organization_name, hint: t("budgets.investments.form.organization_name_note") %>
+    </div>
+
+    <div id="tags">
+      <%= f.label :tag_list, t("budgets.investments.form.tags_label") %>
+      <p class="help-text" id="tags-list-help-text"><%= t("budgets.investments.form.tags_instructions") %></p>
+
+      <div id="category_tags" class="tags">
+        <%= f.label :category_tag_list, t("budgets.investments.form.tag_category_label") %>
+        <% categories.each do |tag| %>
+          <a class="js-add-tag-link"><%= tag.name %></a>
+        <% end %>
+      </div>
+
+      <br>
+      <%= f.text_field :tag_list, value: investment.tag_list.to_s,
+                       label: false,
+                       placeholder: t("budgets.investments.form.tags_placeholder"),
+                       aria: { describedby: "tags-list-help-text" },
+                       class: "js-tag-list tag-autocomplete",
+                       data: { js_url: suggest_tags_path } %>
+    </div>
+
+    <%= render SDG::RelatedListSelectorComponent.new(f) %>
+  </fieldset>
+
+  <div class="actions">
+    <% unless investment.persisted? %>
+      <div class="terms-check">
+        <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
+
+      </div>
+    <% end %>
+
+    <%= f.submit t("budgets.investments.form.submit_button"), class: "button success" %>
+  </div>
 <% end %>
