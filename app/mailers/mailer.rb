@@ -231,9 +231,12 @@ class Mailer < ApplicationMailer
     @provider = @offer.author
     @requester = @proposal.author
 
-    I18n.with_locale(@provider.locale || I18n.default_locale) do
+    # CRITICAL: Set this so the prevent_delivery filter doesn't kill the email
+    @email_to = @provider.email
+
+    with_user(@provider) do
       mail(
-        to: @provider.email,
+        to: @email_to,
         subject: t("mailers.collaboration_request.subject", requester_name: @requester.name)
       )
     end
