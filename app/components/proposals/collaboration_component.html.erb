@@ -1,85 +1,14 @@
-<%# app/components/proposals/collaboration_component.html.erb %>
-
-<div class="collaboration-status-sidebar admin" style="overflow: hidden;">
+<div class="collaboration-status-sidebar admin" style="display: block; clear: both; position: relative; width: 100%;">
   <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status") %></h2>
 
-  <%# 1. SUCCESS STORIES %>
-  <% if @proposal.proposal_matches.fulfilled.any? %>
-    <details class="margin-bottom padding-bottom-s border-bottom">
-      <summary class="small" style="cursor: pointer;"><%= t("proposals.show.successful_collabs_count") %>
-        (<%= @proposal.proposal_matches.fulfilled.count %>)
-      </summary>
-      <div class="padding-top-s">
-        <% @proposal.proposal_matches.fulfilled.each do |match| %>
-          <p class="small margin-bottom-0"><strong><%= match.offer.title %></strong></p>
-        <% end %>
-      </div>
-    </details>
-  <% end %>
+  <%# 1. Success History (Static List) %>
+  <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
 
-  <%# 2. ACTIVE WORK (Combined Finalizing & Confirmed) %>
-  <div class="active-collaboration-section">
-    <% if author? %>
-      <%# AUTHOR VIEW: Show Actionable items %>
-      <% if @proposal.proposal_matches.confirmed.any? || @proposal.proposal_matches.accepted.any? %>
-        <div class="callout primary tiny">
-          <% @proposal.proposal_matches.accepted.each do |match| %>
-            <div class="text-center margin-bottom-s">
-              <p class="small">Finalize with <strong><%= match.offer.author.name %></strong></p>
-              <%= render Admin::TableActionsComponent.new(match, actions: [:confirm], confirm_path: confirm_proposal_match_path(match)) %>
-            </div>
-          <% end %>
-          <% @proposal.proposal_matches.confirmed.each do |match| %>
-            <div class="text-center">
-              <p class="small">Active: <strong><%= match.offer.author.name %></strong></p>
-              <%= render Admin::TableActionsComponent.new(match, actions: [:fulfill], fulfill_path: fulfill_proposal_match_path(match)) %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-    <% else %>
-      <%# VISITOR VIEW: Single "Finalizing" message %>
-      <% if @proposal.proposal_matches.accepted.any? %>
-        <div class="text-center padding-bottom-m">
-          <% @proposal.proposal_matches.accepted.each do |match| %>
-            <p class="margin-bottom-0">
-              <i class="fa fa-hourglass-half text-warning"></i>
-              <%= t("proposals.show.finalizing_with") %> <strong><%= match.offer.author.name %></strong>
-            </p>
-          <% end %>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
+  <%# 2. Active Tasks (Author vs Visitor logic) %>
+  <%= render Proposals::Collaboration::ActiveTasksComponent.new(@proposal, @current_user) %>
 
-  <%# 3. VISITOR SPECIFIC SECTION %>
-  <% if @current_user && !author? %>
-    <hr class="margin-top-m margin-bottom-m">
+  <%# 3. Visitor Action (The form or the status badge) %>
+  <%= render Proposals::Collaboration::VisitorActionComponent.new(@proposal, @current_user) %>
 
-    <div class="visitor-meta text-center" style="display: block; clear: both;">
-      <% user_match = @proposal.proposal_matches.where(offer_id: @current_user.offers.pluck(:id)).first %>
-
-      <% if user_match %>
-        <p class="margin-bottom-s"><%= t("proposals.show.your_link_status") %></p>
-
-        <%# No flex wrapper here, just a standard centered div to prevent overlap %>
-        <div class="status-badge-container margin-bottom-m">
-          <span class="label <%= status_label_class(user_match.status) %>" style="display: inline-block; padding: 0.6rem 1rem;">
-            <%= t("proposal_matches.status.#{user_match.status}") %>
-          </span>
-        </div>
-
-      <% elsif @current_user.offers.active.any? %>
-        <h3 class="sidebar-title"><%= t("proposals.show.offer_help_title") %></h3>
-        <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
-          <%= f.hidden_field :proposal_id, value: @proposal.id %>
-          <%= f.collection_select :offer_id, @current_user.offers.active, :id, :title, {}, class: "full-width margin-bottom" %>
-          <%= f.submit t("proposals.show.propose_button"), class: "button success expanded small" %>
-        <% end %>
-      <% end %>
-    </div>
-  <% end %>
-
-  <%# Guard rail to stop any CSS bleeding %>
-  <div style="clear: both; margin-bottom: 2rem;"></div>
+  <div style="clear: both; height: 1px;"></div>
 </div>

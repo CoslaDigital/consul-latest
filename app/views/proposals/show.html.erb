@@ -71,12 +71,12 @@
                   <%= t("proposals.show.budget_investment_link") %>
               <% end %>
 
-              <%= render Proposals::CollaborationComponent.new(@proposal, current_user) %>
-
             </div>
           <% end %>
 
           <%= render "proposals/support_status", proposal: @proposal %>
+
+          <%= render Proposals::CollaborationComponent.new(@proposal, current_user) %>
 
           <%= render "proposals/social_share", proposal: @proposal, share_title: t("proposals.show.share") %>
 

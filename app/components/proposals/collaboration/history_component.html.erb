@@ -1,0 +1,20 @@
+<% if @proposal.proposal_matches.fulfilled.any? %>
+  <div class="collaboration-history margin-bottom-l">
+    <h3 class="sidebar-title">
+      <i class="fa fa-certificate text-success"></i> <%= t("proposals.show.fulfilled_collabs") %>
+    </h3>
+
+    <ul class="no-bullet margin-bottom-0">
+      <% @proposal.proposal_matches.fulfilled.each do |match| %>
+        <li class="margin-bottom-s border-bottom padding-bottom-s">
+          <p class="small margin-bottom-0">
+            <strong><%= match.offer.title %></strong>
+          </p>
+          <small class="text-muted">
+            <%= t("proposals.show.supported_by") %> <%= match.offer.author.name %>
+          </small>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
