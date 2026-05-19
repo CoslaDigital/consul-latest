@@ -28,4 +28,4 @@ gem 'simple_calendar', '~>2.4', '>= 2.4.3'
 gem "devise-two-factor", "~> 6.1"
 gem "rqrcode", "~> 2.0"
 gem "faker"
-gem 'acts_as_list'
+gem "acts_as_list"
