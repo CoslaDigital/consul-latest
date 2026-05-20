@@ -458,7 +458,7 @@ en:
       finalizing_with: "Arranging help with"
       is_supporting: "is providing help"
       finalize_author_action: ""Finalize connection with %{name}""
-      active_author_action: ""Active connection: %{name}""
+      active_author_action: "Active connection: %{name}"
     update:
       form:
         submit_button: Save changes
