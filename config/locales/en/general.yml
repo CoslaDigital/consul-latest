@@ -454,6 +454,11 @@ en:
       draft: Proposal in draft. Cannot yet get supports, nor does it appear in the list of proposals.
       select_offer_prompt: Select an available offer
       propose_button: "Make an Offer"
+      collaboration_actions: "Finalise Support"
+      finalizing_with: "Arranging help with"
+      is_supporting: "is providing help"
+      finalize_author_action: ""Finalize connection with %{name}""
+      active_author_action: ""Active connection: %{name}""
     update:
       form:
         submit_button: Save changes

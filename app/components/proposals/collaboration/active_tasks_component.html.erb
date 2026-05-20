@@ -9,14 +9,18 @@
 
         <% @proposal.proposal_matches.accepted.each do |match| %>
           <div class="text-center margin-bottom-s border-bottom padding-bottom-s">
-            <p class="small margin-bottom-s">Finalize with <strong><%= match.offer.author.name %></strong></p>
+            <p class="small margin-bottom-s">
+              <%= t("proposals.show.finalize_author_action", name: match.offer.author.name) %>
+            </p>
             <%= render Admin::TableActionsComponent.new(match, actions: [:confirm], confirm_path: confirm_proposal_match_path(match)) %>
           </div>
         <% end %>
 
         <% @proposal.proposal_matches.confirmed.each do |match| %>
           <div class="text-center padding-top-s">
-            <p class="small margin-bottom-s">Active: <strong><%= match.offer.author.name %></strong></p>
+            <p class="small margin-bottom-s">
+              <%= t("proposals.show.active_author_action", name: match.offer.author.name) %>
+            </p>
             <%= render Admin::TableActionsComponent.new(match, actions: [:fulfill], fulfill_path: fulfill_proposal_match_path(match)) %>
           </div>
         <% end %>
