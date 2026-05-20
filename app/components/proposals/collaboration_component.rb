@@ -1,6 +1,11 @@
+# app/components/proposals/collaboration_component.rb
 class Proposals::CollaborationComponent < ApplicationComponent
+  # Changing these to reader attributes allows the view template
+  # to safely see @proposal and @current_user
   attr_reader :proposal, :current_user
+
   delegate :status_label_class, :dom_id, to: :helpers
+
   def initialize(proposal, current_user)
     @proposal = proposal
     @current_user = current_user
@@ -11,19 +16,7 @@ class Proposals::CollaborationComponent < ApplicationComponent
   end
 
   def render?
-    # Don't show the collaboration box if the proposal is retired or the user isn't verified
+    # Don't show the collaboration box if the proposal is retired
     !proposal.retired?
-    true
   end
-
-  private
-
-    def existing_match
-      return nil unless current_user
-      @existing_match ||= proposal.proposal_matches.where(offer_id: current_user.offers.pluck(:id)).first
-    end
-
-    def user_offers
-      @user_offers ||= current_user.offers.active
-    end
 end
