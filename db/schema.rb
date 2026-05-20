@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_20_092620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -167,6 +167,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.integer "budget_id"
     t.integer "group_id"
     t.integer "heading_id"
+    t.integer "position"
     t.index ["ballot_id", "investment_id"], name: "index_budget_ballot_lines_on_ballot_id_and_investment_id", unique: true
     t.index ["ballot_id"], name: "index_budget_ballot_lines_on_ballot_id"
     t.index ["budget_id"], name: "index_budget_ballot_lines_on_budget_id"
@@ -314,6 +315,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.string "video_url"
     t.bigint "estimated_price"
     t.text "summary"
+    t.decimal "votes"
     t.index ["administrator_id"], name: "index_budget_investments_on_administrator_id"
     t.index ["author_id"], name: "index_budget_investments_on_author_id"
     t.index ["budget_id"], name: "index_budget_investments_on_budget_id"
@@ -432,6 +434,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.boolean "published"
     t.boolean "hide_money", default: false
     t.boolean "part_fund"
+    t.boolean "stv"
+    t.integer "stv_winners"
+    t.boolean "stv_dynamic_quota"
+    t.string "kind", default: "budget", null: false
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
@@ -1392,6 +1398,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "proposal_kinds", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "proposal_matches", force: :cascade do |t|
     t.bigint "proposal_id", null: false
     t.bigint "offer_id", null: false
@@ -1460,6 +1473,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.datetime "published_at", precision: nil
     t.boolean "selected", default: false
     t.bigint "price"
+    t.bigint "proposal_kind_id"
     t.index ["author_id", "hidden_at"], name: "index_proposals_on_author_id_and_hidden_at"
     t.index ["author_id"], name: "index_proposals_on_author_id"
     t.index ["cached_votes_up"], name: "index_proposals_on_cached_votes_up"
@@ -1468,6 +1482,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
     t.index ["geozone_id"], name: "index_proposals_on_geozone_id"
     t.index ["hidden_at"], name: "index_proposals_on_hidden_at"
     t.index ["hot_score"], name: "index_proposals_on_hot_score"
+    t.index ["proposal_kind_id"], name: "index_proposals_on_proposal_kind_id"
     t.index ["selected"], name: "index_proposals_on_selected"
     t.index ["tsv"], name: "index_proposals_on_tsv", using: :gin
   end
@@ -2002,6 +2017,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_082829) do
   add_foreign_key "proposal_matches", "offers"
   add_foreign_key "proposal_matches", "proposals"
   add_foreign_key "proposals", "communities"
+  add_foreign_key "proposals", "proposal_kinds"
   add_foreign_key "related_content_scores", "related_contents"
   add_foreign_key "related_content_scores", "users"
   add_foreign_key "sdg_managers", "users"
