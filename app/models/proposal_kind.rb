@@ -1,4 +1,3 @@
-# app/models/proposal_kind.rb
 class ProposalKind < ApplicationRecord
   has_many :proposals, dependent: :nullify
 
@@ -6,10 +5,25 @@ class ProposalKind < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
 
   before_validation :generate_slug
+  after_save :ensure_single_default, if: :default?
+  after_destroy :fallback_default_assignment
+
+  # Scopes
+  scope :default_kind, -> { find_by(default: true) || first }
 
   private
 
     def generate_slug
       self.slug ||= name&.parameterize
+    end
+
+    def ensure_single_default
+      ProposalKind.where.not(id: id).update_all(default: false)
+    end
+
+    def fallback_default_assignment
+      if ProposalKind.any? && !ProposalKind.exists?(default: true)
+        ProposalKind.first.update!(default: true)
+      end
     end
 end

@@ -4,12 +4,31 @@ class ProposalsController
   private
 
     alias_method :consul_allowed_params, :allowed_params
-
     def allowed_params
-      # 1. Fetch the base structural array of parameters from Consul
-      base_attributes = consul_allowed_params
+      consul_allowed_params + [:proposal_kind_id, sdg_goal_ids: []]
+    end
 
-      # 2. Append our custom scalar keys and complex structure keys cleanly
-      base_attributes + [:proposal_kind_id, sdg_goal_ids: []]
+    alias_method :consul_index_customization, :index_customization
+
+    def index_customization
+      # 1. Execute all standard Consul operations first
+      consul_index_customization
+
+      # 2. Extract by ID directly using the slug parameter to avoid join/load dependency crashes
+      if params[:project].present?
+        kind_id = ProposalKind.find_by(slug: params[:project])&.id
+
+        # We pass the resolved ID integer or a fallback 0 if it doesn't exist
+        # so an invalid project slug correctly returns an empty list instead of a crash.
+        target_id = kind_id || 0
+
+        # Filter the main relation stack directly via the foreign key column name
+        @resources = @resources.where(proposal_kind_id: target_id)
+
+        # Filter the featured highlights collection array if present
+        if @featured_proposals.present?
+          @featured_proposals = @featured_proposals.where(proposal_kind_id: target_id)
+        end
+      end
     end
 end

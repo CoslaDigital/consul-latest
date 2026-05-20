@@ -12,6 +12,10 @@ namespace :proposals do
       puts " -> Verified record: #{kind.name} (ID: #{kind.id})"
     end
 
+    if ProposalKind.any? && !ProposalKind.exists?(default: true)
+      ProposalKind.first.update!(default: true)
+    end
+
     puts "Proposal kinds initialization complete!"
   end
 end
