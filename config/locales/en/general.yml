@@ -457,7 +457,7 @@ en:
       collaboration_actions: "Finalise Support"
       finalizing_with: "Arranging help with"
       is_supporting: "is providing help"
-      finalize_author_action: ""Finalize connection with %{name}""
+      finalize_author_action: "Finalize connection with %{name}"
       active_author_action: "Active connection: %{name}"
     update:
       form:

@@ -30,7 +30,7 @@ class Budget
         # Check if the answer's question_id is in our mandatory list
         mandatory_question_ids.include?(answer.budget_question_id)
       end
-
+  result = (answered_mandatory_count == mandatory_question_ids.count)
 
   # 3. The validation passes if the counts are equal.
       result
