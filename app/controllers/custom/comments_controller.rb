@@ -17,12 +17,12 @@ class CommentsController < ApplicationController
       add_notification @comment
       EvaluationCommentNotifier.new(comment: @comment).process if send_evaluation_notification?
 
-      results = moderate
-      if results[:flagged] || results[:hidden]
-        flash[:error] = "Your comment is being moderated. Please come back later."
+      # results = moderate
+      # if results[:flagged] || results[:hidden]
+      #  flash[:error] = "Your comment is being moderated. Please come back later."
         # returning here prevents execution from slipping down to the JS render
-        return redirect_back(fallback_location: root_path)
-      end
+      # return redirect_back(fallback_location: root_path)
+      # end
 
       # Explicitly handle standard, non-moderated JS and HTML responses
       respond_to do |format|
