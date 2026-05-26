@@ -99,34 +99,39 @@ module AiModeratable
         end
       end
 
-      # Map back into CONSUL's native counter metrics
+      # --- 1. CALCULATE FLAGS IF TRIGGERED ---
+      calculated_flags = 0
       if is_flagged || is_hidden
-        # Calculate a flag weight: +2 for each category crossing flag barrier, +4 if crossing hide barrier
-        calculated_flags = 0
         scores.each do |_, val|
           v = val.to_f
           calculated_flags += 4 if v >= hidden_threshold.to_f
           calculated_flags += 2 if v >= flag_threshold.to_f && v < hidden_threshold.to_f
         end
+      else
+        # If safe, retain the comment's current flags_count (usually 0)
+        calculated_flags = self.flags_count
+      end
 
-        # --- PACK METADATA COHESIVELY ---
-        meta_payload = {
-          model_used: model_name,
-          evaluation_at: Time.current,
-          scores: scores,
-          reasoning: data["reasoning"]
-        }
+      meta_payload = {
+        model_used: model_name,
+        evaluated_at: Time.current, # <--- Serves perfectly as your ai_moderated_at timestamp!
+        scores: scores,
+        reasoning: data["reasoning"],
+        flagged: is_flagged,
+        hidden: is_hidden
+      }
 
-        # Pass the payload safely alongside flags and hidden attributes
-        update_columns(
-          flags_count: calculated_flags,
-          hidden_at: is_hidden ? Time.current : nil,
-          ai_moderation_meta: meta_payload
-        )
+      update_columns(
+        flags_count: calculated_flags,
+        hidden_at: is_hidden ? Time.current : self.hidden_at,
+        ai_moderation_meta: meta_payload
+      )
 
-        Rails.logger.info "[AI Moderation] Comment ##{id} processed by #{model_name}. " \
-                            "Flagged: #{is_flagged}, Hidden: #{is_hidden}. " \
+      if is_flagged || is_hidden
+        Rails.logger.info "[AI Moderation] Comment ##{id} FLAGGED/HIDDEN by #{model_name}. " \
                             "Triggers: #{triggered_categories.join(', ')}. Reason: #{data['reasoning']}"
+      else
+        Rails.logger.info "[AI Moderation] Comment ##{id} marked CLEAN by #{model_name}."
       end
 
     rescue RubyLLM::Error => e
