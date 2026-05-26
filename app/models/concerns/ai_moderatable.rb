@@ -109,10 +109,19 @@ module AiModeratable
           calculated_flags += 2 if v >= flag_threshold.to_f && v < hidden_threshold.to_f
         end
 
-        # Direct write to database to keep background queue fast and error-free
+        # --- PACK METADATA COHESIVELY ---
+        meta_payload = {
+          model_used: model_name,
+          evaluation_at: Time.current,
+          scores: scores,
+          reasoning: data["reasoning"]
+        }
+
+        # Pass the payload safely alongside flags and hidden attributes
         update_columns(
           flags_count: calculated_flags,
-          hidden_at: is_hidden ? Time.current : nil
+          hidden_at: is_hidden ? Time.current : nil,
+          ai_moderation_meta: meta_payload
         )
 
         Rails.logger.info "[AI Moderation] Comment ##{id} processed by #{model_name}. " \
