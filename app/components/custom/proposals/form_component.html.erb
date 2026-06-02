@@ -38,7 +38,9 @@
     <%= render Proposals::ProposalKindComponent.new(f) %>
 
     <% unless Proposals::ProposalKindComponent.new(f).render? %>
-      <%= f.hidden_field :proposal_kind_id, value: ProposalKind.default_kind&.id %>
+      <% if ProposalKind.default_kind.present? %>
+        <%= f.hidden_field :proposal_kind_id, value: ProposalKind.default_kind.id %>
+      <% end %>
     <% end %>
 
     <div>
