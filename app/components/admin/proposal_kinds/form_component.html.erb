@@ -1,0 +1,26 @@
+<h2><%= title %></h2>
+
+<%= form_with(model: [:admin, proposal_kind], local: true) do |f| %>
+  <%= render "shared/errors", resource: proposal_kind %>
+
+  <div class="row">
+    <div class="small-12 medium-6 columns">
+      <%= f.label :name, "Proposal Type Label Name" %>
+      <%= f.text_field :name, placeholder: "e.g., Youth Participatory Grant", required: true %>
+    </div>
+  </div>
+
+  <% unless proposal_kind.default? || proposal_kind.new_record? %>
+    <div class="row">
+      <div class="small-12 columns">
+        <%= f.check_box :default %>
+        <%= f.label :default, "Promote to system-wide default option" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit class: "button clear-margin-bottom" %>
+    <%= link_to "Cancel", admin_proposal_kinds_path, class: "button hollow secondary space-left" %>
+  </div>
+<% end %>

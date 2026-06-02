@@ -1,0 +1,7 @@
+<div>
+  <%= form.label :proposal_kind_id, "Project Type / Scope" %>
+  <p class="help-text">Select which project or matching system this proposal belongs to.</p>
+  <%= form.select :proposal_kind_id, proposal_kind_options,
+                  label: false,
+                  include_blank: "General" %>
+</div>

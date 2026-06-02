@@ -1,6 +1,7 @@
 class Proposals::FormComponent < ApplicationComponent; end
 
-load Rails.root.join("app","components","proposals","form_component.rb") 
+load Rails.root.join("app", "components", "proposals", "form_component.rb")
+
 class Proposals::FormComponent < ApplicationComponent
   include TranslatableFormHelper
   include GlobalizeHelper
@@ -16,5 +17,9 @@ class Proposals::FormComponent < ApplicationComponent
 
     def categories
       Tag.category.order(:name)
+    end
+
+    def proposal_kind_options
+      ProposalKind.order(:name).pluck(:name, :id)
     end
 end

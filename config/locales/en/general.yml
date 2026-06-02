@@ -289,7 +289,6 @@ en:
       sign_in: "You can sign in with any of the methods on this page"
       sign_in_help: ""
       sign_up: "Sign up with:"
-
     oidc:
       sign_in: Sign in with OIDC
       sign_up: Sign up with OIDC
@@ -338,6 +337,7 @@ en:
       proposal_title_note: "Give a suitable name to your proposal"
       proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
       proposal_description_note: "Provide a detailed description of your project"
+      proposal_video_url_note: You may add a link to YouTube or Vimeo
       proposal_estimated_price: Estimated Cost
       proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it
       tag_category_label: "Categories"
@@ -451,6 +451,11 @@ en:
       draft: Proposal in draft. Cannot yet get supports, nor does it appear in the list of proposals.
       select_offer_prompt: Select an available offer
       propose_button: "Make an Offer"
+      collaboration_actions: "Finalise Support"
+      finalizing_with: "Arranging help with"
+      is_supporting: "is providing help"
+      finalize_author_action: "Finalize connection with %{name}"
+      active_author_action: "Active connection: %{name}"
     update:
       form:
         submit_button: Save changes
@@ -961,8 +966,8 @@ en:
     poll:
       take_part: Take part from %{from} to %{to}
   remote_translations:
-    text: The original content of this page is not available in your language. Would you like to translate it?
-    all_remote_translations_enqueued_text: Please wait 5 seconds and refresh the website for translated content to be displayed.
+    text: The content of this page is not available in your language
+    all_remote_translations_enqueued_text: In a short period of time refreshing the page you will be able to see all the content in your language.
     create:
       enqueue_remote_translation: Translations have been correctly requested.
     button: Translate page

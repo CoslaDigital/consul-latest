@@ -1,0 +1,72 @@
+<%# app/views/custom/proposals/_info.html.erb %>
+
+<%= render Shared::DetailedInfoComponent.new(@proposal) %>
+
+<%= render_image(@proposal.image, :large, true) if @proposal.image.present? %>
+
+<br>
+<% unless @proposal.selected? %>
+  <p>
+    <%= t("proposals.show.code") %>
+    <strong><%= @proposal.code %></strong>
+  </p>
+<% end %>
+
+<%# --- STRUCTURED SUMMARY BLOCK --- %>
+<div class="proposal-summary-block" style="margin-bottom: 1.5rem;">
+  <h4 style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem;">
+    Summary
+  </h4>
+  <blockquote><%= @proposal.summary %></blockquote>
+</div>
+
+<div>
+  <h4><%= t("budgets.investments.show.estimated_price") %></h4>
+  <p class="investment-project-amount">
+    <%= proposal.price.nil? ? "<em>Not yet known</em>".html_safe : proposal.formatted_price %>
+  </p>
+</div>
+
+<%= render Shared::EmbeddedVideoComponent.new(@proposal) %>
+
+<%# --- STRUCTURED DESCRIPTION BLOCK --- %>
+<div class="proposal-description-block" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+  <h4 style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem;">
+    Full Project Details & Description
+  </h4>
+  <div class="proposal-description-text" style="line-height: 1.6; color: #333;">
+    <%= auto_link_already_sanitized_html wysiwyg(@proposal.description) %>
+  </div>
+</div>
+
+<% if feature?(:map) && map_location_available?(@proposal.map_location) %>
+  <div class="margin">
+    <%= render_map(@proposal.map_location) %>
+  </div>
+<% end %>
+
+<% if @proposal.video_url.present? %>
+  <div class="video-link">
+    <p>
+      <span class="icon-video"></span>&nbsp;
+      <strong><%= t("proposals.show.title_video_url") %></strong>
+    </p>
+    <%= sanitize_and_auto_link @proposal.video_url %>
+  </div>
+<% end %>
+
+<% if @proposal.retired? %>
+  <div id="retired_explanation" class="callout">
+    <h2>
+      <%= t("proposals.show.retired") %>:
+      <%= t("proposals.retire_options.#{@proposal.retired_reason}") unless @proposal.retired_reason == "other" %>
+    </h2>
+    <%= simple_format sanitize_and_auto_link(@proposal.retired_explanation), {}, sanitize: false %>
+  </div>
+<% end %>
+
+<% if feature?(:allow_attached_documents) %>
+  <%= render Documents::DocumentsComponent.new(@proposal.documents) %>
+<% end %>
+
+<%= render "shared/tags", taggable: @proposal %>

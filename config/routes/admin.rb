@@ -296,6 +296,13 @@ namespace :admin do
     end
 
     resources :geozones, only: [:index, :new, :create, :edit, :update, :destroy]
+
+    resources :proposal_kinds, except: [:show] do
+      member do
+        patch :set_default
+      end
+    end
+
     resource :locales, only: [:show, :update]
 
     resources :postcodes, except: [:show] do

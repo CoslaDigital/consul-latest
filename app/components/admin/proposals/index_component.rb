@@ -18,4 +18,8 @@ class Admin::Proposals::IndexComponent < ApplicationComponent
         link_to t("admin.questions.index.successful_proposals_tab"), successful_admin_proposals_path
       end
     end
+
+    def proposal_kinds_link
+      link_to "Manage Proposal Types", admin_proposal_kinds_path, class: "button hollow secondary float-right"
+    end
 end
