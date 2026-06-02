@@ -14,10 +14,12 @@
   <%= render "shared/canonical", href: proposal_url(@proposal) %>
 <% end %>
 
+<%# FIXED: Re-added the missing GDPR feature check key below to prevent cache fragmentation failures %>
 <% cache [locale_and_user_status(@proposal),
           @proposal,
           @proposal.author,
           Flag.flagged?(current_user, @proposal),
+          feature?("gdpr.require_consent_for_embedded_videos"),
           @proposal.followed_by?(current_user),
           current_user&.voted_for?(@proposal)] do %>
   <div class="proposal-show">
@@ -26,6 +28,19 @@
         <%= back_link_to proposals_path unless preview %>
 
         <h1><%= @proposal.title %></h1>
+
+        <% # NEW: Displays the Proposal Kind tag clearly right below the main title header %>
+        <% if ProposalKind.count > 1 %>
+          <div class="proposal-project-track" style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.25rem;">
+              Project Classification / Track
+            </h4>
+            <span class="tag secondary" style="font-size: 0.95rem; padding: 0.4rem 0.8rem; display: inline-block; border-radius: 4px;">
+              <%= @proposal.kind_name %>
+            </span>
+          </div>
+        <% end %>
+
         <% if @proposal.retired? %>
           <div data-alert class="callout alert margin-top proposal-retired">
             <strong>
@@ -76,8 +91,6 @@
 
           <%= render "proposals/support_status", proposal: @proposal %>
           <%= render Proposals::CollaborationComponent.new(@proposal, current_user) %>
-
-
 
           <div class="sidebar-divider"></div>
 

@@ -35,6 +35,12 @@
   <fieldset>
     <legend><%#= t("shared.optional") %>Other Information</legend>
 
+    <%= render Proposals::ProposalKindComponent.new(f) %>
+
+    <% unless Proposals::ProposalKindComponent.new(f).render? %>
+      <%= f.hidden_field :proposal_kind_id, value: ProposalKind.default_kind&.id %>
+    <% end %>
+
     <div>
           <%= f.number_field :price, label: t("proposals.form.proposal_estimated_price"), hint: t("proposals.form.proposal_estimated_price_note")%>
     </div>
