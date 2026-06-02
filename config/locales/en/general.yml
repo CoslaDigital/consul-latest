@@ -369,6 +369,19 @@ en:
       selected_proposals_link: View selected proposals
       archived_proposals: Archived proposals
       proposals_lists: Proposals lists
+      milestones:
+        requested:
+          title: "Collaboration Requested"
+          description: "A community member requested the resource assistance: \"%{resource_title}\"."
+        accepted:
+          title: "Collaboration Arranged"
+          description: "The resource offer \"%{resource_title}\" was pre-accepted. Awaiting final confirmation."
+        confirmed:
+          title: "Resource Support Active"
+          description: "Collaboration confirmed! %{user_name} is now actively providing \"%{resource_title}\" to support this proposal."
+        fulfilled:
+          title: "Support Successfully Received"
+          description: "The resource assistance for \"%{resource_title}\" has been marked as fully completed and delivered."
       retired_links:
         all: All
         duplicated: Duplicated
