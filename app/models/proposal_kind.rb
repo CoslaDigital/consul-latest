@@ -9,7 +9,11 @@ class ProposalKind < ApplicationRecord
   after_destroy :fallback_default_assignment
 
   # Scopes
-  scope :default_kind, -> { find_by(default: true) || first }
+  # scope :default_kind, -> { find_by(default: true) || first }
+
+  def self.default_kind
+    find_by(default: true) || first
+  end
 
   private
 
