@@ -1,3 +1,4 @@
+# app/components/proposals/proposal_kind_component.rb
 class Proposals::ProposalKindComponent < ApplicationComponent
   attr_reader :form
 
@@ -5,8 +6,9 @@ class Proposals::ProposalKindComponent < ApplicationComponent
     @form = form
   end
 
+  # FIXED: Only render the visible form dropdown fields if multiple tracks exist.
   def render?
-    ProposalKind.any?
+    ProposalKind.count > 1
   end
 
   private

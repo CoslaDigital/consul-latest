@@ -14,7 +14,9 @@ class ProposalKind < ApplicationRecord
   private
 
     def generate_slug
-      self.slug ||= name&.parameterize
+      if name_changed? || slug.blank?
+        self.slug = name&.parameterize
+      end
     end
 
     def ensure_single_default
