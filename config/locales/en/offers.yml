@@ -65,6 +65,9 @@ en:
       active_count: "active collaborations"
       no_offers: "You haven't created any resource offers yet."
       inbound_requests: "Requests for my Proposals"
+      tabs:
+        resources_offered: "Resources I'm Offering"
+        help_received: "Resources Offered to My Projects"
       column:
         resource: "Resource Title"
         status: "Current Status"
