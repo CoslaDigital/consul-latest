@@ -9,6 +9,8 @@ module Abilities
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
 
+      can :manage, Legislation::PropositionsImport
+
       can [:search, :create, :index, :destroy], ::ProcessManager
 
       can :restore, Comment
