@@ -269,6 +269,9 @@ namespace :admin do
     end
 
     namespace :legislation do
+
+      resources :propositions_imports, only: [:new, :create]
+
       resources :processes do
         resources :questions
         resources :proposals do

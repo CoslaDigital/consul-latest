@@ -7,6 +7,8 @@ module Abilities
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
 
+      can :manage, Legislation::PropositionsImport
+
       can :restore, Comment
       cannot :restore, Comment, hidden_at: nil
 
