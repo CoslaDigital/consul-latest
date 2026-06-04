@@ -3,7 +3,7 @@ en:
 
     ballots:
       reasons_for_not_balloting:
-        invalid_geozone: "You cannot vote on this project because your location is not valid. Your geozone is %{user_geozone}, but this project requires one of the following: %{required_geozones}."
+        invalid_geozone: "You cannot vote on this candidate because your location is not valid. Your geozone is %{user_geozone}, but this candidate requires one of the following: %{required_geozones}."
 
     index:
       milestones: Progress Updates
@@ -11,26 +11,26 @@ en:
       ys_name: Young Scot Card Holders
     investments:
       form:
-        title: "Submit a Project Proposal"
-        description: "Project Description"
+        title: "Submit a candidate Proposal"
+        description: "candidate Description"
         heading_note: "Select the area this proposal applies to"
         subtitle: "%{heading} (%{price})"
-        subtitle_note: "What is your project or application called?"
+        subtitle_note: "What is your candidate or application called?"
         subtitle_without_price: "%{heading}"
         subtitle_without_price_note: "subtitle help text"
-        summary: "Project Summary"
-        summary_note: "Give a brief summary of you project (maximum 200 characters)"
+        summary: "candidate Summary"
+        summary_note: "Give a brief summary of you candidate (maximum 200 characters)"
     select:
-      title: "Select Budget"
+      title: "Select election"
       proposal_name: "Proposal Name"
-      select_budget: "Select Budget"
-      choose_budget: "Choose a budget"
+      select_budget: "Select election"
+      choose_budget: "Choose a election"
       next: "Next"
-      no_budgets: "No budgets are currently accepting new projects"
+      no_budgets: "No elections are currently accepting new candidates"
     select_headings:
-      title: "Select Budget Heading"
+      title: "Select election Heading"
       proposal_name: "Proposal Name"
-      budget_name: "Budget Name"
+      budget_name: "election Name"
       select_group: "Select Group"
       choose_group: "Choose a group"
       select_heading: "Select Heading"
