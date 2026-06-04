@@ -1,145 +1,177 @@
-<h1><%= investment.title %></h1>
-<div class="budget-investment-info">
-  <%= render "/shared/author_info", resource: investment %>
+<div class="row">
+  <%# --- MAIN CONTENT COLUMN --- %>
+  <div class="small-12 medium-8 column">
 
-  <span class="bullet">&nbsp;&bull;&nbsp;</span>
-  <%= l investment.created_at.to_date %>
-  <span class="bullet">&nbsp;&bull;&nbsp;</span>
-  <%= render Shared::CommentsCountComponent.new(investment.comments_count, url: "#comments") %>
-  <span class="bullet">&nbsp;&bull;&nbsp;</span>
-  <%= investment.heading.name %>
-  <span class="bullet">&nbsp;&bull;&nbsp;</span>
-  <% if local_assigns[:preview].nil? %>
-    <span class="js-flag-actions">
-      <%= render "shared/flag_actions", flaggable: investment %>
-    </span>
-  <% end %>
-</div>
+    <%# 1. Main Title & Meta Header Block %>
+    <header class="investment-header margin-bottom">
+      <h1><%= investment.title %></h1>
 
-<br>
+      <div class="budget-investment-info metadata-tags label-list">
+        <%= render "/shared/author_info", resource: investment %>
+        <span class="bullet-divider">&bull;</span>
+        <time class="date"><%= l investment.created_at.to_date %></time>
+        <span class="bullet-divider">&bull;</span>
+        <span class="category-tag"><i class="icon-heading"></i> <%= investment.heading.name %></span>
 
-<%= render_image(investment.image, :large, true) if investment.image.present? %>
+        <% if local_assigns[:preview].nil? %>
+          <span class="js-flag-actions pull-right">
+            <%= render "shared/flag_actions", flaggable: investment %>
+          </span>
+        <% end %>
+      </div>
+    </header>
 
-<p id="investment_code">
-  <%= sanitize(custom_t("budgets.investments.show.code", code: investment.id)) %>
-</p>
+    <%# 2. Main Hero Image %>
+    <% if investment.image.present? %>
+      <div class="investment-image-wrapper margin-bottom">
+        <%= render_image(investment.image, :large, true) %>
+      </div>
+    <% end %>
 
- <div>
-<% if investment.should_show_estimated_price? %>
-     <h3><%= custom_t("budgets.investments.show.estimated_price") %></h3>
-  <p class="investment-project-amount">
-    <%= investment.formatted_estimated_price %>
-  </p>
-  <hr>
-<% end %>
-</div>
-<div>
-
-  <h3><%= custom_t("budgets.investments.show.summary") %></h3>
-<%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
-<hr>
-  <h3><%= custom_t("budgets.investments.show.description") %></h3>
-<%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
-</div>
-<hr>
-
-<%# 1. Get all enabled questions from the @budget %>
-<% @budget.questions.where(enabled: true).order(:id).each do |question| %>
-
-  <%#
-    2. LEVEL 1 CHECK: Can the current user read this question at all?
-       - A guest CANNOT read a private question.
-       - An admin CAN.
-  %>
-  <% if can? :read, question %>
-
-    <%# 3. If YES, render the question title. %>
-    <h4><%= question.text.html_safe %></h4>
-
-    <p>
-      <%#
-        4. LEVEL 2 CHECK: Now, get the answers for this question
-           from the @investment, and use .accessible_by to
-           filter them using the :read, Budget::Investment::Answer rules.
-      %>
-      <% visible_answers = @investment.answers
-                                      .where(budget_question_id: question.id)
-                                      .accessible_by(current_ability) %>
-
-      <%#
-        5. Loop through ONLY the answers the user is allowed to see.
-           If `visible_answers` is empty (no answer submitted OR
-           answer is private), this loop is skipped and nothing
-           is shown, which is the correct behavior.
-      %>
-      <% visible_answers.find_each do |answer| %>
-        <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
+    <%# 3. Structural Content Sections %>
+    <section class="investment-body">
+      <% if investment.should_show_unfeasibility_explanation? %>
+        <div class="callout alert margin-bottom">
+          <h2><%= custom_t("budgets.investments.show.unfeasibility_explanation") %></h2>
+          <p><%= investment.unfeasibility_explanation %></p>
+        </div>
       <% end %>
-    </p>
 
-  <% end %>
-  <%# If `can? :read, question` is false, the question is private
-      and the user is not an admin, so nothing is rendered. %>
-<% end %>
+      <div class="investment-summary lead margin-bottom">
+        <h3><%= custom_t("budgets.investments.show.summary") %></h3>
+        <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
+      </div>
 
-<%= render Shared::EmbeddedVideoComponent.new(@investment) %>
+      <div class="investment-description margin-bottom">
+        <h3><%= custom_t("budgets.investments.show.description") %></h3>
+        <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
+      </div>
+    </section>
 
-<% if @investment.video_url.present? %>
-  <div class="video-link">
-    <p>
-      <span class="icon-video"></span>&nbsp;
-      <strong><%= custom_t("proposals.show.title_video_url") %></strong>
-    </p>
-    <%= sanitize_and_auto_link @investment.video_url %>
+    <%# 4. Dynamic Custom/Private Questions %>
+    <% if @budget.questions.where(enabled: true).any? %>
+      <section class="investment-questions padding-top margin-bottom border-top">
+        <% @budget.questions.where(enabled: true).order(:id).each do |question| %>
+          <% if can? :read, question %>
+            <div class="question-block margin-bottom">
+              <h4><%= question.text.html_safe %></h4>
+
+              <% visible_answers = @investment.answers
+                                              .where(budget_question_id: question.id)
+                                              .accessible_by(current_ability) %>
+
+              <div class="answer-block panel callout light">
+                <% visible_answers.find_each do |answer| %>
+                  <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
+
+    <%# 5. Media Layers %>
+    <%= render Shared::EmbeddedVideoComponent.new(@investment) %>
+
+    <% if @investment.video_url.present? %>
+      <div class="video-link callout panel margin-bottom">
+        <p>
+          <span class="icon-video"></span>&nbsp;
+          <strong><%= custom_t("proposals.show.title_video_url") %></strong>
+        </p>
+        <%= sanitize_and_auto_link @investment.video_url %>
+      </div>
+    <% end %>
+
+    <% if feature?(:map) && map_location_available?(@investment.map_location) %>
+      <div class="investment-map margin-bottom">
+        <h4><%= t("shared.map") %></h4>
+        <%= render_map(investment.map_location) %>
+      </div>
+    <% end %>
+
+    <% if investment.should_show_price_explanation? %>
+      <section class="price-explanation-section padding-top margin-bottom border-top" id="price_explanation" data-magellan-target="price_explanation">
+        <h2><%= custom_t("budgets.investments.show.price_explanation") %></h2>
+        <p><%= investment.price_explanation %></p>
+      </section>
+    <% end %>
+
+    <%# 6. Interactive Actions & Comments Anchors %>
+    <footer class="investment-footer margin-top padding-top border-top">
+      <div class="margin-bottom">
+        <%= render Shared::CommentsCountComponent.new(investment.comments_count, url: "#comments") %>
+      </div>
+
+      <% if local_assigns[:preview].nil? %>
+        <%= render "relationable/related_content", relationable: investment %>
+
+        <div class="js-moderator-investment-actions margin-top">
+          <%= render "budgets/investments/actions", investment: investment %>
+        </div>
+      <% end %>
+    </footer>
+
   </div>
-<% end %>
 
-<% if feature?(:map) && map_location_available?(@investment.map_location) %>
-  <div class="margin">
-    <%= render_map(investment.map_location) %>
+  <%# --- SIDEBAR METADATA COLUMN --- %>
+  <div class="small-12 medium-4 column sidebar">
+
+    <%# Project Statistics & Pricing Box %>
+    <div class="card callout panel secondary margin-bottom">
+      <h5 class="subheader"><%= sanitize(custom_t("budgets.investments.show.code", code: investment.id)) %></h5>
+
+      <% if investment.should_show_estimated_price? %>
+        <div class="price-box margin-top">
+          <span class="label subheader"><%= custom_t("budgets.investments.show.estimated_price") %></span>
+          <p class="investment-project-amount h3 font-bold no-margin">
+            <%= investment.formatted_estimated_price %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Context Information Checklist %>
+    <% if investment.organization_name.present? || investment.location.present? || investment.external_url.present? %>
+      <div class="card callout panel light margin-bottom">
+        <h5><%= t("shared.details") %></h5>
+        <ul class="no-bullet text-small">
+          <% if investment.organization_name.present? %>
+            <li class="margin-bottom-small">
+              <strong><%= t("budgets.investments.show.organization_name", default: "Organization") %>:</strong><br>
+              <%= investment.organization_name %>
+            </li>
+          <% end %>
+
+          <% if investment.location.present? %>
+            <li class="margin-bottom-small">
+              <strong><%= t("budgets.investments.show.location", default: "Location") %>:</strong><br>
+              <%= investment.location %>
+            </li>
+          <% end %>
+
+          <% if investment.external_url.present? %>
+            <li class="investment-external-link">
+              <strong><%= t("shared.external_link") %>:</strong><br>
+              <%= sanitize_and_auto_link investment.external_url %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# Documents & Taxonomy Tags %>
+    <% if feature?(:allow_attached_documents) && investment.documents.any? %>
+      <div class="margin-bottom">
+        <%= render Documents::DocumentsComponent.new(investment.documents) %>
+      </div>
+    <% end %>
+
+    <div class="sidebar-tags card panel callout light">
+      <h5><%= t("shared.tags") %></h5>
+      <%= render "shared/tags", taggable: investment %>
+    </div>
+
   </div>
-<% end %>
-
-<% if investment.location.present? %>
-  <p>
-    <%= sanitize(custom_t("budgets.investments.show.location", location: investment.location)) %>
-  </p>
-<% end %>
-
-<% if investment.organization_name.present? %>
-  <p>
-    <%= sanitize(custom_t("budgets.investments.show.organization_name", name: investment.organization_name)) %>
-  </p>
-<% end %>
-
-<% if feature?(:allow_attached_documents) %>
-  <%= render Documents::DocumentsComponent.new(investment.documents) %>
-<% end %>
-
-<%= render "shared/tags", taggable: investment %>
-
-<% if investment.external_url.present? %>
-  <div class="investment-external-link">
-    <%= sanitize_and_auto_link investment.external_url %>
-  </div>
-<% end %>
-
-<% if investment.should_show_unfeasibility_explanation? %>
-  <h2><%= custom_t("budgets.investments.show.unfeasibility_explanation") %></h2>
-  <p><%= investment.unfeasibility_explanation %></p>
-<% end %>
-
-<% if investment.should_show_price_explanation? %>
-  <h2 id="price_explanation" data-magellan-target="price_explanation">
-    <%= custom_t("budgets.investments.show.price_explanation") %>
-  </h2>
-  <p><%= investment.price_explanation %></p>
-<% end %>
-
-<% if local_assigns[:preview].nil? %>
-  <%= render "relationable/related_content", relationable: investment %>
-
-  <div class="js-moderator-investment-actions margin">
-    <%= render "budgets/investments/actions", investment: investment %>
-  </div>
-<% end %>
+</div>
