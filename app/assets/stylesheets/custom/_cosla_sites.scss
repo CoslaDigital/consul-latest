@@ -276,4 +276,17 @@
   @include shared-styles;
 }
 
+.site-elections {
+  --main-header: #EC008B;
+  --brand: #55366B;
+  --brand-secondary: #EE7522;
+  --brand-contrast: #FFFFFF;
+  --footer: #eee6db;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #a9c731;
+  --top-links-contrast: #FFFFFF;
+  @import "cosla_shared";
+  @include shared-styles;
+}
+
 
