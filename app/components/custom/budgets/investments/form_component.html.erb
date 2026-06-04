@@ -98,7 +98,7 @@
         <%= render MapLocations::FormFieldsComponent.new(f, map_location: map_location) %>
       </div>
     <% end %>
-
+    <% unless budget.election? %>
     <div id="location">
       <%= f.text_field :location, hint: t("budgets.investments.form.location_note") %>
     </div>
@@ -128,6 +128,7 @@
     </div>
 
     <%= render SDG::RelatedListSelectorComponent.new(f) %>
+    <% end %>
   </fieldset>
 
   <div class="actions">
