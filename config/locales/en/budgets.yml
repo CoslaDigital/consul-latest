@@ -136,13 +136,13 @@ en:
       show:
         price_explanation: Price explanation
         unfeasibility_explanation: Unfeasibility explanation
-        code: "Investment project code: <strong>%{code}</strong>"
+        code: "Candidate code: <strong>%{code}</strong>"
         description: "Project Description"
-        summary: "Project Summary"
+        summary: "Overview"
         location: "Location: <strong>%{location}</strong>"
         organization_name: "Proposed on behalf of: <strong>%{name}</strong>"
         share: Share
-        title: Investment project
+        title: Candidate
         supports: Supports
         votes: Votes
         price: Price
@@ -160,7 +160,7 @@ en:
         add: Vote
         add_label: "Vote %{investment}"
         already_added: You have already added this investment project
-        support_title: Support this project
+        support_title: Support this candidate
         supports:
           one: 1 support
           other: "%{count} supports"
@@ -172,7 +172,7 @@ en:
         check_ballot_link: "check my votes"
         price: "Total budget"
       votes:
-        already_supported: "You have already supported this investment project. Share it!"
+        already_supported: "You have already supported this candidate. Share it!"
         confirm_group:
           one: "You can only support investments in %{count} district. If you continue you cannot change the election of your district. Are you sure?"
           other: "You can only support investments in %{count} districts. If you continue you cannot change the election of your district. Are you sure?"
