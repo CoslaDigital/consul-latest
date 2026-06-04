@@ -180,9 +180,9 @@ en:
         groups_and_headings: "Heading groups"
         headings_caption: "Headings in %{group}"
       winners:
-        calculate: Calculate Winner Investments
+        calculate: Calculate Winners
         calculated: Winners being calculated, it may take a minute.
-        recalculate: Recalculate Winner Investments
+        recalculate: Recalculate Winners
       ballots:
         feature_disabled: 'The feature <strong>Polls</strong> must be enabled to create booths. You can enable it from the <a href="%{link}">settings configuration</a> page.'
     budget_groups:
@@ -1656,7 +1656,7 @@ en:
       sdg:
         budget_investments:
           amount: "Approved amount"
-          winners: "Winner investment projects"
+          winners: "Winning Candidates"
           sent: "Investment projects sent"
         debates: "Debates"
         polls: "Polls"
