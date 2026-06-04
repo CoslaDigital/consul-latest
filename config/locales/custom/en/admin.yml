@@ -84,7 +84,7 @@ en:
           ballots: "This will let you manage physical ballots. Only use this option if you're going to use physical booths to collect ballots during the final voting phase."
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
-          questions: "Create form fields to be displayed on budget investments"
+          questions: "Create form fields to be displayed on application forms"
         edit: "Edit budget"
         preview: "Preview"
         preview_results: "Preview results"
@@ -159,7 +159,7 @@ en:
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
         success_notice: Budget deleted successfully
-        unable_notice: You cannot delete a budget that has associated investments
+        unable_notice: You cannot delete an that has associated candidates
         unable_notice_polls: You cannot delete a budget that has an associated poll
       new:
         title_multiple: New multiple headings budget
