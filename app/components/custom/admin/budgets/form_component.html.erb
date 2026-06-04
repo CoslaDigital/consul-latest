@@ -77,13 +77,16 @@
       </div>
       <div class="row expanded highlight">
         <div class="small-12 medium-6 column">
-          <%= f.check_box :hide_money, { checked: true, disabled: true, hint: custom_t("admin.budgets.edit.hide_money_election_help_text") } %>
+          <%# --- CHANGED THIS TO A BASIC TAG --- %>
+          <%# This keeps the UI exactly the same, but stops Rails from generating bad parameters %>
+          <%= check_box_tag :hide_money_visual_only, "1", true, disabled: true %>
+          <label for="hide_money_visual_only">Hide money</label>
+          <p class="help-text"><%= custom_t("admin.budgets.edit.hide_money_election_help_text") %></p>
         </div>
       </div>
     </fieldset>
   </div>
 
-  <%# ... (rest of the form: Phases, Image, Staff, etc.) ... %>
   <%# Ensure all rows containing inputs use class="row expanded" to fix indentation %>
   <fieldset>
     <legend>Results</legend>

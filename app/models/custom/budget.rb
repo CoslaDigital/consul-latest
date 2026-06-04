@@ -6,4 +6,12 @@ class Budget < ApplicationRecord
 
   enum kind: { budget: "budget", election: "election" }
 
+  before_save :enforce_election_settings, if: :election?
+
+  private
+
+    def enforce_election_settings
+      self.hide_money = true
+    end
+
 end
