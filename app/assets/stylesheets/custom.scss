@@ -60,7 +60,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    
+
     // !! REMOVED: aspect-ratio and max-height
     // This allows the container to grow vertically
     // based on its content.
@@ -84,79 +84,78 @@
   // These rules apply to children of ANY .hero-header
 
   // The semi-transparent content box
-  .row {
-    padding: clamp(1.0rem, 4vw, 1.5rem);
-    display: flex;        // Use flex for the row's *children*
-    flex-direction: column; // Stack the text vertically
-    align-items: center;  // Center the text horizontally
-    justify-content: center; // Center the text vertically
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 30px;
-    max-width: 900px;
-    width: 100%;
-    position: relative; // For the z-index and ::before
-    z-index: 2; // Sits in front of the background image
-    text-align: center; // Ensure text inside is centered
+  .hero-content {
 
-    // The background for the .row
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
+    .row {
+      padding: clamp(1.0rem, 4vw, 1.5rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 30px;
+      max-width: 900px;
       width: 100%;
-      height: 100%;
-      background: linear-gradient(to top, $brand-secondary 0%, $brand 100%);
-      opacity: 0.7;
-      border-radius: inherit;
-      z-index: -1; // Sits behind the .row's text content
+      position: relative;
+      z-index: 2;
+      text-align: center;
+
+      // The background shaded box overlay
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, $brand-secondary 0%, $brand 100%);
+        opacity: 0.7;
+        border-radius: inherit;
+        z-index: -1;
+      }
     }
-  }
 
-  // --- Text styles (Unchanged) ---
-  .homepage-title {
-    display: block;
-    font-size: clamp(1rem, 2.5vw, 1.5rem);
-    font-weight: 600;
-    margin-bottom: 0;
-    color: #ffffffcc;
-  }
+    // Move the text and link styles in here too so they target safely
+    .homepage-title {
+      display: block;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      font-weight: 600;
+      margin-bottom: 0;
+      color: #ffffffcc;
+    }
 
-  h1 {
-    font-size: clamp(1rem, 5vw, 2.75rem);
-    font-weight: bold;
-    color: #fff;
-    margin-top: 1.25rem;
-  }
+    h1 {
+      font-size: clamp(1rem, 5vw, 2.75rem);
+      font-weight: bold;
+      color: #fff;
+      margin-top: 1.25rem;
+    }
 
-  .homepage-lead {
-    font-size: clamp(1rem, 2vw, 1.25rem);
-    margin-bottom: 2rem;
-    color: #ffffffcc;
-  }
+    .homepage-lead {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin-bottom: 2rem;
+      color: #ffffffcc;
+    }
 
-  // --- Link (button) styles (Unchanged) ---
-  .homepage-link {
-    display: inline-block;
-    margin: 0.5rem 0;
-    margin-top: 1.0rem;
-    margin-bottom: 1.0rem;
-    justify-content: center;
-    background-color: var(--brand-secondary);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+    .homepage-link {
+      display: inline-block;
+      margin: 1.0rem 0;
+      background-color: var(--brand-secondary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 
-    &:hover {
-      background-color: #005fa3;
+      &:hover {
+        background-color: #005fa3;
+      }
     }
   }
 } // --- End of .hero-header block ---
@@ -197,7 +196,7 @@
   position: relative; // CRITICAL: Allows z-index to work
   z-index: 2; // Pulls it in front of the background
   width: 100%; // Ensure it takes up space
-  
+
   // Optional: adds shadow for readability
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); 
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
