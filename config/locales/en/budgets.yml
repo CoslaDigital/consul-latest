@@ -137,8 +137,8 @@ en:
         price_explanation: Price explanation
         unfeasibility_explanation: Unfeasibility explanation
         code: "Candidate code: <strong>%{code}</strong>"
-        description: "Project Description"
-        summary: "Overview"
+        description: "Why do you want to be an MSYP?"
+        summary: "The three issues I want to focus on as an MSYP are"
         location: "Location: <strong>%{location}</strong>"
         organization_name: "Proposed on behalf of: <strong>%{name}</strong>"
         share: Share
