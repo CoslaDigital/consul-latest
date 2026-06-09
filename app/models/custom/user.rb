@@ -6,10 +6,45 @@ class User < ApplicationRecord
     :valid_na_document?
   ].freeze
 
+  NEC_PREFIX_MAPPING = {
+    "633718" => "aberdeen_city",
+    "633727" => "aberdeenshire",
+    "633719" => "angus",
+    "633644" => "argyll_and_bute",
+    "633668" => "city_of_edinburgh",
+    "633741" => "clackmannanshire",
+    "633624" => "western_isles", # Comhairle nan Eilean Siar
+    "633670" => "dumfries_and_galloway",
+    "633720" => "dundee_city",
+    "633728" => "east_ayrshire",
+    "633590" => "east_dunbartonshire",
+    "633675" => "east_lothian",
+    "633570" => "east_renfrewshire",
+    "633733" => "falkirk",
+    "633250" => "fife",
+    "633740" => "glasgow_city",
+    "633603" => "highland",
+    "633560" => "inverclyde",
+    "633678" => "midlothian",
+    "633604" => "moray",
+    "633680" => "north_ayrshire",
+    "633284" => "north_lanarkshire",
+    "633605" => "orkney_islands",
+    "633722" => "perth_and_kinross",
+    "633289" => "renfrewshire",
+    "633743" => "scottish_borders",
+    "633606" => "shetland_islands",
+    "633682" => "south_ayrshire",
+    "633231" => "south_lanarkshire",
+    "633739" => "stirling",
+    "633580" => "west_dunbartonshire",
+    "633676" => "west_lothian"
+  }.freeze
+
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
-  
+
   def masked_username
     return username if username.blank?
     # If the username is 4 characters or less, just mask the middle
@@ -20,7 +55,7 @@ class User < ApplicationRecord
       username.gsub(/\A(..)(.*)(..)\z/) { "#{$1}#{'*' * $2.length}#{$3}" }
     end
   end
-  
+
   def process_manager?
     process_manager.present?
   end
@@ -288,13 +323,21 @@ class User < ApplicationRecord
       ys_email = "#{username}@consul.dev"
       ys_confirmed_at = Time.now
       #    ys_geozone = 1
-      ys_geozone = Geozone.find_or_create_by(name: "ys").id
-      Rails.logger.info("YS Trying to create new user")
+      prefix = username.to_s[0, 6]
+      council_name = NEC_PREFIX_MAPPING[prefix]
+
+      # Construct the geozone name, defaulting to "ys" if prefix is unknown
+      geozone_name = council_name ? "ys_#{council_name}" : "ys"
+
+      ys_geozone_id = Geozone.find_or_create_by(name: geozone_name).id
+      # ---------------------------------
+
+      Rails.logger.info("YS Trying to create new user with Geozone: #{geozone_name}")
       user = User.new(
         username: ys_username,
         email: ys_email,
         password: ys_password,
-        geozone_id: ys_geozone,
+        geozone_id: ys_geozone_id, # Updated to use dynamic geozone
         terms_of_service: "1",
         document_number: ys_document_number,
         confirmed_at: DateTime.current,
