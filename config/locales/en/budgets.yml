@@ -45,14 +45,14 @@ en:
     phase:
       drafting: Draft (Not visible to the public)
       informing: Information
-      accepting: Accepting projects
-      reviewing: Reviewing projects
-      selecting: Selecting projects
-      valuating: Valuating projects
-      publishing_prices: Publishing projects prices
-      balloting: Voting projects
+      accepting: Accepting nominations
+      reviewing: Reviewing candidates
+      selecting: Selecting candidates
+      valuating: Vetting candidates
+      publishing_prices: Publishing Candidates
+      balloting: Voting
       reviewing_ballots: Reviewing voting
-      finished: Finished budget
+      finished: Results announced
     index:
       title: Participatory budgets
       empty_budgets: There are no budgets.

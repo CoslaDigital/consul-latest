@@ -33,7 +33,17 @@ en:
         zero: You have not voted for any candidate project.
       reasons_for_not_balloting:
         invalid_geozone: "You cannot vote on this candidate because your location is not valid. Your geozone is %{user_geozone}, but this candidate requires one of the following: %{required_geozones}."
-
+    phase:
+      drafting: Draft (Not visible to the public)
+      informing: Information
+      accepting: Accepting nominations
+      reviewing: Reviewing candidates
+      selecting: Selecting candidates
+      valuating: Vetting candidates
+      publishing_prices: Publishing Candidates
+      balloting: Voting
+      reviewing_ballots: Reviewing voting
+      finished: Results announced
     index:
       title: Elections
       budget_investments: Candidates

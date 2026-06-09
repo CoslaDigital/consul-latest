@@ -85,19 +85,19 @@ en:
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
           questions: "Create form fields to be displayed on application forms"
-        edit: "Edit budget"
+        edit: "Edit Election"
         preview: "Preview"
         preview_results: "Preview results"
         questions: "Manage Questions"
       index:
-        title: Participatory budgets
-        new_link: Create new budget
+        title: Elections
+        new_link: Create new election
         filter: Filter
         filters:
           all: All
           open: Open
           finished: Finished
-        budget_investments: Investment projects
+        budget_investments: Election Candidates
         table_budget_type: "Type"
         table_completed: Completed
         table_draft: "Draft"
@@ -111,11 +111,11 @@ en:
         admin_ballots: Ballots
         no_budgets: "There are no budgets."
       create:
-        notice: New participatory budget created successfully!
+        notice: New election created successfully!
       update:
-        notice: Participatory budget updated successfully
+        notice: Election updated successfully
       publish:
-        notice: "Participatory budget published successfully"
+        notice: "election published successfully"
       edit:
         title: Edit Participatory budget
         drafting: "This participatory budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
@@ -180,9 +180,9 @@ en:
         groups_and_headings: "Heading groups"
         headings_caption: "Headings in %{group}"
       winners:
-        calculate: Calculate Winner Investments
+        calculate: Calculate Winners
         calculated: Winners being calculated, it may take a minute.
-        recalculate: Recalculate Winner Investments
+        recalculate: Recalculate Winners
       ballots:
         feature_disabled: 'The feature <strong>Polls</strong> must be enabled to create booths. You can enable it from the <a href="%{link}">settings configuration</a> page.'
     budget_groups:
