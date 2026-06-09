@@ -7,14 +7,25 @@ class YsLoginController < Devise::SessionsController
   def create
     username = params.dig(:user, :username)
 
-    # Note: Your description says 14 digits, but your validation code checks for 16.
     # This code follows your validation logic for a 16-digit number.
     if User.validate_document_number(username)
       user = User.log_in_or_create_ys_user(username)
 
       if user&.persisted?
         set_flash_message!(:notice, :signed_in)
-        sign_in_and_redirect user, event: :authentication
+
+        # 1. Sign the user in without automatically redirecting
+        sign_in(user, event: :authentication)
+
+        # 2. Check verification status and redirect accordingly
+        if user.unverified?
+          # This hits your VerificationController#show, which handles routing
+          # them to the exact step they need via your next_step_path logic.
+          redirect_to verification_path
+        else
+          # Fallback to standard Devise redirect if they are already verified
+          redirect_to after_sign_in_path_for(user)
+        end
       else
         error_message = user&.errors&.full_messages&.join(', ') || "Please try again."
         flash[:alert] = "Could not sign you in. #{error_message}"

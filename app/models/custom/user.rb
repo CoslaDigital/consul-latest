@@ -341,8 +341,8 @@ class User < ApplicationRecord
         terms_of_service: "1",
         document_number: ys_document_number,
         confirmed_at: DateTime.current,
-        verified_at: DateTime.current,
-        residence_verified_at: DateTime.current
+      # verified_at: DateTime.current,
+      # residence_verified_at: DateTime.current
       )
 
       Rails.logger.info("User save errors: #{user.errors.full_messages.join(", ")}")

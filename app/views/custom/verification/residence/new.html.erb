@@ -23,6 +23,16 @@
 
     <%= form_for @residence, as: "residence", url: residence_path do |f| %>
       <%= render "errors" %>
+      <% if @residence.errors.any? %>
+        <div class="callout alert" style="background-color: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px;">
+          <strong>Debug:</strong>
+          <ul>
+            <% @residence.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
       <div class="row" style="display: none;">
         <div class="small-12 medium-8">
