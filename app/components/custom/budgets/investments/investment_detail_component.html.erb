@@ -1,8 +1,7 @@
 <div class="row">
-  <%# --- MAIN DESCRIPTION COLUMN --- %>
-  <div class="small-12 medium-8 column">
+  <%# --- MAIN DESCRIPTION COLUMN (66% Width) --- %>
 
-    <%# 1. Component Title & Native Meta Header Info %>
+
     <header class="investment-header margin-bottom">
       <h1><%= investment.title %></h1>
       <%= render Shared::DetailedInfoComponent.new(investment, preview: preview) do %>
@@ -10,40 +9,42 @@
       <% end %>
     </header>
 
-    <%# 2. Main Hero Feature Image %>
     <% if investment.image.present? %>
-      <div class="investment-image-wrapper margin-bottom-medium">
+    <div class="investment-image-wrapper margin-bottom-medium text-center">
         <%= render_image(investment.image, :large, true) %>
       </div>
     <% end %>
 
-    <%# 3. Main Text Sections %>
     <section class="investment-body">
       <% if investment.should_show_unfeasibility_explanation? %>
-        <div class="callout alert margin-bottom">
-          <h2><%= t("budgets.investments.show.unfeasibility_explanation") %></h2>
-          <p><%= investment.unfeasibility_explanation %></p>
+        <div class="investment-unfeasibility margin-bottom">
+          <h4><%= t("budgets.investments.show.unfeasibility_explanation") %></h4>
+          <div class="callout alert no-margin">
+            <p class="no-margin"><%= investment.unfeasibility_explanation %></p>
+          </div>
         </div>
       <% end %>
 
-      <div class="investment-summary lead margin-bottom">
-        <h3><%= t("budgets.investments.show.summary") %></h3>
-        <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
+      <div class="investment-summary margin-bottom">
+        <h4><%= t("budgets.investments.show.summary") %></h4>
+        <div class="panel callout light no-margin">
+          <%= auto_link_already_sanitized_html wysiwyg(investment.summary) %>
+        </div>
       </div>
 
       <div class="investment-description margin-bottom">
-        <h3><%= t("budgets.investments.show.description") %></h3>
-        <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
+        <h4><%= t("budgets.investments.show.description") %></h4>
+        <div class="panel callout light no-margin">
+          <%= auto_link_already_sanitized_html wysiwyg(investment.description) %>
+        </div>
       </div>
     </section>
 
-    <%# 4. Loop Through Custom Form Survey/Private Questions %>
     <% if investment.budget.questions.where(enabled: true).any? %>
       <section class="investment-questions padding-top margin-bottom border-top">
         <% investment.budget.questions.where(enabled: true).order(:id).each do |question| %>
           <div class="question-block margin-bottom">
             <h4><%= question.text.html_safe %></h4>
-
             <div class="answer-block panel callout light no-margin">
               <% investment.answers.where(budget_question_id: question.id).find_each do |answer| %>
                 <% if can? :read, answer %>
@@ -58,55 +59,38 @@
       </section>
     <% end %>
 
-    <%# 5. Multimedia Features %>
     <%= render Shared::EmbeddedVideoComponent.new(investment) %>
 
     <% if investment.video_url.present? %>
-      <div class="video-link callout panel margin-bottom">
-        <p>
-          <span class="icon-video"></span>&nbsp;
-          <strong><%= t("proposals.show.title_video_url") %></strong>
-        </p>
-        <%= sanitize_and_auto_link investment.video_url %>
-      </div>
-    <% end %>
-
-    <% if feature?(:map) && map_location_available?(investment.map_location) %>
-      <div class="investment-map margin-bottom">
-        <h4><%= t("shared.map", default: "Location Map") %></h4>
-        <%= render_map(investment.map_location) %>
+      <div class="video-link margin-bottom">
+        <h4><%= t("proposals.show.title_video_url") %></h4>
+        <div class="callout panel light no-margin">
+          <p class="no-margin">
+            <span class="icon-video"></span>&nbsp;
+            <%= sanitize_and_auto_link investment.video_url %>
+          </p>
+        </div>
       </div>
     <% end %>
 
     <% if investment.should_show_price_explanation? %>
       <section class="price-explanation-section padding-top margin-bottom border-top" id="price_explanation" data-magellan-target="price_explanation">
-        <h2><%= t("budgets.investments.show.price_explanation") %></h2>
-        <p><%= investment.price_explanation %></p>
-      </section>
-    <% end %>
-
-    <%# 6. Base Component Footer Actions %>
-    <% unless preview? %>
-      <footer class="investment-footer padding-top border-top margin-top">
-        <%= render "relationable/related_content", relationable: investment %>
-
-        <div class="js-moderator-investment-actions margin-top">
-          <%= render Shared::ModerationActionsComponent.new(investment) %>
+        <h4><%= t("budgets.investments.show.price_explanation") %></h4>
+        <div class="panel callout light no-margin">
+          <p class="no-margin"><%= investment.price_explanation %></p>
         </div>
-      </footer>
+      </section>
     <% end %>
 
   </div>
 
-  <%# --- SIDEBAR COLUMN (STRICTLY DETAILS & DOCUMENTS) --- %>
+<%# --- SIDEBAR COLUMN (33% Width) --- %>
   <div class="small-12 medium-4 column sidebar">
 
-    <%# Context Information Checklist %>
     <% if investment.should_show_estimated_price? || investment.organization_name.present? || investment.location.present? || investment.external_url.present? %>
       <div class="card callout panel light margin-bottom">
-        <h5><%= t("shared.details", default: "Information") %></h5>
+        <h6><%= t("shared.details", default: "Information") %></h6>
         <ul class="no-bullet text-small no-margin">
-
           <% if investment.should_show_estimated_price? %>
             <li class="margin-bottom border-bottom padding-bottom">
               <strong><%= t("budgets.investments.show.estimated_price") %>:</strong>
@@ -115,21 +99,18 @@
               </p>
             </li>
           <% end %>
-
           <% if investment.organization_name.present? %>
             <li class="margin-bottom-small">
               <strong><%= t("budgets.investments.show.organization_name") %>:</strong><br>
               <%= investment.organization_name %>
             </li>
           <% end %>
-
           <% if investment.location.present? %>
             <li class="margin-bottom-small">
               <strong><%= t("budgets.investments.show.location") %>:</strong><br>
               <%= investment.location %>
             </li>
           <% end %>
-
           <% if investment.external_url.present? %>
             <li class="investment-external-link">
               <strong><%= t("shared.external_link", default: "External Link") %>:</strong><br>
@@ -140,7 +121,6 @@
       </div>
     <% end %>
 
-    <%# Document Storage Attachments %>
     <% if feature?(:allow_attached_documents) && investment.documents.any? %>
       <div class="margin-bottom">
         <%= render Documents::DocumentsComponent.new(investment.documents) %>
@@ -148,4 +128,31 @@
     <% end %>
 
   </div>
+
+<%# --- FULL WIDTH MAP SECTION (Breaks out of the 8-column layout) --- %>
+<% if feature?(:map) && map_location_available?(investment.map_location) %>
+  <div class="row">
+
+  <div class="investment-map margin-bottom margin-top">
+        <h4><%= t("shared.map", default: "Location Map") %></h4>
+        <div class="callout panel light no-margin">
+          <%= render_map(investment.map_location) %>
+        </div>
+      </div>
+  </div>
+<% end %>
+
+<%# --- FOOTER ACTIONS --- %>
+<div class="row">
+
+<% unless preview? %>
+      <footer class="investment-footer padding-top border-top margin-top">
+        <%= render "relationable/related_content", relationable: investment %>
+
+        <div class="js-moderator-investment-actions margin-top">
+          <%= render Shared::ModerationActionsComponent.new(investment) %>
+        </div>
+      </footer>
+    <% end %>
+
 </div>
