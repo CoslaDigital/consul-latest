@@ -10,7 +10,8 @@ class Ability
       if user.administrator?
         merge Abilities::Administrator.new(user)
       elsif user.process_manager?
-        merge Abilities::ProcessManager.new(user)  
+        merge Abilities::ProcessManager.new(user)
+        merge Abilities::Common.new(user)
       elsif user.moderator?
         merge Abilities::Moderator.new(user)
       elsif user.manager?

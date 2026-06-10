@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
-  
+
   def masked_username
     return username if username.blank?
     # If the username is 4 characters or less, just mask the middle
@@ -20,13 +20,13 @@ class User < ApplicationRecord
       username.gsub(/\A(..)(.*)(..)\z/) { "#{$1}#{'*' * $2.length}#{$3}" }
     end
   end
-  
+
   def process_manager?
     process_manager.present?
   end
 
   def administrator?
-    administrator.present? || process_manager.present?
+    administrator.present?
   end
 
   def self.unlock_in

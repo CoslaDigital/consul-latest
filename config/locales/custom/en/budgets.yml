@@ -40,4 +40,8 @@ en:
       select_proposal: "Select one of your proposals to request a collaboration"
       no_proposals: "You need to have an active proposal or project to request a collaboration"
       request_button: "Request this resource"
+  flash:
+    actions:
+      errors:
+        not_allowed: "You do not have permission for this action"
 
