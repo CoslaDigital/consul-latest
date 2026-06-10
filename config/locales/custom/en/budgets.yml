@@ -282,7 +282,7 @@ en:
         title: Edit Election
         drafting: "This participatory budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
         publish: "Publish election"
-        delete: Delete budget
+        delete: Delete election
         phase: Phase
         phases_caption: "Phases"
         phases_table_help_text: "The configuration of these phases is used for information purposes only. Its function is to define the phases information displayed on the public page of the participatory budget."
@@ -321,11 +321,11 @@ en:
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
         success_notice: Budget deleted successfully
-        unable_notice: You cannot delete a budget that has associated investments
-        unable_notice_polls: You cannot delete a budget that has an associated poll
+        unable_notice: You cannot delete a process that has associated candidates
+        unable_notice_polls: You cannot delete a process that has an associated poll
       new:
-        title_multiple: New multiple headings budget
-        title_single: New single heading budget
+        title_multiple: New multiple headings election
+        title_single: New single heading election
       help:
         budgets: "Participatory budgets allow citizens to propose and decide directly how to spend part of the budget, with monitoring and rigorous evaluation of proposals by the institution."
         budget_questions: "Here you can create, edit, and manage the questions that will be presented as part of the application form for this budget."
@@ -342,7 +342,7 @@ en:
         groups_and_headings: "Heading groups"
         headings_caption: "Headings in %{group}"
       winners:
-        calculate: Calculate Winner Investments
+        calculate: Calculate Winners
         calculated: Winners being calculated, it may take a minute.
         recalculate: Recalculate Winner Investments
       ballots:
