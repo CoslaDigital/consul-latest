@@ -3,7 +3,7 @@ module Abilities
     include CanCan::Ability
 
     def initialize(user)
-      merge Abilities::ProcessManager.new(user)
+
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
 

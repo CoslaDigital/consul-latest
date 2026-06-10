@@ -9,10 +9,39 @@ class Admin::BudgetsController < Admin::BaseController
 
   has_filters %w[all open finished], only: :index
 
-  before_action :load_budget, except: [:index]
+  # Exclude new and create actions from load_budget so params[:id] doesn't throw an error
+  before_action :load_budget, except: [:index, :new, :create]
   load_and_authorize_resource class: "Budget"
 
   def index
+    # --- MANUAL DEBUGGING CODE ---
+    Rails.logger.debug "--- CanCanCan Debug in BudgetsController#index ---"
+    Rails.logger.debug "Current User: #{current_user.inspect}"
+    Rails.logger.debug "Ability Class being used: #{current_ability.class.name}"
+
+    # @budgets is already pre-loaded and scoped by CanCanCan here.
+    # We simply chain your filters, order, and pagination onto it.
+    @budgets = @budgets.send(@current_filter).order(created_at: :desc).page(params[:page])
+  end
+
+  def show
+  end
+
+  def new
+  end
+
+  # Intercept creation to link the budget to the Process Manager
+  def create
+    @budget.author = current_user
+
+    if @budget.save
+      redirect_to admin_budget_path(@budget), notice: t("admin.budgets.create.notice")
+    else
+      render :new
+    end
+  end
+
+  def edit
     # --- MANUAL DEBUGGING CODE ---
     Rails.logger.debug "--- CanCanCan Debug in BudgetsController#index ---"
     Rails.logger.debug "Current User: #{current_user.inspect}"
@@ -49,7 +78,6 @@ class Admin::BudgetsController < Admin::BaseController
       @budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
     end
 
-    #@budget.headings.each { |heading| Budget::Result.new(@budget, heading).delay.calculate_winners }
     redirect_to admin_budget_budget_investments_path(
                   budget_id: @budget.id,
                   advanced_filters: ["winners"]

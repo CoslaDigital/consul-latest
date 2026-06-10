@@ -61,7 +61,7 @@ class User < ApplicationRecord
   end
 
   def administrator?
-    administrator.present? || process_manager.present?
+    administrator.present?
   end
 
   def self.unlock_in

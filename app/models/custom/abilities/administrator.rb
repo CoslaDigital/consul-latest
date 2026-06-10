@@ -1,11 +1,15 @@
+load Rails.root.join("app", "models", "abilities", "administrator.rb")
+
 module Abilities
   class Administrator
     include CanCan::Ability
 
     def initialize(user)
-      merge Abilities::ProcessManager.new(user)
+      # merge Abilities::ProcessManager.new(user)
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
+
+      can [:search, :create, :index, :destroy], ::ProcessManager
 
       can :restore, Comment
       cannot :restore, Comment, hidden_at: nil

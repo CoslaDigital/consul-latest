@@ -7,7 +7,7 @@ module Abilities
       can :read, Budget::Investment::Answer
 
       cannot :edit, Administrator
-       can :index, Administrator
+      can :index, Administrator
 
       can :restore, Comment
       cannot :restore, Comment, hidden_at: nil
@@ -68,26 +68,64 @@ module Abilities
 
       can :manage, Dashboard::Action
 
-      can [:budget_headings, :select, :select_headings, :index, :read, :create, :update, :destroy], Budget
-      can :publish, Budget, id: Budget.drafting.ids
-      can :calculate_winners, Budget, &:reviewing_ballots?
-      can :read_results, Budget do |budget|
-        budget.balloting_finished? && budget.has_winning_investments?
+      # ====================================================================
+      # BUDGET CORE RULES — author-scoped
+      # ====================================================================
+      can :read, :admin_dashboard
+      can [:index, :create, :budget_headings, :select, :select_headings], Budget
+
+      cannot [:update, :destroy, :publish, :calculate_winners, :read_results, :read_admin_stats], Budget
+      can [:read, :update, :destroy], Budget, author_id: user.id
+
+      can :publish, Budget, id: Budget.drafting.where(author_id: user.id).ids
+
+      can :calculate_winners, Budget do |budget|
+        budget.author_id == user.id && budget.reviewing_ballots?
       end
 
-      can [:read, :create, :update, :destroy], Budget::Group
-      can [:read, :create, :update, :destroy], Budget::Heading
-      can [:hide, :admin_update, :update, :toggle_selection], Budget::Investment
-      can [:valuate, :comment_valuation], Budget::Investment
-      cannot [:admin_update, :valuate, :comment_valuation],
-             Budget::Investment, budget: { phase: "finished" }
-      can [:select, :deselect], Budget::Investment do |investment|
-        investment.feasible? && investment.valuation_finished? && !investment.budget.finished?
+      can :read_results, Budget do |budget|
+        budget.author_id == user.id && budget.balloting_finished? && budget.has_winning_investments?
       end
+
+      can :read_admin_stats, Budget do |budget|
+        budget.author_id == user.id && budget.balloting_or_later?
+      end
+
+      # ====================================================================
+      # BUDGET PHASE RULES — isolation override
+      # ====================================================================
+      can :read, Budget::Phase
+
+      # 1. Nuke ALL core engine rules (including :edit and :new)
+      cannot :manage, Budget::Phase
+
+      # 2. Re-grant using ONLY Hash conditions (CanCanCan handles both SQL and memory checks with this)
+      can [:create, :update, :destroy], Budget::Phase, budget: { author_id: user.id }
+
+      # ====================================================================
+      # BUDGET GROUP RULES — isolation override
+      # ====================================================================
+      can :read, Budget::Group
+
+      # 1. Nuke ALL core engine rules
+      cannot :manage, Budget::Group
+
+      # 2. Re-grant using ONLY Hash conditions
+      can [:create, :update, :destroy], Budget::Group, budget: { author_id: user.id }
+
+      # ====================================================================
+      # BUDGET HEADING RULES — isolation override via deep association
+      # ====================================================================
+      can :read, Budget::Heading
+
+      # 1. Nuke ALL core engine rules
+      cannot :manage, Budget::Heading
+
+      # 2. Re-grant using ONLY Hash conditions
+      can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: user.id } }
 
       can :create, Budget::ValuatorAssignment
-
-      can :read_admin_stats, Budget, &:balloting_or_later?
+      # ====================================================================
 
       can [:search, :update, :create, :index, :destroy], Banner
 
