@@ -32,7 +32,7 @@ class Admin::MenuComponent < ApplicationComponent
         milestone_statuses_link,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?),
-        (sensemaker_link if feature?(:sensemaker))
+        (sensemaker_link if Sensemaker.enabled?)
       ]
     end
 
