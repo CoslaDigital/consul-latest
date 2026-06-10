@@ -1,8 +1,16 @@
 <% provide :title, @investment.title %>
-<% content_for :canonical do %>
-  <%= render "shared/canonical", href: budget_investment_url %>
+
+<% content_for :header_addon do %>
+  <%= render "shared/search_form",
+             search_path: budget_investments_path(budget_id: @budget.id, page: 1),
+             i18n_namespace: "budgets.investments.index.search_form" %>
 <% end %>
 
+<% content_for :canonical do %>
+  <%= render "shared/canonical", href: budget_investment_url(@budget, @investment) %>
+<% end %>
+
+<%= back_link_to budget_investments_path(@budget, heading_id: @investment.heading_id), t("budgets.investments.show.see_all") %>
 <%= render "/budgets/investments/investment_show",
            investment: @investment,
            investment_ids: @investment_ids,

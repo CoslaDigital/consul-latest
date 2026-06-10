@@ -154,6 +154,7 @@ en:
         project_winner: "Winning candidate"
         project_not_selected: "This candidate <strong>has not been selected</strong> for balloting phase."
         see_price_explanation: See price explanation
+        see_all: "Back to candidates list"
       wrong_price_format: Only integer numbers
       investment:
         add: Vote
