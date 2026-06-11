@@ -29,6 +29,7 @@ class Admin::MenuComponent < ApplicationComponent
         settings_links,
         (events_link if feature?(:events)),
         collaborations_link,
+        milestone_statuses_link,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?),
         (sensemaker_link if feature?(:sensemaker))
@@ -627,6 +628,15 @@ class Admin::MenuComponent < ApplicationComponent
         t("admin.menu.sdg_managers"),
         admin_sdg_managers_path,
         sdg_managers?
+      ]
+    end
+
+    def milestone_statuses_link
+      [
+        t("admin.menu.milestone_statuses", default: "Milestone Statuses"),
+        admin_milestone_statuses_path,
+        controller_name == "milestone_statuses",
+        class: "milestone-statuses-link"
       ]
     end
 

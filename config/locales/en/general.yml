@@ -288,10 +288,6 @@ en:
       sign_in: "You can sign in with any of the methods on this page"
       sign_in_help: ""
       sign_up: "Sign up with:"
-    saml:
-      sign_in: Sign in with SAML
-      sign_up: Sign up with SAML
-      name: SAML
     oidc:
       sign_in: Sign in with OIDC
       sign_up: Sign up with OIDC
@@ -340,7 +336,6 @@ en:
       proposal_title_note: "Give a suitable name to your proposal"
       proposal_summary_note: "Give a short overview of your proposal(maximum 200 characters)"
       proposal_description_note: "Provide a detailed description of your project"
-      proposal_video_url_note: You may add a link to YouTube or Vimeo
       proposal_estimated_price: Estimated Cost
       proposal_estimated_price_note: Please give an estimate of the cost of this proposal if you know it
       tag_category_label: "Categories"
@@ -374,6 +369,19 @@ en:
       selected_proposals_link: View selected proposals
       archived_proposals: Archived proposals
       proposals_lists: Proposals lists
+      milestones:
+        requested:
+          title: "Collaboration Requested"
+          description: "A community member requested the resource assistance: \"%{resource_title}\"."
+        accepted:
+          title: "Collaboration Arranged"
+          description: "The resource offer \"%{resource_title}\" was pre-accepted. Awaiting final confirmation."
+        confirmed:
+          title: "Resource Support Active"
+          description: "Collaboration confirmed! %{user_name} is now actively providing \"%{resource_title}\" to support this proposal."
+        fulfilled:
+          title: "Support Successfully Received"
+          description: "The resource assistance for \"%{resource_title}\" has been marked as fully completed and delivered."
       retired_links:
         all: All
         duplicated: Duplicated
@@ -436,7 +444,7 @@ en:
       successful: "This proposal has reached the required supports."
       selected: "Selected proposal"
     show:
-      code: "Proposal code:"
+      code: "Proposal code"
       comments_tab: Comments
       dashboard_proposal_link: Dashboard
       budget_investment_link: Create Budget Proposal
