@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AiModeratable
   extend ActiveSupport::Concern
 
@@ -6,7 +8,7 @@ module AiModeratable
   end
 
   def queue_ai_moderation
-    self.delay.moderate_with_ai
+    delay.moderate_with_ai
   end
 
   def moderate_with_ai
@@ -20,14 +22,12 @@ module AiModeratable
     return unless Setting.find_by(key: "llm.comment_moderation")&.enabled?
 
     # Define thresholds. Fall back to global defaults if settings don't exist.
-    # Lower threshold = stricter moderation. Higher threshold = more relaxed.
-    # Extract values directly from the new unified llm key settings
-    flag_threshold = Setting["llm.moderation_flag_threshold"] || 0.4
-    hidden_threshold = Setting["llm.moderation_hidden_threshold"] || 0.75
+    flag_threshold = (Setting["llm.moderation_flag_threshold"] || 0.4).to_f
+    hidden_threshold = (Setting["llm.moderation_hidden_threshold"] || 0.75).to_f
 
     system_prompt = <<~PROMPT
       You are an advanced automated content moderation system.
-      Analyze the input comment and provide a floating-point score between 0.0 (completely innocent/safe) and 1.0 (extremely severe/violating) for each category.
+      Analyze the input comment and provide a floating-point score between 0.0 and 1.0 for each category.
 
       Categories:
       - hate_speech: Discriminatory language targeting protected groups, racism, sexism, bigotry.
@@ -59,7 +59,8 @@ module AiModeratable
         active_context = active_context.dup { |c| c.request_timeout = 300 }
       elsif provider_name == :vertexai
         active_context = active_context.dup do |c|
-          c.vertexai_location = Tenant.current_secrets.llm&.[]("vertexai_location") || "us-central1"
+          loc_secret = Tenant.current_secrets.llm&.[]("vertexai_location")
+          c.vertexai_location = loc_secret || "us-central1"
         end
       elsif provider_name == :anthropic || model_name.include?("claude")
         active_context = active_context.dup { |c| c.retry_interval = 12.0 }
@@ -88,33 +89,32 @@ module AiModeratable
         score_value = score.to_f
 
         # High severity violation triggers automatic hiding
-        if score_value >= hidden_threshold.to_f
+        if score_value >= hidden_threshold
           is_hidden = true
           is_flagged = true
           triggered_categories << "#{category}(H:#{score_value})"
           # Moderate violation triggers a flag for review
-        elsif score_value >= flag_threshold.to_f
+        elsif score_value >= flag_threshold
           is_flagged = true
           triggered_categories << "#{category}(F:#{score_value})"
         end
       end
 
-      # --- 1. CALCULATE FLAGS IF TRIGGERED ---
+      # --- CALCULATE FLAGS IF TRIGGERED ---
       calculated_flags = 0
       if is_flagged || is_hidden
         scores.each do |_, val|
           v = val.to_f
-          calculated_flags += 4 if v >= hidden_threshold.to_f
-          calculated_flags += 2 if v >= flag_threshold.to_f && v < hidden_threshold.to_f
+          calculated_flags += 4 if v >= hidden_threshold
+          calculated_flags += 2 if v >= flag_threshold && v < hidden_threshold
         end
       else
-        # If safe, retain the comment's current flags_count (usually 0)
-        calculated_flags = self.flags_count
+        calculated_flags = flags_count
       end
 
       meta_payload = {
         model_used: model_name,
-        evaluated_at: Time.current, # <--- Serves perfectly as your ai_moderated_at timestamp!
+        evaluated_at: Time.current,
         scores: scores,
         reasoning: data["reasoning"],
         flagged: is_flagged,
@@ -123,24 +123,34 @@ module AiModeratable
 
       update_columns(
         flags_count: calculated_flags,
-        hidden_at: is_hidden ? Time.current : self.hidden_at,
+        hidden_at: is_hidden ? Time.current : hidden_at,
         ai_moderation_meta: meta_payload
       )
 
       if is_flagged || is_hidden
-        Rails.logger.info "[AI Moderation] Comment ##{id} FLAGGED/HIDDEN by #{model_name}. " \
-                            "Triggers: #{triggered_categories.join(', ')}. Reason: #{data['reasoning']}"
+        log_msg = I18n.t(
+          "moderation.ai_integration.logs.flagged_or_hidden",
+          id: id,
+          model: model_name,
+          triggers: triggered_categories.join(", "),
+          reason: data["reasoning"]
+        )
       else
-        Rails.logger.info "[AI Moderation] Comment ##{id} marked CLEAN by #{model_name}."
+        log_msg = I18n.t("moderation.ai_integration.logs.clean", id: id, model: model_name)
       end
 
+      Rails.logger.info log_msg
+
     rescue RubyLLM::Error => e
-      Rails.logger.error "[AI Moderation] RubyLLM Error for Comment ##{id}: #{e.message}"
+      err_msg = I18n.t("moderation.ai_integration.errors.ruby_llm_crash", id: id, message: e.message)
+      Rails.logger.error err_msg
       raise e
     rescue JSON::ParserError
-      Rails.logger.warn "[AI Moderation] JSON Parsing crash for Comment ##{id}. Content: #{raw_content.inspect}"
+      log_warn = I18n.t("moderation.ai_integration.errors.json_parser_crash", id: id, content: raw_content.inspect)
+      Rails.logger.warn log_warn
     rescue => e
-      Rails.logger.error "[AI Moderation] Unexpected exception caught for Comment ##{id}: #{e.message}"
+      err_msg = I18n.t("moderation.ai_integration.errors.unexpected_exception", id: id, message: e.message)
+      Rails.logger.error err_msg
     end
   end
 end

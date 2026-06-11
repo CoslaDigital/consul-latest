@@ -1,25 +1,23 @@
 <% if comment.ai_moderation_meta.present? %>
-  <div class="ai-moderation-summary" style="background: #f9f9f9; border-left: 4px solid #cc0000; padding: 12px; margin-top: 10px; font-size: 0.85rem; border-radius: 0 4px 4px 0;">
-    <strong>🤖 AI Moderation Audit Trail</strong> (Evaluated by: <%= comment.ai_moderation_meta["model_used"] %>)
-
-    <p style="margin: 6px 0; color: #333;">
-      <strong>Reasoning:</strong>
+  <div class="admin-budget-investment-info margin-top">
+    <strong><%= t("shared.ai_moderation_info.audit_trail") %></strong>
+    <%= t("shared.ai_moderation_info.evaluated_by", model: comment.ai_moderation_meta["model_used"]) %>
+    <p>
+      <strong><%= t("shared.ai_moderation_info.reasoning") %></strong>
       <em><%= comment.ai_moderation_meta["reasoning"] %></em>
     </p>
-
-    <div class="ai-scores-grid" style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 6px;">
+    <div class="menu simple" style="margin-top: 0.5rem;">
       <% comment.ai_moderation_meta["scores"]&.each do |category, score| %>
-        <%# Grab the active thresholds dynamically to match UI colors to your settings %>
         <%
           flag_t = Setting["llm.moderation_flag_threshold"].to_f
           hide_t = Setting["llm.moderation_hidden_threshold"].to_f
           score_f = score.to_f
 
-          color = "text-muted"
-          color = "color: #ffae00; font-weight: bold;" if score_f >= flag_t
-          color = "color: #cc0000; font-weight: bold;" if score_f >= hide_t
+          color_class = "text-medium"
+          color_class = "rejected" if score_f >= flag_t
+          color_class = "rejected font-weight-bold" if score_f >= hide_t
         %>
-        <span style="<%= color if score_f >= flag_t %>">
+        <span class="<%= color_class %>" style="margin-right: 1.5rem; display: inline-block;">
           <%= category.humanize %>: <%= (score_f * 100).round %>%
         </span>
       <% end %>
