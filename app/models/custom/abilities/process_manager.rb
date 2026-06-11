@@ -122,7 +122,7 @@ module Abilities
       cannot :manage, Budget::Heading
 
       # 2. Re-grant using ONLY Hash conditions
-      can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: user.id } }
+      can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: user.id }}
 
       can :create, Budget::ValuatorAssignment
       # ====================================================================
