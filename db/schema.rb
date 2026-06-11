@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_10_085747) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -863,8 +863,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_10_085747) do
     t.tsvector "tsv"
     t.date "summary_publication_date"
     t.boolean "summary_publication_enabled"
+    t.integer "author_id"
     t.index ["allegations_end_date"], name: "index_legislation_processes_on_allegations_end_date"
     t.index ["allegations_start_date"], name: "index_legislation_processes_on_allegations_start_date"
+    t.index ["author_id"], name: "index_legislation_processes_on_author_id"
     t.index ["debate_end_date"], name: "index_legislation_processes_on_debate_end_date"
     t.index ["debate_start_date"], name: "index_legislation_processes_on_debate_start_date"
     t.index ["draft_end_date"], name: "index_legislation_processes_on_draft_end_date"
