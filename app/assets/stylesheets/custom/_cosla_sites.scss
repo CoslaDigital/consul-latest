@@ -251,16 +251,39 @@
 }
 
 .site-ren {
-  --brand: #10069F;
-  --brand-secondary: #00B140;
+  /* --- Brand Core --- */
+  --brand: #D01678;
+  --brand-secondary: #363281;
   --brand-contrast: #FFFFFF;
-  --footer: #023C19;
-  --footer-contrast: #FFFFFF;
+
+  /* --- Global Layout --- */
+  --background-color: #363281;
+  --text-color: #333333;
+
+  /* --- Main Header --- */
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  /* --- Top Links --- */
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+
+  /* --- Subnavigation --- */
+  --subnavigation: #EAEAEA;
+
+  /* --- Footer --- */
+  --footer: #7F3089;
+  --footer-contrast: #FFFFFF;
+
+  /* --- Buttons & Interactive --- */
+  --button-background-hover: #00B140;
+  --button-background-hover-contrast: #FFFFFF;
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+
   @import "cosla_shared";
   @include shared-styles;
+
 }
 
 .site-highland {
