@@ -820,6 +820,7 @@ es:
       local_census_records: Censo local
       machine_learning: "IA / Machine learning"
       multitenancy: Multientidad
+      milestone_statuses: "Estados de los hitos"
     administrators:
       index:
         title: Administradores

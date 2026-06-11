@@ -884,6 +884,7 @@ en:
       machine_learning: "AI / Machine learning"
       sensemaker: "Sensemaker"
       multitenancy: Multitenancy
+      milestone_statuses: "Milestone Statuses"
     administrators:
       index:
         title: Administrators
