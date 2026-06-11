@@ -5,6 +5,7 @@ class Admin::BudgetsController < Admin::BaseController
   include ReportAttributes
   include ImageAttributes
   include FeatureFlags
+
   feature_flag :budgets
 
   has_filters %w[all open finished], only: :index
@@ -42,21 +43,6 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def edit
-    # --- MANUAL DEBUGGING CODE ---
-    Rails.logger.debug "--- CanCanCan Debug in BudgetsController#index ---"
-    Rails.logger.debug "Current User: #{current_user.inspect}"
-    Rails.logger.debug "Ability Class being used: #{current_ability.class.name}"
-
-    # 1. Manual Authorization Step
-    # This will raise the CanCan::AccessDenied error if it fails,
-    # pinpointing the exact moment of failure.
-    #    authorize! :index, Budget
-
-    # 2. Manual Loading Step
-    # This shows you the collection of budgets the user is allowed to see.
-    #    @budgets = Budget.accessible_by(current_ability)
-    #    Rails.logger.debug "Accessible Budgets Found: #{@budgets.count}"
-    #    Rails.logger.debug "------------------------------------------------"
     @budgets = Budget.send(@current_filter).order(created_at: :desc).page(params[:page])
   end
 
@@ -114,5 +100,4 @@ class Admin::BudgetsController < Admin::BaseController
     def allowed_params
       consul_allowed_params + [:stv, :stv_winners, :stv_dynamic_quota, :kind]
     end
-
 end
