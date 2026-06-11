@@ -147,4 +147,8 @@ class Admin::Dashboard::IndexComponent < ApplicationComponent
   def documentation_link
     link_to "https://docs.consuldemocracy.org", "https://docs.consuldemocracy.org", target: "_blank"
   end
+
+  def local_documentation_link
+    link_to "https://cosla-consul.gitbook.io/cosla_consul-docs", "https://cosla-consul.gitbook.io/cosla_consul-docs", target: "_blank"
+  end
 end
