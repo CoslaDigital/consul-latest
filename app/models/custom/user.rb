@@ -9,15 +9,15 @@ class User < ApplicationRecord
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
-
   def masked_username
     return username if username.blank?
+
     # If the username is 4 characters or less, just mask the middle
     if username.length <= 4
-      username.gsub(/(?<=.).(?=.)/, '*')
+      username.gsub(/(?<=.).(?=.)/, "*")
     else
       # Keeps first 2 and last 2, masks the rest
-      username.gsub(/\A(..)(.*)(..)\z/) { "#{$1}#{'*' * $2.length}#{$3}" }
+      username.gsub(/\A(..)(.*)(..)\z/) { "#{$1}#{"*" * $2.length}#{$3}" }
     end
   end
 
@@ -63,7 +63,7 @@ class User < ApplicationRecord
   # Get the existing user by email if the provider gives us a verified email.
   def self.first_or_initialize_for_oauth(auth)
     oauth_email = auth.info.email
-    oauth_verified = auth.info.verified || auth.info.verified_email || auth.info.email_verified || auth.extra.raw_info.email_verified
+    auth.info.verified || auth.info.verified_email || auth.info.email_verified || auth.extra.raw_info.email_verified
     oauth_email_confirmed = oauth_email.present? #&& oauth_verified
     oauth_user = User.find_by(email: oauth_email) if oauth_email_confirmed
 
@@ -125,24 +125,21 @@ class User < ApplicationRecord
 
     # Assuming 'extracted_values' is the hash containing extracted values
     saml_username = extracted_values["saml_username"]
-    saml_authority_code = extracted_values["saml_authority_code"]
+    extracted_values["saml_authority_code"]
     saml_firstname = extracted_values["saml_firstname"]
     saml_surname = extracted_values["saml_surname"]
-    saml_long = extracted_values["saml_longitude"]
-    saml_lat = extracted_values["saml_latitude"]
+    extracted_values["saml_longitude"]
+    extracted_values["saml_latitude"]
     saml_date_of_birth = extracted_values["saml_date_of_birth"]
     saml_gender = extracted_values["saml_gender"]
     saml_postcode = extracted_values["saml_postcode"]
     saml_email = extracted_values["saml_email"]
-    saml_town = extracted_values["saml_town"]
+    extracted_values["saml_town"]
 
     oauth_email = saml_email
-    oauth_gender = saml_gender
     oauth_username = saml_username
-    oauth_lacode = saml_authority_code
     saml_full_name = saml_firstname + "_" + saml_surname
-    oauth_date_of_birth = saml_date_of_birth
-    oauth_email_confirmed = oauth_email.present?
+    oauth_email.present?
     saml_email_confirmed = saml_email.present?
 
     # Normalize the saml_postcode by stripping spaces and converting to lowercase
@@ -154,13 +151,11 @@ class User < ApplicationRecord
     new_geozone_id = Postcode.find_geozone_for_postcode(normalized_saml_postcode)
     # Update the user's geozone if it has changed (based on geozone ID comparison)
     if existing_user && new_geozone_id && new_geozone_id != existing_user.geozone_id
-      existing_user.update(geozone_id: new_geozone_id)
+      existing_user.update!(geozone_id: new_geozone_id)
       Rails.logger.info("User geozone updated to #{new_geozone_id}")
     end
 
-    # lacode comes from list of councils registered with IS
-    oauth_lacode_ref = "9079" # this should be picked up from secrets in future
-    oauth_lacode_confirmed = oauth_lacode == oauth_lacode_ref
+    # lacode comes from list of councils registered with IS # this should be picked up from secrets in future
     oauth_user = User.find_by(email: saml_email) if saml_email_confirmed
 
     # Initialize saml_geozone_id
@@ -197,8 +192,8 @@ class User < ApplicationRecord
     extracted_values = self.class.extract_saml_attributes(auth)
 
     Rails.logger.info("extracted values: #{extracted_values.inspect}")
-    saml_date_of_birth = extracted_values["saml_date_of_birth"]
-    saml_gender = extracted_values["saml_gender"]
+    extracted_values["saml_date_of_birth"]
+    extracted_values["saml_gender"]
     saml_postcode = extracted_values["saml_postcode"]
     # Normalize the saml_postcode by stripping spaces and converting to lowercase
     normalized_saml_postcode = saml_postcode.strip.downcase if saml_postcode.present?
@@ -211,7 +206,7 @@ class User < ApplicationRecord
     # Add more fields if necessary
 
     # Save only if any changes have been made
-    save if changed?
+    save! if changed?
   end
 
   # send the notification using AdminNotification system
@@ -273,102 +268,102 @@ class User < ApplicationRecord
 
   private
 
-  def self.log_in_or_create_ys_user(username)
-    Rails.logger.info("YS inside log in or create")
-    if (existing_user = User.find_by(username: username))
-      Rails.logger.info("YS Existing user")
-      # Log in the existing user
-      return existing_user # Assuming successful login
-    else
-      # Create a new user
-      Rails.logger.info("Create YS - NOT EXISTING USER")
-      ys_username = username
-      ys_password = username
-      ys_document_number = username
-      ys_email = "#{username}@consul.dev"
-      ys_confirmed_at = Time.now
-      #    ys_geozone = 1
-      ys_geozone = Geozone.find_or_create_by(name: "ys").id
-      Rails.logger.info("YS Trying to create new user")
-      user = User.new(
-        username: ys_username,
-        email: ys_email,
-        password: ys_password,
-        geozone_id: ys_geozone,
-        terms_of_service: "1",
-        document_number: ys_document_number,
-        confirmed_at: DateTime.current,
-        verified_at: DateTime.current,
-        residence_verified_at: DateTime.current
-      )
-
-      Rails.logger.info("User save errors: #{user.errors.full_messages.join(", ")}")
-      Rails.logger.info("YS About to try to sign in the user #{user.inspect}")
-      user.valid?
-      # Check if there are errors NOT related to the password
-      # We ignore errors on :password, but keep errors on :email, :username, etc.
-      other_errors = user.errors.messages.except(:password)
-      if other_errors.empty?
-        # 3. If the only issues were password-related, force save
-        if user.save(validate: false)
-          Rails.logger.info("Create YS - USER created (Password complexity bypassed)")
-          user.errors.clear
-          return user
-        else
-          Rails.logger.info("Create YS - System Error during save")
-        end
+    def self.log_in_or_create_ys_user(username)
+      Rails.logger.info("YS inside log in or create")
+      if (existing_user = User.find_by(username: username))
+        Rails.logger.info("YS Existing user")
+        # Log in the existing user
+        existing_user # Assuming successful login
       else
-        # 4. If there were real errors (like duplicate email), fail as normal
-        Rails.logger.info("Create YS - USER NOT created due to: #{other_errors}")
+        # Create a new user
+        Rails.logger.info("Create YS - NOT EXISTING USER")
+        ys_username = username
+        ys_password = username
+        ys_document_number = username
+        ys_email = "#{username}@consul.dev"
+        Time.zone.now
+        #    ys_geozone = 1
+        ys_geozone = Geozone.find_or_create_by!(name: "ys").id
+        Rails.logger.info("YS Trying to create new user")
+        user = User.new(
+          username: ys_username,
+          email: ys_email,
+          password: ys_password,
+          geozone_id: ys_geozone,
+          terms_of_service: "1",
+          document_number: ys_document_number,
+          confirmed_at: DateTime.current,
+          verified_at: DateTime.current,
+          residence_verified_at: DateTime.current
+        )
+
+        Rails.logger.info("User save errors: #{user.errors.full_messages.join(", ")}")
+        Rails.logger.info("YS About to try to sign in the user #{user.inspect}")
+        user.valid?
+        # Check if there are errors NOT related to the password
+        # We ignore errors on :password, but keep errors on :email, :username, etc.
+        other_errors = user.errors.messages.except(:password)
+        if other_errors.empty?
+          # 3. If the only issues were password-related, force save
+          if user.save(validate: false)
+            Rails.logger.info("Create YS - USER created (Password complexity bypassed)")
+            user.errors.clear
+            return user
+          else
+            Rails.logger.info("Create YS - System Error during save")
+          end
+        else
+          # 4. If there were real errors (like duplicate email), fail as normal
+          Rails.logger.info("Create YS - USER NOT created due to: #{other_errors}")
+        end
+
+        nil # Return nil if save failed
+      end
+    end
+
+    def self.validate_document_number(document_number)
+      return false if document_number.blank?
+
+      DOCUMENT_ID_STRATEGIES.any? do |strategy|
+        if strategy.is_a?(Regexp)
+          # Check against Regex
+          document_number.to_s.match?(strategy)
+        elsif strategy.is_a?(Symbol) && respond_to?(strategy)
+          # Call the custom method
+          send(strategy, document_number)
+        end
+      end
+    end
+
+    def self.valid_ys_document?(document_number)
+      valid_prefixes = Rails.application.secrets.ys_prefixes || []
+
+      if valid_prefixes.empty?
+        Rails.logger.warn("No valid document prefixes found in secrets.")
+        return false
       end
 
-      nil # Return nil if save failed
-    end
-  end
+      # Perform the specific YS checks
+      return false unless document_number.to_s.length == 16
 
-  def self.validate_document_number(document_number)
-    return false if document_number.blank?
+      prefix = document_number.to_s[0, 6]
+      middle = document_number.to_s[6, 8]
+      suffix = document_number.to_s[14, 2]
 
-    DOCUMENT_ID_STRATEGIES.any? do |strategy|
-      if strategy.is_a?(Regexp)
-        # Check against Regex
-        document_number.to_s.match?(strategy)
-      elsif strategy.is_a?(Symbol) && respond_to?(strategy)
-        # Call the custom method
-        send(strategy, document_number)
-      end
-    end
-  end
+      return false unless valid_prefixes.include?(prefix)
+      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
 
-  def self.valid_ys_document?(document_number)
-    valid_prefixes = Rails.application.secrets.ys_prefixes || []
-
-    if valid_prefixes.empty?
-      Rails.logger.warn("No valid document prefixes found in secrets.")
-      return false
+      true
     end
 
-    # Perform the specific YS checks
-    return false unless document_number.to_s.length == 16
+    def self.valid_na_document?(document_number)
+      # Define the allowed formats
+      allowed_formats = [
+        /\AON0\d{4,14}\z/, # NA digital
+        /\A[Pp]0\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
+      ]
 
-    prefix = document_number.to_s[0, 6]
-    middle = document_number.to_s[6, 8]
-    suffix = document_number.to_s[14, 2]
-
-    return false unless valid_prefixes.include?(prefix)
-    return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
-
-    true
-  end
-
-  def self.valid_na_document?(document_number)
-    # Define the allowed formats
-    allowed_formats = [
-      /\AON0\d{4,14}\z/, # NA digital
-      /\A[Pp]0\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
-    ]
-
-    # Check if the document number matches ANY of the formats
-    allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
-  end
+      # Check if the document number matches ANY of the formats
+      allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
+    end
 end
