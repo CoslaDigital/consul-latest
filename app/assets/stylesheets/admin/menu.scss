@@ -32,6 +32,10 @@
       @include icon(archive, solid);
     }
 
+    &.milestone-statuses-link {
+      @include icon(flag, solid);
+    }
+
     &.budgets-link,
     &.investments-link,
     &.budget-investments-link {

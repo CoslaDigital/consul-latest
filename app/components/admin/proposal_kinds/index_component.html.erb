@@ -1,0 +1,45 @@
+<div class="header-action">
+  <h2 class="inline-block">Proposal Types / Project Configurations</h2>
+  <%= link_to "Add New Proposal Type", new_admin_proposal_kind_path, class: "button success float-right" %>
+</div>
+
+<% if proposal_kinds.any? %>
+  <table class="table-list text-center">
+    <thead>
+    <tr>
+      <th class="text-left">Type Name</th>
+      <th>Url Segment Slug</th>
+      <th>Default Status</th>
+      <th class="text-right">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% proposal_kinds.each do |kind| %>
+      <tr>
+        <td class="text-left font-bold">
+          <%= kind.name %>
+        </td>
+        <td><code><%= kind.slug %></code></td>
+        <td>
+          <% if kind.default? %>
+            <span class="tag success">Active Default</span>
+          <% else %>
+            <%= link_to "Set as Default", set_default_admin_proposal_kind_path(kind), method: :patch, class: "button hollow micro secondary" %>
+          <% end %>
+        </td>
+        <td class="text-right">
+          <%= render Admin::TableActionsComponent.new(
+            kind,
+            actions: kind.default? ? [:edit] : [:edit, :destroy],
+            edit_path: edit_admin_proposal_kind_path(kind),
+            destroy_path: admin_proposal_kind_path(kind),
+            destroy_confirmation: "Are you sure you want to delete this type? Attached proposals will safely revert to General classifications."
+          ) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="callout warning">No custom proposal kinds configured yet.</div>
+<% end %>

@@ -1,3 +1,4 @@
+# app/components/offers/mine_component.rb
 class Offers::MineComponent < ApplicationComponent
   attr_reader :user
 
@@ -10,12 +11,20 @@ class Offers::MineComponent < ApplicationComponent
     if valid_filters.include?(@params_filter)
       @params_filter
     else
+      # Defaults to the first tab that actually has items
       valid_filters.first
     end
   end
 
+  # DYNAMIC LOGIC: Only returns filters if there are items inside them
   def valid_filters
-    ["resources_offered", "help_received"]
+    filters = []
+    filters << "resources_offered" if offers_offered.any?
+    filters << "help_received" if help_received.any?
+
+    # Fallback: If both are empty, default to "resources_offered"
+    # so the page still renders an empty state gracefully.
+    filters.present? ? filters : ["resources_offered"]
   end
 
   def count(filter)
@@ -35,5 +44,4 @@ class Offers::MineComponent < ApplicationComponent
                                     .includes(:offer, proposal: :author)
                                     .order(created_at: :desc)
   end
-
 end
