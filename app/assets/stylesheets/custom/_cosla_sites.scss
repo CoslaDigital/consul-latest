@@ -252,20 +252,23 @@
 
 .site-ren {
   /* --- Brand Core --- */
-  --brand: #D01678;
-  --brand-secondary: #363281;
+  --brand: #363281;
+  --brand-secondary: #D01678;
   --brand-contrast: #FFFFFF;
+  --brand-contrast2: #00959E;
+  --brand-contrast3: #009ACD;
+  --brand-contrast4: #F4E63C;
 
   /* --- Global Layout --- */
   --background-color: #363281;
-  --text-color: #333333;
+  --text-color: #363281;
 
   /* --- Main Header --- */
   --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
 
   /* --- Top Links --- */
-  --top-links: var(--brand-secondary);
+  --top-links: var(--brand-contrast2);
   --top-links-contrast: #FFFFFF;
 
   /* --- Subnavigation --- */
@@ -280,6 +283,15 @@
   --button-background-hover-contrast: #FFFFFF;
   --anchor-color: var(--brand);
   --anchor-color-hover: var(--brand-secondary);
+
+  /* --- Hero Gradient --- */
+  .hero-header .row::before {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%);
+    opacity: 0.8;
+    border-radius: inherit;
+  }
 
   @import "cosla_shared";
   @include shared-styles;
@@ -298,5 +310,3 @@
   @import "cosla_shared";
   @include shared-styles;
 }
-
-
