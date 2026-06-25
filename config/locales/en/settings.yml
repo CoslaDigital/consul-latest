@@ -91,8 +91,6 @@ en:
       google_login_description: "Allow users to sign up with their Google Account"
       wordpress_login: "Wordpress login"
       wordpress_login_description: "Allow users to sign up with their Wordpress Account"
-      saml_login: "Saml login"
-      saml_login_description: "Allow users to sign up with their Saml Account"
       oidc_login: "OpenID Connect login"
       oidc_login_description: "Allow users to sign up with OpenID Connect (OIDC)"
       saml_login: "SAML login"

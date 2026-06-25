@@ -4,7 +4,7 @@
 
 ### 1. Production server
 
-- Supported distributions: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye or Debian Bookworm
+- Supported distributions: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye, Debian Bookworm or Debian Trixie
 - RAM: 32GB
 - Processor: Quad core
 - Hard Drive: 20 GB
@@ -12,7 +12,7 @@
 
 ### 2. Staging server
 
-- Supported distributions: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye or Debian Bookworm
+- Supported distributions: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye, Debian Bookworm or Debian Trixie
 - RAM: 16GB
 - Processor: Dual core
 - Hard Drive: 20 GB

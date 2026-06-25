@@ -120,10 +120,6 @@ If you have configured LLM credentials in `secrets.yml` file, but that provider 
 
 Use `config/llm_prompts.yml` and edit `remote_translation_prompt` to set up your own translation prompt. Ensure that the prompt returns the resulting translation as it's expected to be viewed by the end user.
 
-##### Enabling the feature
-
-Once we have configured everything in LLM Settings tab, we can proceed to enable the feature. To enable it, in the administration area access the section **Settings > Global settings > Features** and enable the **Remote translation** feature.
-
 #### Pricing
 
 Different LLM providers use different pricing strategies, but they are almost always based on input and output token usage. We can estimate 1 token = ~4 characters of text. The text to translate, along with translation prompt, will count towards input tokens, and the translated result towards output token count. Following this logic, translating 1 Million characters consumes about ~250k tokens as input and ~250k tokes as an output.
@@ -136,7 +132,7 @@ We attach some screenshots of how the application interacts with our users:
 
 * When a user visits a page in a language without translated content, an informative text will appear at the top of the page next to a button to request the translation. (**Note:** *If a user visits a page with a language not supported by the translation service, no text or translation button will be displayed. See section: Available languages for remote translation*)
 
-  ![The text "The content of this page is not available in your language" is displayed next to a "Translate page" button at the top of the page](../../img/translations/remote_translations/display-text-and-button-en.png)
+  ![The text "The original content of this page is not available in your language. Would you like to translate it?" is displayed next to a "Translate page" button at the top of the page](../../img/translations/remote_translations/display-text-and-button-en.png)
 
 * Once the user clicks the `Translate page` button, the translations are enqueued and the page is reloaded with a notice (*informing that the translations have been requested correctly*) and an informative text in the header (*explaining when you will be able to see these translations*).
 

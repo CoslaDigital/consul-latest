@@ -1,4 +1,4 @@
-FROM ruby:3.3.10-bookworm
+FROM ruby:3.3.11-trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -8,7 +8,6 @@ RUN apt-get update -qq \
     build-essential \
     cmake \
     imagemagick \
-    libappindicator1 \
     libpq-dev \
     libxss1 \
     memcached \

@@ -101,21 +101,23 @@ Al crear o editar proyectos de gasto:
 
 1. **El usuario completa título y/o descripción**: La funcionalidad usa el contenido de estos campos cuando están disponibles para generar sugerencias.
 
-2. **El usuario hace clic en "Sugerir una imagen con IA"**: Aparece un botón junto al campo de carga de imagen (solo cuando no hay imagen adjunta actualmente).
+2. **El usuario hace clic en "Añadir imagen"**: En la sección de campos opcionales, este botón despliega tanto el formulario para seleccionar una imagen como el botón de sugerencias con IA
+
+3. **El usuario hace clic en "Sugerir una imagen con IA"**: Aparece un botón junto al campo de carga de imagen (solo cuando no hay imagen adjunta actualmente).
 
    ![Formulario de carga de imagen con botón de sugerencia IA](../../img/image_suggestions/upload-form-with-button-es.png)
 
-3. **El sistema genera sugerencias**:
+4. **El sistema genera sugerencias**:
    - El LLM analiza el título y la descripción
    - Extrae conceptos clave y genera una consulta de búsqueda
    - Busca en la API de Pexels con la consulta generada
    - Devuelve hasta 4 sugerencias de imágenes relevantes
 
-4. **El usuario ve las sugerencias**: Aparece una cuadrícula de imágenes sugeridas debajo del botón de carga.
+5. **El usuario ve las sugerencias**: Aparece una cuadrícula de imágenes sugeridas debajo del botón de carga.
 
    ![Cuadrícula de imágenes sugeridas](../../img/image_suggestions/suggested-images-grid-es.png)
 
-5. **El usuario selecciona una imagen**: Al hacer clic en una imagen sugerida:
+6. **El usuario selecciona una imagen**: Al hacer clic en una imagen sugerida:
    - Descarga la imagen de Pexels
    - La adjunta al formulario como si fuera subida por el usuario
    - Reemplaza la interfaz de carga con la vista previa de la imagen seleccionada
@@ -189,6 +191,7 @@ Para mayor uso, Pexels ofrece planes de pago. Consulta [precios de la API de Pex
 
 ### El botón para solicitar imágenes no aparece
 
+- Confirma que has pulsado antes **"Añadir imagen"** en la imagen descriptiva; el botón de sugerencias con IA solo se muestra después de abrir ese bloque.
 - Verifica que el proveedor LLM y el modelo estén configurados en **Admin > Configuración Global > Configuración LLM**
 - Verifica que la configuración de Sugerencias de imágenes esté habilitada
 - Asegúrate de que la clave API de Pexels esté presente en `secrets.yml`

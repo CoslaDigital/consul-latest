@@ -3,7 +3,6 @@ include RemotelyTranslatable
 
 describe RemotelyTranslatable do
   before do
-    Setting["feature.remote_translations"] = true
     allow(RemoteTranslations::Caller).to receive(:configured?).and_return(true)
   end
 

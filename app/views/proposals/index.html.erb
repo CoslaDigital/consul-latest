@@ -38,7 +38,7 @@
       <div class="row">
         <div class="small-12 column">
           <%= render Proposals::MapComponent.new(@proposals) %>
-          <%= render "view_mode" %>
+          <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
     <% end %>
@@ -100,16 +100,7 @@
       <% if params[:retired].blank? %>
         <%= render "categories" %>
         <%= render "shared/tag_cloud", taggable: "Proposal" %>
-        <div class="sidebar-divider"></div>
-        <div class="proposals-geozones">
-          <h2 class="sidebar-title"><%= link_to t("shared.tags_cloud.districts_list"), map_proposals_path, id: "map", title: t("shared.tags_cloud.districts_list") %></h2>
-          <br>
-          <ul id="geozones" class="no-bullet">
-            <% @geozones.each do |geozone| %>
-              <li><%= link_to geozone.name, proposals_path(search: geozone.name) %></li>
-            <% end %>
-          </ul>
-        </div>
+        <%= render Proposals::GeozonesComponent.new %>
       <% end %>
       <%= render "retired" %>
       <%= render "proposals_lists" %>

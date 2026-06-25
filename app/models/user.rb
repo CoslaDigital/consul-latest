@@ -234,6 +234,19 @@ Rails.logger.info("oauth_user #{oauth_user}")
     )
   end
 
+  def self.create_from_census_response!(response, params = {})
+    create!({
+      verified_at: Time.current,
+      erased_at: Time.current,
+      password: random_password,
+      terms_of_service: "1",
+      email: nil,
+      gender: response.gender,
+      date_of_birth: response.date_of_birth.in_time_zone.to_datetime,
+      geozone: Geozone.find_by(census_code: response.district_code)
+    }.merge(params))
+  end
+
   def name
     organization? ? organization.name : username
   end

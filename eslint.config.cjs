@@ -1,0 +1,97 @@
+const {
+  defineConfig,
+  globalIgnores,
+} = require("eslint/config");
+
+const globals = require("globals");
+const js = require("@eslint/js");
+
+const {
+  FlatCompat,
+} = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all
+});
+
+module.exports = defineConfig([globalIgnores([
+  "app/assets/javascripts/ckeditor/config.js",
+  "eslint.config.cjs",
+  "**/node_modules/",
+  "**/vendor/",
+]), {
+  extends: compat.extends("eslint:recommended"),
+  languageOptions: {
+    globals: {
+      ...globals.browser,
+      $: "readonly",
+      App: "readonly",
+      AmsifySuggestags: "readonly",
+      annotator: "readonly",
+      c3: "readonly",
+      CKEDITOR: "readonly",
+      L: "readonly",
+      Turbolinks: "readonly",
+    },
+    ecmaVersion: 5,
+    sourceType: "script",
+  },
+  rules: {
+    "array-bracket-spacing": "error",
+    "array-callback-return": "error",
+    "block-spacing": "error",
+    "brace-style": "error",
+    "comma-spacing": "error",
+    "computed-property-spacing": "error",
+    curly: "error",
+    "dot-notation": "error",
+    "eol-last": "error",
+    eqeqeq: ["error", "always", {
+      null: "ignore",
+    }],
+    indent: ["error", 2],
+    "key-spacing": "error",
+    "keyword-spacing": "error",
+    "linebreak-style": "error",
+    "max-len": ["warn", {
+      code: 110,
+    }],
+    "no-array-constructor": "error",
+    "no-console": "error",
+    "no-multi-spaces": "error",
+    "no-multiple-empty-lines": ["error", {
+      max: 1,
+    }],
+    "no-param-reassign": "error",
+    "no-shadow": "error",
+    "no-spaced-func": "error",
+    "no-trailing-spaces": "error",
+    "no-unused-vars": ["error", {
+      caughtErrors: "none",
+    }],
+    "no-void": "error",
+    "no-whitespace-before-property": "error",
+    "object-curly-spacing": ["error", "always", {
+      objectsInObjects: false,
+    }],
+    "padded-blocks": ["error", "never"],
+    quotes: ["error", "double", {
+      avoidEscape: true,
+    }],
+    semi: ["error", "always"],
+    "semi-spacing": "error",
+    "space-before-blocks": "error",
+    "space-before-function-paren": ["error", "never"],
+    "space-in-parens": "error",
+    "space-infix-ops": "error",
+    "space-unary-ops": "error",
+    "spaced-comment": ["error", "always", {
+      markers: ["="],
+      exceptions: ["-"],
+    }],
+    strict: "error",
+    yoda: "error",
+  },
+}]);

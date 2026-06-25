@@ -1,8 +1,8 @@
 source "https://rubygems.org"
 
-#ruby file: ".ruby-version"
+ruby file: ".ruby-version"
 
-gem "rails", "~> 7.2.3"
+gem "rails", "~> 7.2.3.1"
 
 gem "acts-as-taggable-on", "~> 13.0.0"
 gem "acts_as_votable", "~> 0.14.0"
@@ -22,11 +22,12 @@ gem "csv", "~> 3.3.5"
 gem "daemons", "~> 1.4.1"
 gem "dalli", "~> 4.3.3"
 gem "delayed_job_active_record", "~> 4.1.11"
-gem "devise", "~> 5.0.2"
+gem "devise", "~> 5.0.3"
 gem "devise-security", "~> 0.18.0"
 gem "exiftool_vendored", "~> 13.52.0"
 gem "file_validators", "~> 3.0.0"
 gem "font-awesome-sass", "~> 5.15.1" # Remember to update vendor/assets/images/fontawesome when updating this gem
+gem "globalize", "~> 7.1.1"
 gem "geocoder", "~> 1.8"
 gem "globalize", "~> 7.1.1"
 gem "globalize-accessors", "~> 0.3.0"
@@ -79,6 +80,7 @@ end
 group :development, :test do
   gem "debug", "~> 1.9.2"
   gem "factory_bot_rails", "~> 6.5.1"
+  gem "faker", "~> 3.5.2"
   gem "i18n-tasks", "~> 0.9.37"
   gem "knapsack_pro", "~> 8.4.0"
   gem "launchy", "~> 3.1.1"
@@ -109,7 +111,6 @@ group :development do
   gem "mdl", "~> 0.15.0", require: false
   gem "pronto", "~> 0.11.5", require: false
   gem "pronto-erb_lint", "~> 0.1.6", require: false
-  gem "pronto-eslint", "~> 0.11.1", require: false
   gem "pronto-rubocop", "~> 0.11.6", require: false
   gem "pronto-stylelint", "~> 0.11.1", require: false
   gem "rubocop", "~> 1.81.7", require: false
