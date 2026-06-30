@@ -14,7 +14,6 @@
 //= require jquery-ujs
 //= require jquery-ui/ui/version
 //= require jquery-ui/ui/data
-//= require jquery-ui/ui/ie
 //= require jquery-ui/ui/keycode
 //= require jquery-ui/ui/position
 //= require jquery-ui/ui/safe-active-element
