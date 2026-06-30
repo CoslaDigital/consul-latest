@@ -68,7 +68,6 @@ en:
     investments:
       form:
         title: "Submit a candidate Proposal"
-        description: "The three issues I want to focus on as an MSYP are"
         heading_note: "Select the area this proposal applies to"
         subtitle: "%{heading} (%{price})"
         subtitle_note: "What is your name"
