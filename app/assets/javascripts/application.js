@@ -16,7 +16,6 @@
 //= require jquery-ui/ui/data
 //= require jquery-ui/ui/keycode
 //= require jquery-ui/ui/position
-//= require jquery-ui/ui/safe-active-element
 //= require jquery-ui/ui/scroll-parent
 //= require jquery-ui/ui/unique-id
 //= require jquery-ui/ui/widget
