@@ -90,6 +90,23 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def proposal_published(proposal)
+    @proposal = proposal
+    @email_to = @proposal.author.email
+
+    with_user(@proposal.author) do
+      mail(to: @email_to, subject: t("mailers.proposal_published.subject"))
+    end
+  end
+
+  def proposal_published_admin(proposal)
+    @proposal = proposal
+    with_user(@proposal.author) do
+      @email_to = ::Setting["admin_email"]
+      mail(to: @email_to, subject: "CONSUL DEMOCRACY: New proposal Published") if @email_to.present?
+    end
+  end
+
   def budget_investment_unfeasible(investment)
     @investment = investment
     @author = investment.author
@@ -156,6 +173,103 @@ class Mailer < ApplicationMailer
     end
   end
 
+  def proposal_match_created(match_or_id)
+    # 1. Hydrate the record safely regardless of background worker payload state
+    @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
+
+    # 2. Extract the associated relationships needed by your html.erb template
+    @proposal = @match.proposal
+    @offer = @match.offer
+    @provider = @offer.author
+    @requester = @proposal.author
+
+    # 3. Explicitly hook the recipient user profile mapping
+    @recipient = @provider # This maps to 'Hi <%= @provider.name %>' from your view file
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_created.subject"))
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    # Prevent background jobs from retrying infinitely if a record gets deleted quickly
+    Rails.logger.error("Mailer failed: ProposalMatch ##{match_or_id} no longer exists. #{e.message}")
+    mail.perform_deliveries = false
+  end
+
+  def proposal_match_accepted(match_or_id)
+    @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
+    @recipient = @match.proposal.author
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_accepted.subject"))
+    end
+  end
+
+  def proposal_match_confirmed(match_or_id)
+    @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
+    @recipient = @match.offer.author
+    @email_to = @recipient.email
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.proposal_match_confirmed.subject"))
+    end
+  end
+  def proposal_match_admin_notification(match, action_type)
+    @match = match
+    @action_type = action_type
+    @email_to = Setting["admin_email"]
+
+    I18n.with_locale(Setting.default_locale) do
+      mail(to: @email_to, subject: "MUTUAL AID: Collaboration #{@action_type.titleize}") if @email_to.present?
+    end
+  end
+
+  def new_offer_admin_notification(offer)
+    @offer = offer
+    @email_to = Setting["admin_email"]
+
+    I18n.with_locale(Setting.default_locale) do
+      mail(to: @email_to, subject: "MUTUAL AID: New Resource Offer Published") if @email_to.present?
+    end
+  end
+
+  def collaboration_request_notification(match)
+    @match = match
+    @offer = match.offer
+    @proposal = match.proposal
+    @provider = @offer.author
+    @requester = @proposal.author
+
+    # CRITICAL: Set this so the prevent_delivery filter doesn't kill the email
+    @email_to = @provider.email
+
+    with_user(@provider) do
+      mail(
+        to: @email_to,
+        subject: t("mailers.collaboration_request.subject", requester_name: @requester.name)
+      )
+    end
+  end
+
+  def collaboration_introduction(match_or_id, recipient_or_id)
+    # 1. THIS HYDRATION STEP MUST HAPPEN FIRST
+    @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
+    @recipient = recipient_or_id.is_a?(ActiveRecord::Base) ? recipient_or_id : User.find(recipient_or_id)
+
+    # 2. Now these calls will safely run against the model instead of an Integer ID
+    @proposal = @match.proposal
+    @offer = @match.offer
+    @email_to = @recipient.email
+
+    # Determine other party contact details for layout display
+    @other_party = (@recipient.id == @proposal.author_id) ? @offer.author : @proposal.author
+
+    with_user(@recipient) do
+      mail(to: @email_to, subject: t("mailers.collaboration_introduction.subject", title: @proposal.title, default: "Collaboration Connected!"))
+    end
+  end
+
   private
 
     def with_user(user, &)
@@ -172,4 +286,5 @@ class Mailer < ApplicationMailer
       user.add_subscriptions_token
       @token = user.subscriptions_token
     end
+
 end

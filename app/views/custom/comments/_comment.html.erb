@@ -1,0 +1,39 @@
+<% valuation = local_assigns.fetch(:valuation, false) %>
+
+<%# MAGIC FIX: Only render the HTML if the comment is visible, OR if it's hidden but has replies we need to support %>
+<% unless (comment.hidden? || comment.user.hidden?) && comment.children.blank? %>
+
+  <%# cache [locale_and_user_status(comment), can?(:admin, :all), comment, commentable_cache_key(comment.commentable), comment.author] do %>
+  <div id="<%= dom_id(comment) %>" class="comment small-12">
+    <div class="comment-body">
+
+      <% if comment.hidden? || comment.user.hidden? %>
+        <%# If we got inside here, the comment is hidden BUT has children. Show the standard placeholder. %>
+        <div class="callout secondary">
+          <p><%= t("comments.comment.deleted") %></p>
+        </div>
+      <% else %>
+
+        <%# Normal, clean comment rendering %>
+        <%= render Comments::AvatarComponent.new(comment) %>
+
+        <%= render Comments::InfoComponent.new(comment,
+                                               valuation: valuation,
+                                               user_viewer: current_user) %>
+
+        <div class="comment-user
+                    <%= user_level_class comment %>
+                    <%= comment_author_class comment, comment.commentable.author_id %>">
+          <%= simple_format sanitize_and_auto_link(comment.body), {}, sanitize: false %>
+        </div>
+
+        <%# Use the StatusBarComponent which handles all reply/vote logic %>
+        <%= render Comments::StatusBarComponent.new(comment, valuation: valuation) %>
+      <% end %>
+    </div>
+
+    <%= render "comments/comment_list", comments: child_comments_of(comment), valuation: valuation %>
+  </div>
+  <%# end %>
+
+<% end %>

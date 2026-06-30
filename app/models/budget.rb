@@ -3,6 +3,7 @@ class Budget < ApplicationRecord
   include Sluggable
   include Reportable
   include Imageable
+  include CalendarItem
 
   translates :name, :main_link_text, :main_link_url, touch: true
   include Globalizable
@@ -81,6 +82,14 @@ class Budget < ApplicationRecord
 
   def ends_at
     phases.published.last&.ends_at
+  end
+
+  def phase_name_on(date)
+    active_phase = published_phases.find do |p|
+      # Ensure dates exist to avoid errors, then check range
+      p.starts_at && p.ends_at && (p.starts_at..p.ends_at).cover?(date)
+    end
+    active_phase ? active_phase.name : "unknown"
   end
 
   def description
@@ -200,10 +209,12 @@ class Budget < ApplicationRecord
   def investments_filters
     [
       ("winners" if finished?),
+      ("unsuccessful" if finished?),
       ("selected" if publishing_prices_or_later? && !finished?),
       ("unselected" if publishing_prices_or_later?),
       ("not_unfeasible" if valuating?),
-      ("unfeasible" if valuating_or_later?)
+      ("unfeasible" if valuating_or_later?),
+      ("everything")
     ].compact
   end
 

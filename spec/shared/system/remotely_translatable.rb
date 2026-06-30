@@ -14,8 +14,6 @@ shared_examples "remotely_translatable" do |factory_name, path_name, path_argume
   let!(:resource) { create(factory_name) }
 
   before do
-    Setting["feature.remote_translations"] = true
-
     available_locales = %w[de en es fr pt zh-Hans]
     allow(available_locales_class).to receive(:locales).and_return(available_locales)
 
@@ -29,6 +27,7 @@ shared_examples "remotely_translatable" do |factory_name, path_name, path_argume
       stub_secrets(llm: { openai_api_key: "1234" })
     else
       Setting["llm.provider"] = Setting["llm.model"] = Setting["llm.use_llm_for_translations"] = nil
+      Setting["feature.remote_translations"] = true
       allow(Rails.application.secrets).to receive(:microsoft_api_key).and_return("123")
     end
   end
@@ -69,8 +68,8 @@ shared_examples "remotely_translatable" do |factory_name, path_name, path_argume
         create(:remote_translation, remote_translatable: resource, locale: :es)
         visit path_in_spanish
 
-        expect(page).to have_content "En un breve periodo de tiempo refrescando la página " \
-                                     "podrá ver todo el contenido en su idioma"
+        expect(page).to have_content "Por favor, espera 5 segundos y actualiza la página " \
+                                     "para que se muestre el contenido traducido."
         expect(page).not_to have_button "Traducir página"
       end
     end
@@ -152,15 +151,15 @@ shared_examples "remotely_translatable" do |factory_name, path_name, path_argume
 
         expect(page).not_to have_button "Traducir página"
         expect(page).to have_content "Se han solicitado correctamente las traducciones."
-        expect(page).to have_content "En un breve periodo de tiempo refrescando la página " \
-                                     "podrá ver todo el contenido en su idioma"
+        expect(page).to have_content "Por favor, espera 5 segundos y actualiza la página " \
+                                     "para que se muestre el contenido traducido."
 
         refresh
 
         expect(page).not_to have_content "Se han solicitado correctamente las traducciones."
         expect(page).not_to have_button "Traducir página"
-        expect(page).to have_content "En un breve periodo de tiempo refrescando la página " \
-                                     "podrá ver todo el contenido en su idioma"
+        expect(page).to have_content "Por favor, espera 5 segundos y actualiza la página " \
+                                     "para que se muestre el contenido traducido."
       end
     end
 

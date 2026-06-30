@@ -18,6 +18,25 @@ class BudgetsController < ApplicationController
     @finished_budgets = @budgets.finished.order(created_at: :desc)
   end
 
+  def select
+    @proposal = Proposal.find(params[:proposal_id])
+    @budgets = Budget.accepting
+  end
+
+  def select_headings
+    @proposal = Proposal.find(params[:proposal_id])
+    @budget = Budget.find(params[:budget_id])
+    @groups = Budget::Group.where(budget_id: @budget.id)
+  end
+
+  def budget_headings
+    @group = Budget::Group.find(params[:group_id])
+    @headings = @group.headings
+    respond_to do |format|
+      format.json { render json: @headings }
+    end
+  end
+
   private
 
     def load_budget

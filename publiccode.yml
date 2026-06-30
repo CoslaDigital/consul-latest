@@ -3,8 +3,8 @@ publiccodeYmlVersion: "0.4"
 name: Consul Democracy
 url: "https://github.com/consuldemocracy/consuldemocracy.git"
 landingURL: "https://consuldemocracy.org"
-softwareVersion: "2.4.1"
-releaseDate: "2025-11-17"
+softwareVersion: "2.5.0"
+releaseDate: "2026-04-13"
 logo: "https://github.com/consuldemocracy/consuldemocracy/blob/master/public/consul_logo.svg"
 
 platforms:
@@ -116,11 +116,11 @@ localisation:
 dependsOn:
   open:
     - name: Ruby
-      version: "3.3.10"
+      version: "3.3.11"
     - name: Rails
-      version: "7.1.6"
+      version: "7.2.3.1"
     - name: Node.js
-      version: "20.19.5"
+      version: "20.20.2"
     - name: PostgreSQL
       versionMin: "13"
     - name: ImageMagick

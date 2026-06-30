@@ -35,12 +35,17 @@ class Proposal < ApplicationRecord
 
   belongs_to :author, -> { with_hidden }, class_name: "User", inverse_of: :proposals
   belongs_to :geozone
+  belongs_to :proposal_kind, optional: true
   has_many :comments, as: :commentable, inverse_of: :commentable, dependent: :destroy
   has_many :proposal_notifications, dependent: :destroy
   has_many :dashboard_executed_actions, dependent: :destroy, class_name: "Dashboard::ExecutedAction"
   has_many :dashboard_actions, through: :dashboard_executed_actions, class_name: "Dashboard::Action"
   has_many :polls, as: :related, inverse_of: :related
   has_one :summary_comment, as: :commentable, class_name: "MlSummaryComment", dependent: :destroy
+
+  # NEW: Mutual Aid / Matchmaking Associations
+  has_many :proposal_matches, dependent: :destroy
+  has_many :matched_offers, through: :proposal_matches, source: :offer
 
   validates_translation :title, presence: true, length: { in: 4..Proposal.title_max_length }
   validates_translation :description, length: { maximum: Proposal.description_max_length }
@@ -89,10 +94,24 @@ class Proposal < ApplicationRecord
   scope :draft,          -> { where(published_at: nil) }
 
   scope :not_supported_by_user, ->(user) { where.not(id: user.find_voted_items(votable_type: "Proposal")) }
+  scope :created_by, ->(author) { where(author: author) }
+
+  def active_collaborations
+    matched_offers.where(proposal_matches: { status: [:accepted, :fulfilled] })
+  end
+
+  def pending_requests
+    proposal_matches.pending
+  end
 
   def publish
     update!(published_at: Time.current)
+    Mailer.proposal_published(self).deliver_later unless Setting["feature.dashboard.notification_emails"]
     send_new_actions_notification_on_published
+  end
+
+  def notify_admin
+    Mailer.proposal_published_admin(self).deliver_later
   end
 
   def published?
@@ -101,6 +120,61 @@ class Proposal < ApplicationRecord
 
   def draft?
     published_at.nil?
+  end
+
+  def status
+    if retired?
+      "retired"
+    elsif published?
+      "published"
+    else
+      "draft"
+    end
+  end
+
+  def self.to_csv
+    require "csv"
+    sanitizer = Rails::Html::FullSanitizer.new
+    headers = [
+      I18n.t("admin.proposals.index.id", default: "ID"),
+      I18n.t("admin.proposals.index.code", default: "Code"),
+      I18n.t("activerecord.attributes.proposal.title", default: "Title"),
+      I18n.t("proposals.form.proposal_summary", default: "Summary"),
+      I18n.t("activerecord.attributes.proposal.description", default: "Description"),
+      I18n.t("activerecord.attributes.proposal.price", default: "Price"),
+      I18n.t("admin.proposals.index.author", default: "Author"),
+      I18n.t("activerecord.attributes.proposal.responsible_name", default: "Responsible Name"),
+      I18n.t("attributes.email", default: "Email"),
+      I18n.t("proposals.form.geozone", default: "Geozone"),
+      I18n.t("admin.proposals.index.milestones", default: "Milestones"),
+      I18n.t("admin.proposals.index.selected", default: "Selected"),
+      I18n.t("admin.proposals.index.status", default: "Status")
+    ]
+
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+
+      all.find_each do |proposal|
+        clean_summary = sanitizer.sanitize(proposal.summary)&.squish
+        clean_description = sanitizer.sanitize(proposal.description)&.squish
+
+        csv << [
+          proposal.id,
+          proposal.code,
+          proposal.title,
+          clean_summary,
+          clean_description,
+          proposal.price,
+          proposal.author.try(:username),
+          proposal.responsible_name,
+          proposal.author.try(:email),
+          proposal.geozone&.name,
+          proposal.milestones.count,
+          proposal.selected?,
+          proposal.status # <--- The new status field
+        ]
+      end
+    end
   end
 
   def self.recommendations(user)
@@ -148,7 +222,7 @@ class Proposal < ApplicationRecord
   def self.for_summary
     summary = {}
     categories = Tag.category_names.sort
-    geozones   = Geozone.names.sort
+    geozones = Geozone.names.sort
 
     groups = categories + geozones
     groups.each do |group|
@@ -265,6 +339,21 @@ class Proposal < ApplicationRecord
     if new_actions_ids.present?
       Dashboard::Mailer.delay.new_actions_notification_on_published(self, new_actions_ids)
     end
+  end
+
+  def formatted_amount(amount)
+    ActionController::Base.helpers.number_to_currency(amount,
+                                                      precision: 0,
+                                                      locale: I18n.locale,
+                                                      unit: "£")
+  end
+
+  def formatted_price
+    formatted_amount(price)
+  end
+
+  def kind_name
+    proposal_kind&.name || "General Proposal"
   end
 
   protected

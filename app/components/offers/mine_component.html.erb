@@ -1,0 +1,29 @@
+<% # app/components/offers/mine_component.html.erb %>
+<div class="offers-mine-component">
+
+  <%# Only show the tab menu if there's actually more than one tab to switch between %>
+  <% if valid_filters.size > 1 %>
+    <ul class="menu simple margin-top margin-bottom border-bottom">
+      <% valid_filters.each do |filter| %>
+        <li class="<%= 'is-active' if current_filter == filter %>">
+          <% if current_filter == filter %>
+            <h2 class="h5 bold no-margin">
+              <%= t("offers.mine.tabs.#{filter}") %> (<%= count(filter) %>)
+            </h2>
+          <% else %>
+            <%= link_to t("offers.mine.tabs.#{filter}"),
+                        mine_offers_path(filter: filter) %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div class="tabs-content margin-top">
+    <% if current_filter == "resources_offered" %>
+      <%= render "offers/mine/resources_offered", offers: offers_offered %>
+    <% else %>
+      <%= render "offers/mine/help_received", matches: help_received %>
+    <% end %>
+  </div>
+</div>

@@ -6,12 +6,16 @@ class RemoteTranslations::Caller
   end
 
   def self.configured?
-    llm? || Tenant.current_secrets.microsoft_api_key.present?
+    llm? || microsoft?
   end
 
   def self.llm?
     [Setting["llm.provider"], Setting["llm.model"],
      Setting["llm.use_llm_for_translations"]].all?(&:present?)
+  end
+
+  def self.microsoft?
+    Setting["feature.remote_translations"].present? && Tenant.current_secrets.microsoft_api_key.present?
   end
 
   def self.translation_provider

@@ -1,0 +1,29 @@
+<td style="<%= css_for_mailer_content %>">
+
+  <h1 style="<%= css_for_mailer_heading %>">
+    New Resource Offer Created
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    A new offer has been published on the Mutual Aid platform.
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <strong>Author:</strong> <%= @offer.author.name %><br>
+    <strong>Title:</strong> <%= @offer.title %><br>
+    <strong>Description:</strong> <%= sanitize(truncate(@offer.description, length: 150)).html_safe %>
+  </p>
+
+  <table style="width: 100%;">
+    <tbody>
+    <tr>
+      <td style="padding-bottom: 12px; text-align: center;">
+        <%= link_to admin_collaborations_url, style: css_for_mailer_button do %>
+          Review in Admin Dashboard
+        <% end %>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</td>

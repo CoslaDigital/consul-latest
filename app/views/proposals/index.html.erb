@@ -37,7 +37,8 @@
     <% unless params[:selected].present? %>
       <div class="row">
         <div class="small-12 column">
-          <%= render "view_mode" %>
+          <%= render Proposals::MapComponent.new(@proposals) %>
+          <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
     <% end %>

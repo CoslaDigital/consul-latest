@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe "Account" do
-  let(:user) { create(:user, username: "Manuela Colau") }
+  let(:user) { create(:user, username: "Manuela Colau", password: "judgmentday") }
 
   before do
     login_as(user)
@@ -187,7 +187,7 @@ describe "Account" do
 
     login_through_form_as(user)
 
-    expect(page).to have_content "Invalid Email or username or password"
+    expect(page).to have_content "Invalid email or username or password"
   end
 
   scenario "Erasing an account removes all related roles" do

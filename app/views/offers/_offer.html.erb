@@ -1,0 +1,31 @@
+<div id="<%= dom_id(offer) %>" class="offer clear margin-bottom">
+  <div class="panel" style="padding: 20px; border: 1px solid #e6e6e6; background: #fff;">
+    <div class="row">
+      <div class="small-12 medium-9 column">
+        <div class="offer-content">
+          <h3><%= link_to offer.title, offer_path(offer) %></h3>
+
+          <p class="offer-info" style="color: #666; font-size: 0.9em;">
+            <span class="label <%= offer.status %>"><%= offer.status.titleize %></span>
+            <% if offer.geozone %>
+              &nbsp;|&nbsp; <span class="icon-location"></span> <%= offer.geozone.name %>
+            <% end %>
+          </p>
+
+          <div class="offer-description">
+            <%= truncate(strip_tags(offer.description), length: 200) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="small-12 medium-3 column text-right">
+        <div class="offer-author" style="font-size: 0.9em; color: #666;">
+          <%= t("offers.show.author", default: "Offered by") %><br>
+          <strong><%= offer.author.name %></strong>
+        </div>
+
+        <%= link_to t("offers.index.view_offer", default: "View Details"), offer_path(offer), class: "button hollow expanded margin-top" %>
+      </div>
+    </div>
+  </div>
+</div>

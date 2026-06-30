@@ -5,6 +5,8 @@ module Abilities
     def initialize(user)
       merge Abilities::Everyone.new(user)
 
+      can [:read, :enable, :manage, :show], :two_factor_authentication
+
       can [:read, :update], User, id: user.id
 
       can :read, Debate
@@ -85,6 +87,8 @@ module Abilities
         can [:create, :destroy], ActsAsVotable::Vote, voter_id: user.id, votable_type: "Comment"
       end
 
+      can [:budget_headings, :select, :select_headings], Budget
+
       if user.level_two_or_three_verified?
         can :vote, Proposal, &:published?
 
@@ -92,16 +96,16 @@ module Abilities
 
         can :create, Legislation::Answer
 
-        can :create, Budget::Investment,  budget: { phase: "accepting" }
-        can :update, Budget::Investment,  budget: { phase: "accepting" }, author_id: user.id
+        can :create, Budget::Investment, budget: { phase: "accepting" }
+        can :update, Budget::Investment, budget: { phase: "accepting" }, author_id: user.id
         can :suggest, Budget::Investment, budget: { phase: "accepting" }
         can :destroy, Budget::Investment, budget: { phase: ["accepting", "reviewing"] }, author_id: user.id
         can [:create, :destroy], ActsAsVotable::Vote,
             voter_id: user.id,
             votable_type: "Budget::Investment",
-            votable: { budget: { phase: "selecting" }}
+            votable: { budget: { phase: "selecting" } }
 
-        can [:show, :create], Budget::Ballot,          budget: { phase: "balloting" }
+        can [:show, :create], Budget::Ballot, budget: { phase: "balloting" }
         can [:create, :destroy], Budget::Ballot::Line, budget: { phase: "balloting" }
 
         can :create, DirectMessage
@@ -110,6 +114,38 @@ module Abilities
         can :answer, Poll do |poll|
           poll.answerable_by?(user)
         end
+        # ==========================================
+        # NEW: Mutual Aid / Offer Matching Abilities
+        # ==========================================
+
+        # 1. Offers CRUD
+        can [:read, :mine], Offer
+        can :create, Offer
+        can [:update, :destroy], Offer, author_id: user.id, hidden_at: nil
+
+        # 2. Matchmaking (The Handshake Lifecycle)
+
+        # Anyone can initiate a match (Request help or Offer help)
+        can :create, ProposalMatch
+
+        # Only the person PROVIDING the resource can Accept or Reject the initial request
+        can [:accept, :reject], ProposalMatch do |match|
+          match.offer.author_id == user.id
+        end
+
+        # Only the person RECEIVING the resource (Proposal Author) can Confirm
+        # the handshake to start, or Fulfill it when finished.
+        can [:confirm, :fulfill], ProposalMatch do |match|
+          match.proposal.author_id == user.id
+        end
+        # ==========================================
+        can :answer, Poll::Question do |question|
+          question.answerable_by?(user)
+        end
+        can :destroy, Poll::Answer do |answer|
+          answer.author == user && answer.question.answerable_by?(user)
+        end
+
       end
 
       can [:create, :show], ProposalNotification, proposal: { author_id: user.id }

@@ -41,6 +41,29 @@
         </div>
       </div>
     <% end %>
+    <div class="milestone-actions margin-top">
+      <% if can? :update, milestone %>
+        <%
+          parent = milestone.milestoneable
 
+          # Explicitly define paths only for user-managed resources.
+          # Legislation is purposely omitted because it has no public edit route.
+          path = case parent
+                 when Budget::Investment
+                   edit_budget_investment_milestone_path(parent.budget_id, parent.id, milestone)
+                 when Proposal
+                   edit_proposal_milestone_path(parent, milestone)
+                 else
+                   nil
+                 end
+        %>
+
+        <% if path.present? %>
+          <%= link_to t("milestones.milestone.edit_button", default: "Edit Milestone"),
+                      path,
+                      class: "button tiny" %>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 </li>

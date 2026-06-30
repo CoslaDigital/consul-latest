@@ -4,15 +4,16 @@
 
 Aplicación de Participación Ciudadana y Gobierno Abierto
 
-## Web CONSUL DEMOCRACY Project
+## Fundación CONSUL DEMOCRACY y página web del proyecto
 
-Puedes acceder a la página principal del proyecto en [http://consuldemocracy.org](http://consuldemocracy.org) donde puedes encontrar documentación sobre el uso de la plataforma, videos y enlaces al espacio de la comunidad.
+Puedes acceder a la página principal del proyecto en [http://consuldemocracy.org](http://consuldemocracy.org/es) donde puedes encontrar información sobre el uso de la plataforma, la Fundación CONSUL DEMOCRACY, la comunidad de usuarios y socios locales, noticias y formas de obtener más ayuda o ponerte en contacto con nosotros.
 
 ## Configuración para desarrollo y tests
 
-**NOTA**: para unas instrucciones más detalladas, consulta la [documentación de instalación local](installation/local_installation.md).
+**NOTA**:
+El proceso de instalación varía según el sistema operativo. Por favor, consulta la [documentación de instalación local](installation/local_installation.md) apropiada para tu SO.
 
-Prerrequisitos: tener instalado git, Ruby 3.3.10, CMake, pkg-config, Node.js 20.19.5, ImageMagick y PostgreSQL (13 o superior).
+Prerrequisitos: tener instalado git, Ruby 3.3.11, CMake, pkg-config, Node.js 20.20.2, ImageMagick y PostgreSQL (>=13).
 
 **Nota**: Es posible que ejecutar `bin/setup`, como se indica a continuación, falle si has configurado un nombre de usuario y contraseña para PostgreSQL. Si es así, edita las líneas que contienen `username:` y `password:` (añadiendo tus credenciales) en el fichero `config/database.yml` y ejecuta `bin/setup` de nuevo.
 
@@ -47,6 +48,10 @@ Pero para ciertas acciones, como apoyar, necesitarás un usuario verificado, el 
  **user:** verified@consul.dev
  **pass:** 12345678
 
+## Configuración para entornos de producción
+
+Ver [instalador](https://github.com/consuldemocracy/installer)
+
 ## Licencia
 
 El código de este proyecto está publicado bajo la licencia AFFERO GPL v3 (ver [LICENSE-AGPLv3.txt](open_source/license.md))
@@ -54,7 +59,3 @@ El código de este proyecto está publicado bajo la licencia AFFERO GPL v3 (ver 
 ## Contribuciones
 
 Ver fichero [CONTRIBUTING_ES.md](https://github.com/consuldemocracy/consuldemocracy/blob/master/CONTRIBUTING_ES.md)
-
-## Desarrollo en local con Docker
-
-Puedes leer la guía en [https://consul_docs.gitbooks.io/docs/content/es/getting_started/docker.html](https://consul_docs.gitbooks.io/docs/content/es/getting_started/docker.html)

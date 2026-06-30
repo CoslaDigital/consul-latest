@@ -1,5 +1,5 @@
 module Budgets
-  class InvestmentsController < ApplicationController
+  class InvestmentsController < ApplicationController 
     include FeatureFlags
     include CommentableActions
     include FlagActions
@@ -22,7 +22,6 @@ module Budgets
     before_action :set_random_seed, only: :index
     before_action :load_categories, only: :index
     before_action :set_default_investment_filter, only: :index
-    before_action :set_view, only: :index
 
     feature_flag :budgets
 
@@ -70,10 +69,13 @@ module Budgets
 
     def update
       if @investment.update(investment_params)
+        puts "Investment Params: #{investment_params.inspect}" # Debugging statement
         redirect_to budget_investment_path(@budget, @investment),
                     notice: t("flash.actions.update.budget_investment")
       else
+        puts "Investment Params: #{investment_params.inspect}" # Debugging statement
         render "edit"
+        
       end
     end
 
@@ -105,7 +107,7 @@ module Budgets
       end
 
       def allowed_params
-        attributes = [:heading_id, :tag_list, :organization_name, :location,
+        attributes = [:video_url, :estimated_price, :summary,  :heading_id, :tag_list, :organization_name, :location,
                       :terms_of_service, :related_sdg_list,
                       image_attributes: image_attributes,
                       documents_attributes: document_attributes,
@@ -138,10 +140,6 @@ module Budgets
 
       def load_budget
         @budget = Budget.find_by_slug_or_id! params[:budget_id]
-      end
-
-      def set_view
-        @view = (params[:view] == "minimal") ? "minimal" : "default"
       end
 
       def investments_with_filters

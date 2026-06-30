@@ -7,16 +7,24 @@ class User < ApplicationRecord
     attribute field, :boolean, default: -> { !Setting["feature.gdpr.require_consent_for_notifications"] }
   end
 
-  devise :database_authenticatable, :registerable, :confirmable, :recoverable, :rememberable,
+  devise :registerable, :confirmable, :recoverable, :rememberable,
          :trackable, :validatable, :omniauthable, :password_expirable, :secure_validatable,
          authentication_keys: [:login]
   devise :lockable if Rails.application.config.devise_lockable
+
+  devise :two_factor_authenticatable
+
+  devise :two_factor_backupable
+
+  serialize :otp_backup_codes, type: Array
 
   acts_as_voter
   acts_as_paranoid column: :hidden_at
   include ActsAsParanoidAliases
 
   include Graphqlable
+
+  include Loggable
 
   has_one :administrator
   has_one :moderator
@@ -82,6 +90,7 @@ class User < ApplicationRecord
            inverse_of: :author
   has_many :related_contents, foreign_key: :author_id, inverse_of: :author, dependent: nil
   has_many :topics, foreign_key: :author_id, inverse_of: :author
+  has_many :offers, foreign_key: "author_id", dependent: :destroy
   belongs_to :geozone
 
   validates :username, presence: true, if: :username_required?
@@ -100,6 +109,8 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :organization, update_only: true
 
   attr_accessor :skip_password_validation, :login
+  #  attr_accessor :otp_backup_codes
+  #  attr_accessor :otp_plain_backup_codes
 
   scope :administrators, -> { joins(:administrator) }
   scope :moderators,     -> { joins(:moderator) }
@@ -134,10 +145,21 @@ class User < ApplicationRecord
 
   # Get the existing user by email if the provider gives us a verified email.
   def self.first_or_initialize_for_oauth(auth)
+  Rails.logger.info('Attributes in auth.info:')
+    auth.info.each do |key, value|
+    Rails.logger.info("#{key}: #{value}")
+  end
+
     oauth_email           = auth.info.email
-    oauth_verified        = auth.info.verified || auth.info.verified_email || auth.info.email_verified
-    oauth_email_confirmed = oauth_email.present? && oauth_verified
+    oauth_verified        = auth.info.verified || auth.info.verified_email || auth.info.email_verified || auth.extra.raw_info.email_verified
+    oauth_email_confirmed = oauth_email.present? # && oauth_verified
     oauth_user            = User.find_by(email: oauth_email) if oauth_email_confirmed
+#Rails.logger.info("auth verified #{auth.info.verified}")
+#Rails.logger.info("google email verified #{auth.info.extra.raw_info.email_verified}")
+Rails.logger.info("oauth_email #{oauth_email}")
+Rails.logger.info("oauth_verified #{oauth_verified}")
+Rails.logger.info("oauth_confirmed #{oauth_email_confirmed}")
+Rails.logger.info("oauth_user #{oauth_user}")
 
     oauth_user || User.new(
       username: auth.info.name || auth.uid,
@@ -145,8 +167,84 @@ class User < ApplicationRecord
       oauth_email: oauth_email,
       password: Devise.friendly_token[0, 20],
       terms_of_service: "1",
-      confirmed_at: oauth_email_confirmed ? DateTime.current : nil
+      confirmed_at: oauth_email_confirmed ? DateTime.current : nil,
+      verified_at: DateTime.current ,
+      residence_verified_at:  DateTime.current
     )
+  end
+
+  def self.create_from_census_response!(response, params = {})
+    create!({
+      verified_at: Time.current,
+      erased_at: Time.current,
+      password: random_password,
+      terms_of_service: "1",
+      email: nil,
+      gender: response.gender,
+      date_of_birth: response.date_of_birth.in_time_zone.to_datetime,
+      geozone: Geozone.find_by(census_code: response.district_code)
+    }.merge(params))
+  end
+
+  # Get the existing user by email if the provider gives us a verified email.
+  def self.first_or_initialize_for_saml(auth)
+    # Log the attributes in auth.info
+    Rails.logger.info('Attributes in auth.info:')
+      auth.info.each do |key, value|
+      Rails.logger.info("#{key}: #{value}")
+    end
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.1", 0).to_s)
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.2", 0).to_s)
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.3", 0).to_s)
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.4", 0).to_s)
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.5", 0).to_s)
+    Rails.logger.info( auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.6", 0).to_s)
+    oauth_username           = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.1", 0).to_s
+    oauth_email           = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.22", 0).to_s
+    oauth_email_confirmed = oauth_email.present?
+    # oauth_email_confirmed = oauth_email.present? && (auth.info.verified || auth.info.verified_email)
+    oauth_lacode              = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.17", 0).to_s
+    oauth_full_name           = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.2", 0).to_s + "_" + auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.4", 0).to_s
+    oauth_date_of_birth = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.8", 0).to_s
+    oauth_gender = auth.extra.raw_info.all.dig("urn:oid:0.9.2342.19200300.100.1.9", 0).to_s
+    #lacode comes from list of councils registered with IS
+    oauth_lacode_ref          = "9079"
+    oauth_lacode_confirmed    = oauth_lacode == oauth_lacode_ref
+    oauth_user            = User.find_by(email: oauth_email) if oauth_email_confirmed
+    #  oauth_username = oauth_full_name ||  oauth_email.split("@").first || auth.info.name || auth.uid
+    # if oauth_username == oauth_full_name
+    #      oauth_username = "#{oauth_full_name}_#{rand(100..999)}"
+    #   end
+    if oauth_username.present? && oauth_username != oauth_email && oauth_username != oauth_full_name
+        oauth_username = oauth_username
+    else
+    # If the original value of oauth_username is the same as oauth_email or oauth_full_name, add a random numbe
+        oauth_username = "#{oauth_full_name}_#{rand(100..999)}"
+    end
+    oauth_user || User.new(
+      username:  oauth_username,
+      email: oauth_email,
+      #date_of_birth: oauth_date_of_birth,
+      gender: oauth_gender,
+      password: Devise.friendly_token[0, 20],
+      terms_of_service: "1",
+      confirmed_at: DateTime.current,
+      verified_at: DateTime.current ,
+      residence_verified_at:  DateTime.current
+    )
+  end
+
+  def self.create_from_census_response!(response, params = {})
+    create!({
+      verified_at: Time.current,
+      erased_at: Time.current,
+      password: random_password,
+      terms_of_service: "1",
+      email: nil,
+      gender: response.gender,
+      date_of_birth: response.date_of_birth.in_time_zone.to_datetime,
+      geozone: Geozone.find_by(census_code: response.district_code)
+    }.merge(params))
   end
 
   def name
@@ -413,7 +511,7 @@ class User < ApplicationRecord
   end
 
   def send_devise_notification(notification, *)
-    devise_mailer.send(notification, self, *).deliver_later
+    devise_mailer.send(notification, self, *args).deliver_later
   end
 
   def add_subscriptions_token
@@ -426,6 +524,22 @@ class User < ApplicationRecord
     else
       { digit: 0, lower: 0, symbol: 0, upper: 0 }
     end
+  end
+
+  def self.random_password
+    lowercase = ("a".."z").to_a
+    uppercase = ("A".."Z").to_a
+    digits    = ("0".."9").to_a
+    symbols   = %w[- _ . , : ; ! @ # $ % & *]
+    all_chars = lowercase + uppercase + digits + symbols
+
+    characters = Array.new(password_complexity[:lower]) { lowercase.sample } +
+                 Array.new(password_complexity[:upper]) { uppercase.sample } +
+                 Array.new(password_complexity[:digit]) { digits.sample } +
+                 Array.new(password_complexity[:symbol]) { symbols.sample } +
+                 Array.new(password_length.min + rand(2..4)) { all_chars.sample }
+
+    characters.shuffle.join
   end
 
   def self.maximum_attempts
@@ -442,6 +556,61 @@ class User < ApplicationRecord
 
   def slug
     username.to_s.parameterize
+  end
+
+  # def otp_provisioning_uri(account, options = {})
+  #   issuer = options[:issuer]
+  #   secret = self.otp_secret
+  #   "otpauth://totp/#{issuer}:#{account}?secret=#{secret}&issuer=#{issuer}"
+  # end
+
+  def otp_qr_code
+    issuer = Tenant.current_secrets.server_name.to_s # this needs changed to server name
+    label = "#{issuer}:#{email}"
+    uri = otp_provisioning_uri(label, issuer: issuer)
+    RQRCode::QRCode.new(uri).as_png(size: 200).to_data_url
+  end
+
+  def requires_2fa?
+    administrator? && Setting.otp_enabled?
+  end
+
+  def generate_otp_secret
+    self.otp_secret = ROTP::Base32.random_base32
+  end
+
+  # Generate an OTP secret it it does not already exist
+  def generate_two_factor_secret_if_missing!
+    return unless otp_secret.nil?
+
+    update!(otp_secret: User.generate_otp_secret)
+  end
+
+  def otp_two_factor_enabled?
+    otp_required_for_login
+  end
+
+  # Ensure that the user is prompted for their OTP when they login
+  def enable_two_factor!
+    update!(otp_required_for_login: true)
+  end
+
+  # Disable the use of OTP-based two-factor.
+  def disable_two_factor!
+    update!(
+      otp_required_for_login: false,
+      otp_secret: nil,
+      otp_backup_codes: nil
+    )
+  end
+
+  # Determine if backup codes have been generated
+  def two_factor_backup_codes_generated?
+    otp_backup_codes.present?
+  end
+
+  def can_be_administrator?
+    otp_required_for_login || !Setting.otp_enabled?
   end
 
   private

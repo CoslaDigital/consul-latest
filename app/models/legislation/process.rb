@@ -6,6 +6,7 @@ class Legislation::Process < ApplicationRecord
   include Documentable
   include SDG::Relatable
   include Searchable
+  include CalendarItem
 
   acts_as_paranoid column: :hidden_at
   acts_as_taggable_on :customs
@@ -42,6 +43,8 @@ class Legislation::Process < ApplicationRecord
            foreign_key: "legislation_process_id",
            inverse_of: :process,
            dependent: :destroy
+
+  belongs_to :author, class_name: "User", optional: true
 
   validates_translation :title, presence: true
   validates :start_date, presence: true
@@ -120,6 +123,10 @@ class Legislation::Process < ApplicationRecord
   def proposals_phase
     Legislation::Process::Phase.new(proposals_phase_start_date,
                                     proposals_phase_end_date, proposals_phase_enabled)
+  end
+
+  def summary_publication
+    Legislation::Process::Publication.new(summary_publication_date, summary_publication_enabled)
   end
 
   def draft_publication

@@ -1,4 +1,5 @@
 resources :proposals do
+  resources :milestones
   resource :dashboard, only: [:show], controller: "dashboard" do
     collection do
       patch :publish

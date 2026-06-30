@@ -14,10 +14,8 @@
 //= require jquery-ujs
 //= require jquery-ui/ui/version
 //= require jquery-ui/ui/data
-//= require jquery-ui/ui/ie
 //= require jquery-ui/ui/keycode
 //= require jquery-ui/ui/position
-//= require jquery-ui/ui/safe-active-element
 //= require jquery-ui/ui/scroll-parent
 //= require jquery-ui/ui/unique-id
 //= require jquery-ui/ui/widget
@@ -180,6 +178,7 @@ var initialize_modules = function() {
   App.AccountMenu.initialize();
   App.AuthenticityTokenRefresh.initialize();
   App.CookiesConsent.initialize();
+  App.Accordion.initialize();
 };
 
 var destroy_non_idempotent_modules = function() {

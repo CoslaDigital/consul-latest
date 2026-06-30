@@ -1528,6 +1528,33 @@ $font-awesome-icons: (
 }
 
 @mixin admin-action-icons {
+
+  .accept-link {
+    @include has-fa-icon(check-circle, regular);
+    color: $color-success;
+  }
+
+  .reject-link {
+    @include has-fa-icon(times-circle, regular);
+    /* Note: .reject-link is already in your SCSS color list for $alert-color */
+  }
+
+  /* If you add Confirm or Fulfill later: */
+  .confirm-link {
+    @include has-fa-icon(handshake, regular);
+    color: $color-success;
+  }
+
+  .confirm-link {
+    @include has-fa-icon(handshake, regular);
+    color: $color-success;
+  }
+
+  .fulfill-link {
+    @include has-fa-icon(check-circle, solid);
+    color: $color-success;
+  }
+
   .edit-link {
     @include has-fa-icon(edit, regular);
   }
@@ -1603,6 +1630,10 @@ $font-awesome-icons: (
     @include has-fa-icon(tools, solid);
   }
 
+  .copy-link {
+    @include has-fa-icon(copy, regular)
+  }
+
   .download-link {
     @include has-fa-icon(download, solid);
   }
@@ -1626,5 +1657,15 @@ $font-awesome-icons: (
 
   .cards-link {
     @include has-fa-icon(images, regular);
+  }
+
+  .locked-icon {
+    @include has-fa-icon(lock, solid);
+    color: $alert-color;
+  }
+
+  .unlocked-icon {
+    @include has-fa-icon(lock-open, solid);
+    color: $color-success;
   }
 }

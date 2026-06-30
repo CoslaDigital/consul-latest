@@ -1,0 +1,242 @@
+// 1. Move the import to the very top
+@import "cosla_shared";
+
+// ==========================================================================
+// SITE VARIABLE CONFIGURATIONS (Pure Data Data-Store)
+// ==========================================================================
+
+.site-coslatest {
+  --brand: #c5ead5;
+  --brand-secondary: #f4b56e;
+  --footer: var(--brand-secondary);
+  --top-links: var(--brand-secondary);
+  --main-header: var(--brand);
+  --brand-contrast: #da95a7;
+}
+
+.site-dev {
+  --anchor-color: #372;
+  --anchor-color-hover: #137;
+  --brand: #153;
+  --brand-secondary: #134a00;
+  --button-background-hover: #fa0;
+  --button-background-hover-contrast: #FFF;
+  --brand-contrast: #FFFFFF;
+  --footer: #D0E0F4;
+  --main-header-contrast: #FFFFFF;
+  --main-header: #351;
+  --top-links: var(--main-header);
+  --subnavigation: #ffd;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+}
+
+.site-dev2 {
+  --brand: #FF3366;
+  --footer: #FCE4EC;
+  --top-links: var(--footer);
+  --top-links-contrast: #FFF;
+  --brand-secondary: #f4b56e;
+  --footer: var(--brand-secondary);
+  --main-header: var(--brand);
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+}
+
+.site-jdev {
+  --brand: #a783e6;
+  --main-header: var(--brand);
+  --brand-secondary: #e624ae;
+  --top-links: var(--brand-secondary);
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --footer: var(--top-links);
+}
+
+.site-glasgow {
+  --brand: #2f7276;
+  --brand-secondary: #83a8ab;
+  --footer: var(--brand-secondary);
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+}
+
+.site-perthandkinross {
+  --brand: #001489;
+  --brand-secondary: #000853;
+  --brand-contrast: #FFFFFF;
+  --footer: #D0E0F4;
+  --main-header-contrast: #FFFFFF;
+}
+
+.site-eastlothian {
+  --brand: #005293;
+  --brand-secondary: #002F59;
+  --footer: #CEDBEA;
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-southayrshire {
+  --brand: #005293;
+  --brand-secondary: #002F59;
+  --footer: #CEDBEA;
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-northayrshire {
+  --brand: #0065BD;
+  --brand-secondary: #0057A4;
+  --brand-contrast: #FFFFFF;
+  --footer: #D0E0F4;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-edinburgh {
+  --brand: #6D3465;
+  --brand-secondary: #492445;
+  --brand-contrast: #FFFFFF;
+  --footer: #D0E0F4;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-orkney {
+  --brand: #000000;
+  --brand-secondary: #f10505;
+  --brand-contrast: #FFFFFF;
+  --footer: #cacaca;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #222222fc;
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-inverclyde {
+  --brand: #36808c;
+  --brand-secondary: #75a5ad;
+  --brand-contrast: #FFFFFF;
+  --footer: #d7e5e7;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-arb {
+  --brand: #10069F;
+  --brand-secondary: #00B140;
+  --brand-contrast: #FFFFFF;
+  --footer: #023C19;
+  --footer-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-wdn {
+  --brand: #0063be;
+  --brand-secondary: #002664;
+  --brand-contrast: #FFFFFF;
+  --footer: #009a49;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #009a49;
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-dundee {
+  --brand: #593F73;
+  --main-header: var(--brand);
+  --brand-secondary: #7e59a3;
+  --top-links: var(--brand-secondary);
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --footer: var(--top-links);
+  --footer-contrast: #FFFFFF;
+}
+
+.site-aberdeen {
+  --main-header: #EC008B;
+  --brand: #55366B;
+  --brand-secondary: #EE7522;
+  --brand-contrast: #FFFFFF;
+  --footer: #eee6db;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #a9c731;
+  --top-links-contrast: #FFFFFF;
+}
+
+.site-ren {
+  --brand: #363281;
+  --brand-secondary: #D01678;
+  --brand-contrast: #FFFFFF;
+  --brand-contrast2: #00959E;
+  --brand-contrast3: #009ACD;
+  --brand-contrast4: #F4E63C;
+  --background-color: #363281;
+  --text-color: #363281;
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+  --top-links: var(--brand-contrast2);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+  --footer: #7F3089;
+  --footer-contrast: #FFFFFF;
+  --button-background-hover: #00B140;
+  --button-background-hover-contrast: #FFFFFF;
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+
+  .hero-header .row::before {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%);
+    opacity: 0.8;
+    border-radius: inherit;
+  }
+}
+
+.site-highland {
+  --brand: #522e91;
+  --brand-secondary: #00833e;
+  --brand-contrast: #FFFFFF;
+  --footer: #0069aa;
+  --footer-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  --top-links: #00833e;
+  --top-links-contrast: #FFFFFF;
+}
+
+
+// ==========================================================================
+// GLOBAL APPLICATION
+// ==========================================================================
+
+.site-coslatest,
+.site-dev,
+.site-dev2,
+.site-jdev,
+.site-glasgow,
+.site-perthandkinross,
+.site-eastlothian,
+.site-southayrshire,
+.site-northayrshire,
+.site-edinburgh,
+.site-orkney,
+.site-inverclyde,
+.site-arb,
+.site-wdn,
+.site-dundee,
+.site-aberdeen,
+.site-ren,
+.site-highland {
+  @include shared-styles;
+}

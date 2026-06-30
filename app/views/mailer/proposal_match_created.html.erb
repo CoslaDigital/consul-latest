@@ -1,0 +1,35 @@
+<td style="<%= css_for_mailer_content %>">
+  <h1 style="<%= css_for_mailer_heading %>">
+    <%= t("mailers.collaboration_request.title") %>
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    Hi <%= @provider.name %>,
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <strong><%= @requester.name %></strong> is interested in your offer:
+    "<em><%= @offer.title %></em>".
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    They would like to use this resource for their proposal:
+    <strong><%= @proposal.title %></strong>.
+  </p>
+
+  <table style="width: 100%;">
+    <tbody>
+    <tr>
+      <td style="padding-bottom: 12px; text-align: center;">
+        <%= link_to mine_offers_url, style: css_for_mailer_button do %>
+          View Request & Respond
+        <% end %>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p style="<%= css_for_mailer_text %>">
+    You can accept this request in your dashboard to start the coordination process.
+  </p>
+</td>

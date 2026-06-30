@@ -1,0 +1,31 @@
+<%# Main intro message %>
+<p>
+  <%= t("mailers.collaboration_request.hi", name: @provider.name) %>
+</p>
+
+<p>
+  <%= t("mailers.collaboration_request.main_text",
+        requester_name: @requester.name,
+        proposal_title: @proposal.title) %>:
+</p>
+
+<%# The Resource/Offer being requested %>
+<blockquote style="background: #f9f9f9; border-left: 10px solid #ccc; margin: 1.5em 10px; padding: 0.5em 10px;">
+  <strong><%= @offer.title %></strong>
+</blockquote>
+
+<p>
+  <%= t("mailers.collaboration_request.action_text") %>
+</p>
+
+<%# Action Button to go to the dashboard %>
+<p style="text-align: center; margin-top: 20px;">
+  <%= link_to t("mailers.collaboration_request.button"),
+              mine_offers_url,
+              class: "button",
+              style: "background-color: #2ba6cb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block;" %>
+</p>
+
+<p>
+  <%= t("mailers.collaboration_request.footer_text") %>
+</p>

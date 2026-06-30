@@ -1,0 +1,40 @@
+<td style="<%= css_for_mailer_content %>">
+
+  <h1 style="<%= css_for_mailer_heading %>">
+    <%= t("mailers.proposal_match_accepted.title", default: "Help is on the way!") %>
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_accepted.hi", name: @recipient.name) %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= sanitize(
+          t("mailers.proposal_match_accepted.text",
+            provider: tag.strong(@match.offer.author.name),
+            offer: tag.strong(@match.offer.title),
+            proposal: tag.strong(@match.proposal.title))
+        ) %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_accepted.instruction",
+          default: "Before you start working together, you must perform the final handshake to confirm the collaboration.") %>
+  </p>
+
+  <table style="width: 100%;">
+    <tbody>
+    <tr>
+      <td style="padding-bottom: 12px; text-align: center;">
+        <%= link_to mine_offers_url, style: css_for_mailer_button do %>
+          <%= t("mailers.proposal_match_accepted.go_to_dashboard", default: "Confirm & Start Collaboration") %>
+        <% end %>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_accepted.sincerely", default: "The Mutual Aid Team") %>
+  </p>
+</td>

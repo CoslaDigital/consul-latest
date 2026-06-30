@@ -27,6 +27,9 @@ class Admin::MenuComponent < ApplicationComponent
         profiles_links,
         stats_link,
         settings_links,
+        (events_link if feature?(:events)),
+        collaborations_link,
+        milestone_statuses_link,
         dashboard_links,
         (machine_learning_link if ::MachineLearning.enabled?),
         (sensemaker_link if feature?(:sensemaker))
@@ -262,6 +265,23 @@ class Admin::MenuComponent < ApplicationComponent
       ]
     end
 
+  def events_link
+    [
+      t("admin.menu.events"),
+      admin_events_path,
+      controller_name == "events",
+      class: "events-link"
+    ]
+  end
+
+    def collaborations_link
+      [
+        t("admin.menu.collaborations"),
+        admin_collaborations_path,
+        controller_name == "collaborations",
+        class: "collaborations-link"
+      ]
+    end
     def site_customization_links
       section(t("admin.menu.title_site_customization"),
               active: customization?, class: "site-customization-link") do
@@ -477,7 +497,10 @@ class Admin::MenuComponent < ApplicationComponent
           tags_link,
           (locales_link if I18n.available_locales.many?),
           geozones_link,
-          local_census_records_link
+          postcodes_link,
+          local_census_records_link,
+          class: ("is-active" if settings?)
+
         )
       end
     end
@@ -522,6 +545,14 @@ class Admin::MenuComponent < ApplicationComponent
         t("admin.menu.geozones"),
         admin_geozones_path,
         controller_name == "geozones"
+      ]
+    end
+
+    def postcodes_link
+      [
+        t("admin.menu.postcodes"),
+        admin_postcodes_path,
+        controller_name == "postcodes"
       ]
     end
 
@@ -597,6 +628,15 @@ class Admin::MenuComponent < ApplicationComponent
         t("admin.menu.sdg_managers"),
         admin_sdg_managers_path,
         sdg_managers?
+      ]
+    end
+
+    def milestone_statuses_link
+      [
+        t("admin.menu.milestone_statuses", default: "Milestone Statuses"),
+        admin_milestone_statuses_path,
+        controller_name == "milestone_statuses",
+        class: "milestone-statuses-link"
       ]
     end
 

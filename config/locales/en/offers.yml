@@ -1,0 +1,121 @@
+en:
+  offers:
+    index:
+      title: "Community Offers"
+      start_offer: "Create an Offer"
+      my_offers: "My Mutual Aid Dashboard"
+      status_filter_title: "Offer Lists"
+      empty: "No offers found matching your criteria."
+      search_form:
+        label: "Search offers"
+        placeholder: "Search offers by keyword, district, or resource..."
+        button: "Search"
+      orders:
+        newest: "Newest"
+        most_active: "Most Active"
+      orders_label: "Order by"
+      section_header:
+        title: "Mutual Aid - Offers of assistance"
+
+    new:
+      title: "Create an Offer"
+      subtitle: "Offer your skills, time, or resources to help citizen proposals succeed."
+      recommendations_title: "Tips for a great offer"
+      recommendation_one: "Be specific about what you are offering (e.g., '10 hours of design work' instead of 'design')."
+      recommendation_two: "Specify your availability and timeframe."
+      recommendation_three: "Tag your offer accurately so proposals can find you."
+      form:
+        submit_button: "Publish Offer"
+
+    edit:
+      title: "Edit Offer"
+      form:
+        submit_button: "Update Offer"
+
+    form:
+      status_label: "Availability Status"
+      status_help: "Set to 'Pending' or 'Claimed' if you want to temporarily stop receiving new requests."
+      title_label: "What resource are you providing?"
+      title_placeholder: "e.g. 5 hours of web consulting"
+      description_label: "Explain the details, limitations, and availability of your offer."
+      geozone: "District / Neighborhood"
+      geozone_help: "Where is this available? Leave blank if city-wide or remote."
+      tags_label: "Tags"
+      tags_instructions: "Tags help match your offer to relevant proposals."
+      tags_placeholder: "e.g., Environment, Legal, Labor"
+
+    status:
+      available: "Available"
+      pending: "In Discussion"
+      claimed: "Claimed"
+      withdrawn: "Withdrawn"
+
+    create:
+      success: "Your offer has been published to the community!"
+    update:
+      success: "Offer updated successfully."
+    destroy:
+      success: "Offer removed."
+    mine:
+      title: "My Mutual Aid Dashboard"
+      offered_by_me: "Resources I'm Offering"
+      offered_by_me_help: "Manage claims on your offers"
+      offered_to_me: "Resources Offered to My Projects"
+      offered_to_me_help: "view offers of assistance and collaboration"
+      active_count: "active collaborations"
+      no_offers: "You haven't created any resource offers yet."
+      inbound_requests: "Requests for my Proposals"
+      tabs:
+        resources_offered: "Resources I'm Offering"
+        help_received: "Resources Offered to My Projects"
+      column:
+        resource: "Resource Title"
+        status: "Current Status"
+        stats: "Activity"
+        pending_requests: "Pending Requests"
+        pending_requests_count:
+          one: "1 request pending"
+          other: "%{count} requests pending"
+        active_count: "Active"
+        completed_count: "Completed"
+      no_inbound: "No current offers of help"
+      completed_count: "Completed"
+      no_pending_requests: "No Pending Requests"
+      for_project: "For project"
+  admin:
+    actions:
+      actions: "Actions"
+      edit: "Edit"
+
+  proposal_matches:
+    status:
+      pending: "Pending Review"
+      accepted: "Offer Accepted"
+      confirmed: "In Progress"
+      rejected: "Declined"
+      withdrawn: "Cancelled"
+      fulfilled: "Completed"
+    accept:
+      button: "Accept"
+      success: "Collaboration request accepted"
+    confirm:
+      success: "Collaboration confirmed successfully!"
+    reject:
+      button: "Decline"
+      success: "Collaboration rejected successfully!"
+    fulfill:
+      success: "Collaboration marked as completed! Thank you for supporting the community."
+    error: "There was an error updating the collaboration."
+    create:
+      success: "Collaboration requested successfully!"
+      error_duplicate: "You have already requested a collaboration for this resource."
+
+  proposals:
+    show:
+      collaboration_status: "Collaborations"
+      active_collabs: "Active Support"
+      fulfilled_collabs: "Successfully Completed"
+      awaiting_confirmation: "Action Required: Finalize Help"
+      confirm_button: "Confirm & Start"
+      fulfill_button: "Mark as Received/Completed"
+      confirm_fulfillment_check: "Confirm that this help has been received and the task is complete?"

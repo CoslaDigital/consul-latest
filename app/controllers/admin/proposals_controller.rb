@@ -1,4 +1,6 @@
 class Admin::ProposalsController < Admin::BaseController
+  require 'csv'
+  include ActionView::Helpers::SanitizeHelper
   include HasOrders
   include CommentableActions
   include FeatureFlags
@@ -17,8 +19,9 @@ class Admin::ProposalsController < Admin::BaseController
     respond_to do |format|
       format.html { @proposals = @proposals.page(params[:page]) }
       format.csv do
-        send_data Proposal::Exporter.new(@proposals).to_csv,
-                  filename: "proposals.csv"
+        # Use the model's CSV method directly
+        send_data @proposals.to_csv,
+                  filename: "proposals-#{Date.today}.csv"
       end
     end
   end
@@ -58,19 +61,20 @@ class Admin::ProposalsController < Admin::BaseController
 
   private
 
-    def resource_model
-      Proposal
-    end
+  def resource_model
+    Proposal
+  end
 
-    def load_proposal
-      @proposal = Proposal.find(params[:id])
-    end
+  def load_proposal
+    @proposal = Proposal.find(params[:id])
+  end
 
-    def proposal_params
-      params.require(:proposal).permit(allowed_params)
-    end
+  def proposal_params
+    params.require(:proposal).permit(allowed_params)
+  end
 
-    def allowed_params
-      [:selected]
-    end
+  def allowed_params
+    [:selected]
+  end
+
 end

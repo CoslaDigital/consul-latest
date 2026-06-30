@@ -1,0 +1,12 @@
+<section class="comments">
+  <div class="row">
+    <div id="comments" class="small-12 column">
+      <h2>
+        <%= t("offers.show.comments_title", default: "Comments") %>
+        <span class="js-comments-count">(<%= @offer.comments_count %>)</span>
+      </h2>
+
+      <%= render Shared::CommentsComponent.new(@offer, @comment_tree) %>
+    </div>
+  </div>
+</section>

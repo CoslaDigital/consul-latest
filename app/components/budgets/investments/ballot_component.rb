@@ -45,13 +45,27 @@ class Budgets::Investments::BallotComponent < ApplicationComponent
       ballot.heading_for_group(investment.group)
     end
 
-    def cannot_vote_text
-      if reason.present? && !voted?
-        t("budgets.ballots.reasons_for_not_balloting.#{reason}",
-          verify_account: link_to_verify_account,
-          my_heading: link_to_my_heading,
-          change_ballot: link_to_change_ballot,
-          heading_link: heading_link(assigned_heading, budget))
-      end
+  def cannot_vote_text
+    # Return early if there's no reason to show a message
+    return if reason.blank? || voted?
+
+    options = {
+      verify_account: link_to_verify_account,
+      my_heading: link_to_my_heading,
+      change_ballot: link_to_change_ballot,
+      heading_link: heading_link(assigned_heading, budget)
+    }
+
+    # If the specific reason is invalid_geozone, add geozone names to the options
+    if reason.to_s == "invalid_geozone"
+      user_geozone = current_user.geozone&.name || "None"
+
+      required_geozones = Geozone.where(id: investment.heading.geozone_ids).pluck(:name).join(", ")
+
+      options[:user_geozone] = user_geozone
+      options[:required_geozones] = required_geozones
     end
+
+    t("budgets.ballots.reasons_for_not_balloting.#{reason}", **options)
+  end
 end

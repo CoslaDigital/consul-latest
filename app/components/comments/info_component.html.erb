@@ -15,18 +15,33 @@
     <% if comment.user.hidden? || comment.user.erased? %>
       <span class="user-name"><%= t("comments.comment.user_deleted") %></span>
     <% else %>
-      <span class="user-name"><%= link_to comment.user.name, user_path(comment.user) %></span>
+      <span class="user-name">
+        <% is_official_account = comment.user.administrator? ||
+                                 comment.user.moderator? ||
+                                 comment.user.official_level.to_i > 0 %>
+
+        <% can_view_real_name = current_user&.administrator? ||
+                                (current_user&.id == comment.user_id) %>
+
+        <% if is_official_account || can_view_real_name %>
+          <%= link_to comment.user.name, user_path(comment.user) %>
+        <% else %>
+          <%= comment.user.masked_username %>
+        <% end %>
+      </span>
       <% if comment.user.display_official_position_badge? %>
         <span class="label round level-<%= comment.user.official_level %>">
           <%= comment.user.official_position %>
         </span>
       <% end %>
     <% end %>
+
     <% if comment.user.verified_organization? %>
       <span class="label round is-association">
         <%= t("shared.collective") %>
       </span>
     <% end %>
+
     <% if comment.user_id == comment.commentable.author_id %>
       <span class="label round is-author">
         <%= t("comments.comment.author") %>

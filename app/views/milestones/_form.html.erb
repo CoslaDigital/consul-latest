@@ -1,0 +1,23 @@
+<%
+  # Use the parent detected by the controller or attached to the milestone
+  parent = milestone.milestoneable || @milestoneable
+
+  # Construct the route array
+  if parent.is_a?(Budget::Investment)
+    # Uses symbols to avoid budget_budget stuttering and grabs IDs from @budget/@investment
+    target = [:budget, :investment, milestone]
+  else
+    # Standard 2-level nesting for Proposals
+    target = [parent, milestone]
+  end
+%>
+
+<%= render "shared/globalize_locales", resource: milestone %>
+
+<%= translatable_form_for target do |f| %>
+  <%= render 'shared/milestones/form_fields', form: f %>
+
+  <div class="actions margin-top">
+    <%= f.submit t("shared.save"), class: "button" %>
+  </div>
+<% end %>

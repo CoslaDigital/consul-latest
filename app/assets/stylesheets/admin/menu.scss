@@ -32,6 +32,10 @@
       @include icon(archive, solid);
     }
 
+    &.milestone-statuses-link {
+      @include icon(flag, solid);
+    }
+
     &.budgets-link,
     &.investments-link,
     &.budget-investments-link {
@@ -112,6 +116,14 @@
 
     &.sensemaker-link {
       @include icon(lightbulb, solid);
+    }
+
+    &.events-link {
+      @include icon(calendar, solid);
+    }
+
+    &.collaborations-link {
+      @include icon(handshake, solid);
     }
 
     &.administrators-link {

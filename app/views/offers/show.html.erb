@@ -1,0 +1,183 @@
+<% provide :title, @offer.title %>
+<% preview = false unless local_assigns.has_key? :preview %>
+
+<% content_for :meta_description do %>
+  <%= truncate(strip_tags(@offer.description), length: 150) %>
+<% end %>
+
+<% content_for :canonical do %>
+  <%= render "shared/canonical", href: offer_url(@offer) %>
+<% end %>
+
+<div class="offer-show">
+  <div id="<%= dom_id(@offer) %>" class="row">
+    <div class="small-12 medium-9 column">
+      <%= back_link_to offers_path unless preview %>
+
+      <h1><%= @offer.title %></h1>
+
+      <div class="offer-meta margin-bottom">
+        <span class="label <%= @offer.status %>"><%= @offer.status.titleize %></span>
+        <%= render Shared::GeozoneLinkComponent.new(@offer, offers_path(search: geozone_name(@offer))) %>
+      </div>
+
+      <%= render "info" %>
+
+      <div class="margin-top">
+        <%= render Shared::ModerationActionsComponent.new(@offer) %>
+      </div>
+
+      <% unless preview %>
+        <%# --- 1. AUTHOR STATUS MANAGEMENT (Prompt to Claim) --- %>
+        <% if @offer.author == current_user && @offer.pending? %>
+          <aside class="callout warning margin-top">
+            <p>
+              <i class="fa fa-exclamation-triangle"></i>
+              <strong><%= t("offers.show.pending_notice", default: "This offer is currently 'Pending'.") %></strong>
+              <br><%= t("offers.show.pending_help", default: "Is this resource now fully committed? Mark it as claimed to hide it from the active list.") %>
+            </p>
+            <div class="button-group">
+              <%= button_to t("offers.show.mark_claimed", default: "Mark as Claimed"),
+                            offer_path(@offer, offer: { status: :claimed }),
+                            method: :patch,
+                            class: "button success small" %>
+
+              <%= button_to t("offers.show.keep_available", default: "Keep Available"),
+                            offer_path(@offer, offer: { status: :available }),
+                            method: :patch,
+                            class: "button hollow secondary small" %>
+            </div>
+          </aside>
+        <% end %>
+
+        <%# --- 2. PENDING REQUESTS (Visible to Offer Author) --- %>
+        <% if @offer.author == current_user && @offer.proposal_matches.pending.any? %>
+          <aside class="callout secondary margin-top">
+            <h3><%= t("offers.show.pending_requests", default: "Collaboration Requests") %></h3>
+            <ul class="no-bullet">
+              <% @offer.proposal_matches.pending.each do |match| %>
+                <li class="padding-top border-bottom padding-bottom" style="list-style: none;">
+                  <p>
+                    <strong><%= match.proposal.author.name %></strong> wants to match this with:
+                    <%= link_to match.proposal.title, proposal_path(match.proposal), class: "strong" %>
+                  </p>
+
+                  <div class="button-group">
+                    <%= button_to t("offers.show.accept_button", default: "Accept"),
+                                  accept_proposal_match_path(match),
+                                  method: :patch,
+                                  class: "button success small" %>
+
+                    <%= button_to t("offers.show.reject_button", default: "Decline"),
+                                  reject_proposal_match_path(match),
+                                  method: :patch,
+                                  class: "button alert hollow small" %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </aside>
+        <% end %>
+
+        <%# --- 3. ACTIVE COLLABORATIONS --- %>
+        <% active_matches = @offer.proposal_matches.accepted %>
+        <% if active_matches.any? %>
+          <div class="callout success margin-top">
+            <h4><%= t("offers.show.active_collaborations", default: "Confirmed Collaborations") %></h4>
+            <ul class="no-bullet">
+              <% active_matches.each do |match| %>
+                <li class="margin-bottom border-bottom padding-bottom">
+                  <i class="fa fa-check-circle text-success"></i>
+                  <strong><%= match.proposal.author.name %></strong>: <%= link_to match.proposal.title, proposal_path(match.proposal) %>
+
+                  <% if match.proposal.author == current_user %>
+                    <div class="margin-top">
+                      <%= button_to t("offers.show.fulfill_button", default: "Confirm Received / Completed"),
+                                    fulfill_proposal_match_path(match),
+                                    method: :patch,
+                                    class: "button success small hollow",
+                                    data: { confirm: t("offers.show.confirm_fulfill", default: "Mark this collaboration as finished?") } %>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%# --- 4. COMMENTS SECTION --- %>
+        <div class="tabs-content margin-top" data-tabs-content="offers_tabs">
+          <div class="tabs-panel is-active" id="tab-comments">
+            <%= render "offers/comments" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# --- SIDEBAR --- %>
+    <% unless preview %>
+      <aside class="small-12 medium-3 column">
+
+        <div class="callout" style="background: #f9f9f9; border-left: 4px solid #28a745;">
+          <h3><%= t("offers.show.need_this", default: "Need this resource?") %></h3>
+
+          <% if current_user.nil? %>
+            <p><%= t("offers.show.login_to_request", default: "Sign in to request this offer for your proposal.") %></p>
+            <%= link_to t("devise.sessions.new.log_in"), new_user_session_path, class: "button expanded" %>
+
+          <% elsif @offer.author == current_user %>
+            <p><em><%= t("offers.show.is_yours", default: "This is your offer.") %></em></p>
+            <%= link_to t("offers.edit.title", default: "Edit Offer"), edit_offer_path(@offer), class: "button hollow expanded" %>
+
+          <% elsif !@offer.active? %>
+            <div class="callout warning tiny">
+              <p>
+                <strong><%= t("offers.show.unavailable", default: "This offer is currently not accepting new requests.") %></strong>
+              </p>
+            </div>
+
+          <% else %>
+            <%# Find if the user has a specific match for their proposals %>
+            <% user_proposal_ids = current_user.proposals.pluck(:id) %>
+            <% existing_match = @offer.proposal_matches.where(proposal_id: user_proposal_ids).first %>
+
+            <% if existing_match %>
+              <div class="text-center">
+                <span class="label <%= existing_match.status %>"><%= existing_match.status.titleize %></span>
+                <p class="help-text margin-top">
+                  <%= t("offers.show.already_requested_for", default: "Requested for:") %><br>
+                  <strong><%= existing_match.proposal.title %></strong>
+                </p>
+              </div>
+            <% elsif current_user.proposals.not_archived.not_retired.any? %>
+              <p><%= t("offers.show.select_proposal", default: "Select a proposal to request a collaboration:") %></p>
+
+              <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
+                <%= f.hidden_field :offer_id, value: @offer.id %>
+
+                <div class="field margin-bottom">
+                  <%= f.collection_select :proposal_id, current_user.proposals.not_archived.not_retired, :id, :title, { prompt: t("offers.show.prompt_proposal", default: "Choose a Proposal...") }, class: "full-width" %>
+                </div>
+
+                <div class="actions">
+                  <%= f.submit t("offers.show.request_button", default: "Request Collaboration"), class: "button success expanded" %>
+                </div>
+              <% end %>
+            <% else %>
+              <p><%= t("offers.show.no_proposals", default: "You don't have any active proposals.") %></p>
+              <%= link_to t("proposals.index.start_proposal"), new_proposal_path, class: "button expanded" %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div class="sidebar-divider"></div>
+        <h2><%= t("offers.show.author", default: "Offered by") %></h2>
+        <p><%= @offer.author.name %></p>
+
+        <%= render "proposals/social_share", proposal: @offer, share_title: t("offers.show.share", default: "Share this offer") %>
+        <%= render Sensemaker::ReportLinkComponent.new(@offer) %>
+
+      </aside>
+    <% end %>
+  </div>
+</div>

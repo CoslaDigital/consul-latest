@@ -21,6 +21,11 @@
           </span>
         <% end %>
       <% end %>
+
+        <h4><%= t("budgets.investments.show.estimated_price") %></h4>
+        <p class="investment-project-amount">
+          <%= proposal.price.nil? ? content_tag(:em, t("proposals.proposal.price_not_yet_known")) : proposal.formatted_price %>
+        </p>
     <% end %>
 
     <% if show_proposal_votes? %>

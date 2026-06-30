@@ -1,0 +1,28 @@
+<tr id="<%= dom_id(question) %>" class="budget_question">
+     <td data-field="title">
+        <%= link_to question.text.truncate(60), edit_admin_budget_budget_question_path(@budget, question) %>
+      </td>
+      <td data-field="mandatory">
+        <%= question.is_mandatory ? "✓" : "✗" %>
+      </td>
+      <td data-field="private">
+        <%= question.is_private ? "✓" : "✗" %>
+      </td>
+      <td data-field="enabled">
+         <%= render Admin::BudgetQuestions::ToggleEnabledComponent.new(question) %>
+      </td>
+      <td class="actions-cell"> <%# Added a class for potential styling of the cell itself %>
+          <%= render Admin::TableActionsComponent.new(
+        question,
+        actions: [:edit, :destroy],
+        edit_text: t("common.edit"),
+        edit_path: edit_admin_budget_budget_question_path(@budget, question),
+        # edit_options: { class: "your-edit-button-class" }, # Optional: if Admin::ActionComponent accepts these
+
+        destroy_text: t("common.delete"),
+        destroy_path: admin_budget_budget_question_path(@budget, question),
+        destroy_confirmation: t("common.confirm_delete_item", item: Budget::Question.model_name.human)
+      ) %>
+      </td>
+
+</tr>

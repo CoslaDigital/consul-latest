@@ -1,0 +1,47 @@
+<% if @current_user && !author? %>
+  <div class="visitor-meta margin-top-l">
+    <hr class="sidebar-divider">
+
+    <% user_match = @proposal.proposal_matches.where(offer_id: @current_user.offers.pluck(:id)).first %>
+
+    <ul class="no-bullet margin-bottom-0">
+      <li class="text-center">
+        <% if user_match %>
+          <%# 1. Narratively leading into the status badge %>
+          <p class="margin-bottom-s">
+            <%= t("proposals.show.your_link_status", default: "Your offer is currently:") %>
+          </p>
+
+          <div class="status-badge-container">
+            <span class="label <%= status_label_class(user_match.status) %>" style="display: inline-block; padding: 0.6rem 1rem;">
+              <%= t("proposal_matches.status.#{user_match.status}") %>
+            </span>
+          </div>
+
+        <% elsif @current_user.offers.active.any? %>
+          <%# 2. The Offer Form %>
+          <h3 class="sidebar-title"><%= t("proposals.show.offer_help_title") %></h3>
+
+          <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
+            <%= f.hidden_field :proposal_id, value: @proposal.id %>
+
+            <div class="margin-bottom">
+              <%= f.collection_select :offer_id, @current_user.offers.active, :id, :title,
+                                      { prompt: t("proposals.show.select_offer_prompt") },
+                                      class: "full-width" %>
+            </div>
+
+            <%= f.submit t("proposals.show.propose_button"), class: "button success expanded small margin-bottom-0" %>
+          <% end %>
+
+        <% else %>
+          <%# 3. Call to create an offer if none exist %>
+          <p class="small text-muted margin-bottom-s">
+            <%= t("proposals.show.no_offers_to_link") %>
+          </p>
+          <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded small margin-bottom-0" %>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+<% end %>

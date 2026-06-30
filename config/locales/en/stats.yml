@@ -34,6 +34,14 @@ en:
       percent_heading_census: "% Heading census"
       participatory_disclaimer: "** The numbers of total participants refer to persons that created, supported or voted investment proposals."
       heading_disclaimer: "*** Data about headings refer to the heading where each user voted, not necessarily the one that person is registered on."
+      participation_density_view: "Participation Density View"
+      density_level: "Density Level"
+      precisions:
+        district: "District (10km)"
+        neighborhood: "Neighborhood (1km)"
+        street: "Street (100m)"
+        building: "Building (10m)"
+        update: "Update"
     polls:
       by_channel: "Participants by channel"
       vote_by_channel: "Vote type by channel"

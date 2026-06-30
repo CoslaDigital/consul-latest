@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  load_and_authorize_resource
+  load_and_authorize_resource class: User
 
   has_filters %w[active erased], only: :index
 
@@ -11,5 +11,15 @@ class Admin::UsersController < Admin::BaseController
       format.html
       format.js
     end
+  end
+
+  def lock
+    @user.lock_access!
+    redirect_to admin_users_path, notice: t("admin.users.lock.success")
+  end
+
+  def unlock
+    @user.unlock_access!
+    redirect_to admin_users_path, notice: t("admin.users.unlock.success")
   end
 end

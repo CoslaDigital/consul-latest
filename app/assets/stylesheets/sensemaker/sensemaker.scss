@@ -29,6 +29,7 @@
 
 .admin .sensemaker {
 
+.admin .sensemaker {
   form.sensemaker-buttons-busy {
     button[type="submit"][data-temp-disable="true"],
     input[type="submit"][data-temp-disable="true"] {
@@ -192,12 +193,16 @@
         list-style: none;
       }
 
+      // (moved to shallower block below)
+
       li.result-group {
         list-style: none;
         margin-bottom: 0.5rem;
         margin-top: 0.5rem;
         padding: 0;
       }
+
+      // (moved to shallower block below)
 
       li.result-row {
         opacity: 0.8;

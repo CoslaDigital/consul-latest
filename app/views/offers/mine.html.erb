@@ -1,0 +1,11 @@
+<% provide :title, t("offers.mine.title") %>
+
+<main id="offers_mine" class="row margin-top">
+  <div class="small-12 column">
+    <%= back_link_to offers_path %>
+    <h1><%= t("offers.mine.title") %></h1>
+
+    <%= render Offers::MineComponent.new(user: current_user,
+                                         current_filter: params[:filter]) %>
+  </div>
+</main>

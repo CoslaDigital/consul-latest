@@ -1,0 +1,14 @@
+<div class="collaboration-status-sidebar admin" style="display: block; clear: both; position: relative; width: 100%;">
+  <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status") %></h2>
+
+  <%# 1. Success History (Static List) %>
+  <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
+
+  <%# 2. Active Tasks (Author vs Visitor logic) %>
+  <%= render Proposals::Collaboration::ActiveTasksComponent.new(@proposal, @current_user) %>
+
+  <%# 3. Visitor Action (The form or the status badge) %>
+  <%= render Proposals::Collaboration::VisitorActionComponent.new(@proposal, @current_user) %>
+
+  <div style="clear: both; height: 1px;"></div>
+</div>

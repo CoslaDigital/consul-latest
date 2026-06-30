@@ -1,0 +1,33 @@
+<td style="<%= css_for_mailer_content %>">
+  <h1 style="<%= css_for_mailer_heading %>">
+    <%= t("mailers.collaboration_introduction.title") %>
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.collaboration_introduction.intro",
+          other_name: @other_party.name,
+          proposal_title: @proposal.title) %>
+  </p>
+
+  <div style="background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
+    <p style="<%= css_for_mailer_text %>; margin-bottom: 5px;">
+      <strong><%= t("mailers.collaboration_introduction.contact_details") %></strong>
+    </p>
+    <p style="<%= css_for_mailer_text %>">
+      <%= @other_party.name %>:
+      <a href="mailto:<%= @other_party.email %>" style="color: #2196F3;"><%= @other_party.email %></a>
+    </p>
+  </div>
+
+  <p style="<%= css_for_mailer_text %>">
+    <strong><%= t("mailers.collaboration_introduction.summary_title") %></strong>
+  </p>
+  <ul style="<%= css_for_mailer_text %>">
+    <li><strong><%= t("offers.form.title_label") %>:</strong> <%= @offer.title %></li>
+    <li><strong><%= t("admin.collaborations.index.proposal") %>:</strong> <%= @proposal.title %></li>
+  </ul>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.collaboration_introduction.next_steps") %>
+  </p>
+</td>

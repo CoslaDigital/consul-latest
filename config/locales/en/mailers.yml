@@ -27,6 +27,15 @@ en:
       new_reply_by: There is a new response from <strong>%{commenter}</strong> to your comment on
       subject: Someone has responded to your comment
       title: New response to your comment
+    proposal_published:
+      subject: "Thank you for publishing a proposal!"
+      title: "Thank you for publishing a proposal!"
+      intro: "Hi <strong>%{author}</strong>,"
+      text: "Thank you for publishing your proposal <strong>%{proposal}</strong>."
+      follow: "We will inform you about how the process progresses, which you can also follow on <strong>%{link}</strong>."
+      follow_link: "Proposals"
+      sincerely: "Sincerely,"
+      share: "Share your project"
     proposal_notification_digest:
       info: "Here are the new notifications that have been published by authors of the proposals that you have supported in %{org_name}."
       title: "Proposal notifications in %{org_name}"
@@ -60,11 +69,12 @@ en:
       share: "Share your project"
     budget_investment_unfeasible:
       title: "Your investment project has been marked as unfeasible"
-      hi: "Dear user,"
-      new: "For all these, we invite you to elaborate a <strong>new investment</strong> that adjusts to the conditions of this process. You can do it following this link: %{url}."
+      hi: "Dear %{author},"
+      intro: "Following a review of your application, we are sorry to inform you that your application %{investment} for budget %{budget} will not be proceeding to the next phase this time because it does not meet the criteria for the fund"
+      new: "Please do consider submitting a new application to future opportunities"
       new_href: "new investment project"
       sincerely: "Sincerely"
-      sorry: "Sorry for the inconvenience and we again thank you for your invaluable participation."
+      sorry: "Sorry for any disappointment this causes and we again thank you for your invaluable participation."
       subject: "Your investment project '%{code}' has been marked as unfeasible"
     budget_investment_selected:
       subject: "Your investment project '%{code}' has been selected"
@@ -96,6 +106,20 @@ en:
       subject: "Machine Learning - Content has been generated successfully"
       text: "Content has been generated successfully."
       title: "Machine Learning script"
+    collaboration_introduction:
+      subject: "Introduction: Collaboration for %{title}"
+      title: "It's a Match!"
+      intro: "Great news! You are now connected with %{other_name} regarding the proposal '%{proposal_title}'."
+      contact_details: "You can now coordinate directly via email:"
+      summary_title: "Collaboration Summary"
+      next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
+    collaboration_request:
+      subject: "Someone wants to collaborate on %{requester_name}'s project"
+      hi: "Hi %{name},"
+      main_text: "%{requester_name} has requested your help for their project '%{proposal_title}'"
+      action_text: "You can review this request and accept or decline it from your dashboard."
+      button: "Go to my dashboard"
+      footer_text: "Thank you for participating in the Mutual Aid network!"
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"
@@ -127,3 +151,22 @@ en:
       text_9: "You will also find this new recommended dissemination action..."
       text_10: "You sure have more resources to use!"
       dashboard_button: "Go ahead, discover them!"
+    proposal_match_accepted:
+      subject: "Collaboration Accepted: Time to start!"
+      title: "Your request has been accepted!"
+      hi: "Hi %{name},"
+      text: "%{provider} has accepted your request to help '%{proposal}' with: %{offer}."
+      instruction: "Please confirm the collaboration on your dashboard to exchange contact details."
+      go_to_dashboard: "Confirm & Start"
+      sincerely: "The Community Team"
+    proposal_match_created:
+      subject: "New Mutual Aid Request"
+    proposal_match_confirmed:
+      subject: "Collaboration Confirmed: Time to start!"
+      title: "Handshake Complete!"
+      hi: "Hi %{name},"
+      text: "The lead for '%{proposal}' has confirmed your offer of %{offer}. You are now officially collaborating!"
+      next_steps: "Check your dashboard to coordinate the final steps."
+      view_dashboard: "View My Dashboard"
+    new_offer_admin_notification:
+      subject: "MUTUAL AID: New Resource Offer Published"

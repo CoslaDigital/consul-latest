@@ -1,36 +1,27 @@
-<%= render "shared/globalize_locales", resource: @milestone %>
+<%# app/views/admin/milestones/_form.html.erb %>
+<%
+  # Guard: ensure we have the milestone object
+  milestone ||= @milestone
 
-<%= translatable_form_for @milestone, url: admin_polymorphic_path(@milestone) do |f| %>
+  # Detect the parent (milestoneable)
+  parent = milestone.milestoneable || @milestoneable
 
-  <div class="row">
-    <div class="small-12 medium-6 margin-bottom column">
-      <%= f.select :status_id,
-                   @statuses.map { |s| [s.name, s.id] },
-                   { include_blank: @statuses.any? ? "" : t("admin.milestones.form.no_statuses_defined") },
-                   { disabled: @statuses.blank? } %>
-      <%= link_to t("admin.milestones.form.admin_statuses"),
-                  admin_milestone_statuses_path %>
-    </div>
-  </div>
+  # Build the Admin Namespace target array
+  target = if parent.is_a?(Budget::Investment)
+             # Admin route: [:admin, budget, investment, milestone]
+             [:admin, parent.budget, parent, milestone]
+           else
+             # Admin route: [:admin, parent, milestone] (Works for Proposals/Legislation)
+             [:admin, parent, milestone]
+           end
+%>
 
-  <div class="row">
-    <%= f.translatable_fields do |translations_form| %>
-      <div class="column">
-        <%= translations_form.hidden_field :title, value: l(Time.current, format: :datetime),
-                                                   maxlength: Milestone.title_max_length %>
-        <%= translations_form.text_area :description, rows: 5 %>
-      </div>
-    <% end %>
-  </div>
+<%= render "shared/globalize_locales", resource: milestone %>
 
-  <div class="row">
-    <div class="column">
-      <%= f.date_field :publication_date %>
+<%= translatable_form_for target do |f| %>
+  <%= render "shared/milestones/form_fields", form: f %>
 
-      <%= render Images::NestedComponent.new(f) %>
-      <%= render Documents::NestedComponent.new(f) %>
-
-      <%= f.submit nil, class: "button success" %>
-    </div>
+  <div class="actions margin-top">
+    <%= f.submit nil, class: "button" %>
   </div>
 <% end %>

@@ -1,0 +1,108 @@
+// Mutual Aid Dashboard - Integrated Styles
+.offer-dashboard-item {
+  .panel {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $global-radius;
+    padding: $line-height;
+    position: relative;
+    transition: box-shadow 0.2s ease;
+    border-left: 5px solid $text-light; // Default muted strip
+
+    &:hover {
+      box-shadow: 0 2px 10px rgba($black, 0.08);
+    }
+
+    // Status-specific Action Strips using your specific variables
+    &.border-left-pending {
+      border-left-color: $warning-border;
+    }
+
+    &.border-left-accepted {
+      border-left-color: $brand;
+    }
+
+    &.border-left-confirmed {
+      border-left-color: $check;
+    }
+
+    &.border-left-fulfilled {
+      border-left-color: $text-medium;
+    }
+
+    // Typography overrides to match Shared::BasicContentComponent
+    .basic-content {
+      h3 {
+        // Dig into the 'small' map, then the 'h3' map, then grab the 'font-size' value
+        font-size: rem-calc(map-get(map-get(map-get($header-styles, small), "h3"), "font-size"));
+        margin-bottom: $line-height * 0.25;
+
+        @include breakpoint(medium) {
+          // Do the same for the 'medium' map
+          font-size: rem-calc(map-get(map-get(map-get($header-styles, medium), "h3"), "font-size"));
+        }
+
+        a {
+          color: $brand;
+          text-decoration: none;
+
+          &:hover {
+            color: $anchor-color-hover;
+          }
+        }
+      }
+
+      .basic-description {
+        font-size: $small-font-size;
+        color: $text-medium;
+        line-height: $line-height;
+      }
+    }
+
+    // Status Labels
+    .label {
+      font-size: $tiny-font-size;
+      border-radius: $global-radius;
+
+      &.available {
+        background-color: $check;
+      }
+
+      &.pending {
+        background-color: $warning-border;
+        color: $color-warning;
+      }
+
+      &.claimed {
+        background-color: $text-medium;
+      }
+    }
+  }
+}
+
+// Sidebar Recommendation Styling
+.sidebar-tips {
+  border: 1px solid $border;
+
+  h3 {
+    color: $brand;
+    margin-bottom: $line-height;
+  }
+
+  .recommendations {
+    li {
+      font-size: $small-font-size;
+      padding: ($line-height * 0.5) 0;
+      border-bottom: 1px solid $light;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .fa {
+        color: $brand;
+        margin-right: $font-icon-margin;
+      }
+    }
+  }
+}

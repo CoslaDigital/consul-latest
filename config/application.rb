@@ -19,6 +19,11 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# TODO: remove after upgrading to ruby_llm 2.0.0
+RubyLLM.configure do |config|
+  config.use_new_acts_as = true
+end
+
 module Consul
   class Application < Rails::Application
     def secrets
@@ -94,54 +99,51 @@ module Consul
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     # config.autoload_lib(ignore: %w[assets tasks])
 
-    # Configuration for the application, engines, and railties goes here.
-    #
-    # These settings can be overridden in specific environments using the files
-    # in config/environments, which are processed later.
-    #
-    config.time_zone = Rails.application.secrets.time_zone.presence || "Madrid"
+    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
+    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
+    config.time_zone = Rails.application.secrets.time_zone.presence || "Edinburgh"
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = :en
     available_locales = [
       "ar",
-      "bg",
-      "bs",
-      "ca",
-      "cs",
-      "da",
+#      "bg",
+#      "bs",
+#      "ca",
+#      "cs",
+#      "da",
       "de",
-      "el",
+#      "el",
       "en",
       "es",
-      "es-PE",
-      "eu",
-      "fa",
+#      "es-PE",
+#      "eu",
+#      "fa",
       "fr",
       "gd",
-      "gl",
-      "he",
-      "hr",
-      "id",
-      "it",
-      "ka",
-      "ne",
-      "nl",
-      "oc",
-      "pl",
-      "pt",
-      "pt-BR",
-      "ro",
+#      "gl",
+#      "he",
+#      "hr",
+#      "id",
+#      "it",
+#      "ka",
+#      "ne",
+#      "nl",
+#      "oc",
+#      "pl",
+#      "pt",
+#      "pt-BR",
+#      "ro",
       "ru",
-      "sl",
-      "sq",
-      "so",
-      "sr",
-      "sv",
-      "tr",
+#      "sl",
+#      "sq",
+#      "so",
+#      "sr",
+#      "sv",
+#      "tr",
       "uk-UA",
-      "val",
+#      "val",
       "zh-CN",
       "zh-TW"
     ]

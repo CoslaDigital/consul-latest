@@ -1,5 +1,14 @@
 <div class="table-actions">
+  <%# Custom content (if any) rendered first %>
   <%= content %>
+
+  <% if actions.include?(:accept) %>
+    <%= action(:accept, **accept_options, text: accept_text, path: accept_path) %>
+  <% end %>
+
+  <% if actions.include?(:reject) %>
+    <%= action(:reject, **reject_options, text: reject_text, path: reject_path) %>
+  <% end %>
 
   <% if actions.include?(:edit) %>
     <%= action(:edit, **edit_options, text: edit_text, path: edit_path) %>
@@ -7,5 +16,13 @@
 
   <% if actions.include?(:destroy) %>
     <%= action(:destroy, **destroy_options, text: destroy_text, path: destroy_path) %>
+  <% end %>
+
+  <% if actions.include?(:confirm) %>
+    <%= action(:confirm, **confirm_options, path: confirm_path) %>
+  <% end %>
+
+  <% if actions.include?(:fulfill) %>
+    <%= action(:fulfill, **fulfill_options, path: fulfill_path) %>
   <% end %>
 </div>

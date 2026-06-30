@@ -21,7 +21,16 @@
     <%= render "results_by_booth" %>
   <% end %>
 
+  <% if @poll.answers.any? %>
+    <h3><%= t("admin.polls.show.results_tab") %></h3>
+    <% @poll.questions.each do |question| %>
+      <%= render Polls::Results::QuestionComponent.new(question) %>
+    <% end %>
+  <% end %>
+
   <% if @poll.voters.any? %>
     <%= render "show_results", resource: @poll %>
   <% end %>
+
+
 </div>

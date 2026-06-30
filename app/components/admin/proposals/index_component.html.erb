@@ -7,30 +7,44 @@
 <% if proposals.any? %>
   <%= render Admin::SearchComponent.new(label: t("admin.shared.search.label.proposals")) %>
 
+  <%# The single button bar containing your two primary utilities %>
+  <div class="page-actions" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+    <%= link_to t("admin.proposals.index.download_csv"),
+                url_for(params.permit!.merge(format: :csv)),
+                class: "button clear-margin-bottom" %>
+
+    <%# ONLY ONE: Replaced with a clean, secondary-styled management shortcut %>
+    <%= link_to "Manage Proposal Types",
+                admin_proposal_kinds_path,
+                class: "button hollow secondary clear-margin-bottom" %>
+  </div>
+
   <%= render Shared::DownloadCsvLinkComponent.new(path_helper: :admin_proposals_path) %>
   <h3><%= page_entries_info proposals %></h3>
 
   <table>
     <thead>
-      <tr>
-        <th class="text-center"><%= t("admin.proposals.index.id") %></th>
-        <th><%= Proposal.human_attribute_name(:title) %></th>
-        <th><%= t("admin.proposals.index.author") %></th>
-        <th><%= t("admin.proposals.index.milestones") %></th>
-        <th><%= t("admin.proposals.index.selected") %></th>
-      </tr>
+    <tr>
+      <th class="text-center"><%= t("admin.proposals.index.id") %></th>
+      <th><%= Proposal.human_attribute_name(:title) %></th>
+      <th><%= t("admin.proposals.index.author") %></th>
+      <th><%= t("admin.proposals.index.status") %></th>
+      <th><%= t("admin.proposals.index.milestones") %></th>
+      <th><%= t("admin.proposals.index.selected") %></th>
+    </tr>
     </thead>
 
     <tbody>
-      <% proposals.each do |proposal| %>
-        <tr id="<%= dom_id(proposal) %>" class="proposal">
-          <td class="text-center"><%= proposal.id %></td>
-          <td><%= link_to proposal.title, admin_proposal_path(proposal) %></td>
-          <td><%= proposal.author.username %></td>
-          <td><%= proposal.milestones.count %></td>
-          <td><%= render Admin::Proposals::ToggleSelectionComponent.new(proposal) %></td>
-        </tr>
-      <% end %>
+    <% proposals.each do |proposal| %>
+      <tr id="<%= dom_id(proposal) %>" class="proposal">
+        <td class="text-center"><%= proposal.id %></td>
+        <td><%= link_to proposal.title, admin_proposal_path(proposal) %></td>
+        <td><%= proposal.author.username %></td>
+        <td><%= proposal.published? ? t("admin.proposals.index.published") : t("admin.proposals.index.draft") %></td>
+        <td><%= proposal.milestones.count %></td>
+        <td><%= render Admin::Proposals::ToggleSelectionComponent.new(proposal) %></td>
+      </tr>
+    <% end %>
     </tbody>
   </table>
 

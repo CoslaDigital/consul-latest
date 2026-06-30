@@ -1,0 +1,64 @@
+<%# app/views/matches/_help_received.html.erb %>
+
+<div class="admin">
+  <% if matches.any? %>
+    <table>
+      <thead>
+      <tr>
+        <th scope="col"><%= t("offers.mine.column.provider") %></th>
+        <th scope="col"><%= t("offers.mine.column.resource") %></th>
+        <th scope="col"><%= t("offers.mine.column.project") %></th>
+        <th scope="col" class="text-center"><%= t("offers.mine.column.status") %></th>
+        <th scope="col" class="text-center"><%= t("offers.mine.column.actions") %></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% matches.each do |match| %>
+        <tr id="<%= dom_id(match) %>" class="match-row">
+
+          <%# 1. Provider Name %>
+          <td>
+            <i class="fa fa-user-circle text-muted"></i>
+            <strong><%= match.offer.author.name %></strong>
+          </td>
+
+          <%# 2. Resource/Offer Link %>
+          <td>
+            <%= link_to match.offer.title, match.offer, class: "bold" %>
+          </td>
+
+          <%# 3. Linked Project %>
+          <td>
+            <%= link_to match.proposal.title, match.proposal, class: "text-muted small" %>
+          </td>
+
+          <%# 4. Status Badge %>
+          <td class="text-center">
+              <span class="label <%= status_label_class(match.status) %>">
+                <%= t("proposal_matches.status.#{match.status}", default: match.status.titleize) %>
+              </span>
+          </td>
+
+          <%# 5. Actions Column %>
+          <td class="text-center">
+            <%# We only render the component if there is an action to take %>
+            <% if match.accepted? || match.confirmed? %>
+              <%= render Admin::TableActionsComponent.new(match,
+                                                          actions: (match.accepted? ? [:confirm] : [:fulfill]),
+                                                          confirm_path: confirm_proposal_match_path(match),
+                                                          fulfill_path: fulfill_proposal_match_path(match)
+              ) %>
+            <% else %>
+              <span class="text-muted small"><em><%= t("admin.actions.none") %></em></span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="callout primary">
+      <p><%= t("offers.mine.no_inbound") %></p>
+    </div>
+  <% end %>
+</div>
