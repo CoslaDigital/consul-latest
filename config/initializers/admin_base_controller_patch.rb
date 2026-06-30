@@ -27,7 +27,7 @@ Rails.application.config.to_prepare do
 
         # --- BUDGET FIREWALL ---
         if controller_path.start_with?("admin/budgets", "admin/budget_")
-          return if action_name.in?(%w[index show])
+          return if action_name.in?(%w[index])
 
           target_id = params[:budget_id] || params[:id]
           return unless target_id
@@ -40,7 +40,7 @@ Rails.application.config.to_prepare do
 
         # --- LEGISLATION FIREWALL ---
         if controller_path.start_with?("admin/legislation/")
-          return if action_name.in?(%w[index show])
+          return if action_name.in?(%w[index])
 
           target_id = params[:process_id] || params[:legislation_process_id] || params[:id]
           return unless target_id
