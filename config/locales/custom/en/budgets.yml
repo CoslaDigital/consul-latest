@@ -279,7 +279,7 @@ en:
         type_pending: "Pending: No headings yet"
         type_single: "Single heading"
         admin_ballots: Ballots
-        no_budgets: "There are no budgets."
+        no_budgets: "There are no elections."
       create:
         notice: New participatory budget created successfully!
       update:
@@ -315,8 +315,8 @@ en:
         main_call_to_action: "Main call to action (optional)"
         main_call_to_action_description: "This link will appear on main banner of this participatory budget and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
         info:
-          budget_settings: "General participatory budget settings"
-          staff_settings: "Administrators and Valuators assigned to the budget"
+          budget_settings: "General election settings"
+          staff_settings: "Administrators and Valuators assigned to the election"
         hide_money: "Hide money"
         hide_money_help_text: "If this option is checked, all fields showing the amount of money will be hidden throughout the process."
         part_fund: "Part Fund Winners"
@@ -445,7 +445,7 @@ en:
         buttons:
           filter: Filter
         download_current_selection: "Download current selection"
-        no_budget_investments: "There are no investment projects."
+        no_budget_investments: "There are no candidates."
         title: Investment projects
         columns: Columns
         assigned_admin: Assigned administrator

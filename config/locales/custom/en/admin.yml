@@ -117,9 +117,9 @@ en:
       publish:
         notice: "election published successfully"
       edit:
-        title: Edit Participatory budget
-        drafting: "This participatory budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
-        publish: "Publish budget"
+        title: Edit Election
+        drafting: "This election is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
+        publish: "Publish election"
         delete: Delete budget
         phase: Phase
         phases_caption: "Phases"
@@ -145,7 +145,7 @@ en:
         main_call_to_action: "Main call to action (optional)"
         main_call_to_action_description: "This link will appear on main banner of this participatory budget and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
         info:
-          budget_settings: "General participatory budget settings"
+          budget_settings: "General election settings"
           staff_settings: "Administrators and Valuators assigned to the budget"
         hide_money: "Hide money"
         hide_money_help_text: "If this option is checked, all fields showing the amount of money will be hidden throughout the process."
