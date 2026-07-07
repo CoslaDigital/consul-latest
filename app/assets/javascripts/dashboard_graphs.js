@@ -1,5 +1,5 @@
-//= require d3
-//= require c3
+//= require d3/d3
+//= require c3/c3
 //= require c3ext
 
 (function() {

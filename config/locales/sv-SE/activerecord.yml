@@ -1,5 +1,6 @@
 sv:
   attributes:
+    created_at: Skapad kl.
     geozone_id: "Område"
     results_enabled: "Visa resultat"
     stats_enabled: "Visa statistik"
@@ -106,22 +107,19 @@ sv:
       legislation/proposal:
         one: "Förslag"
         other: "Förslag"
-      legislation/draft_versions:
+      legislation/draft_version:
         one: "Utkastversion"
-        other: "Versioner av utkast"
-      legislation/questions:
+        other: "Utkastversioner"
+      legislation/question:
         one: "Fråga"
         other: "Frågor"
-      legislation/question_options:
+      legislation/question_option:
         one: "Frågealternativ"
-        other: "Svarsalternativ"
-      legislation/answers:
+        other: "Frågealternativ"
+      legislation/answer:
         one: "Svar"
         other: "Svar"
-      documents:
-        one: "Dokument"
-        other: "Dokument"
-      images:
+      image:
         one: "Bild"
         other: "Bilder"
       tenant:
@@ -251,6 +249,7 @@ sv:
         main_link_url: "Länken leder till (lägg till en länk)"
       comment:
         body: "Kommentar"
+        parent_id: "Överordnad"
         user: "Användare"
       debate:
         author: "Skribent"
@@ -361,7 +360,6 @@ sv:
         title: "Titel"
       site_customization/page:
         content: Innehåll
-        created_at: Skapad kl.
         subtitle: Underrubrik
         slug: URL
         status: Status

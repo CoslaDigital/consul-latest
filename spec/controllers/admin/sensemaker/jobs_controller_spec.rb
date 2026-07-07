@@ -12,10 +12,60 @@ describe Admin::Sensemaker::JobsController do
   before { sign_in(admin) }
 
   describe "GET #index" do
-    it "returns successful response" do
+    it "returns successful response and sets no filter_target when no filter params" do
       get :index
 
       expect(response).to have_http_status(:ok)
+      expect(controller.instance_variable_get(:@filter_target)).to be(nil)
+    end
+
+    context "when filtering by resource_type and resource_id" do
+      let!(:debate_job) do
+        create(:sensemaker_job,
+               user: admin,
+               analysable_type: "Debate",
+               analysable_id: debate.id,
+               parent_job_id: nil,
+               started_at: nil,
+               finished_at: 1.day.ago)
+      end
+      let!(:other_job) do
+        create(:sensemaker_job,
+               user: admin,
+               analysable_type: "Debate",
+               analysable_id: create(:debate).id,
+               parent_job_id: nil,
+               started_at: nil,
+               finished_at: 1.day.ago)
+      end
+
+      it "sets filter_target and scopes jobs to that resource" do
+        get :index, params: { resource_type: "debates", resource_id: debate.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(controller.instance_variable_get(:@filter_target)).to eq(debate)
+        jobs = controller.instance_variable_get(:@sensemaker_jobs)
+        expect(jobs).to include(debate_job)
+        expect(jobs).not_to include(other_job)
+      end
+    end
+
+    context "when target is not found" do
+      it "redirects to index with alert" do
+        get :index, params: { resource_type: "debates", resource_id: 99999 }
+
+        expect(response).to redirect_to(admin_sensemaker_jobs_path)
+        expect(flash[:alert]).to be_present
+      end
+    end
+
+    context "when resource_type is unknown" do
+      it "redirects to index with alert" do
+        get :index, params: { resource_type: "unknown_type", resource_id: 1 }
+
+        expect(response).to redirect_to(admin_sensemaker_jobs_path)
+        expect(flash[:alert]).to be_present
+      end
     end
   end
 
@@ -29,9 +79,9 @@ describe Admin::Sensemaker::JobsController do
 
   describe "GET #download" do
     let(:job) { sensemaker_job }
+    let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
 
     context "when artefact param is provided and valid" do
-      let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
       let(:basename) { "artefact-#{SecureRandom.hex}.json" }
       let(:tmp_file) { File.join(data_folder, basename) }
 
@@ -47,6 +97,28 @@ describe Admin::Sensemaker::JobsController do
       end
 
       it "sends the requested artefact file" do
+        get :download, params: { id: job.id, artefact: basename }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.header["Content-Disposition"]).to include(basename)
+      end
+    end
+
+    context "when input artefact param is provided and valid" do
+      let(:basename) { "input-#{SecureRandom.hex}.csv" }
+      let(:tmp_file) { File.join(data_folder, basename) }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(tmp_file))
+        File.write(tmp_file, "comment-id,comment_text\n1,test")
+        job.update!(input_file: tmp_file)
+      end
+
+      after do
+        FileUtils.rm_f(tmp_file)
+      end
+
+      it "sends the requested input artefact file" do
         get :download, params: { id: job.id, artefact: basename }
 
         expect(response).to have_http_status(:ok)
@@ -190,7 +262,7 @@ describe Admin::Sensemaker::JobsController do
         expect(job.script).to eq("runner.ts")
       end
 
-      it "creates job with single-html-build.js when quick_action is report" do
+      it "creates job with sensemaking-report-ui when quick_action is report" do
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
@@ -205,7 +277,7 @@ describe Admin::Sensemaker::JobsController do
         }
 
         job = Sensemaker::Job.last
-        expect(job.script).to eq("single-html-build.js")
+        expect(job.script).to eq("sensemaking-report-ui")
       end
     end
 
@@ -302,7 +374,7 @@ describe Admin::Sensemaker::JobsController do
              user: admin,
              analysable_type: "Debate",
              analysable_id: debate.id,
-             script: "single-html-build.js",
+             script: "sensemaking-report-ui",
              started_at: 1.hour.ago,
              finished_at: Time.current,
              error: nil,
@@ -338,7 +410,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                started_at: Time.current,
                finished_at: nil,
                error: nil,
@@ -366,7 +438,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                started_at: 1.hour.ago,
                finished_at: Time.current,
                error: "Some error occurred",
@@ -394,7 +466,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                started_at: 1.hour.ago,
                finished_at: Time.current,
                error: nil,
@@ -520,7 +592,7 @@ describe Admin::Sensemaker::JobsController do
              user: admin,
              analysable_type: "Debate",
              analysable_id: debate.id,
-             script: "single-html-build.js",
+             script: "sensemaking-report-ui",
              started_at: 1.hour.ago,
              finished_at: Time.current,
              error: nil,

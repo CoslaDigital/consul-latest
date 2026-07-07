@@ -32,7 +32,7 @@ module Attachable
   def association_class
     type = send("#{association_name}_type")
 
-    type.constantize if type.present?
+    type.presence&.constantize
   end
 
   def set_cached_attachment_from_attachment

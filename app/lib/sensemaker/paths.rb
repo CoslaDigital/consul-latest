@@ -28,11 +28,11 @@ module Sensemaker
       Rails.root.join(sensemaker_relative_data_folder)
     end
 
-    def self.visualization_folder
+    def self.report_ui_folder
       if Rails.env.test?
-        Rails.root.join("tmp/sensemaker_test_folder/web-ui")
+        Rails.root.join("tmp/sensemaker_test_folder/report-ui")
       else
-        Rails.root.join("node_modules/@cosla/sensemaking-web-ui")
+        Rails.root.join("node_modules/@cosla/sensemaking-report-ui")
       end
     end
   end

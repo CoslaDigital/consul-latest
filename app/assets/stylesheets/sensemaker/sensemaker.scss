@@ -1,4 +1,50 @@
+@mixin flex-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  justify-content: flex-start;
+}
+
+@mixin flex-between {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.sensemaker-analyses-link {
+  @include has-fa-icon(microscope, solid);
+
+  &::before {
+    left: -0.25rem;
+    position: relative;
+    top: -0.1rem;
+  }
+}
+
+.sensemaker-icon {
+  @include has-fa-icon(microscope, solid);
+}
+
 .admin .sensemaker {
+  .additional-context {
+    border: 1px solid $border;
+    height: fit-content;
+    padding: 0.2rem;
+
+    pre {
+      background-color: #efefef;
+      margin: 0;
+      max-height: 22.4rem;
+      overflow-wrap: break-word;
+      overflow-y: scroll;
+      padding: 0.2rem;
+      white-space: break-spaces;
+    }
+  }
+
   form.sensemaker-buttons-busy {
     button[type="submit"][data-temp-disable="true"],
     input[type="submit"][data-temp-disable="true"] {
@@ -162,16 +208,12 @@
         list-style: none;
       }
 
-      // (moved to shallower block below)
-
       li.result-group {
         list-style: none;
         margin-bottom: 0.5rem;
         margin-top: 0.5rem;
         padding: 0;
       }
-
-      // (moved to shallower block below)
 
       li.result-row {
         opacity: 0.8;
@@ -268,7 +310,6 @@
     background-color: #f8f9fa;
   }
 
-  // Job links styling
   .job-link {
     color: $brand;
     font-weight: bold;
@@ -279,7 +320,6 @@
     }
   }
 
-  // Job details styling
   .job-details-table {
     border-collapse: collapse;
     width: 100%;
@@ -319,11 +359,25 @@
       background-color: $color-info;
     }
   }
+
+  .filter-controls {
+    @include flex-between;
+    margin-bottom: $line-height;
+
+    select {
+      height: $line-height * 1.5;
+      margin-bottom: 0;
+    }
+    label { font-weight: normal; opacity: 0.8; }
+
+    a,
+    p { margin-bottom: 0; }
+    p { opacity: 0.8; }
+  }
 }
 
 .sensemaker {
 
-  // Responsive adjustments
   @include breakpoint(small only) {
     .hero-section {
       h1 {
@@ -347,22 +401,13 @@
   }
 
   .flex-between {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-    justify-content: space-between;
+    @include flex-between;
 
+    button,
     .button { margin-bottom: 0; }
   }
-
-  .flex-row {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-    justify-content: flex-start;
-  }
+  .flex-row { @include flex-row; }
+  .fit-content { width: fit-content; }
 
   .flex-grow {
     flex: 1;
@@ -372,7 +417,7 @@
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 2px;
+    gap: 4px;
     justify-content: flex-end;
   }
 
@@ -391,7 +436,6 @@
     text-transform: uppercase;
   }
 
-  // Target header (quiz-header style box)
   .target-header {
     margin-bottom: 2.2rem;
 

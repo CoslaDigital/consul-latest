@@ -204,6 +204,7 @@ en:
       participation_text: Decide how to shape the city you want to live in.
       participation_title: Participation
       privacy: Privacy Policy
+      source_code: Source code
     header:
       administration_menu: Menu
       administration: Administration
@@ -357,7 +358,7 @@ en:
         archival_date: archived
         recommendations: recommendations
       recommendations:
-        without_results: There are not proposals related to your interests
+        without_results: There are no proposals related to your interests
         without_interests: Follow proposals so we can give you recommendations
         disable: "Recommendations for proposals will stop showing if you dismiss them. You can enable them again in 'My account' page"
         actions:

@@ -31,6 +31,8 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.force_2factor
       feature.remove_investments_supports
       feature.gdpr.require_consent_for_notifications
+      feature.gdpr.require_consent_for_embedded_videos
+      feature.gdpr.warning_for_external_links
       feature.dashboard.notification_emails
       feature.events
     ]

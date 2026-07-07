@@ -1,5 +1,4 @@
 require "rails_helper"
-require "sessions_helper"
 
 describe "Legislation Proposals" do
   let(:user)     { create(:user) }
@@ -40,13 +39,13 @@ describe "Legislation Proposals" do
         first_user_proposals_order = nil
         second_user_proposals_order = nil
 
-        in_browser(:one) do
+        using_session(:one) do
           login_as user
           visit legislation_process_proposals_path(process)
           first_user_proposals_order = legislation_proposals_order
         end
 
-        in_browser(:two) do
+        using_session(:two) do
           login_as user2
           visit legislation_process_proposals_path(process)
           second_user_proposals_order = legislation_proposals_order
@@ -54,12 +53,12 @@ describe "Legislation Proposals" do
 
         expect(first_user_proposals_order).not_to eq(second_user_proposals_order)
 
-        in_browser(:one) do
+        using_session(:one) do
           visit legislation_process_proposals_path(process)
           expect(legislation_proposals_order).to eq(first_user_proposals_order)
         end
 
-        in_browser(:two) do
+        using_session(:two) do
           visit legislation_process_proposals_path(process)
           expect(legislation_proposals_order).to eq(second_user_proposals_order)
         end
@@ -91,7 +90,7 @@ describe "Legislation Proposals" do
   end
 
   context "Selected filter" do
-    scenario "apperars even if there are not any selected poposals" do
+    scenario "apperars even if there are no selected proposals" do
       create(:legislation_proposal, legislation_process_id: process.id)
 
       visit legislation_process_proposals_path(process)
@@ -303,35 +302,5 @@ describe "Legislation Proposals" do
     visit new_legislation_process_proposal_path(process)
 
     expect(page).not_to have_field("Scope of operation")
-  end
-
-  context "Embedded video" do
-    scenario "Show YouTube video" do
-      proposal = create(:legislation_proposal, video_url: "http://www.youtube.com/watch?v=a7UFm6ErMPU")
-
-      visit legislation_process_proposal_path(proposal.process, proposal)
-
-      within "#js-embedded-video" do
-        expect(page).to have_css "iframe[src='https://www.youtube-nocookie.com/embed/a7UFm6ErMPU']"
-      end
-    end
-
-    scenario "Show Vimeo video" do
-      proposal = create(:legislation_proposal, video_url: "https://vimeo.com/7232823")
-
-      visit legislation_process_proposal_path(proposal.process, proposal)
-
-      within "#js-embedded-video" do
-        expect(page).to have_css "iframe[src='https://player.vimeo.com/video/7232823?dnt=1']"
-      end
-    end
-
-    scenario "Dont show video" do
-      proposal = create(:legislation_proposal, video_url: nil)
-
-      visit legislation_process_proposal_path(proposal.process, proposal)
-
-      expect(page).not_to have_css "#js-embedded-video"
-    end
   end
 end

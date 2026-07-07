@@ -22,7 +22,8 @@ set :application, deploysecret(:app_name, default: "consul")
 set :deploy_to, deploysecret(:deploy_to)
 set :ssh_options, port: deploysecret(:ssh_port)
 
-set :repo_url, "https://github.com/CoslaDigital/consul-latest.git"
+# To use your own repository, don't change this line. Change `lib/consul/repository.rb` instead.
+set :repo_url, Consul::Repository.url # Don't change this line!
 
 set :revision, `git rev-parse --short #{fetch(:branch)}`.strip
 
@@ -41,12 +42,12 @@ set :local_user, ENV["USER"]
 
 set :fnm_path, "$HOME/.fnm"
 set :fnm_install_command, "curl -fsSL https://fnm.vercel.app/install | " \
-  "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
+                          "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
 set :fnm_update_command, "#{fetch(:fnm_install_command)} --skip-shell"
 set :fnm_setup_command, -> do
-  "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
-    "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
-end
+                          "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
+                            "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
+                        end
 set :fnm_install_node_command, -> { "#{fetch(:fnm_setup_command)} && fnm use --install-if-missing" }
 set :fnm_map_bins, %w[node npm rake yarn]
 
@@ -64,8 +65,6 @@ set :delayed_job_monitor, true
 
 set :whenever_roles, -> { :app }
 
-set :setup_sensemaker, ENV["SETUP_SENSEMAKER"] == "true"
-
 namespace :deploy do
   after "rvm1:hook", "map_node_bins"
 
@@ -75,8 +74,6 @@ namespace :deploy do
   after "deploy:migrate", "add_new_settings"
 
   after :publishing, "setup_puma"
-
-  after :publishing, "setup_sensemaker"
 
   after :finished, "refresh_sitemap"
 
@@ -181,17 +178,6 @@ task :setup_puma do
 
   after "setup_puma", "puma:install"
   after "setup_puma", "puma:enable"
-end
-
-desc "Setup Sensemaker"
-task :setup_sensemaker do
-  on roles(:app) do
-    within release_path do
-      with rails_env: fetch(:rails_env) do
-        execute :rake, "sensemaker:setup" if fetch(:setup_sensemaker, false)
-      end
-    end
-  end
 end
 
 task :setup_delayed_job_environment do

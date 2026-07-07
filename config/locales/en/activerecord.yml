@@ -1,5 +1,6 @@
 en:
   attributes:
+    created_at: Created at
     geozone_id: "Scope of operation"
     results_enabled: "Show results"
     stats_enabled: "Show stats"
@@ -107,22 +108,19 @@ en:
       legislation/proposal:
         one: "Proposal"
         other: "Proposals"
-      legislation/draft_versions:
+      legislation/draft_version:
         one: "Draft version"
         other: "Draft versions"
-      legislation/questions:
+      legislation/question:
         one: "Question"
         other: "Questions"
-      legislation/question_options:
+      legislation/question_option:
         one: "Question option"
         other: "Question options"
-      legislation/answers:
+      legislation/answer:
         one: "Answer"
         other: "Answers"
-      documents:
-        one: "Document"
-        other: "Documents"
-      images:
+      image:
         one: "Image"
         other: "Images"
       tenant:
@@ -252,6 +250,7 @@ en:
         main_link_url: "The link takes you to (add a link)"
       comment:
         body: "Comment"
+        parent_id: "Parent"
         user: "User"
       debate:
         author: "Author"
@@ -369,7 +368,6 @@ en:
         title: "Title"
       site_customization/page:
         content: Content
-        created_at: Created at
         subtitle: Subtitle
         slug: Slug
         status: Status

@@ -5,10 +5,17 @@ class ImageSuggestionsController < ApplicationController
   before_action :authenticate_user!
   skip_authorization_check
 
+  rate_limit to: 10,
+             within: 15.minutes,
+             by: -> { current_user.id },
+             only: :create,
+             with: -> { render_rate_limit_response }
+
   def create
-    @resource_type = params[:resource_type]
-    @title = image_suggestion_params[:title]
-    @description = image_suggestion_params[:description]
+    @suggestions = ImageSuggestions::Llm::Client.call(
+      title: image_suggestion_params[:title],
+      description: image_suggestion_params[:description]
+    )
 
     respond_to do |format|
       format.js
@@ -19,7 +26,7 @@ class ImageSuggestionsController < ApplicationController
     begin
       attachment = ImageSuggestions::Pexels.download(params[:id])
     rescue ImageSuggestions::Pexels::PexelsError, Pexels::APIError => e
-      return render json: { errors: e.message }, status: :unprocessable_entity
+      return render json: { errors: e.message }, status: :unprocessable_content
     end
 
     @direct_upload = DirectUpload.new(
@@ -40,14 +47,23 @@ class ImageSuggestionsController < ApplicationController
                      attachment_url: polymorphic_path(@direct_upload.relation.attachment) }
     else
       render json: { errors: @direct_upload.errors[:attachment].join(", ") },
-             status: :unprocessable_entity
+             status: :unprocessable_content
     end
   end
 
   private
 
+    def render_rate_limit_response
+      @suggestions = ImageSuggestions::Llm::Client::Response.new
+      @suggestions.errors << I18n.t("images.errors.messages.rate_limit_exceeded")
+
+      respond_to do |format|
+        format.js { render :create }
+      end
+    end
+
     def image_suggestion_params
-      @image_suggestion_params ||= params.require(@resource_type.parameterize.underscore)
+      @image_suggestion_params ||= params.require(params[:resource_type].parameterize.underscore)
                                          .permit(translations_attributes: [:title, :description])
                                          .fetch(:translations_attributes, {})
                                          .values.first || {}

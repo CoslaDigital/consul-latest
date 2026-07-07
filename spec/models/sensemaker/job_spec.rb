@@ -53,7 +53,7 @@ describe Sensemaker::Job do
 
       context "when job is publishable" do
         before do
-          job.script = "single-html-build.js"
+          job.script = "sensemaking-report-ui"
           job.finished_at = Time.current
           job.error = nil
           output_path = "#{data_folder}/report-#{job.id}.html"
@@ -109,6 +109,117 @@ describe Sensemaker::Job do
     end
   end
 
+  describe ".for_analysable" do
+    context "when record is a Budget" do
+      let(:budget) { create(:budget) }
+      let!(:published_budget_job) do
+        j = create(:sensemaker_job, analysable_type: "Budget", analysable_id: budget.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_budget_job) do
+        create(:sensemaker_job, analysable_type: "Budget", analysable_id: budget.id, published: false)
+      end
+      let!(:other_budget_job) do
+        j = create(:sensemaker_job,
+                   analysable_type: "Budget",
+                   analysable_id: create(:budget).id,
+                   published: false)
+        j.update_column(:published, true)
+        j
+      end
+
+      it "with published_only: true returns only published jobs for that budget" do
+        scope = Sensemaker::Job.for_analysable(budget, published_only: true)
+        expect(scope).to include(published_budget_job)
+        expect(scope).not_to include(unpublished_budget_job)
+        expect(scope).not_to include(other_budget_job)
+      end
+
+      it "with published_only: false returns all jobs for that budget" do
+        scope = Sensemaker::Job.for_analysable(budget, published_only: false)
+        expect(scope).to include(published_budget_job)
+        expect(scope).to include(unpublished_budget_job)
+        expect(scope).not_to include(other_budget_job)
+      end
+    end
+
+    context "when record is a Debate (else branch)" do
+      let(:debate) { create(:debate) }
+      let!(:published_debate_job) do
+        j = create(:sensemaker_job, analysable_type: "Debate", analysable_id: debate.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_debate_job) do
+        create(:sensemaker_job, analysable_type: "Debate", analysable_id: debate.id, published: false)
+      end
+
+      it "with published_only: true returns only published jobs for that record" do
+        scope = Sensemaker::Job.for_analysable(debate, published_only: true)
+        expect(scope).to include(published_debate_job)
+        expect(scope).not_to include(unpublished_debate_job)
+      end
+
+      it "with published_only: false returns all jobs for that record" do
+        scope = Sensemaker::Job.for_analysable(debate, published_only: false)
+        expect(scope).to include(published_debate_job)
+        expect(scope).to include(unpublished_debate_job)
+      end
+    end
+
+    context "when record is Proposal (all proposals)" do
+      let!(:all_proposals_job) do
+        j = create(:sensemaker_job, analysable_type: "Proposal", analysable_id: nil, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:specific_proposal_job) do
+        j = create(:sensemaker_job,
+                   analysable_type: "Proposal",
+                   analysable_id: create(:proposal).id,
+                   published: false)
+        j.update_column(:published, true)
+        j
+      end
+
+      it "with published_only: true returns only published jobs with nil analysable_id" do
+        scope = Sensemaker::Job.for_analysable(Proposal, published_only: true)
+        expect(scope).to include(all_proposals_job)
+        expect(scope).not_to include(specific_proposal_job)
+      end
+
+      it "with published_only: false returns all jobs with nil analysable_id" do
+        unpublished = create(:sensemaker_job,
+                             analysable_type: "Proposal",
+                             analysable_id: nil,
+                             published: false)
+        scope = Sensemaker::Job.for_analysable(Proposal, published_only: false)
+        expect(scope).to include(all_proposals_job)
+        expect(scope).to include(unpublished)
+        expect(scope).not_to include(specific_proposal_job)
+      end
+    end
+
+    context "when record is a Poll" do
+      let(:poll) { create(:poll) }
+      let!(:published_poll_job) do
+        j = create(:sensemaker_job, analysable_type: "Poll", analysable_id: poll.id, published: false)
+        j.update_column(:published, true)
+        j
+      end
+      let!(:unpublished_poll_job) do
+        create(:sensemaker_job, analysable_type: "Poll", analysable_id: poll.id, published: false)
+      end
+
+      it "with published_only: false returns all jobs for that poll" do
+        scope = Sensemaker::Job.for_analysable(poll, published_only: false)
+        expect(scope).to include(published_poll_job)
+        expect(scope).to include(unpublished_poll_job)
+      end
+    end
+  end
+
   describe "instance methods" do
     describe "#has_multiple_outputs?" do
       it "returns true for advanced_runner.ts and runner.ts" do
@@ -123,7 +234,7 @@ describe Sensemaker::Job do
         expect(job.has_multiple_outputs?).to be false
         job.script = "health_check_runner.ts"
         expect(job.has_multiple_outputs?).to be false
-        job.script = "single-html-build.js"
+        job.script = "sensemaking-report-ui"
         expect(job.has_multiple_outputs?).to be false
       end
     end
@@ -134,7 +245,7 @@ describe Sensemaker::Job do
         "advanced_runner.ts" => ->(j) { "output-#{j.id}" },
         "runner.ts" => ->(j) { "output-#{j.id}" },
         "health_check_runner.ts" => ->(j) { "health-check-#{j.id}.txt" },
-        "single-html-build.js" => ->(j) { "report-#{j.id}.html" }
+        "sensemaking-report-ui" => ->(j) { "report-#{j.id}.html" }
       }.each do |script, expected_fn|
         it "returns the correct output file name for #{script}" do
           job.script = script
@@ -223,7 +334,7 @@ describe Sensemaker::Job do
 
       {
         "advanced_runner.ts" => ->(j, rel_df) { "#{rel_df}/output-#{j.id}" },
-        "single-html-build.js" => ->(j, rel_df) { "#{rel_df}/report-#{j.id}.html" }
+        "sensemaking-report-ui" => ->(j, rel_df) { "#{rel_df}/report-#{j.id}.html" }
       }.each do |script, expected_path_fn|
         it "returns the correct relative path for #{script}" do
           job.script = script
@@ -353,6 +464,72 @@ describe Sensemaker::Job do
       end
     end
 
+    describe "#input_artefact_paths" do
+      it "returns an empty array when input_file is blank" do
+        allow(job).to receive(:input_file).and_return("")
+        expect(job.input_artefact_paths).to eq([])
+      end
+
+      it "returns a single path for single-input scripts" do
+        job.script = "runner.ts"
+        job.input_file = "/tmp/input-#{job.id}.csv"
+        expect(job.input_artefact_paths).to eq([job.input_file])
+      end
+
+      it "returns derived JSON artefacts for sensemaking-report-ui" do
+        job.script = "sensemaking-report-ui"
+        job.input_file = "/tmp/output-#{job.id}"
+
+        expect(job.input_artefact_paths).to eq([
+          "#{job.input_file}-topic-stats.json",
+          "#{job.input_file}-summary.json",
+          "#{job.input_file}-comments-with-scores.json",
+          "#{job.input_file}-metadata.json"
+        ])
+      end
+    end
+
+    describe "#input_file" do
+      include_context "sensemaker paths stubbed"
+
+      it "defaults to advanced-output for report script when input_file is not set" do
+        job.script = "sensemaking-report-ui"
+        job[:input_file] = nil
+        expect(job.input_file).to eq("#{data_folder}/advanced-output")
+      end
+    end
+
+    describe "#existing_input_artefact_paths" do
+      before do
+        allow(File).to receive(:exist?).and_return(false)
+      end
+
+      it "returns only input artefacts that exist" do
+        existing_path = "/tmp/input-existing-#{job.id}.csv"
+        allow(File).to receive(:exist?).with(existing_path).and_return(true)
+        job.script = "runner.ts"
+        job.input_file = existing_path
+
+        expect(job.existing_input_artefact_paths).to eq([existing_path])
+      end
+
+      it "returns only existing derived input artefacts for sensemaking-report-ui" do
+        job.script = "sensemaking-report-ui"
+        job.input_file = "/tmp/output-#{job.id}"
+        existing = "#{job.input_file}-summary.json"
+        missing_1 = "#{job.input_file}-topic-stats.json"
+        missing_2 = "#{job.input_file}-comments-with-scores.json"
+        missing_3 = "#{job.input_file}-metadata.json"
+
+        allow(File).to receive(:exist?).with(existing).and_return(true)
+        allow(File).to receive(:exist?).with(missing_1).and_return(false)
+        allow(File).to receive(:exist?).with(missing_2).and_return(false)
+        allow(File).to receive(:exist?).with(missing_3).and_return(false)
+
+        expect(job.existing_input_artefact_paths).to eq([existing])
+      end
+    end
+
     describe "#has_outputs?" do
       include_context "sensemaker paths stubbed"
 
@@ -414,9 +591,9 @@ describe Sensemaker::Job do
         allow(File).to receive(:exist?).and_return(false)
       end
 
-      context "when script is single-html-build.js" do
+      context "when script is sensemaking-report-ui" do
         before do
-          job.script = "single-html-build.js"
+          job.script = "sensemaking-report-ui"
           job.finished_at = Time.current
           job.error = nil
         end
@@ -541,7 +718,7 @@ describe Sensemaker::Job do
            "#{df}/output-#{j.id}-comments-with-scores.json"]
         },
         "categorization_runner.ts" => ->(j, df) { ["#{df}/categorization-output-#{j.id}.csv"] },
-        "single-html-build.js" => ->(j, df) { ["#{df}/report-#{j.id}.html"] },
+        "sensemaking-report-ui" => ->(j, df) { ["#{df}/report-#{j.id}.html"] },
         "runner.ts" => ->(j, df) {
           ["#{df}/output-#{j.id}-summary.json", "#{df}/output-#{j.id}-summary.html",
            "#{df}/output-#{j.id}-summary.md", "#{df}/output-#{j.id}-summaryAndSource.csv"]

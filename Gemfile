@@ -22,7 +22,7 @@ gem "csv", "~> 3.3.5"
 gem "daemons", "~> 1.4.1"
 gem "dalli", "~> 4.3.3"
 gem "delayed_job_active_record", "~> 4.1.11"
-gem "devise", "~> 5.0.3"
+gem "devise", "~> 5.0.4"
 gem "devise-security", "~> 0.18.0"
 gem "exiftool_vendored", "~> 13.52.0"
 gem "file_validators", "~> 3.0.0"
@@ -30,9 +30,9 @@ gem "font-awesome-sass", "~> 5.15.1" # Remember to update vendor/assets/images/f
 gem "geocoder", "~> 1.8"
 gem "globalize", "~> 7.1.1"
 gem "globalize-accessors", "~> 0.3.0"
-gem "googleauth", "~> 1.16.1"
+gem "googleauth", "~> 1.16.2"
 gem "graphiql-rails", "~> 1.8.0"
-gem "graphql", "~> 2.5.20"
+gem "graphql", "~> 2.6.1"
 gem "groupdate", "~> 6.7.0"
 gem "image_processing", "~> 1.14.0"
 gem "invisible_captcha", "~> 2.3.0"
@@ -60,14 +60,14 @@ gem "ruby_llm", "~> 1.9.1"
 gem "sassc-embedded", "~> 1.77.5"
 gem "sassc-rails", "~> 2.1.2"
 gem "savon", "~> 2.15.1"
-gem "sitemap_generator", "~> 6.3.0"
+gem "sitemap_generator", "~> 7.0.1"
 gem "social-share-button", "~> 1.2.4"
 gem "sprockets", "~> 4.2.2"
 gem "sprockets-rails", "~> 3.5.2", require: "sprockets/railtie"
 gem "turbolinks", "~> 5.2.1"
-gem "turnout", "~> 2.5.0"
+gem "turnout2024", "~> 3.0.2", require: "turnout"
 gem "uglifier", "~> 4.2.1"
-gem "view_component", "~> 4.2.0"
+gem "view_component", "~> 4.9.0"
 gem "whenever", "~> 1.1.2", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
@@ -78,10 +78,10 @@ source "https://rails-assets.org" do
 end
 
 group :development, :test do
-  gem "debug", "~> 1.9.2"
+  gem "debug", "~> 1.11.0"
   gem "factory_bot_rails", "~> 6.5.1"
-  gem "faker", "~> 3.5.2"
-  gem "i18n-tasks", "~> 0.9.37"
+  gem "faker", "~> 3.6.1"
+  gem "i18n-tasks", "~> 0.9.37", require: false
   gem "knapsack_pro", "~> 8.4.0"
   gem "launchy", "~> 3.1.1"
   gem "letter_opener_web", "~> 3.0.0"
@@ -89,11 +89,11 @@ end
 
 group :test do
   gem "capybara", "~> 3.40.0"
-  gem "capybara-webmock", "~> 0.7.0"
-  gem "email_spec", "~> 2.3.0"
+  gem "email_spec", "~> 2.3.1"
   gem "pdf-reader", "~> 2.15.1"
-  gem "rspec-rails", "~> 8.0.3"
-  gem "selenium-webdriver", "~> 4.38.0"
+  gem "puffing-billy", "~> 4.0"
+  gem "rspec-rails", "~> 8.0.4"
+  gem "selenium-webdriver", "~> 4.43.0"
   gem "simplecov", "~> 0.22.0", require: false
   gem "simplecov-lcov", "~> 0.9.0", require: false
 end
@@ -106,18 +106,18 @@ group :development do
   gem "capistrano3-delayed-job", "~> 1.7.6"
   gem "capistrano3-puma", "~> 6.2.0"
   gem "erb_lint", "~> 0.9.0", require: false
-  gem "faraday-retry", "~> 2.3.2", require: false
+  gem "faraday-retry", "~> 2.4.0", require: false
   gem "htmlbeautifier", "~> 1.4.3", require: false
   gem "mdl", "~> 0.15.0", require: false
   gem "pronto", "~> 0.11.5", require: false
   gem "pronto-erb_lint", "~> 0.1.6", require: false
   gem "pronto-rubocop", "~> 0.11.6", require: false
   gem "pronto-stylelint", "~> 0.11.1", require: false
-  gem "rubocop", "~> 1.81.7", require: false
+  gem "rubocop", "~> 1.86.1", require: false
   gem "rubocop-capybara", "~> 2.22.1", require: false
   gem "rubocop-factory_bot", "~> 2.28.0", require: false
   gem "rubocop-performance", "~> 1.26.1", require: false
-  gem "rubocop-rails", "~> 2.33.4", require: false
+  gem "rubocop-rails", "~> 2.34.3", require: false
   gem "rubocop-rspec", "~> 3.9.0", require: false
   gem "rubocop-rspec_rails", "~> 2.32.0", require: false
   gem "rvm1-capistrano3", "~> 1.4.0", require: false

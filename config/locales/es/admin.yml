@@ -1877,6 +1877,24 @@ es:
         table_actions: "Acciones"
         cancel_all: "Cancelar todo"
         new_run: "Nueva ejecución"
+        target_not_found: "Objetivo no encontrado."
+        filtered_by_target: "Mostrando trabajos de %{name}"
+        filter_by: "Filtrar por"
+        filter_all_types: "-"
+        filter_reset: "× Limpiar filtros"
+        sensemaker_analyses_count:
+          one: "1 análisis Sensemaker"
+          other: "%{count} análisis Sensemaker"
+        resource_types:
+          budgets: "Presupuestos"
+          debates: "Debates"
+          proposals: "Propuestas"
+          polls: "Encuestas"
+          poll_questions: "Preguntas de encuesta"
+          legislation_processes: "Procesos legislativos"
+          legislation_questions: "Preguntas legislativas"
+          legislation_proposals: "Propuestas legislativas"
+          legislation_question_options: "Opciones de pregunta legislativa"
       new:
         title: Nuevo análisis Sensemaker
         select_target: "Selecciona un objetivo de los resultados"
@@ -1917,12 +1935,16 @@ es:
         job_spawned_by: "Trabajo generado por"
         target_type: "Tipo de objetivo"
         target_title: "Título del objetivo"
+        additional_context: "Contexto adicional"
         error_report: "Informe de error"
         error_log: "Registro de errores"
         prerequisite_jobs: "Trabajos prerrequisito"
         prerequisite_jobs_help: "Estos trabajos se crearon como prerrequisitos para este trabajo"
         actions: "Acciones"
+        files: "Archivos"
+        input_files: "Archivos de entrada"
         output_files: "Archivos de salida"
+        none_available: "Ninguno disponible"
         select_file_download: "Selecciona un archivo para descargar."
         back_to_jobs: "Volver a trabajos"
         published_reports_link: "Informe(s) publicado(s)"
@@ -1967,17 +1989,9 @@ es:
         advanced_runner_ts:
           title: "Analizar"
           description: "Analizar la conversación con estadísticas"
-        single_html_build_js:
+        sensemaking_report_ui:
           title: "Informe"
           description: "Analizar y generar un informe en formato HTML"
-      tags_description: "Genera etiquetas automáticas en todos los elementos que pueden ser etiquetados."
-      title: "Machine learning"
-      script_selection_help: "Selecciona un script para procesar contenido y generar etiquetas o resúmenes por IA."
-      execution_options:
-        force_update_label: "Forzar actualización"
-        force_update_help: "Procesa todos los registros independientemente de su antigüedad."
-        dry_run_label: "Simulacro (Dry Run)"
-        dry_run_help: "Prueba la lógica sin guardar en la base de datos."
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros

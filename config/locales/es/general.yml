@@ -203,6 +203,7 @@ es:
       participation_text: Decide cómo debe ser la ciudad que quieres.
       participation_title: Participación
       privacy: Política de privacidad
+      source_code: Código fuente
     header:
       administration_menu: Menú
       administration: Administración
@@ -659,6 +660,10 @@ es:
       audit_trail: "Historial de Auditoría de IA"
       evaluated_by: "(Evaluado por: %{model})"
       reasoning: "Razonamiento:"
+    embedded_video:
+      accept: "Ver vídeo"
+      warning: "Esta página contiene un vídeo de un proveedor externo. Al acceder al contenido, aceptas que tus datos puedan ser transferidos a proveedores externos."
+    warning_for_external_links: "Al confirmar, aceptas salir del sitio web."
     embedded_video:
       accept: "Ver vídeo"
       warning: "Esta página contiene un vídeo de un proveedor externo. Al acceder al contenido, aceptas que tus datos puedan ser transferidos a proveedores externos."

@@ -106,22 +106,19 @@ tr:
       legislation/proposal:
         one: "Önerge"
         other: "Önergeler"
-      legislation/draft_versions:
+      legislation/draft_version:
         one: "Taslak sürüm"
         other: "Taslak sürümler"
-      legislation/questions:
+      legislation/question:
         one: "Soru"
         other: "Sorular"
-      legislation/question_options:
+      legislation/question_option:
         one: "Soru seçeneği"
         other: "Soru seçenekleri"
-      legislation/answers:
+      legislation/answer:
         one: "Yanıt"
         other: "Yanıtlar"
-      documents:
-        one: "Belge"
-        other: "Belgeler"
-      images:
+      image:
         one: "Görsel"
         other: "Görseller"
       tenant:
@@ -361,7 +358,6 @@ tr:
         title: "Başlık"
       site_customization/page:
         content: İçerik
-        created_at: Oluşturulma
         subtitle: Alt yazı
         slug: Kısaltma
         status: Durum

@@ -1,10 +1,34 @@
 class Admin::Sensemaker::JobsController < Admin::BaseController
+  include Sensemaker::ResourceTypeResolution
+
   def index
     @running_jobs = Sensemaker::Job.running.includes(:children).order(created_at: :desc)
-    @sensemaker_jobs = Sensemaker::Job.where(parent_job_id: nil)
-                                      .includes(:children)
-                                      .where.not(id: @running_jobs.pluck(:id))
-                                      .order(created_at: :desc)
+
+    @filter_resource_type, @filter_resource_id = normalized_filter_params
+    if @filter_resource_type.present? && @filter_resource_id.present?
+      @filter_target = sensemaker_find_resource(@filter_resource_type, @filter_resource_id)
+      unless @filter_target
+        redirect_to admin_sensemaker_jobs_path, alert: t("admin.sensemaker.index.target_not_found")
+        return
+      end
+      base_scope = Sensemaker::Job.for_analysable(@filter_target, published_only: false)
+    elsif @filter_resource_type.present?
+      resource_class = sensemaker_model_for_resource_type(@filter_resource_type)
+      unless resource_class
+        redirect_to admin_sensemaker_jobs_path, alert: t("admin.sensemaker.index.target_not_found")
+        return
+      end
+      base_scope = Sensemaker::Job.by_analysable_type(resource_class.to_s)
+    else
+      base_scope = Sensemaker::Job
+    end
+
+    @sensemaker_jobs = base_scope.where(parent_job_id: nil)
+                                 .includes(:children)
+                                 .where.not(id: @running_jobs.pluck(:id))
+                                 .order(created_at: :desc)
+
+    @sensemaker_resource_types = Sensemaker::ResourceTypeResolution::SENSEMAKER_RESOURCE_TYPES
   end
 
   def show
@@ -69,7 +93,7 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
                                      collection: question_options } unless question_options.empty?
           end
 
-          collection << { title: I18n.t("activerecord.models.legislation/questions.other"),
+          collection << { title: I18n.t("activerecord.models.legislation/question.other"),
                           collection: question_collection } unless question_collection.empty?
         end
 
@@ -126,7 +150,7 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
           entry
         end
         unless question_entries.empty?
-          collection << { title: I18n.t("activerecord.models.legislation/questions.other"),
+          collection << { title: I18n.t("activerecord.models.legislation/question.other"),
                           collection: question_entries }
         end
       end
@@ -156,7 +180,7 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
     valid_params = sensemaker_job_params.to_h
 
     if params[:quick_action].in?(%w[summary report])
-      valid_params[:script] = params[:quick_action] == "summary" ? "runner.ts" : "single-html-build.js"
+      valid_params[:script] = params[:quick_action] == "summary" ? "runner.ts" : "sensemaking-report-ui"
     elsif valid_params[:script].blank?
       return redirect_to(
         new_admin_sensemaker_job_path(
@@ -226,7 +250,7 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
   def download
     @sensemaker_job = Sensemaker::Job.find(params[:id])
-    artefacts = @sensemaker_job.existing_output_artefact_paths
+    artefacts = @sensemaker_job.existing_input_artefact_paths + @sensemaker_job.existing_output_artefact_paths
 
     if params[:artefact].present?
       requested = File.join(Sensemaker::Paths.sensemaker_data_folder, params[:artefact])
@@ -280,6 +304,10 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
   end
 
   private
+
+    def normalized_filter_params
+      [params[:resource_type].presence, params[:resource_id].presence]
+    end
 
     def sensemaker_job_params
       params.require(:sensemaker_job).permit(:analysable_type, :analysable_id, :script, :additional_context)

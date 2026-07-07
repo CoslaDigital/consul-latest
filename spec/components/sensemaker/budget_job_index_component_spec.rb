@@ -8,7 +8,9 @@ describe Sensemaker::BudgetJobIndexComponent do
   let(:component) { Sensemaker::BudgetJobIndexComponent.new(jobs: jobs, budget: budget) }
 
   before do
-    Setting["feature.sensemaker"] = true
+    Setting["llm.provider"] = "OpenAI"
+    Setting["llm.model"] = "gpt-4o"
+    Setting["llm.use_sensemaker"] = true
   end
 
   describe "#has_jobs?" do
@@ -48,7 +50,7 @@ describe Sensemaker::BudgetJobIndexComponent do
         create(:sensemaker_job,
                analysable_type: "Budget",
                analysable_id: budget.id,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                finished_at: Time.current)
       end
       let(:jobs) { [job] }

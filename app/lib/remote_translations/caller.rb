@@ -10,8 +10,7 @@ class RemoteTranslations::Caller
   end
 
   def self.llm?
-    [Setting["llm.provider"], Setting["llm.model"],
-     Setting["llm.use_llm_for_translations"]].all?(&:present?)
+    ::Llm::Config.configured? && Setting["llm.use_llm_for_translations"].present?
   end
 
   def self.microsoft?

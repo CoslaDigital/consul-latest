@@ -143,6 +143,10 @@ tr:
       gdpr:
         require_consent_for_notifications: Bildirimler için açık rıza
         require_consent_for_notifications_description: Genel Veri Koruma Yönetmeliği (GDPR) kapsamına uygun olarak kişilere duyurular ve benzer bilgiler göndermek için açık kullanıcı rızası gerekir.
+        require_consent_for_embedded_videos: Gömülü videolar için rıza onayı
+        require_consent_for_embedded_videos_description: Dış hizmet sağlayıcılardan gömülü videoları yüklemeden önce bir uyarı görüntüler ve kullanıcının rızası istenir.
+        warning_for_external_links: "Dış bağlantılar ile ilgili uyarı"
+        warning_for_external_links_description: "Kullanıcılara, bir dış siteye gitmeden önce rızalarını isteyen bir açılır pencere görüntüler."
     remote_census:
       general:
         endpoint: "Uç nokta"
@@ -248,3 +252,5 @@ tr:
       use_llm_for_translations_description: "İçerik çevirileri için LLM kullanın ve Microsoft çeviri hizmetlerine göre öncelik kazanın."
       model: "Model"
       model_description: "Kullanılacak LLM modeli."
+      use_ai_image_suggestions: "Yapay zeka görsel önerileri"
+      use_ai_image_suggestions_description: "Kullanıcıların kendi görsellerini yüklemesi yerine Pexels önerileri için yapay zeka kullanmalarını sağlayın."

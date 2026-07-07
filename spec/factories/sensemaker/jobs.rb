@@ -20,8 +20,12 @@ FactoryBot.define do
       published { true }
     end
 
+    trait :report do
+      script { "sensemaking-report-ui" }
+    end
+
     trait :publishable do
-      script { "single-html-build.js" }
+      script { "sensemaking-report-ui" }
       finished_at { Time.current }
       error { nil }
       published { false }

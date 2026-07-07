@@ -161,6 +161,8 @@ Layout/LineEndStringConcatenationIndentation:
 
 Layout/LineLength:
   Max: 110
+  AllowHeredoc: false
+  AllowQualifiedName: false
   Exclude:
     - "Gemfile"
     - "config/environments/production.rb"
@@ -290,6 +292,9 @@ Lint/ConstantDefinitionInBlock:
 Lint/ConstantReassignment:
   Enabled: true
 
+Lint/CircularArgumentReference:
+  Enabled: true
+
 Lint/DeprecatedClassMethods:
   Enabled: true
 
@@ -337,6 +342,15 @@ Lint/SymbolConversion:
   Exclude:
     - "app/models/setting.rb"
     - "db/dev_seeds/settings.rb"
+
+Lint/UnreachableCode:
+  Enabled: true
+
+Lint/UnreachableLoop:
+  Enabled: true
+
+Lint/UnreachablePatternBranch:
+  Enabled: true
 
 Lint/UselessAssignment:
   Enabled: true
@@ -457,6 +471,9 @@ Rails/HasManyOrHasOneDependent:
 Rails/HttpStatus:
   Enabled: true
 
+Rails/HttpStatusNameConsistency:
+  Enabled: true
+
 Rails/I18nLocaleAssignment:
   Enabled: true
   Include:
@@ -491,6 +508,9 @@ Rails/PluralizationGrammar:
   Enabled: true
 
 Rails/Presence:
+  Enabled: true
+
+Rails/RedirectBackOrTo:
   Enabled: true
 
 Rails/RedundantActiveRecordAllMethod:
@@ -763,7 +783,13 @@ Style/ComparableBetween:
 Style/DigChain:
   Enabled: true
 
+Style/EmptyClassDefinition:
+  Enabled: true
+
 Style/EmptyStringInsideInterpolation:
+  Enabled: true
+
+Style/FileOpen:
   Enabled: true
 
 Style/FileRead:
@@ -816,6 +842,9 @@ Style/LineEndConcatenation:
 Style/MapIntoArray:
   Enabled: true
 
+Style/MapJoin:
+  Enabled: true
+
 Style/MapToHash:
   Enabled: true
 
@@ -833,6 +862,9 @@ Style/MutableConstant:
 Style/NegatedIfElseCondition:
   Enabled: true
 
+Style/NegativeArrayIndex:
+  Enabled: true
+
 Style/Not:
   Enabled: true
 
@@ -846,6 +878,9 @@ Style/Proc:
   Enabled: true
 
 Style/RaiseArgs:
+  Enabled: true
+
+Style/ReduceToHash:
   Enabled: true
 
 Style/RedundantArgument:
@@ -864,6 +899,9 @@ Style/RedundantFileExtensionInRequire:
   Enabled: true
 
 Style/RedundantFreeze:
+  Enabled: true
+
+Style/RedundantMinMaxBy:
   Enabled: true
 
 Style/RedundantInterpolation:

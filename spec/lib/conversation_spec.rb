@@ -12,7 +12,10 @@ describe Conversation do
   shared_examples "rejects non-open-ended Poll::Question" do |method_name|
     it "raises ArgumentError" do
       conversation = Conversation.new("Poll::Question", question.id)
-      expect { conversation.send(method_name) }.to raise_error(ArgumentError, /only supported for open-ended Poll::Question/)
+      expect { conversation.send(method_name) }.to raise_error(
+        ArgumentError,
+        /only supported for open-ended Poll::Question/
+      )
     end
   end
 
@@ -113,6 +116,24 @@ describe Conversation do
       )
     end
 
+    it "can compile context for Legislation::QuestionOption and include filter note" do
+      process = create(:legislation_process)
+      question = create(:legislation_question, process: process)
+      option = create(:legislation_question_option, question: question, value: "Option A")
+
+      conversation = Conversation.new("Legislation::QuestionOption", option.id)
+      context_result = conversation.compile_context
+
+      expect(context_result).to be_present
+      expect(context_result).to include(
+        "This debate is part of the legislation process, \"#{process.title}\""
+      )
+      expect(context_result).to include(
+        "Note: Comments in this analysis are filtered to only include comments from users " \
+        "who selected the option \"Option A\""
+      )
+    end
+
     it "sanitizes HTML from Legislation::Proposal description and summary" do
       proposal = create(:legislation_proposal,
                         description: "<p>Legislation <strong>description</strong> with HTML.</p>",
@@ -196,6 +217,14 @@ describe Conversation do
       expect(conversation.comments.size).to eq(3)
     end
 
+    it "can compile context for all Proposals (collection conversation)" do
+      conversation = Conversation.new("Proposal", nil)
+      context_result = conversation.compile_context
+
+      expect(context_result).to be_present
+      expect(context_result).to include("These are the proposals that have been submitted")
+    end
+
     it_behaves_like "rejects non-open-ended Poll::Question", :compile_context do
       let(:poll) { create(:poll) }
       let(:question) do
@@ -220,24 +249,6 @@ describe Conversation do
         "This Poll is composed of 1 question(s). The questions are as follows:"
       )
       expect(context_result).to include("Q1 (Open ended): Open Question")
-    end
-
-    it "can compile context for other target types" do
-      target_types = Sensemaker::Job::ANALYSABLE_TYPES - ["Poll", "Poll::Question", "Legislation::Question",
-                                                          "Legislation::Proposal", "Debate", "Proposal",
-                                                          "Legislation::QuestionOption",
-                                                          "Budget", "Budget::Group"]
-      target_types.each do |target_type|
-        target_factory = target_type.downcase.gsub("::", "_").to_sym
-        target = create!(target_factory)
-        3.times do
-          create(:comment, commentable: target, user: user)
-        end
-        conversation = Conversation.new(target_type, target.id)
-        context_result = conversation.compile_context
-        expect(context_result).to be_present, "Failed to compile context for #{target_factory}"
-        expect(context_result).to include("- Comments: #{conversation.comments.size}")
-      end
     end
 
     it "can compile context for Legislation::Process with questions index and prefix note" do

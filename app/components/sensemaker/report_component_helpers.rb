@@ -1,7 +1,7 @@
 module Sensemaker::ReportComponentHelpers
   extend ActiveSupport::Concern
 
-  SCRIPT_REPORT = "single-html-build.js".freeze
+  SCRIPT_REPORT = "sensemaking-report-ui".freeze
   SCRIPT_SUMMARY = "runner.ts".freeze
 
   def display_title_for(record)

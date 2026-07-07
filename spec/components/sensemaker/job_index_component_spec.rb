@@ -5,12 +5,20 @@ describe Sensemaker::JobIndexComponent do
 
   let(:debate) { create(:debate, title: "Test Debate") }
   let(:jobs) { [] }
-  let(:component) { Sensemaker::JobIndexComponent.new(jobs: jobs, parent_resource: parent_resource, resource: resource) }
+  let(:component) do
+    Sensemaker::JobIndexComponent.new(
+      jobs: jobs,
+      parent_resource: parent_resource,
+      resource: resource
+    )
+  end
   let(:parent_resource) { nil }
   let(:resource) { debate }
 
   before do
-    Setting["feature.sensemaker"] = true
+    Setting["llm.provider"] = "OpenAI"
+    Setting["llm.model"] = "gpt-4o"
+    Setting["llm.use_sensemaker"] = true
   end
 
   describe "#has_jobs?" do
@@ -73,8 +81,8 @@ describe Sensemaker::JobIndexComponent do
   end
 
   describe "#script_type_tag" do
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is sensemaking-report-ui" do
+      let(:job) { create(:sensemaker_job, script: "sensemaking-report-ui") }
 
       it "returns Report" do
         render_inline component
@@ -134,7 +142,7 @@ describe Sensemaker::JobIndexComponent do
         create(:sensemaker_job,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                finished_at: Time.current,
                comments_analysed: 10)
       end

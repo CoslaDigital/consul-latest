@@ -8,7 +8,9 @@ describe Sensemaker::ReportComponentHelpers do
   let(:host) { Sensemaker::JobIndexComponent.new(jobs: jobs, parent_resource: nil, resource: nil) }
 
   before do
-    Setting["feature.sensemaker"] = true
+    Setting["llm.provider"] = "OpenAI"
+    Setting["llm.model"] = "gpt-4o"
+    Setting["llm.use_sensemaker"] = true
   end
 
   describe "#display_title_for" do
@@ -66,8 +68,8 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#script_type_tag" do
     before { render_inline host }
 
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is sensemaking-report-ui" do
+      let(:job) { create(:sensemaker_job, script: "sensemaking-report-ui") }
 
       it "returns Report translation" do
         expect(host.script_type_tag(job)).to eq(I18n.t("sensemaker.job_index.script_type.report"))
@@ -94,8 +96,8 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#view_job_text" do
     before { render_inline host }
 
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is sensemaking-report-ui" do
+      let(:job) { create(:sensemaker_job, script: "sensemaking-report-ui") }
 
       it "returns view_report translation" do
         expect(host.view_job_text(job)).to eq(I18n.t("sensemaker.job_index.view_report"))
@@ -114,8 +116,8 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#analysis_type_badge_class" do
     before { render_inline host }
 
-    it "returns badge-report for single-html-build.js" do
-      job = create(:sensemaker_job, script: "single-html-build.js")
+    it "returns badge-report for sensemaking-report-ui" do
+      job = create(:sensemaker_job, script: "sensemaking-report-ui")
       expect(host.analysis_type_badge_class(job)).to eq("badge-report")
     end
 

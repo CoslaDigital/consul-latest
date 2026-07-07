@@ -7,11 +7,13 @@ describe Sensemaker::ReportLinkComponent do
   let(:component) { Sensemaker::ReportLinkComponent.new(debate) }
 
   before do
-    Setting["feature.sensemaker"] = true
+    Setting["llm.provider"] = "OpenAI"
+    Setting["llm.model"] = "gpt-4o"
+    Setting["llm.use_sensemaker"] = true
   end
 
   describe "#render?" do
-    context "when sensemaker feature is enabled and job exists for a resource" do
+    context "when sensemaker is enabled and job exists for a resource" do
       let(:persisted_output) { Rails.root.join("tmp", "test-report.html").to_s }
 
       before do
@@ -20,7 +22,7 @@ describe Sensemaker::ReportLinkComponent do
         job = create(:sensemaker_job,
                      analysable_type: "Debate",
                      analysable_id: debate.id,
-                     script: "single-html-build.js",
+                     script: "sensemaking-report-ui",
                      finished_at: Time.current,
                      error: nil,
                      persisted_output: persisted_output,
@@ -37,7 +39,7 @@ describe Sensemaker::ReportLinkComponent do
       end
     end
 
-    context "when sensemaker feature is enabled and but job is unpublished" do
+    context "when sensemaker is enabled and but job is unpublished" do
       before do
         create(:sensemaker_job, :unpublished, analysable_type: "Debate", analysable_id: debate.id)
       end
@@ -47,9 +49,9 @@ describe Sensemaker::ReportLinkComponent do
       end
     end
 
-    context "when sensemaker feature is disabled" do
+    context "when sensemaker is disabled" do
       before do
-        Setting["feature.sensemaker"] = nil
+        Setting["llm.use_sensemaker"] = false
         create(:sensemaker_job, analysable_type: "Debate", analysable_id: debate.id)
       end
 
@@ -74,7 +76,7 @@ describe Sensemaker::ReportLinkComponent do
         create(:sensemaker_job,
                analysable_type: "Proposal",
                analysable_id: nil,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                finished_at: Time.current,
                error: nil,
                persisted_output: persisted_output,
@@ -109,7 +111,7 @@ describe Sensemaker::ReportLinkComponent do
         job = create(:sensemaker_job,
                      analysable_type: "Debate",
                      analysable_id: debate.id,
-                     script: "single-html-build.js",
+                     script: "sensemaking-report-ui",
                      finished_at: Time.current,
                      error: nil,
                      persisted_output: persisted_output,
@@ -148,7 +150,7 @@ describe Sensemaker::ReportLinkComponent do
         create(:sensemaker_job,
                analysable_type: "Proposal",
                analysable_id: nil,
-               script: "single-html-build.js",
+               script: "sensemaking-report-ui",
                finished_at: Time.current,
                error: nil,
                persisted_output: persisted_output,

@@ -106,24 +106,6 @@ el:
       legislation/proposal:
         one: "Πρόταση"
         other: "Προτάσεις"
-      legislation/draft_versions:
-        one: "Προσχέδιο"
-        other: "Εκδοχές του σχεδίου"
-      legislation/questions:
-        one: "Ερώτηση"
-        other: "Ερωτήσεις"
-      legislation/question_options:
-        one: "Επιλογή ερώτησης"
-        other: "Ερώτημα επιλογών"
-      legislation/answers:
-        one: "Απάντηση"
-        other: "Απαντήσεις"
-      documents:
-        one: "Έγγραφο"
-        other: "Έγγραφα"
-      images:
-        one: "Εικόνα"
-        other: "Εικόνες"
       topic:
         one: "Θέμα"
         other: "Θέματα"
@@ -345,7 +327,6 @@ el:
         title: "Τίτλος"
       site_customization/page:
         content: Περιεχόμενο
-        created_at: Δημιουργήθηκε στις
         subtitle: Υπότιτλος
         slug: Slug
         status: Κατάσταση

@@ -1548,7 +1548,7 @@ en:
       author: Author
       created_at: Creation date
       name: Name
-      no_signature_sheets: "There are not signature_sheets"
+      no_signature_sheets: "There are no signature sheets"
       index:
         title: Signature sheets
         new: New signature sheets
@@ -1894,6 +1894,24 @@ en:
         table_actions: "Actions"
         cancel_all: "Cancel all"
         new_run: "New Run"
+        target_not_found: "Target not found."
+        filtered_by_target: "Showing jobs for %{name}"
+        filter_by: "Filter by"
+        filter_all_types: "-"
+        filter_reset: "× Clear filters"
+        sensemaker_analyses_count:
+          one: "1 sensemaker analysis"
+          other: "%{count} sensemaker analyses"
+        resource_types:
+          budgets: "Budgets"
+          debates: "Debates"
+          proposals: "Proposals"
+          polls: "Polls"
+          poll_questions: "Poll questions"
+          legislation_processes: "Legislation processes"
+          legislation_questions: "Legislation questions"
+          legislation_proposals: "Legislation proposals"
+          legislation_question_options: "Legislation question options"
       new:
         title: New Sensemaker analysis
         select_target: "Select a target from the results"
@@ -1934,12 +1952,16 @@ en:
         job_spawned_by: "Job spawned by"
         target_type: "Target Type"
         target_title: "Target Title"
+        additional_context: "Additional context"
         error_report: "Error report"
         error_log: "Error Log"
         prerequisite_jobs: "Prerequisite Jobs"
         prerequisite_jobs_help: "These jobs were created as prerequisites for this job"
         actions: "Actions"
+        files: "Files"
+        input_files: "Input files"
         output_files: "Output files"
+        none_available: "None available"
         select_file_download: "Select a file to download."
         back_to_jobs: "Back to Jobs"
         published_reports_link: "Published report(s)"
@@ -1984,7 +2006,7 @@ en:
         advanced_runner_ts:
           title: "Analyse"
           description: "Analyse the conversation with statistics"
-        single_html_build_js:
+        sensemaking_report_ui:
           title: "Report"
           description: "Analyse and generate a report in HTML format"
     machine_learning:

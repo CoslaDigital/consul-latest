@@ -7,14 +7,16 @@ describe Sensemaker::JobCardComponent do
     create(:sensemaker_job,
            analysable_type: "Debate",
            analysable_id: create(:debate).id,
-           script: "single-html-build.js",
+           script: "sensemaking-report-ui",
            finished_at: Time.current,
            comments_analysed: 5)
   end
   let(:component) { Sensemaker::JobCardComponent.new(job) }
 
   before do
-    Setting["feature.sensemaker"] = true
+    Setting["llm.provider"] = "OpenAI"
+    Setting["llm.model"] = "gpt-4o"
+    Setting["llm.use_sensemaker"] = true
   end
 
   describe "rendering" do

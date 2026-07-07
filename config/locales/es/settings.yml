@@ -114,8 +114,6 @@ es:
       force_2factor_description: "Obliga a los administradores a usar 2FA en su próximo inicio de sesión"
       machine_learning: "IA / Machine learning"
       machine_learning_description: "Habilita la sección de IA / Machine Learning para ejecutar scripts de python y enriquecer el contenido automáticamente."
-      sensemaker: "Sensemaker"
-      sensemaker_description: "Habilita la integración de Sensemaker para ayudar a analizar y comprender conversaciones a gran escala."
       map: "Geolocalización de propuestas y proyectos de gasto"
       map_description: "Activa la geolocalización de propuestas y proyectos de gasto"
       allow_images: "Permitir subir y mostrar imágenes"
@@ -147,11 +145,10 @@ es:
       gdpr:
         require_consent_for_notifications: Consentimiento explícito para notificaciones
         require_consent_for_notifications_description: Requerir que los usuarios tengan que dar consentimiento explícito para enviarles boletines e información similar tal y como describe Reglamento General de Protección de Datos (RGPD).
-      events: calendario de eventos
-      events_description: Habilitar el calendario de eventos y permitir la creación de eventos
-      gdpr:
-        require_consent_for_notifications: Consentimiento explícito para notificaciones
-        require_consent_for_notifications_description: Requerir que los usuarios tengan que dar consentimiento explícito para enviarles boletines e información similar tal y como describe Reglamento General de Protección de Datos (RGPD).
+        require_consent_for_embedded_videos: Consentimiento para vídeos embebidos
+        require_consent_for_embedded_videos_description: Mostrar un aviso y requerir confirmación del usuario antes de cargar vídeos embebidos de proveedores externos.
+        warning_for_external_links: "Aviso en enlaces externos"
+        warning_for_external_links_description: "Activa un aviso que solicita confirmación del usuario antes ir a un sitio web externo."
     remote_census:
       general:
         endpoint: "Endpoint"
@@ -259,3 +256,5 @@ es:
       model_description: "El modelo LLM a usar."
       use_ai_image_suggestions: "Sugerencias de Imágenes con IA"
       use_ai_image_suggestions_description: "Permitir a los usuarios usar IA para sugerir imágenes de Pexels, en lugar de subir las suyas propias."
+      use_sensemaker: "Sensemaker"
+      use_sensemaker_description: "Habilita la integración de Sensemaker para ayudar a analizar y comprender conversaciones a gran escala."
