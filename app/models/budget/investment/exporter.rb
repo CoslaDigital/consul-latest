@@ -30,7 +30,7 @@ class Budget::Investment::Exporter
         I18n.t("admin.budget_investments.index.list.selected"),
         I18n.t("admin.budget_investments.index.list.visible_to_valuators"),
         I18n.t("admin.budget_investments.index.list.author_username"),
-        I18n.t("admin.budget_investments.index.list.author_email")
+        I18n.t("admin.budget_investments.index.list.author_email"),
         I18n.t("admin.budget_investments.index.list.author_username"),
         Budget::Investment.human_attribute_name(:created_at)
       ]
