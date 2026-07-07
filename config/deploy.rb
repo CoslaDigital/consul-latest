@@ -15,7 +15,10 @@ def main_deploy_server
 end
 
 set :rails_env, fetch(:stage)
-set :default_env, { EXECJS_RUNTIME: "Disabled" }
+set :default_env, {
+  EXECJS_RUNTIME: "Disabled",
+  rvm_path: "~/.rvm"
+}
 set :rvm1_map_bins, -> { fetch(:rvm_map_bins).to_a.concat(%w[rake gem bundle ruby]).uniq }
 
 set :application, deploysecret(:app_name, default: "consul")
