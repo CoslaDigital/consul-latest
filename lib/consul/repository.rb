@@ -19,7 +19,7 @@ module Consul
       private
 
         def consul_url
-          "https://github.com/consuldemocracy/consuldemocracy.git"
+          "https://github.com/CoslaDigital/consul-latest"
         end
     end
   end
