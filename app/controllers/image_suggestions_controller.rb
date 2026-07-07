@@ -5,10 +5,17 @@ class ImageSuggestionsController < ApplicationController
   before_action :authenticate_user!
   skip_authorization_check
 
+  rate_limit to: 10,
+             within: 15.minutes,
+             by: -> { current_user.id },
+             only: :create,
+             with: -> { render_rate_limit_response }
+
   def create
-    @resource_type = params[:resource_type]
-    @title = image_suggestion_params[:title]
-    @description = image_suggestion_params[:description]
+    @suggestions = ImageSuggestions::Llm::Client.call(
+      title: image_suggestion_params[:title],
+      description: image_suggestion_params[:description]
+    )
 
     respond_to do |format|
       format.js
@@ -46,8 +53,17 @@ class ImageSuggestionsController < ApplicationController
 
   private
 
+    def render_rate_limit_response
+      @suggestions = ImageSuggestions::Llm::Client::Response.new
+      @suggestions.errors << I18n.t("images.errors.messages.rate_limit_exceeded")
+
+      respond_to do |format|
+        format.js { render :create }
+      end
+    end
+
     def image_suggestion_params
-      @image_suggestion_params ||= params.require(@resource_type.parameterize.underscore)
+      @image_suggestion_params ||= params.require(params[:resource_type].parameterize.underscore)
                                          .permit(translations_attributes: [:title, :description])
                                          .fetch(:translations_attributes, {})
                                          .values.first || {}

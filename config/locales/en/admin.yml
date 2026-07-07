@@ -1548,7 +1548,7 @@ en:
       author: Author
       created_at: Creation date
       name: Name
-      no_signature_sheets: "There are not signature_sheets"
+      no_signature_sheets: "There are no signature sheets"
       index:
         title: Signature sheets
         new: New signature sheets
@@ -1894,15 +1894,33 @@ en:
         table_actions: "Actions"
         cancel_all: "Cancel all"
         new_run: "New Run"
+        target_not_found: "Target not found."
+        filtered_by_target: "Showing jobs for %{name}"
+        filter_by: "Filter by"
+        filter_all_types: "-"
+        filter_reset: "× Clear filters"
+        sensemaker_analyses_count:
+          one: "1 sensemaker analysis"
+          other: "%{count} sensemaker analyses"
+        resource_types:
+          budgets: "Budgets"
+          debates: "Debates"
+          proposals: "Proposals"
+          polls: "Polls"
+          poll_questions: "Poll questions"
+          legislation_processes: "Legislation processes"
+          legislation_questions: "Legislation questions"
+          legislation_proposals: "Legislation proposals"
+          legislation_question_options: "Legislation question options"
       new:
         title: New Sensemaker analysis
         select_target: "Select a target from the results"
         results: "results"
         analysing: "Analysing"
-        review_context: "Review the additional context, then select a script to run."
+        review_context: "Review the additional context, then click a Generate button, or, select a script in advanced options."
+        generate_ranked_propositions: "Generate ranked propositions"
         additional_context_label: "Additional context"
         additional_context_hint: "Optional text that helps guide the analysis. For example, briefly describe what the conversation is about so the AI has useful background. The target's title and description are already included."
-        generate_summary: "Generate summary"
         generate_report: "Generate report"
         advanced_options: "Advanced options"
         expert_options_hint: "For expert users. Run any Sensemaker script by choosing from the input."
@@ -1934,12 +1952,16 @@ en:
         job_spawned_by: "Job spawned by"
         target_type: "Target Type"
         target_title: "Target Title"
+        additional_context: "Additional context"
         error_report: "Error report"
         error_log: "Error Log"
         prerequisite_jobs: "Prerequisite Jobs"
         prerequisite_jobs_help: "These jobs were created as prerequisites for this job"
         actions: "Actions"
+        files: "Files"
+        input_files: "Input files"
         output_files: "Output files"
+        none_available: "None available"
         select_file_download: "Select a file to download."
         back_to_jobs: "Back to Jobs"
         published_reports_link: "Published report(s)"
@@ -1958,13 +1980,13 @@ en:
         title_2: "How does Sensemaker work?"
         description_2: "Sensemaker uses LLMs (large language models) to analyse conversations and identify patterns. Sensemaker will perform an analysis on the comments associated with a target resource e.g. a debate, proposal, poll, topic, legislation process. Details about the target resource (e.g. title, description) will be used as additional context to support the analysis."
         title_3: "How to use Sensemaker?"
-        description_3: "To use Sensemaker, go to the Sensemaker Analysis tab, then click the 'New Run' button. Search for a target resource and select it. Add any additional context if needed and select a script to run."
+        description_3: "To use Sensemaker, go to the Sensemaker Analysis tab, then click the 'New Run' button. Search for a target resource and select it. Add any additional context if needed, then click Generate report for the full analysis pipeline."
         title_4: "Available scripts"
         description_4: "The following scripts are available:"
       notice:
         cancelled_jobs: "All sensemaker jobs have been cancelled."
         script_info: "The script has been queued successfully."
-        script_required: "Please select a script from the expert options, or use Generate Summary / Generate Report."
+        script_required: "Please select a script from the expert options, or use Generate report / Generate ranked propositions."
         output_file_not_found: "Output file not found"
         deleted_job: "Analysis job deleted successfully"
         cannot_publish: "The analysis cannot be published because it is not finished or has errors or does not have an output file."
@@ -1972,21 +1994,30 @@ en:
         unpublished: "The analysis has been unpublished successfully."
       delete_alert: "Are you sure you want to delete this analysis? This action can't be undone"
       scripts:
-        health_check_runner_ts:
+        health_check:
           title: "Perform health check"
-          description: "Health check to verify sensemaker is working"
-        categorization_runner_ts:
+          description: "Verify LLM connectivity and configuration"
+        categorize:
           title: "Categorise"
-          description: "Categorise comments into topics and subtopics"
-        runner_ts:
-          title: "Summarise"
-          description: "Generate a summary of the conversation"
-        advanced_runner_ts:
-          title: "Analyse"
-          description: "Analyse the conversation with statistics"
-        single_html_build_js:
-          title: "Report"
-          description: "Analyse and generate a report in HTML format"
+          description: "Discover topics and extract representative quotes"
+        bridge_scores:
+          title: "Bridging scores"
+          description: "Score quotes for bridging attributes"
+        report_text:
+          title: "Generate report data"
+          description: "Produce structured report JSON with topic summaries"
+        propositions:
+          title: "Generate propositions"
+          description: "Generate candidate propositions from categorised comments (requires categorise first, or runs it automatically)"
+        refine_propositions:
+          title: "Refine propositions (simulated jury)"
+          description: "Rank and refine propositions with a simulated jury (long-running; requires proposition generation first)"
+        ranked_propositions:
+          title: "Export ranked propositions (CSV)"
+          description: "Full pipeline: categorise, generate propositions, jury refinement, then export ranked propositions by topic. Very long-running and LLM-intensive."
+        report_ui:
+          title: "Generate interactive report"
+          description: "Run the full pipeline and build an HTML report for publishing"
     machine_learning:
       cancel: "Cancel operation"
       cancel_alert: "This action will cancel the current script and it will be necessary to run the script again."

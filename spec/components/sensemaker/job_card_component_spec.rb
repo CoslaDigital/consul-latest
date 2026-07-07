@@ -7,7 +7,7 @@ describe Sensemaker::JobCardComponent do
     create(:sensemaker_job,
            analysable_type: "Debate",
            analysable_id: create(:debate).id,
-           script: "single-html-build.js",
+           script: "report_ui",
            finished_at: Time.current,
            comments_analysed: 5)
   end
@@ -41,24 +41,6 @@ describe Sensemaker::JobCardComponent do
 
         expect(page).to have_content(I18n.t("sensemaker.report_view.comments_analysed_label"))
         expect(page).to have_content("5")
-      end
-    end
-
-    context "when job is a summary (runner.ts)" do
-      let(:job) do
-        create(:sensemaker_job,
-               analysable_type: "Debate",
-               analysable_id: create(:debate).id,
-               script: "runner.ts",
-               finished_at: Time.current)
-      end
-
-      it "renders View Summary link when job has outputs" do
-        allow(job).to receive(:has_outputs?).and_return(true)
-        render_inline component
-
-        expect(page).to have_link(I18n.t("sensemaker.job_index.view_summary"),
-                                  href: serve_report_sensemaker_job_path(job))
       end
     end
   end

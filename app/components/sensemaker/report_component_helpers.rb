@@ -1,9 +1,6 @@
 module Sensemaker::ReportComponentHelpers
   extend ActiveSupport::Concern
 
-  SCRIPT_REPORT = "single-html-build.js".freeze
-  SCRIPT_SUMMARY = "runner.ts".freeze
-
   def display_title_for(record)
     return nil unless record
 
@@ -33,8 +30,6 @@ module Sensemaker::ReportComponentHelpers
     case job_script_kind(job)
     when :report
       t("sensemaker.job_index.script_type.report")
-    when :summary
-      t("sensemaker.job_index.script_type.summary")
     else
       job.script
     end
@@ -44,8 +39,6 @@ module Sensemaker::ReportComponentHelpers
     case job_script_kind(job)
     when :report
       t("sensemaker.job_index.view_report")
-    when :summary
-      t("sensemaker.job_index.view_summary")
     else
       t("sensemaker.job_index.view_job")
     end
@@ -77,8 +70,6 @@ module Sensemaker::ReportComponentHelpers
     case job_script_kind(job)
     when :report
       "badge-report"
-    when :summary
-      "badge-summary"
     else
       "badge-default"
     end
@@ -253,11 +244,8 @@ module Sensemaker::ReportComponentHelpers
   private
 
     def job_script_kind(job)
-      case job.script
-      when SCRIPT_REPORT
+      if Sensemaker::Scripts::PUBLISHABLE_SCRIPTS.include?(job.script)
         :report
-      when SCRIPT_SUMMARY
-        :summary
       else
         :other
       end

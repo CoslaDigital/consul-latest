@@ -1,3 +1,5 @@
+require "shellwords"
+
 namespace :sensemaker do
   desc "Setup Sensemaker Integration"
   task setup: :environment do
@@ -39,26 +41,16 @@ namespace :sensemaker do
     end
 
     def setup_sensemaker_app_prerequisites(logger)
-      begin
-        package_path = Sensemaker::Paths.sensemaker_package_folder
-        sensemaker_path = Sensemaker::Paths.sensemaker_folder
-      rescue => e
-        logger.warn "Could not get paths from Sensemaker::Paths: #{e.message}"
-        logger.warn "Using default paths instead"
-        package_path = Rails.root.join("node_modules/@cosla/sensemaking-tools")
-        sensemaker_path = Rails.root.join("vendor/sensemaking-tools")
-      end
+      sensemaker_path = Sensemaker::Paths.sensemaker_folder
 
       check_dependencies(logger)
-      ensure_package_in_package_json(logger, "@cosla/sensemaking-tools")
-      ensure_web_ui_package_in_package_json(logger)
+      ensure_python_venv_and_package(logger)
 
-      logger.info "Using sensemaking-tools package path: #{package_path}"
-      logger.info "Using sensemaking-tools folder: #{sensemaker_path}"
+      logger.info "Using sensemaker folder: #{sensemaker_path}"
+      logger.info "Using Python venv: #{Sensemaker::Paths.sensemaker_venv}"
 
-      ensure_angular_build_for_web_ui(logger)
       setup_sensemaker_directory(sensemaker_path, logger)
-      verify_cli_available(package_path, logger)
+      verify_python_cli_available(logger)
       check_key_file(logger)
     end
 
@@ -69,8 +61,6 @@ namespace :sensemaker do
       check_key_file(logger)
       check_package(logger)
       check_is_enabled(logger)
-      ensure_angular_build_for_web_ui(logger)
-      check_web_ui_health(logger)
       check_sensemaker_cli(logger)
       logger.info "Sensemaker installation verified you can now use the Sensemaker Tools."
     end
@@ -84,44 +74,76 @@ namespace :sensemaker do
       end
       logger.info "✓ sensemaker_data_folder found"
 
-      context = Llm::Config.context
-      if context.config.vertexai_project_id.blank?
+      config = runtime_config
+      unless config.cli_supported?
+        message = if config.adapter == "ollama"
+                    "Ollama is not supported by the Python Sensemaker tools. " \
+                      "Select Gemini, Vertex AI, or an OpenAI-compatible provider in Admin → Settings → LLM."
+                  else
+                    "Sensemaker LLM provider is not supported. Current provider: " \
+                      "#{config.provider.presence || "(not set)"}."
+                  end
+        logger.warn "✗ #{message}"
+        abort "Error: #{message}"
+      end
+      logger.info "✓ Supported Sensemaker adapter selected: #{config.adapter}."
+
+      if config.adapter == "vertex" && config.vertex_project_id.blank?
         logger.warn "✗ Vertex AI is not configured. Please set tenant secrets " \
                     "llm.vertexai_project_id (and optionally vertexai_location)."
         abort "Error: Vertex AI configuration not found. Please check the logs."
       end
-      logger.info "✓ Vertex AI configuration (context.config.vertexai_project_id) is present."
+      logger.info "✓ Adapter configuration is present."
 
-      provider = Setting["llm.provider"].to_s
-      unless provider.downcase.include?("vertex")
-        logger.warn "✗ Sensemaker requires Vertex AI as the LLM provider. " \
-                    "Current provider: #{provider.presence || "(not set)"}. Set it in Admin → Settings → LLM."
-        abort "Error: Vertex AI must be selected as the LLM provider. Please check the logs."
-      end
-      logger.info "✓ Vertex AI is selected as the LLM provider."
-
-      if Setting["llm.model"].blank?
+      if config.model.blank?
         logger.warn "✗ Sensemaker requires an LLM model to be selected. Set it in Admin → Settings → LLM."
         abort "Error: No LLM model selected. Please check the logs."
       end
       logger.info "✓ LLM model is selected."
+
+      if config.adapter == "openai-compatible" && config.api_key.blank?
+        logger.warn "✗ Sensemaker requires an API key for provider '#{config.compat_provider}'. " \
+                    "Set tenant secret llm.#{config.compat_provider}_api_key."
+        abort "Error: Missing API key for selected provider. Please check the logs."
+      end
+      logger.info "✓ Provider credentials are configured."
+    end
+
+    def build_health_check_command_parts(config, output_file)
+      parts = [
+        "--output_file", output_file.to_s,
+        "--adapter", config.adapter
+      ]
+      parts.concat(["--model_name", config.model]) if config.model.present?
+
+      case config.adapter
+      when "vertex"
+        parts.concat(["--vertex_project", config.vertex_project_id])
+        parts.concat(["--vertex_location", config.vertex_location])
+      when "openai-compatible"
+        parts.concat(["--provider", config.compat_provider])
+        parts.concat(["--api_key", config.api_key]) if config.api_key.present?
+        parts.concat(["--base_url", config.base_url]) if config.base_url.present?
+      when "gemini"
+        parts.concat(["--api_key", config.api_key]) if config.api_key.present?
+      end
+
+      parts
+    end
+
+    def redact_command_for_log(command)
+      command.to_s.gsub(/--api_key\s+\S+/, "--api_key [REDACTED]")
     end
 
     def check_sensemaker_cli(logger)
-      context = Llm::Config.context
+      config = runtime_config
 
       output_file = "#{Sensemaker::Paths.sensemaker_data_folder}/verify-output-#{Time.current.to_i}.txt"
-      package_path = Sensemaker::Paths.sensemaker_package_folder
-      runner_path = package_path.join("runner-cli/health_check_runner.ts")
+      cli = Sensemaker::Paths.sensemaking_cli(Sensemaker::HEALTH_CHECK_CLI)
+      command_parts = build_health_check_command_parts(config, output_file)
+      full_command = ([cli] + command_parts).map { |part| Shellwords.escape(part) }.join(" ")
 
-      command = %Q(npx ts-node #{runner_path} \
-        --vertexProject #{context.config.vertexai_project_id} \
-        --outputFile #{output_file} \
-        --modelName #{Setting["llm.model"]})
-
-      full_command = "cd #{Rails.root} && #{command}"
-
-      logger.info "Running command: #{full_command}"
+      logger.info "Running command: #{redact_command_for_log(full_command)}"
       output = `#{full_command} 2>&1`
       result = $?.exitstatus
 
@@ -132,68 +154,6 @@ namespace :sensemaker do
         logger.warn "✗ Sensemaker CLI is not working correctly."
         logger.warn output
         raise "Sensemaker CLI is not working correctly."
-      end
-    end
-
-    def check_web_ui_health(logger)
-      logger.info "Checking web-ui health..."
-
-      visualization_path = Sensemaker::Paths.visualization_folder
-      output_file = "#{Sensemaker::Paths.sensemaker_data_folder}/health-check-#{Time.current.to_i}.html"
-
-      command = %Q(node #{visualization_path}/health_check.js --outputFile #{output_file})
-
-      output = `cd #{visualization_path} && #{command} 2>&1`
-      result = $?.exitstatus
-
-      if result.eql?(0)
-        logger.info "✓ Web-ui health check passed."
-        logger.info output
-      else
-        logger.warn "✗ Web-ui health check failed."
-        logger.warn output
-        raise "Web-ui health check failed."
-      end
-    end
-
-    def ensure_angular_build_for_web_ui(logger)
-      logger.info "Ensuring Angular build for web-ui..."
-
-      visualization_path = Sensemaker::Paths.visualization_folder
-      dist_path = File.join(visualization_path, "dist/web-ui/browser")
-      build_exists = File.directory?(dist_path) && File.exist?(File.join(dist_path, "index.csr.html"))
-
-      logger.info "Installing Angular build dependencies..."
-      install_command = "cd #{visualization_path} && npm install --include=dev 2>&1"
-      install_output = `#{install_command}`
-      install_result = $?.exitstatus
-
-      if !install_result.eql?(0)
-        logger.warn "✗ Failed to install dependencies"
-        logger.warn install_output
-        raise "Failed to install Angular build dependencies"
-      end
-
-      logger.info "✓ Dependencies installed"
-
-      if build_exists
-        logger.info "✓ Angular build already exists at: #{dist_path}"
-        logger.info "Skipping build step."
-        return
-      end
-
-      logger.info "Building Angular app..."
-
-      build_command = "cd #{visualization_path} && npm run build -- --configuration development 2>&1"
-      build_output = `#{build_command}`
-      result = $?.exitstatus
-
-      if result.eql?(0)
-        logger.info "✓ Angular build for web-ui completed successfully."
-      else
-        logger.warn "✗ Angular build for web-ui failed"
-        logger.warn build_output
-        raise "Angular build for web-ui failed."
       end
     end
 
@@ -215,24 +175,37 @@ namespace :sensemaker do
     end
 
     def check_package(logger)
-      package_path = Sensemaker::Paths.sensemaker_package_folder
+      pip = Sensemaker::Paths.sensemaker_bin.join("pip")
+      unless File.executable?(pip)
+        logger.warn "✗ pip not found in Sensemaker venv: #{pip}"
+        raise "Sensemaker Python venv is missing pip. Run: bundle exec rake sensemaker:setup"
+      end
 
-      if File.directory?(package_path)
-        logger.info "✓ sensemaking-tools package found: #{package_path}"
+      show_output = `#{Shellwords.escape(pip.to_s)} show #{Sensemaker::PYTHON_PACKAGE} 2>&1`
+      unless $?.success?
+        logger.warn "✗ #{Sensemaker::PYTHON_PACKAGE} is not installed in the venv."
+        logger.warn show_output
+        raise "#{Sensemaker::PYTHON_PACKAGE} not installed. Run: bundle exec rake sensemaker:setup"
+      end
 
-        package_json_path = File.join(package_path, "package.json")
-        if File.exist?(package_json_path)
-          package_json = JSON.parse(File.read(package_json_path))
-          version = package_json["version"]
-          logger.info "✓ Installed version: #{version}"
-        end
-      else
-        logger.warn "✗ sensemaking-tools package not found at: #{package_path}"
-        raise "sensemaking-tools package not found. Run 'npm install' first."
+      version_line = show_output.lines.find { |line| line.start_with?("Version:") }
+      installed_version = version_line&.split(":", 2)&.last&.strip
+      logger.info "✓ #{Sensemaker::PYTHON_PACKAGE} installed: #{installed_version}"
+
+      if installed_version != Sensemaker::PYTHON_PACKAGE_VERSION
+        logger.warn "Expected version #{Sensemaker::PYTHON_PACKAGE_VERSION}, found #{installed_version}."
+        logger.warn "Run: bundle exec rake sensemaker:setup"
+        raise "Sensemaker Python package version mismatch."
       end
     end
 
     def check_key_file(logger)
+      adapter = runtime_config.adapter
+      if adapter != "vertex" && adapter != "gemini"
+        logger.info "Skipping GCP credentials file check (adapter is #{adapter || "not set"})."
+        return
+      end
+
       key_path = Rails.application.secrets.google_application_credentials
       if key_path.present?
         path = Pathname.new(key_path).absolute? ? key_path : Rails.root.join(key_path).to_s
@@ -249,29 +222,25 @@ namespace :sensemaker do
     end
 
     def check_directories(logger)
-      package_path = Sensemaker::Paths.sensemaker_package_folder
+      venv_path = Sensemaker::Paths.sensemaker_venv
+      bin_path = Sensemaker::Paths.sensemaker_bin
+      cli_path = Sensemaker::Paths.sensemaker_bin.join(Sensemaker::HEALTH_CHECK_CLI)
       sensemaker_path = Sensemaker::Paths.sensemaker_folder
       data_path = Sensemaker::Paths.sensemaker_data_folder
 
-      if File.directory?(package_path)
-        logger.info "✓ Sensemaker package path found: #{package_path}"
-      else
-        logger.warn "✗ Sensemaker package path not found: #{package_path}"
-        raise "Sensemaker package path not found: #{package_path}"
-      end
-
-      if File.directory?(sensemaker_path)
-        logger.info "✓ Sensemaker data folder found: #{sensemaker_path}"
-      else
-        logger.warn "✗ Sensemaker data folder not found: #{sensemaker_path}"
-        raise "Sensemaker data folder not found: #{sensemaker_path}"
-      end
-
-      if File.directory?(data_path)
-        logger.info "✓ Data path found: #{data_path}"
-      else
-        logger.warn "✗ Data path not found: #{data_path}"
-        raise "Data path not found: #{data_path}"
+      [
+        [venv_path, "Sensemaker Python venv"],
+        [bin_path, "Sensemaker venv bin directory"],
+        [cli_path, "sensemaking-health-check CLI"],
+        [sensemaker_path, "Sensemaker folder"],
+        [data_path, "Sensemaker data folder"]
+      ].each do |path, description|
+        if File.exist?(path)
+          logger.info "✓ #{description} found: #{path}"
+        else
+          logger.warn "✗ #{description} not found: #{path}"
+          raise "#{description} not found: #{path}"
+        end
       end
 
       logger.info "✓ Directories found."
@@ -291,94 +260,104 @@ namespace :sensemaker do
       add_feature_flag(logger)
 
       logger.info "Sensemaker setup complete!"
-      logger.info "Ensure tenant secrets include llm.vertexai_project_id (and optionally vertexai_location)."
+      logger.info "Ensure tenant LLM settings are configured for the selected provider."
       logger.info "To verify your installation, run: bundle exec rake sensemaker:verify"
     end
 
     def check_dependencies(logger)
       logger.info "Checking environment dependencies..."
-      %w[node npm npx].each do |cmd|
-        check_dependency(logger, cmd, cmd == "node" ? "Node.js" : cmd)
-      end
+      check_dependency(logger, "python3", "Python 3")
+      check_python_version(logger)
+      check_dependency(logger, "pip3",
+                       "pip") unless File.executable?(Sensemaker::Paths.sensemaker_bin.join("pip"))
       logger.info "All dependencies are available."
     end
 
+    def check_python_version(logger)
+      version_check = "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"
+      unless system("python3", "-c", version_check)
+        logger.warn "Python 3.10 or newer is required for Sensemaker tools."
+        raise "Python 3.10+ is required for Sensemaker tools."
+      end
+      logger.info "✓ Python version is 3.10 or newer: #{`python3 --version`.strip}"
+    end
+
     def check_dependency(logger, cmd, display_name)
-      unless system("which #{cmd} > /dev/null 2>&1")
+      unless system("which", cmd, out: File::NULL, err: File::NULL)
         logger.warn "#{display_name} not found. Please install #{display_name} to use the Sensemaker feature."
         raise "#{display_name} not found. Please install #{display_name} to use the Sensemaker feature."
       end
-      logger.info "✓ #{display_name} found: #{`#{cmd} --version`.strip}"
+      logger.info "✓ #{display_name} found: #{`#{cmd} --version 2>&1 | head -1`.strip}"
+    end
+
+    def ensure_python_venv_and_package(logger)
+      sensemaker_path = Sensemaker::Paths.sensemaker_folder
+      venv_path = Sensemaker::Paths.sensemaker_venv
+      pip_path = Sensemaker::Paths.sensemaker_bin.join("pip")
+
+      FileUtils.mkdir_p(sensemaker_path)
+
+      unless File.directory?(venv_path)
+        logger.info "Creating Python virtual environment at #{venv_path}..."
+        unless system("python3", "-m", "venv", venv_path.to_s)
+          logger.warn "Failed to create Python venv at #{venv_path}"
+          raise "Failed to create Python venv."
+        end
+        logger.info "✓ Virtual environment created."
+      else
+        logger.info "✓ Virtual environment already exists at #{venv_path}"
+      end
+
+      unless File.executable?(pip_path)
+        logger.warn "✗ pip not found in venv after creation: #{pip_path}"
+        raise "pip not found in Sensemaker venv."
+      end
+
+      package_spec = "#{Sensemaker::PYTHON_PACKAGE}==#{Sensemaker::PYTHON_PACKAGE_VERSION}"
+      logger.info "Installing #{package_spec}..."
+
+      upgrade_pip = `#{Shellwords.escape(pip_path.to_s)} install --upgrade pip 2>&1`
+      unless $?.success?
+        logger.warn "✗ Failed to upgrade pip in venv"
+        logger.warn upgrade_pip
+        raise "Failed to upgrade pip in Sensemaker venv."
+      end
+
+      install_output = `#{Shellwords.escape(pip_path.to_s)} install #{package_spec} 2>&1`
+      unless $?.success?
+        logger.warn "✗ Failed to install #{package_spec}"
+        logger.warn install_output
+        raise "Failed to install #{Sensemaker::PYTHON_PACKAGE}."
+      end
+
+      logger.info install_output
+      Sensemaker::Paths.sensemaking_cli(Sensemaker::HEALTH_CHECK_CLI)
+      logger.info "✓ #{Sensemaker::HEALTH_CHECK_CLI} is available."
+    end
+
+    def verify_python_cli_available(logger)
+      cli = Sensemaker::Paths.sensemaking_cli(Sensemaker::HEALTH_CHECK_CLI)
+      output = `#{Shellwords.escape(cli.to_s)} --help 2>&1`
+
+      if $?.success?
+        logger.info "Sensemaker CLI tool is working correctly."
+      else
+        logger.warn output
+        logger.warn "Failed to run Sensemaker CLI tool. Please check the installation."
+        raise "Failed to run Sensemaker CLI tool. Please check the installation."
+      end
     end
 
     def setup_sensemaker_directory(sensemaker_path, logger)
-      logger.info "Setting up sensemaking-tools data directory..."
+      logger.info "Setting up sensemaking-tools directory..."
       FileUtils.mkdir_p(sensemaker_path) unless File.directory?(sensemaker_path)
-      logger.info "Sensemaker data directory created."
+      logger.info "Sensemaker directory ready."
     end
 
     def setup_data_directory(data_path, logger)
       logger.info "Setting up data directory..."
       FileUtils.mkdir_p(data_path) unless File.directory?(data_path)
       logger.info "Data directory created."
-    end
-
-    def ensure_package_in_package_json(logger, package_name, suggested_version: "^1.0.0")
-      logger.info "Checking package.json for #{package_name} dependency..."
-
-      package_json_path = Rails.root.join("package.json")
-      unless File.exist?(package_json_path)
-        logger.warn "✗ package.json not found."
-        logger.info ""
-        logger.info "Please create package.json and add the following dependency:"
-        logger.info "  \"#{package_name}\": \"#{suggested_version}\""
-        logger.info ""
-        raise "package.json not found. Please create it and add the required dependencies."
-      end
-
-      package_json = JSON.parse(File.read(package_json_path))
-      package_json["dependencies"] ||= {}
-      current_version = package_json["dependencies"][package_name]
-
-      if current_version.nil?
-        logger.warn "✗ #{package_name} not found in package.json"
-        logger.info ""
-        logger.info "Please add the following to your package.json dependencies:"
-        logger.info "  \"#{package_name}\": \"#{suggested_version}\""
-        logger.info ""
-        logger.info "Then run: npm install"
-        logger.info ""
-        raise "#{package_name} not found in package.json. Please add it manually."
-      else
-        logger.info "✓ #{package_name}@#{current_version} found in package.json"
-      end
-    end
-
-    def ensure_web_ui_package_in_package_json(logger)
-      ensure_package_in_package_json(logger, "@cosla/sensemaking-web-ui")
-    end
-
-    def verify_cli_available(package_path, logger)
-      runner_path = File.join(package_path, "runner-cli/health_check_runner.ts")
-
-      Dir.chdir(Rails.root) do
-        output = `npx ts-node #{runner_path} --help 2>&1`
-
-        if $?.success?
-          logger.info "Sensemaker CLI tool is working correctly."
-        else
-          logger.warn output
-          logger.warn "Failed to run Sensemaker CLI tool. Please check the installation."
-          raise "Failed to run Sensemaker CLI tool. Please check the installation."
-        end
-      end
-    end
-
-    def set_file_permissions(sensemaker_path, data_path, logger)
-      logger.info "Setting file permissions..."
-      FileUtils.chmod_R(0755, sensemaker_path)
-      FileUtils.chmod_R(0755, data_path)
-      logger.info "File permissions set."
     end
 
     def add_feature_flag(logger)
@@ -393,5 +372,9 @@ namespace :sensemaker do
         setting.update!(value: "true")
         logger.info "Sensemaker enabled using feature.sensemaker setting."
       end
+    end
+
+    def runtime_config
+      @runtime_config ||= Sensemaker::RuntimeConfig.new(setting: Setting, llm_context: Llm::Config.context)
     end
 end

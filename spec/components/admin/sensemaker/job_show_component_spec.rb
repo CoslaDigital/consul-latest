@@ -1,4 +1,5 @@
 require "rails_helper"
+require "cgi"
 
 describe Admin::Sensemaker::JobShowComponent do
   let(:user) { create(:user) }
@@ -38,24 +39,40 @@ describe Admin::Sensemaker::JobShowComponent do
     end
 
     context "when job can be downloaded" do
-      let(:artefact_path) do
-        File.join(Sensemaker::Paths.sensemaker_data_folder, sensemaker_job.output_file_name)
-      end
+      let(:input_path) { sensemaker_job.default_input_csv }
+      let(:artefact_path) { sensemaker_job.primary_artefact_path }
+
       before do
         sensemaker_job.update!(
           finished_at: Time.current,
-          error: nil
+          error: nil,
+          input_file: input_path
         )
 
-        data_folder = Sensemaker::Paths.sensemaker_data_folder
-        FileUtils.mkdir_p(data_folder)
+        FileUtils.mkdir_p(File.dirname(input_path))
+        File.write(input_path, "participant_id,survey_text\n1,test")
+        FileUtils.mkdir_p(File.dirname(artefact_path))
         File.write(artefact_path, "test")
       end
 
-      it "renders a download link for the output file" do
+      after do
+        FileUtils.rm_f(input_path)
+        FileUtils.rm_f(artefact_path)
+      end
+
+      it "renders grouped download links for input and output files" do
         render_inline(component)
 
+        expect(page).to have_content("Files")
+        expect(page).to have_content("Input files")
+        expect(page).to have_content("Output files")
+        expect(page).to have_link(File.basename(input_path))
         expect(page).to have_link(File.basename(artefact_path))
+        expected_relative = "job-#{sensemaker_job.id}/#{File.basename(artefact_path)}"
+        encoded_relative = CGI.escape(expected_relative)
+        expect(page.native.to_html).to include(
+          "/admin/sensemaker/jobs/#{sensemaker_job.id}/download?artefact=#{encoded_relative}"
+        )
       end
     end
 

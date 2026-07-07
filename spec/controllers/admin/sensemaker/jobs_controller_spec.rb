@@ -11,11 +11,74 @@ describe Admin::Sensemaker::JobsController do
 
   before { sign_in(admin) }
 
+  def create_report_ui_job_with_output(attrs = {})
+    job = create(:sensemaker_job, :publishable,
+                 user: admin,
+                 analysable_type: "Debate",
+                 analysable_id: debate.id,
+                 published: false,
+                 **attrs)
+    output_path = job.default_output_path
+    FileUtils.mkdir_p(File.dirname(output_path))
+    File.write(output_path, "<html><body>Test Report</body></html>")
+    job
+  end
+
   describe "GET #index" do
-    it "returns successful response" do
+    it "returns successful response and sets no filter_target when no filter params" do
       get :index
 
       expect(response).to have_http_status(:ok)
+      expect(controller.instance_variable_get(:@filter_target)).to be(nil)
+    end
+
+    context "when filtering by resource_type and resource_id" do
+      let!(:debate_job) do
+        create(:sensemaker_job,
+               user: admin,
+               analysable_type: "Debate",
+               analysable_id: debate.id,
+               parent_job_id: nil,
+               started_at: nil,
+               finished_at: 1.day.ago)
+      end
+      let!(:other_job) do
+        create(:sensemaker_job,
+               user: admin,
+               analysable_type: "Debate",
+               analysable_id: create(:debate).id,
+               parent_job_id: nil,
+               started_at: nil,
+               finished_at: 1.day.ago)
+      end
+
+      it "sets filter_target and scopes jobs to that resource" do
+        get :index, params: { resource_type: "debates", resource_id: debate.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(controller.instance_variable_get(:@filter_target)).to eq(debate)
+        jobs = controller.instance_variable_get(:@sensemaker_jobs)
+        expect(jobs).to include(debate_job)
+        expect(jobs).not_to include(other_job)
+      end
+    end
+
+    context "when target is not found" do
+      it "redirects to index with alert" do
+        get :index, params: { resource_type: "debates", resource_id: 99999 }
+
+        expect(response).to redirect_to(admin_sensemaker_jobs_path)
+        expect(flash[:alert]).to be_present
+      end
+    end
+
+    context "when resource_type is unknown" do
+      it "redirects to index with alert" do
+        get :index, params: { resource_type: "unknown_type", resource_id: 1 }
+
+        expect(response).to redirect_to(admin_sensemaker_jobs_path)
+        expect(flash[:alert]).to be_present
+      end
     end
   end
 
@@ -29,11 +92,12 @@ describe Admin::Sensemaker::JobsController do
 
   describe "GET #download" do
     let(:job) { sensemaker_job }
+    let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
 
     context "when artefact param is provided and valid" do
-      let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
-      let(:basename) { "artefact-#{SecureRandom.hex}.json" }
-      let(:tmp_file) { File.join(data_folder, basename) }
+      let(:relative_path) { "job-#{job.id}/artefact-#{SecureRandom.hex}.json" }
+      let(:basename) { File.basename(relative_path) }
+      let(:tmp_file) { File.join(data_folder, relative_path) }
 
       before do
         FileUtils.mkdir_p(File.dirname(tmp_file))
@@ -47,10 +111,42 @@ describe Admin::Sensemaker::JobsController do
       end
 
       it "sends the requested artefact file" do
-        get :download, params: { id: job.id, artefact: basename }
+        get :download, params: { id: job.id, artefact: relative_path }
 
         expect(response).to have_http_status(:ok)
         expect(response.header["Content-Disposition"]).to include(basename)
+      end
+    end
+
+    context "when input artefact param is provided and valid" do
+      let(:relative_path) { "job-#{job.id}/input-#{SecureRandom.hex}.csv" }
+      let(:basename) { File.basename(relative_path) }
+      let(:tmp_file) { File.join(data_folder, relative_path) }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(tmp_file))
+        File.write(tmp_file, "comment-id,comment_text\n1,test")
+        job.update!(input_file: tmp_file)
+      end
+
+      after do
+        FileUtils.rm_f(tmp_file)
+      end
+
+      it "sends the requested input artefact file" do
+        get :download, params: { id: job.id, artefact: relative_path }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.header["Content-Disposition"]).to include(basename)
+      end
+    end
+
+    context "when artefact path attempts traversal" do
+      it "redirects to show with alert" do
+        get :download, params: { id: job.id, artefact: "../../etc/passwd" }
+
+        expect(response).to redirect_to(admin_sensemaker_job_path(job))
+        expect(flash[:alert]).to be_present
       end
     end
 
@@ -140,7 +236,7 @@ describe Admin::Sensemaker::JobsController do
         sensemaker_job: {
           analysable_type: "Debate",
           analysable_id: debate.id,
-          script: "categorization_runner.ts",
+          script: "categorize",
           additional_context: "Test context"
         }
       }
@@ -159,7 +255,7 @@ describe Admin::Sensemaker::JobsController do
       expect(job.user).to eq(admin)
       expect(job.analysable_type).to eq("Debate")
       expect(job.analysable_id).to eq(debate.id)
-      expect(job.script).to eq("categorization_runner.ts")
+      expect(job.script).to eq("categorize")
       expect(job.started_at).to be_present
     end
 
@@ -172,25 +268,7 @@ describe Admin::Sensemaker::JobsController do
     end
 
     context "with quick_action" do
-      it "creates job with runner.ts when quick_action is summary" do
-        allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
-        allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
-        allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
-
-        post :create, params: {
-          sensemaker_job: {
-            analysable_type: "Debate",
-            analysable_id: debate.id,
-            additional_context: "Test"
-          },
-          quick_action: "summary"
-        }
-
-        job = Sensemaker::Job.last
-        expect(job.script).to eq("runner.ts")
-      end
-
-      it "creates job with single-html-build.js when quick_action is report" do
+      it "creates job with report_ui when quick_action is report" do
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
@@ -205,7 +283,25 @@ describe Admin::Sensemaker::JobsController do
         }
 
         job = Sensemaker::Job.last
-        expect(job.script).to eq("single-html-build.js")
+        expect(job.script).to eq("report_ui")
+      end
+
+      it "creates job with ranked_propositions when quick_action is ranked_propositions" do
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
+
+        post :create, params: {
+          sensemaker_job: {
+            analysable_type: "Debate",
+            analysable_id: debate.id,
+            additional_context: "Test"
+          },
+          quick_action: "ranked_propositions"
+        }
+
+        job = Sensemaker::Job.last
+        expect(job.script).to eq("ranked_propositions")
       end
     end
 
@@ -232,7 +328,7 @@ describe Admin::Sensemaker::JobsController do
         sensemaker_job: {
           analysable_type: "Debate",
           analysable_id: debate.id,
-          script: "categorization_runner.ts"
+          script: "categorize"
         }
       }
     end
@@ -243,7 +339,7 @@ describe Admin::Sensemaker::JobsController do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Additional context")
       expect(response.body).to include("Input CSV")
-      expect(response.body).to include("comment-id,comment_text")
+      expect(response.body).to include("participant_id,survey_text")
     end
 
     it "handles missing analysable" do
@@ -293,27 +389,11 @@ describe Admin::Sensemaker::JobsController do
   end
 
   describe "PATCH #publish" do
-    let(:successful_job) do
-      output_path = Rails.root.join("tmp", "test-report-#{SecureRandom.hex}.html").to_s
-      FileUtils.mkdir_p(File.dirname(output_path))
-      File.write(output_path, "<html><body>Test Report</body></html>")
-
-      create(:sensemaker_job,
-             user: admin,
-             analysable_type: "Debate",
-             analysable_id: debate.id,
-             script: "single-html-build.js",
-             started_at: 1.hour.ago,
-             finished_at: Time.current,
-             error: nil,
-             published: false,
-             persisted_output: output_path)
-    end
+    let(:successful_job) { create_report_ui_job_with_output }
 
     after do
-      if successful_job&.persisted_output.present?
-        FileUtils.rm_f(successful_job.persisted_output)
-      end
+      output_path = successful_job&.default_output_path
+      FileUtils.rm_f(output_path) if output_path.present? && File.exist?(output_path)
     end
 
     context "when job is eligible for publishing" do
@@ -338,7 +418,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "report_ui",
                started_at: Time.current,
                finished_at: nil,
                error: nil,
@@ -366,7 +446,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "report_ui",
                started_at: 1.hour.ago,
                finished_at: Time.current,
                error: "Some error occurred",
@@ -394,7 +474,7 @@ describe Admin::Sensemaker::JobsController do
                user: admin,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "report_ui",
                started_at: 1.hour.ago,
                finished_at: Time.current,
                error: nil,
@@ -419,26 +499,23 @@ describe Admin::Sensemaker::JobsController do
 
     context "when job script is not publishable" do
       let(:non_publishable_job) do
-        output_path = Rails.root.join("tmp", "test-report-#{SecureRandom.hex}.html").to_s
+        job = create(:sensemaker_job, :categorize,
+                     user: admin,
+                     analysable_type: "Debate",
+                     analysable_id: debate.id,
+                     started_at: 1.hour.ago,
+                     finished_at: Time.current,
+                     error: nil,
+                     published: false)
+        output_path = job.default_output_path
         FileUtils.mkdir_p(File.dirname(output_path))
-        File.write(output_path, "<html><body>Test Report</body></html>")
-
-        create(:sensemaker_job,
-               user: admin,
-               analysable_type: "Debate",
-               analysable_id: debate.id,
-               script: "categorization_runner.ts",
-               started_at: 1.hour.ago,
-               finished_at: Time.current,
-               error: nil,
-               published: false,
-               persisted_output: output_path)
+        File.write(output_path, "participant_id,survey_text\n")
+        job
       end
 
       after do
-        if non_publishable_job&.persisted_output.present?
-          FileUtils.rm_f(non_publishable_job.persisted_output)
-        end
+        output_path = non_publishable_job&.default_output_path
+        FileUtils.rm_f(output_path) if output_path.present? && File.exist?(output_path)
       end
 
       it "does not publish the job" do
@@ -455,83 +532,18 @@ describe Admin::Sensemaker::JobsController do
         expect(flash[:alert]).to be_present
       end
     end
-
-    context "when job script is runner.ts" do
-      let(:runner_job) do
-        data_folder = Sensemaker::Paths.sensemaker_data_folder
-        base_path = File.join(data_folder, "output-#{SecureRandom.hex}")
-        output_files = [
-          "#{base_path}-summary.json",
-          "#{base_path}-summary.html",
-          "#{base_path}-summary.md",
-          "#{base_path}-summaryAndSource.csv"
-        ]
-
-        FileUtils.mkdir_p(File.dirname(base_path))
-        output_files.each { |file| File.write(file, "test content") }
-
-        create(:sensemaker_job,
-               user: admin,
-               analysable_type: "Debate",
-               analysable_id: debate.id,
-               script: "runner.ts",
-               started_at: 1.hour.ago,
-               finished_at: Time.current,
-               error: nil,
-               published: false,
-               persisted_output: base_path)
-      end
-
-      after do
-        if runner_job&.persisted_output.present?
-          base_path = runner_job.persisted_output
-          [
-            "#{base_path}-summary.json",
-            "#{base_path}-summary.html",
-            "#{base_path}-summary.md",
-            "#{base_path}-summaryAndSource.csv"
-          ].each { |file| FileUtils.rm_f(file) }
-        end
-      end
-
-      it "publishes the job" do
-        patch :publish, params: { id: runner_job.id }
-
-        runner_job.reload
-        expect(runner_job.published).to be true
-      end
-
-      it "redirects to job show page with success notice" do
-        patch :publish, params: { id: runner_job.id }
-
-        expect(response).to redirect_to(admin_sensemaker_job_path(runner_job))
-        expect(flash[:notice]).to be_present
-      end
-    end
   end
 
   describe "PATCH #unpublish" do
     let(:published_job) do
-      output_path = Rails.root.join("tmp", "test-report-#{SecureRandom.hex}.html").to_s
-      FileUtils.mkdir_p(File.dirname(output_path))
-      File.write(output_path, "<html><body>Test Report</body></html>")
-
-      create(:sensemaker_job,
-             user: admin,
-             analysable_type: "Debate",
-             analysable_id: debate.id,
-             script: "single-html-build.js",
-             started_at: 1.hour.ago,
-             finished_at: Time.current,
-             error: nil,
-             published: true,
-             persisted_output: output_path)
+      job = create_report_ui_job_with_output
+      job.update!(published: true)
+      job
     end
 
     after do
-      if published_job&.persisted_output.present?
-        FileUtils.rm_f(published_job.persisted_output)
-      end
+      output_path = published_job&.default_output_path
+      FileUtils.rm_f(output_path) if output_path.present? && File.exist?(output_path)
     end
 
     it "unpublishes the job" do

@@ -35,8 +35,7 @@ class Setting < ApplicationRecord
     end
 
     def remove(key)
-      setting = find_by(key: key)
-      setting.destroy if setting.present?
+      find_by(key: key).presence&.destroy
     end
 
     def accepted_content_types_for(group)

@@ -17,7 +17,7 @@ en:
       title_with_resource: "Sensemaker Analysis: %{resource_name}"
       hero_title_with_resource: "Discover what citizens are saying about %{resource_type}"
       hero_title_all_proposals: "Discover what citizens are saying about proposals"
-      page_intro: "Here you can find reports and summaries to better understand everyone's input, produced using %{link}."
+      page_intro: "Here you can find interactive reports to better understand everyone's input, produced using %{link}."
       resource_type_phrases:
         proposal: "this proposal"
         debate: "this debate"
@@ -58,15 +58,13 @@ en:
           all_proposals: "Citizens were asked for their input on proposals. The comments and discussions from citizens were used as input for Sensemaker analysis."
           generic: "Citizens were asked for their input on \"%{resource_title}\". The comments and discussions from citizens were used as input for Sensemaker analysis."
         how_created: "Sensemaker uses AI to analyze large-scale citizen conversations, helping identify patterns, themes, and areas of agreement and disagreement."
-        what_to_expect: "Reports provide detailed analysis including topic identification, categorization, and insights. Summaries offer concise overviews of key themes and findings."
+        what_to_expect: "Reports provide detailed analysis including topic identification, categorization, and insights into areas of agreement and disagreement."
         more_info: "For more information, see the %{link}."
         more_info_link: "Sensemaker homepage"
       script_type:
         report: "Report"
-        summary: "Summary"
       view_job: "View Analysis"
       view_report: "View Report"
-      view_summary: "View Summary"
       completed_at: "Completed"
 
     report_view:

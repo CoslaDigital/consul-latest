@@ -48,7 +48,7 @@ describe Sensemaker::BudgetJobIndexComponent do
         create(:sensemaker_job,
                analysable_type: "Budget",
                analysable_id: budget.id,
-               script: "single-html-build.js",
+               script: "report_ui",
                finished_at: Time.current)
       end
       let(:jobs) { [job] }

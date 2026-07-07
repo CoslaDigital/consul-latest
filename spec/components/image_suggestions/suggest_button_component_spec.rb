@@ -1,11 +1,11 @@
 require "rails_helper"
 
-describe Images::SuggestImagesComponent do
+describe ImageSuggestions::SuggestButtonComponent do
   let(:budget_investment) { build(:budget_investment) }
   let(:form) do
     ConsulFormBuilder.new(:budget_investment, budget_investment, ApplicationController.new.view_context, {})
   end
-  let(:component) { Images::SuggestImagesComponent.new(form) }
+  let(:component) { ImageSuggestions::SuggestButtonComponent.new(form) }
 
   before do
     Setting["llm.provider"] = nil
@@ -39,7 +39,8 @@ describe Images::SuggestImagesComponent do
         it "renders data-resource-id with the object id" do
           render_inline component
 
-          expect(page).to have_css ".suggested-images-wrapper[data-resource-type='Budget::Investment'][data-resource-id='#{budget_investment.id}']"
+          expect(page).to have_css ".suggested-images-wrapper[data-resource-type='Budget::Investment']"
+          expect(page).to have_css ".suggested-images-wrapper[data-resource-id='#{budget_investment.id}']"
         end
       end
     end

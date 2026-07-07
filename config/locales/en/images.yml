@@ -23,5 +23,6 @@ en:
       messages:
         title_and_description_required: To suggest images, please write a title and description first.
         llm_not_configured: LLM is not properly configured. Please contact an administrator.
+        rate_limit_exceeded: Please wait a few minutes before generating new suggestions.
         in_between: must be in between %{min} and %{max}
         wrong_content_type: content type %{content_type} does not match any of accepted content types %{accepted_content_types}

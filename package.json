@@ -1,9 +1,10 @@
 {
   "name": "consuldemocracy",
   "dependencies": {
-    "@cosla/sensemaking-tools": "^1.0.3",
-    "@cosla/sensemaking-web-ui": "^1.0.7",
+    "@cosla/sensemaking-report-generator": "^1.0.0",
     "blueimp-file-upload": "^10.32.0",
+    "c3": "0.4.23",
+    "d3": "3.5.17",
     "foundation-sites": "^6.8.1",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.13.3",
@@ -13,11 +14,11 @@
     "markdown-it": "^14.1.1"
   },
   "devDependencies": {
-    "@stylistic/stylelint-plugin": "^4.0.0",
+    "@stylistic/stylelint-plugin": "^5.1.0",
     "eslint": "^9.39.4",
     "postcss-scss": "^4.0.9",
-    "stylelint": "^16.26.1",
-    "stylelint-order": "^7.0.1",
-    "stylelint-scss": "^6.12.1"
+    "stylelint": "^17.8.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-scss": "^7.0.0"
   }
 }

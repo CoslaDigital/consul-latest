@@ -1,4 +1,4 @@
-class Images::SuggestImagesComponent < ApplicationComponent
+class ImageSuggestions::SuggestButtonComponent < ApplicationComponent
   attr_reader :form
 
   def initialize(form)
@@ -6,8 +6,7 @@ class Images::SuggestImagesComponent < ApplicationComponent
   end
 
   def render?
-    [Setting["llm.provider"], Setting["llm.model"],
-     Setting["llm.use_ai_image_suggestions"]].all?(&:present?)
+    ::Llm::Config.configured? && Setting["llm.use_ai_image_suggestions"].present?
   end
 
   private

@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Llm::Config do
   describe ".context" do
-    let(:config) { instance_double(RubyLLM::Configuration) }
+    let(:config) { double }
     let(:context_double) { double("RubyLLM::Context", config: config) }
 
     before do
@@ -49,7 +49,7 @@ describe Llm::Config do
     end
 
     it "maps provider enabled status using RubyLLM providers" do
-      context = double("RubyLLM::Context", config: instance_double(RubyLLM::Configuration))
+      context = double("RubyLLM::Context", config: double)
       allow(Llm::Config).to receive(:context).and_return(context)
       allow(RubyLLM::Providers).to receive(:constants).and_return([:OpenAI])
 

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :sensemaker_job, class: "Sensemaker::Job" do
     user
-    script { "categorization_runner.ts" }
+    script { "categorize" }
     started_at { Time.current }
     finished_at { nil }
     error { nil }
@@ -11,20 +11,50 @@ FactoryBot.define do
     published { false }
 
     trait :unpublished do
-      script { "runner.ts" }
       published { false }
     end
 
     trait :published do
-      script { "runner.ts" }
+      script { "report_ui" }
       published { true }
     end
 
+    trait :health_check do
+      script { "health_check" }
+    end
+
+    trait :categorize do
+      script { "categorize" }
+    end
+
+    trait :bridge_scores do
+      script { "bridge_scores" }
+    end
+
+    trait :report_text do
+      script { "report_text" }
+    end
+
+    trait :report_ui do
+      script { "report_ui" }
+    end
+
+    trait :propositions do
+      script { "propositions" }
+    end
+
+    trait :refine_propositions do
+      script { "refine_propositions" }
+    end
+
+    trait :ranked_propositions do
+      script { "ranked_propositions" }
+    end
+
     trait :publishable do
-      script { "single-html-build.js" }
+      script { "report_ui" }
       finished_at { Time.current }
       error { nil }
-      published { false }
     end
   end
 end

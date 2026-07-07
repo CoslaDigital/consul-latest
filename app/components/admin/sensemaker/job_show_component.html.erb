@@ -71,11 +71,6 @@
                 </td>
               </tr>
             <% end %>
-          </table>
-        </div>
-
-        <div class="small-12 medium-6 column">
-          <table class="job-details-table">
             <tr>
               <td><strong><%= t("admin.sensemaker.job_show.target_type") %></strong></td>
               <td><%= sensemaker_job.analysable_type %></td>
@@ -85,6 +80,11 @@
               <td><%= analysable_title %></td>
             </tr>
           </table>
+        </div>
+
+        <div class="small-12 medium-6 column additional-context">
+          <h5><%= t("admin.sensemaker.job_show.additional_context") %></h5>
+          <pre class="small"><%= sensemaker_job.additional_context %></pre>
         </div>
       </div>
     </section>
@@ -124,15 +124,44 @@
       </section>
     <% end %>
 
-    <% if sensemaker_job.finished? && !has_error? %>
+    <% if sensemaker_job.finished? %>
       <section class="margin-bottom">
-        <h3><%= t("admin.sensemaker.job_show.output_files") %></h3>
+        <h3><%= t("admin.sensemaker.job_show.files") %></h3>
         <p class="help-text"><%= t("admin.sensemaker.job_show.select_file_download") %></p>
+
+        <h4><%= t("admin.sensemaker.job_show.input_files") %></h4>
         <ul>
-          <% sensemaker_job.existing_output_artefact_paths.each do |path| %>
-            <li>
-              <%= link_to ::File.basename(path), download_admin_sensemaker_job_path(sensemaker_job, artefact: ::File.basename(path)) %>
-            </li>
+          <% input_paths = sensemaker_job.existing_input_artefact_paths %>
+          <% if input_paths.any? %>
+            <% input_paths.each do |path| %>
+              <li>
+                <%= link_to ::File.basename(path),
+                            download_admin_sensemaker_job_path(
+                              sensemaker_job,
+                              artefact: artefact_param_for(path)
+                            ) %>
+              </li>
+            <% end %>
+          <% else %>
+            <li class="small italic"><%= t("admin.sensemaker.job_show.none_available") %></li>
+          <% end %>
+        </ul>
+
+        <h4><%= t("admin.sensemaker.job_show.output_files") %></h4>
+        <ul>
+          <% output_paths = sensemaker_job.existing_output_artefact_paths %>
+          <% if output_paths.any? %>
+            <% output_paths.each do |path| %>
+              <li>
+                <%= link_to ::File.basename(path),
+                            download_admin_sensemaker_job_path(
+                              sensemaker_job,
+                              artefact: artefact_param_for(path)
+                            ) %>
+              </li>
+            <% end %>
+          <% else %>
+            <li class="small italic"><%= t("admin.sensemaker.job_show.none_available") %></li>
           <% end %>
         </ul>
       </section>

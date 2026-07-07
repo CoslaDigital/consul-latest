@@ -22,5 +22,6 @@ es:
       messages:
         title_and_description_required: Para sugerir imágenes, por favor escribe primero un título y una descripción.
         llm_not_configured: El LLM no está configurado correctamente. Por favor, contacta con un administrador.
+        rate_limit_exceeded: Espera unos minutos antes de generar nuevas sugerencias.
         in_between: debe estar entre %{min} y %{max}
         wrong_content_type: El tipo de contenido %{content_type} de la imagen no coincide con ninguno de los tipos de contenido aceptados %{accepted_content_types}

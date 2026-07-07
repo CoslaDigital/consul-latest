@@ -5,7 +5,13 @@ describe Sensemaker::JobIndexComponent do
 
   let(:debate) { create(:debate, title: "Test Debate") }
   let(:jobs) { [] }
-  let(:component) { Sensemaker::JobIndexComponent.new(jobs: jobs, parent_resource: parent_resource, resource: resource) }
+  let(:component) do
+    Sensemaker::JobIndexComponent.new(
+      jobs: jobs,
+      parent_resource: parent_resource,
+      resource: resource
+    )
+  end
   let(:parent_resource) { nil }
   let(:resource) { debate }
 
@@ -73,8 +79,8 @@ describe Sensemaker::JobIndexComponent do
   end
 
   describe "#script_type_tag" do
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is report_ui" do
+      let(:job) { create(:sensemaker_job, script: "report_ui") }
 
       it "returns Report" do
         render_inline component
@@ -82,21 +88,12 @@ describe Sensemaker::JobIndexComponent do
       end
     end
 
-    context "when script is runner.ts" do
-      let(:job) { create(:sensemaker_job, script: "runner.ts") }
-
-      it "returns Summary" do
-        render_inline component
-        expect(component.script_type_tag(job)).to eq(I18n.t("sensemaker.job_index.script_type.summary"))
-      end
-    end
-
     context "when script is something else" do
-      let(:job) { create(:sensemaker_job, script: "other-script.js") }
+      let(:job) { create(:sensemaker_job, script: "categorize") }
 
       it "returns the script name" do
         render_inline component
-        expect(component.script_type_tag(job)).to eq("other-script.js")
+        expect(component.script_type_tag(job)).to eq("categorize")
       end
     end
   end
@@ -134,7 +131,7 @@ describe Sensemaker::JobIndexComponent do
         create(:sensemaker_job,
                analysable_type: "Debate",
                analysable_id: debate.id,
-               script: "single-html-build.js",
+               script: "report_ui",
                finished_at: Time.current,
                comments_analysed: 10)
       end
@@ -148,26 +145,6 @@ describe Sensemaker::JobIndexComponent do
                                 resource_type: I18n.t("sensemaker.job_index.resource_type_phrases.debate"))
         expect(page).to have_content(expected_title)
         expect(page).to have_link(I18n.t("sensemaker.job_index.view_report"),
-                                  href: serve_report_sensemaker_job_path(job))
-      end
-    end
-
-    context "when job is a summary (runner.ts)" do
-      let(:job) do
-        create(:sensemaker_job,
-               analysable_type: "Debate",
-               analysable_id: debate.id,
-               script: "runner.ts",
-               finished_at: Time.current,
-               comments_analysed: 10)
-      end
-      let(:jobs) { [job] }
-
-      it "renders the jobs as cards with View Summary link" do
-        allow(job).to receive(:has_outputs?).and_return(true)
-        render_inline component
-
-        expect(page).to have_link(I18n.t("sensemaker.job_index.view_summary"),
                                   href: serve_report_sensemaker_job_path(job))
       end
     end

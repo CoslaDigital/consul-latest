@@ -44,6 +44,49 @@ describe ImageSuggestionsController do
         }, format: :js
       end.to raise_error(ActionController::ParameterMissing)
     end
+
+    context "when rate limit is exceeded" do
+      render_views
+
+      let(:params) { { resource_type: resource_type, budget_investment: budget_investment_params } }
+
+      before { ImageSuggestionsController.cache_store.clear }
+
+      it "renders rate limit error message" do
+        10.times { post :create, params: params, format: :js }
+
+        post :create, params: params, format: :js
+
+        expect(response).to be_successful
+        expect(response.body).to include "Please wait a few minutes before generating new suggestions."
+      end
+
+      it "allows new requests after waiting a few minutes" do
+        10.times { post :create, params: params, format: :js }
+
+        post :create, params: params, format: :js
+
+        expect(response).to be_successful
+        expect(response.body).to include "Please wait a few minutes before generating new suggestions."
+
+        travel_to(15.minutes.from_now + 1.second) do
+          post :create, params: params, format: :js
+
+          expect(response).to be_successful
+          expect(response.body).not_to include "Please wait a few minutes before generating new suggestions."
+        end
+      end
+
+      it "does not affect other users" do
+        10.times { post :create, params: params, format: :js }
+
+        sign_in create(:user)
+        post :create, params: params, format: :js
+
+        expect(response).to be_successful
+        expect(response.body).not_to include "Please wait a few minutes before generating new suggestions."
+      end
+    end
   end
 
   describe "POST attach" do

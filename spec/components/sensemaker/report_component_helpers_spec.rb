@@ -66,27 +66,19 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#script_type_tag" do
     before { render_inline host }
 
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is report_ui" do
+      let(:job) { create(:sensemaker_job, script: "report_ui") }
 
       it "returns Report translation" do
         expect(host.script_type_tag(job)).to eq(I18n.t("sensemaker.job_index.script_type.report"))
       end
     end
 
-    context "when script is runner.ts" do
-      let(:job) { create(:sensemaker_job, script: "runner.ts") }
-
-      it "returns Summary translation" do
-        expect(host.script_type_tag(job)).to eq(I18n.t("sensemaker.job_index.script_type.summary"))
-      end
-    end
-
     context "when script is something else" do
-      let(:job) { create(:sensemaker_job, script: "other-script.js") }
+      let(:job) { create(:sensemaker_job, script: "categorize") }
 
       it "returns the script name" do
-        expect(host.script_type_tag(job)).to eq("other-script.js")
+        expect(host.script_type_tag(job)).to eq("categorize")
       end
     end
   end
@@ -94,19 +86,19 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#view_job_text" do
     before { render_inline host }
 
-    context "when script is single-html-build.js" do
-      let(:job) { create(:sensemaker_job, script: "single-html-build.js") }
+    context "when script is report_ui" do
+      let(:job) { create(:sensemaker_job, script: "report_ui") }
 
       it "returns view_report translation" do
         expect(host.view_job_text(job)).to eq(I18n.t("sensemaker.job_index.view_report"))
       end
     end
 
-    context "when script is runner.ts" do
-      let(:job) { create(:sensemaker_job, script: "runner.ts") }
+    context "when script is something else" do
+      let(:job) { create(:sensemaker_job, script: "categorize") }
 
-      it "returns view_summary translation" do
-        expect(host.view_job_text(job)).to eq(I18n.t("sensemaker.job_index.view_summary"))
+      it "returns view_job translation" do
+        expect(host.view_job_text(job)).to eq(I18n.t("sensemaker.job_index.view_job"))
       end
     end
   end
@@ -114,18 +106,13 @@ describe Sensemaker::ReportComponentHelpers do
   describe "#analysis_type_badge_class" do
     before { render_inline host }
 
-    it "returns badge-report for single-html-build.js" do
-      job = create(:sensemaker_job, script: "single-html-build.js")
+    it "returns badge-report for report_ui" do
+      job = create(:sensemaker_job, script: "report_ui")
       expect(host.analysis_type_badge_class(job)).to eq("badge-report")
     end
 
-    it "returns badge-summary for runner.ts" do
-      job = create(:sensemaker_job, script: "runner.ts")
-      expect(host.analysis_type_badge_class(job)).to eq("badge-summary")
-    end
-
     it "returns badge-default for other scripts" do
-      job = create(:sensemaker_job, script: "other-script.js")
+      job = create(:sensemaker_job, script: "categorize")
       expect(host.analysis_type_badge_class(job)).to eq("badge-default")
     end
   end

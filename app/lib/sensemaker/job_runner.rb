@@ -2,16 +2,16 @@ require "shellwords"
 
 module Sensemaker
   class JobRunner
-    TIMEOUT = 1800
-    attr_reader :job
+    TIMEOUT = 2800
+    MAX_CLI_ERROR_OUTPUT = 20_000
+    CLI_OUTPUT_TRUNCATION_OMISSION = "\n\n…[output truncated; showing end of log]…\n\n".freeze
 
-    SCRIPTS = [
-      "health_check_runner.ts",
-      "categorization_runner.ts",
-      "runner.ts",
-      "advanced_runner.ts",
-      "single-html-build.js"
-    ].freeze
+    CONTEXT_SCRIPTS = %w[categorize report_text propositions refine_propositions].freeze
+    INPUT_SCRIPTS = %w[categorize bridge_scores report_text propositions].freeze
+    PKL_INPUT_SCRIPTS = %w[refine_propositions ranked_propositions].freeze
+    LLM_SKIP_SCRIPTS = %w[report_ui ranked_propositions].freeze
+
+    attr_reader :job
 
     def initialize(job)
       @job = job
@@ -30,18 +30,6 @@ module Sensemaker
       1
     end
 
-    def input_file
-      if job.input_file.present?
-        job.input_file
-      elsif job.script == "advanced_runner.ts"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/categorization-output-#{job.id}.csv"
-      elsif job.script == "single-html-build.js"
-        "#{Sensemaker::Paths.sensemaker_data_folder}/advanced-output"
-      else
-        "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{job.id}.csv"
-      end
-    end
-
     def output_file_name
       job.output_file_name
     end
@@ -50,16 +38,20 @@ module Sensemaker
       "#{Sensemaker::Paths.sensemaker_data_folder}/#{output_file_name}"
     end
 
-    def script_file
-      if job.script == "single-html-build.js"
-        "#{Sensemaker::Paths.visualization_folder}/single-html-build.js"
-      else
-        "#{Sensemaker::Paths.sensemaker_package_folder}/runner-cli/#{job.script}"
-      end
+    def sensemaker_adapter
+      runtime_config.adapter
     end
 
-    def project_id
-      llm_context.config.vertexai_project_id.to_s
+    def sensemaker_provider
+      runtime_config.compat_provider
+    end
+
+    def sensemaker_api_key
+      runtime_config.api_key
+    end
+
+    def sensemaker_base_url
+      runtime_config.base_url
     end
 
     def self.enabled?
@@ -67,36 +59,11 @@ module Sensemaker
     end
 
     def build_command
-      if job.script == "single-html-build.js"
-        conversation = job.conversation
-        target_label = conversation.target_label(format: :full)
-
-        return %Q(npx ts-node site-build.ts \
-                 --topics #{input_file}-topic-stats.json \
-                 --summary #{input_file}-summary.json \
-                 --comments #{input_file}-comments-with-scores.json \
-                 --reportTitle "Report for #{target_label}" && \
-                 npx ts-node single-html-build.js --outputFile #{output_file})
-      end
-
-      model_name = Setting["llm.model"]
-      additional_context = nil
-      additional_context = job.additional_context.presence unless job.script == "health_check_runner.ts"
-
-      command = %Q(npx ts-node #{script_file} \
-                 --vertexProject #{project_id} \
-                 --modelName #{model_name})
-      command += " --inputFile #{input_file}" unless job.script == "health_check_runner.ts"
-      if additional_context.present?
-        command += " --additionalContext #{Shellwords.escape(additional_context.to_s)}"
-      end
-      if ["advanced_runner.ts", "runner.ts"].include?(job.script)
-        command += " --outputBasename #{output_file}"
-      else
-        command += " --outputFile #{output_file}"
-      end
-
-      command
+      command_parts = [cli_executable.to_s]
+      append_llm_flags(command_parts)
+      append_script_flags(command_parts)
+      append_additional_context_flags(command_parts)
+      command_parts.join(" ")
     end
 
     private
@@ -105,12 +72,106 @@ module Sensemaker
         @llm_context ||= Llm::Config.context
       end
 
+      def runtime_config
+        @runtime_config ||= Sensemaker::RuntimeConfig.new(setting: Setting, llm_context: llm_context)
+      end
+
+      def cli_executable
+        cli_name = Sensemaker::Scripts.cli_for(job.script)
+        return Sensemaker::Paths.node_cli(cli_name) if report_ui?
+
+        Sensemaker::Paths.sensemaking_cli(cli_name)
+      end
+
+      def report_ui?
+        job.script == "report_ui"
+      end
+
+      def ensure_work_dir!
+        FileUtils.mkdir_p(job.work_dir)
+      end
+
+      def append_llm_flags(command_parts)
+        return if llm_skip_script?
+
+        model_name = runtime_config.model
+        command_parts << "--model_name #{Shellwords.escape(model_name)}" if model_name.present?
+
+        case sensemaker_adapter
+        when "vertex"
+          command_parts << "--adapter vertex"
+          command_parts << "--vertex_project #{Shellwords.escape(runtime_config.vertex_project_id)}"
+          command_parts << "--vertex_location #{Shellwords.escape(runtime_config.vertex_location)}"
+        when "openai-compatible"
+          command_parts << "--adapter openai-compatible"
+          command_parts << "--provider #{Shellwords.escape(sensemaker_provider)}"
+          command_parts << "--api_key #{Shellwords.escape(sensemaker_api_key)}" if sensemaker_api_key.present?
+        when "gemini"
+          command_parts << "--adapter gemini"
+          command_parts << "--api_key #{Shellwords.escape(sensemaker_api_key)}" if sensemaker_api_key.present?
+        end
+        if sensemaker_base_url.present?
+          command_parts << "--base_url #{Shellwords.escape(sensemaker_base_url)}"
+        end
+      end
+
+      def append_script_flags(command_parts)
+        work_dir = job.work_dir
+
+        case job.script
+        when "health_check"
+          command_parts << "--output_file #{Shellwords.escape(File.join(work_dir, job.output_file_name))}"
+        when "categorize"
+          command_parts << "--input_file #{Shellwords.escape(job.input_file)}"
+          command_parts << "--output_dir #{Shellwords.escape(work_dir)}"
+          command_parts << "--skip_autoraters"
+        when "bridge_scores"
+          command_parts << "--input_csv #{Shellwords.escape(job.input_file)}"
+          command_parts << "--output_csv #{Shellwords.escape(File.join(work_dir, job.output_file_name))}"
+          command_parts << "--scorer_type GEMINI"
+        when "report_text"
+          command_parts << "--input_csv #{Shellwords.escape(job.input_file)}"
+          command_parts << "--output_dir #{Shellwords.escape(work_dir)}"
+        when "propositions"
+          command_parts << "--r1_input_file #{Shellwords.escape(job.input_file)}"
+          command_parts << "--output_dir #{Shellwords.escape(work_dir)}"
+        when "refine_propositions"
+          command_parts << "--input_pkl #{Shellwords.escape(job.input_file)}"
+          command_parts << "--output_pkl #{Shellwords.escape(File.join(work_dir, job.output_file_name))}"
+          command_parts << "--run_pav_selection"
+          # TODO: consider passing different models
+          # command_parts << "--simulated_jury_model_name #{Shellwords.escape(jury_model)}"
+          # command_parts << "--nuanced_propositions_model_name #{Shellwords.escape(jury_model)}"
+        when "ranked_propositions"
+          output_path = File.join(work_dir, job.output_file_name)
+          command_parts << "--query all_by_topic"
+          command_parts << "--output_format csv"
+          command_parts << Shellwords.escape(job.input_file)
+          command_parts << "> #{Shellwords.escape(output_path)}"
+        when "report_ui"
+          command_parts << "inline"
+          command_parts << "--opinions #{Shellwords.escape(report_ui_opinions_input_file.to_s)}"
+          command_parts << "--summary #{Shellwords.escape(report_ui_summary_input_file.to_s)}"
+          command_parts << "--output #{Shellwords.escape(work_dir)}"
+        end
+      end
+
+      def append_additional_context_flags(command_parts)
+        return unless CONTEXT_SCRIPTS.include?(job.script)
+
+        context = job.additional_context.presence
+        return if context.blank?
+
+        command_parts << "--additional_context #{Shellwords.escape(context.to_s)}"
+      end
+
       def execute_job_workflow
         job.update!(started_at: Time.current)
 
         comments_prepared_count = prepare_input_data
         return unless check_dependencies?
-        return if execute_script.blank?
+        return if execute_script.nil?
+        return unless normalize_report_ui_output!
 
         attribs = { finished_at: Time.current }
         if job.has_outputs?
@@ -130,7 +191,7 @@ module Sensemaker
           parent_job: job,
           analysable_type: job.analysable_type,
           analysable_id: job.analysable_id,
-          script: "categorization_runner.ts",
+          script: "categorize",
           additional_context: job.additional_context
         )
 
@@ -141,55 +202,141 @@ module Sensemaker
           raise "Preparation job #{categorization_job.id} failed"
         end
 
-        job.input_file = categorization_runner.output_file
-        job.save!
+        job.update!(input_file: categorization_job.categorize_output_csv)
 
         categorization_job.comments_analysed
       end
 
-      def prepare_with_advanced_runner_job
-        advanced_job = Sensemaker::Job.create!(
+      def prepare_with_bridge_scores_job
+        comments_count = prepare_with_categorization_job
+
+        bridge_job = Sensemaker::Job.create!(
           user: job.user,
           parent_job: job,
           analysable_type: job.analysable_type,
           analysable_id: job.analysable_id,
-          script: "advanced_runner.ts",
+          script: "bridge_scores",
+          input_file: job.input_file,
           additional_context: job.additional_context
         )
 
-        advanced_runner = Sensemaker::JobRunner.new(advanced_job)
-        advanced_runner.run_synchronously
+        bridge_runner = Sensemaker::JobRunner.new(bridge_job)
+        bridge_runner.run_synchronously
 
-        if advanced_job.reload.errored?
-          raise "Preparation job #{advanced_job.id} failed"
+        if bridge_job.reload.errored?
+          raise "Preparation job #{bridge_job.id} failed"
         end
 
-        job.input_file = advanced_runner.output_file
-        job.save!
+        job.update!(input_file: bridge_job.bridge_scores_csv)
 
-        advanced_job.comments_analysed
+        bridge_job.comments_analysed || comments_count
+      end
+
+      def prepare_with_report_text_job
+        comments_count = prepare_with_bridge_scores_job
+
+        report_job = Sensemaker::Job.create!(
+          user: job.user,
+          parent_job: job,
+          analysable_type: job.analysable_type,
+          analysable_id: job.analysable_id,
+          script: "report_text",
+          input_file: job.input_file,
+          additional_context: job.additional_context
+        )
+
+        report_runner = Sensemaker::JobRunner.new(report_job)
+        report_runner.run_synchronously
+
+        if report_job.reload.errored?
+          raise "Preparation job #{report_job.id} failed"
+        end
+
+        job.update!(input_file: report_job.primary_artefact_path)
+
+        report_job.comments_analysed || comments_count
+      end
+
+      def prepare_with_propositions_job
+        comments_count = prepare_with_categorization_job
+
+        propositions_job = Sensemaker::Job.create!(
+          user: job.user,
+          parent_job: job,
+          analysable_type: job.analysable_type,
+          analysable_id: job.analysable_id,
+          script: "propositions",
+          input_file: job.input_file,
+          additional_context: job.additional_context
+        )
+
+        propositions_runner = Sensemaker::JobRunner.new(propositions_job)
+        propositions_runner.run_synchronously
+
+        if propositions_job.reload.errored?
+          raise "Preparation job #{propositions_job.id} failed"
+        end
+
+        job.update!(input_file: propositions_job.world_model_pkl)
+
+        propositions_job.comments_analysed || comments_count
+      end
+
+      def prepare_with_refine_propositions_job
+        comments_count = prepare_with_propositions_job
+
+        refine_job = Sensemaker::Job.create!(
+          user: job.user,
+          parent_job: job,
+          analysable_type: job.analysable_type,
+          analysable_id: job.analysable_id,
+          script: "refine_propositions",
+          input_file: job.input_file,
+          additional_context: job.additional_context
+        )
+
+        refine_runner = Sensemaker::JobRunner.new(refine_job)
+        refine_runner.run_synchronously
+
+        if refine_job.reload.errored?
+          raise "Preparation job #{refine_job.id} failed"
+        end
+
+        job.update!(input_file: refine_job.refined_world_model_pkl)
+
+        refine_job.comments_analysed || comments_count
       end
 
       def prepare_input_data
         conversation = job.conversation
         comments_prepared_count = 0
+        persisted_input_missing = job.read_attribute(:input_file).blank?
 
         if job.additional_context.blank?
           job.update!(additional_context: conversation.compile_context)
         end
 
-        if job.input_file.blank? && job.script.eql?("advanced_runner.ts")
-          comments_prepared_count = prepare_with_categorization_job
-        elsif job.input_file.blank? && job.script.eql?("single-html-build.js")
-          comments_prepared_count = prepare_with_advanced_runner_job
-        elsif job.input_file.blank?
-          comments_prepared_count = conversation.comments.size
-          exporter = Sensemaker::CsvExporter.new(conversation)
-          exporter.export_to_csv(input_file)
-        end
-
-        if job.script.eql?("advanced_runner.ts")
-          comments_prepared_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(input_file)
+        if persisted_input_missing
+          case job.script
+          when "categorize"
+            comments_prepared_count = conversation.comments.size
+            generated_input_path = job.default_input_csv
+            ensure_work_dir!
+            Sensemaker::CsvExporter.new(conversation).export_to_csv(generated_input_path)
+            job.update!(input_file: generated_input_path)
+          when "bridge_scores", "propositions"
+            comments_prepared_count = prepare_with_categorization_job
+          when "report_text"
+            comments_prepared_count = prepare_with_bridge_scores_job
+          when "refine_propositions"
+            comments_prepared_count = prepare_with_propositions_job
+          when "ranked_propositions"
+            unless ranked_propositions_export_only?
+              comments_prepared_count = prepare_with_refine_propositions_job
+            end
+          when "report_ui"
+            comments_prepared_count = prepare_with_report_text_job
+          end
         end
 
         comments_prepared_count
@@ -203,7 +350,40 @@ module Sensemaker
           return false
         end
 
-        if llm_context.config.vertexai_project_id.blank?
+        return false unless file_exists?(Sensemaker::Paths.sensemaker_data_folder,
+                                         description: "Sensemaker data folder")
+
+        cli_path = cli_executable
+        return false unless file_exists?(cli_path, description: "Sensemaker CLI (#{job.script})")
+
+        if report_ui?
+          return false unless file_exists?(
+            report_ui_opinions_input_file,
+            description: "Report UI opinions input"
+          )
+          return false unless file_exists?(
+            report_ui_summary_input_file,
+            description: "Report UI summary input"
+          )
+
+          return true
+        end
+
+        if ranked_propositions?
+          return false unless file_exists?(job.input_file, description: "Refined world model input")
+
+          return true
+        end
+
+        unless runtime_config.cli_supported?
+          message = "Sensemaker LLM provider is not supported. Current provider: " \
+                    "#{runtime_config.provider.presence || "(not set)"}."
+          job.update!(finished_at: Time.current, error: message)
+          Rails.logger.error(message)
+          return false
+        end
+
+        if sensemaker_adapter == "vertex" && runtime_config.vertex_project_id.blank?
           message = "Vertex AI is not configured. Set tenant secrets llm.vertexai_project_id " \
                     "(and optionally vertexai_location)."
           job.update!(finished_at: Time.current, error: message)
@@ -211,17 +391,23 @@ module Sensemaker
           return false
         end
 
-        provider = Setting["llm.provider"].to_s
-        unless provider.downcase.include?("vertex")
-          message = "Sensemaker requires Vertex AI as the LLM provider. " \
-                    "Current provider: #{provider.presence || "(not set)"}. Set it in Admin → Settings → LLM."
+        if runtime_config.model.blank?
+          message = "Sensemaker requires an LLM model to be selected. Set it in Admin → Settings → LLM."
           job.update!(finished_at: Time.current, error: message)
           Rails.logger.error(message)
           return false
         end
 
-        if Setting["llm.model"].blank?
-          message = "Sensemaker requires an LLM model to be selected. Set it in Admin → Settings → LLM."
+        if sensemaker_adapter == "openai-compatible" && sensemaker_api_key.blank?
+          message = "Sensemaker requires an API key for provider '#{sensemaker_provider}'. " \
+                    "Set tenant secret llm.#{sensemaker_provider}_api_key."
+          job.update!(finished_at: Time.current, error: message)
+          Rails.logger.error(message)
+          return false
+        end
+
+        if sensemaker_adapter == "gemini" && sensemaker_api_key.blank?
+          message = "Sensemaker requires a Gemini API key. Set tenant secret llm.gemini_api_key."
           job.update!(finished_at: Time.current, error: message)
           Rails.logger.error(message)
           return false
@@ -234,52 +420,51 @@ module Sensemaker
                                            description: "Key file (apis.google_application_credentials)")
         end
 
-        unless system("which node > /dev/null 2>&1")
-          message = "Node.js not found. Install Node.js to use the Sensemaker feature."
-          message += "\nPATH: #{ENV["PATH"]}"
-          job.update!(finished_at: Time.current, error: message)
-          Rails.logger.error(message)
+        if input_file_required? && !file_exists?(job.input_file, description: "Input file")
           return false
         end
-
-        unless system("which npx > /dev/null 2>&1")
-          message = "NPX not found. Install NPX to use the Sensemaker feature."
-          message += "\nPATH: #{ENV["PATH"]}"
-          job.update!(finished_at: Time.current, error: message)
-          Rails.logger.error(message)
-          return false
-        end
-
-        return false unless file_exists?(Sensemaker::Paths.sensemaker_package_folder,
-                                         description: "sensemaking-tools package folder")
-        return false unless file_exists?(Sensemaker::Paths.sensemaker_data_folder,
-                                         description: "Sensemaker data folder")
-
-        if job.script == "single-html-build.js"
-          return false unless file_exists?(Sensemaker::Paths.visualization_folder,
-                                           description: "Visualization folder")
-          return false unless file_exists?(input_file + "-topic-stats.json",
-                                           description: "Input file - topic stats")
-          return false unless file_exists?(input_file + "-summary.json",
-                                           description: "Input file - summary")
-          return false unless file_exists?(input_file + "-comments-with-scores.json",
-                                           description: "Input file - comments with scores")
-        else
-          return false unless file_exists?(input_file, description: "Input file")
-        end
-
-        return false unless file_exists?(script_file, description: "Script file")
 
         true
       end
 
-      def execute_script
-        target_folder = Sensemaker::Paths.sensemaker_folder
-        target_folder = Sensemaker::Paths.visualization_folder if job.script == "single-html-build.js"
+      def report_ui_opinions_input_file
+        bridge_job = job.children.where(script: "bridge_scores").order(:created_at).last
+        bridge_job&.bridge_scores_csv
+      end
 
-        command = "cd #{target_folder} && timeout #{TIMEOUT} #{build_command}"
-        Rails.logger.debug("Executing script: #{command}")
-        output = `#{command} 2>&1`
+      def report_ui_summary_input_file
+        report_job = job.children.where(script: "report_text").order(:created_at).last
+        report_job&.primary_artefact_path || job.input_file
+      end
+
+      def normalize_report_ui_output!
+        return true unless report_ui?
+
+        inline_index_path = File.join(job.work_dir, "inline", "index.html")
+        report_html_path = File.join(job.work_dir, job.output_file_name)
+
+        unless File.exist?(inline_index_path)
+          message = "Report UI output not found: #{inline_index_path}"
+          job.update!(finished_at: Time.current, error: message)
+          Rails.logger.error(message)
+          return false
+        end
+
+        FileUtils.cp(inline_index_path, report_html_path)
+        true
+      rescue => e
+        message = "Failed to normalize report UI output: #{e.message}"
+        job.update!(finished_at: Time.current, error: message)
+        Rails.logger.error(message)
+        false
+      end
+
+      def execute_script
+        ensure_work_dir!
+        command = build_command
+        cmd = "cd #{job.work_dir} && timeout #{TIMEOUT} #{command}"
+        Rails.logger.debug("Executing script: #{redact_command(cmd)}")
+        output = `#{cmd} 2>&1`
 
         result = process_exit_status
         if result.eql?(0)
@@ -287,10 +472,10 @@ module Sensemaker
           output
         else
           output = "Timeout: #{TIMEOUT} seconds\n#{output}" if result.eql?(124)
-          output = output.truncate(20000)
-          message = "Command: #{command}\n\n#{output}"
+          truncated_output = truncate_cli_output(output)
+          message = "Command: #{redact_command(cmd)}\n\n#{truncated_output}"
           job.update!(finished_at: Time.current, error: message)
-          Rails.logger.error("Sensemaker::JobRunner error: #{output}")
+          Rails.logger.error("Sensemaker::JobRunner error: #{truncated_output}")
           nil
         end
       end
@@ -313,6 +498,41 @@ module Sensemaker
         job.update!(finished_at: Time.current, error: message)
         Rails.logger.error(message)
         false
+      end
+
+      def truncate_cli_output(output, max_length: MAX_CLI_ERROR_OUTPUT)
+        text = output.to_s
+        return text if text.length <= max_length
+
+        omission = CLI_OUTPUT_TRUNCATION_OMISSION
+        tail_length = max_length - omission.length
+        omission + text[-tail_length..]
+      end
+
+      def redact_command(command)
+        command.to_s
+               .gsub(/--api_key\s+\S+/, "--api_key [REDACTED]")
+               .gsub(/--apiKey\s+\S+/, "--apiKey [REDACTED]")
+      end
+
+      def llm_skip_script?
+        LLM_SKIP_SCRIPTS.include?(job.script)
+      end
+
+      def ranked_propositions?
+        job.script == "ranked_propositions"
+      end
+
+      def ranked_propositions_export_only?
+        ranked_propositions? && job.read_attribute(:input_file).present?
+      end
+
+      def proposition_pipeline_script?
+        Sensemaker::Scripts::PROPOSITION_PIPELINE_SCRIPTS.include?(job.script)
+      end
+
+      def input_file_required?
+        INPUT_SCRIPTS.include?(job.script) || PKL_INPUT_SCRIPTS.include?(job.script)
       end
   end
 end

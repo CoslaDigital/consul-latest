@@ -1,8 +1,8 @@
 require "rails_helper"
 
 describe ImageSuggestions::Pexels do
-  let(:pexels_client) { instance_double(::Pexels::Client) }
-  let(:photos_client) { instance_double(::Pexels::Client::Photos) }
+  let(:pexels_client) { double }
+  let(:photos_client) { double }
 
   describe "evaluates provider configuration across different tenants" do
     before do
@@ -25,7 +25,7 @@ describe ImageSuggestions::Pexels do
 
   describe "#search" do
     let(:pexels_instance) { ImageSuggestions::Pexels.new }
-    let(:search_results) { instance_double(::Pexels::PhotoSet) }
+    let(:search_results) { double }
 
     before do
       allow(::Pexels::Client).to receive(:new).and_return(pexels_client)
@@ -46,10 +46,9 @@ describe ImageSuggestions::Pexels do
     let(:photo_id) { "12345" }
 
     let(:photo) do
-      instance_double(
-        ::Pexels::Photo,
+      double(
         src: { "original" => "https://example.com/image.jpg" },
-        user: instance_double(::Pexels::User, name: "John Doe")
+        user: double(name: "John Doe")
       )
     end
 

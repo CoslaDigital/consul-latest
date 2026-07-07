@@ -1877,15 +1877,33 @@ es:
         table_actions: "Acciones"
         cancel_all: "Cancelar todo"
         new_run: "Nueva ejecución"
+        target_not_found: "Objetivo no encontrado."
+        filtered_by_target: "Mostrando trabajos de %{name}"
+        filter_by: "Filtrar por"
+        filter_all_types: "-"
+        filter_reset: "× Limpiar filtros"
+        sensemaker_analyses_count:
+          one: "1 análisis Sensemaker"
+          other: "%{count} análisis Sensemaker"
+        resource_types:
+          budgets: "Presupuestos"
+          debates: "Debates"
+          proposals: "Propuestas"
+          polls: "Encuestas"
+          poll_questions: "Preguntas de encuesta"
+          legislation_processes: "Procesos legislativos"
+          legislation_questions: "Preguntas legislativas"
+          legislation_proposals: "Propuestas legislativas"
+          legislation_question_options: "Opciones de pregunta legislativa"
       new:
         title: Nuevo análisis Sensemaker
         select_target: "Selecciona un objetivo de los resultados"
         results: "resultados"
         analysing: "Analizando"
-        review_context: "Revisa el contexto adicional, luego selecciona un script para ejecutar."
+        review_context: "Revisa el contexto adicional, luego pulsa un botón Generar o selecciona un script en opciones avanzadas."
+        generate_ranked_propositions: "Generar proposiciones clasificadas"
         additional_context_label: "Contexto adicional"
         additional_context_hint: "Texto opcional que ayuda a orientar el análisis. Por ejemplo, describe brevemente de qué trata la conversación para que la IA tenga contexto. El título y la descripción del objetivo ya se incluyen."
-        generate_summary: "Generar resumen"
         generate_report: "Generar informe"
         advanced_options: "Opciones avanzadas"
         expert_options_hint: "Para usuarios expertos. Ejecuta cualquier script de Sensemaker eligiendo en el desplegable."
@@ -1917,12 +1935,16 @@ es:
         job_spawned_by: "Trabajo generado por"
         target_type: "Tipo de objetivo"
         target_title: "Título del objetivo"
+        additional_context: "Contexto adicional"
         error_report: "Informe de error"
         error_log: "Registro de errores"
         prerequisite_jobs: "Trabajos prerrequisito"
         prerequisite_jobs_help: "Estos trabajos se crearon como prerrequisitos para este trabajo"
         actions: "Acciones"
+        files: "Archivos"
+        input_files: "Archivos de entrada"
         output_files: "Archivos de salida"
+        none_available: "Ninguno disponible"
         select_file_download: "Selecciona un archivo para descargar."
         back_to_jobs: "Volver a trabajos"
         published_reports_link: "Informe(s) publicado(s)"
@@ -1941,13 +1963,13 @@ es:
         title_2: "¿Cómo funciona Sensemaker?"
         description_2: "Sensemaker utiliza LLMs (modelos de lenguaje grandes) para analizar conversaciones e identificar patrones. Sensemaker realizará un análisis sobre los comentarios asociados con un recurso objetivo, por ejemplo, un debate, propuesta, encuesta, tema, proceso legislativo. Los detalles sobre el recurso objetivo (por ejemplo, título, descripción) se utilizarán como contexto adicional para apoyar el análisis."
         title_3: "¿Cómo usar Sensemaker?"
-        description_3: "Para usar Sensemaker, ve a la pestaña Análisis Sensemaker, luego haz clic en el botón 'Nueva Ejecución'. Busca un recurso objetivo y selecciónalo. Añade cualquier contexto adicional si es necesario y selecciona un script para ejecutar."
+        description_3: "Para usar Sensemaker, ve a la pestaña Análisis Sensemaker, luego haz clic en el botón 'Nueva Ejecución'. Busca un recurso objetivo y selecciónalo. Añade contexto adicional si es necesario y haz clic en Generar informe para el pipeline completo."
         title_4: "Scripts disponibles"
         description_4: "Los siguientes scripts están disponibles:"
       notice:
         cancelled_jobs: "Todos los trabajos de sensemaker han sido cancelados."
         script_info: "El script se ha encolado correctamente."
-        script_required: "Selecciona un script en las opciones avanzadas o usa Generar resumen / Generar informe."
+        script_required: "Selecciona un script en las opciones avanzadas o usa Generar informe / Generar proposiciones clasificadas."
         output_file_not_found: "Archivo de salida no encontrado"
         deleted_job: "Trabajo de análisis eliminado correctamente"
         cannot_publish: "El análisis no se puede publicar porque no está terminado o tiene errores o no tiene un archivo de salida."
@@ -1955,29 +1977,30 @@ es:
         unpublished: "El análisis se ha despublicado correctamente."
       delete_alert: "¿Seguro que quieres eliminar este análisis? Esta acción no se puede deshacer"
       scripts:
-        health_check_runner_ts:
+        health_check:
           title: "Realizar verificación de salud"
-          description: "Verificación de salud para comprobar que sensemaker funciona"
-        categorization_runner_ts:
+          description: "Comprobar conectividad y configuración del LLM"
+        categorize:
           title: "Categorizar"
-          description: "Categorizar comentarios en temas y subtemas"
-        runner_ts:
-          title: "Resumir"
-          description: "Generar un resumen de la conversación"
-        advanced_runner_ts:
-          title: "Analizar"
-          description: "Analizar la conversación con estadísticas"
-        single_html_build_js:
-          title: "Informe"
-          description: "Analizar y generar un informe en formato HTML"
-      tags_description: "Genera etiquetas automáticas en todos los elementos que pueden ser etiquetados."
-      title: "Machine learning"
-      script_selection_help: "Selecciona un script para procesar contenido y generar etiquetas o resúmenes por IA."
-      execution_options:
-        force_update_label: "Forzar actualización"
-        force_update_help: "Procesa todos los registros independientemente de su antigüedad."
-        dry_run_label: "Simulacro (Dry Run)"
-        dry_run_help: "Prueba la lógica sin guardar en la base de datos."
+          description: "Descubrir temas y extraer citas representativas"
+        bridge_scores:
+          title: "Puntuaciones de bridging"
+          description: "Puntuar citas según atributos de bridging"
+        report_text:
+          title: "Generar datos del informe"
+          description: "Producir JSON estructurado del informe con resúmenes por tema"
+        propositions:
+          title: "Generar proposiciones"
+          description: "Generar proposiciones candidatas a partir de comentarios categorizados (requiere categorizar antes, o se ejecuta automáticamente)"
+        refine_propositions:
+          title: "Refinar proposiciones (jurado simulado)"
+          description: "Clasificar y refinar proposiciones con un jurado simulado (ejecución larga; requiere la generación de proposiciones previa)"
+        ranked_propositions:
+          title: "Exportar proposiciones clasificadas (CSV)"
+          description: "Pipeline completo: categorizar, generar proposiciones, refinamiento con jurado y exportar proposiciones clasificadas por tema. Muy largo y con mucho uso de LLM."
+        report_ui:
+          title: "Generar informe interactivo"
+          description: "Ejecutar el pipeline completo y generar un informe HTML para publicar"
     cookies:
       vendors:
         empty: No se han encontrado cookies de terceros

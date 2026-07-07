@@ -91,9 +91,7 @@ module ProposalsDashboardHelper
   end
 
   def is_new_action_since_last_login?(proposed_action, new_actions_since_last_login)
-    if new_actions_since_last_login.present?
-      new_actions_since_last_login.include?(proposed_action.id)
-    end
+    new_actions_since_last_login.presence&.include?(proposed_action.id)
   end
 
   def new_resources_since_last_login?(resources, new_actions_since_last_login)

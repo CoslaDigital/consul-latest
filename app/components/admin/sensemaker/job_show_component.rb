@@ -24,4 +24,11 @@ class Admin::Sensemaker::JobShowComponent < ApplicationComponent
   def has_children?
     child_jobs.any?
   end
+
+  def artefact_param_for(path)
+    base = Pathname.new(Sensemaker::Paths.sensemaker_data_folder.to_s)
+    Pathname.new(path).relative_path_from(base).to_s
+  rescue ArgumentError
+    File.basename(path.to_s)
+  end
 end
