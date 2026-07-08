@@ -40,7 +40,15 @@
     <% unless params[:selected].present? %>
       <div class="row">
         <div class="small-12 column">
-          <%= render Proposals::MapComponent.new(@proposals) %>
+          <%
+            map_proposals = @proposals
+            if params[:project].present?
+              kind = ProposalKind.find_by(slug: params[:project])
+              map_proposals = map_proposals.where(proposal_kind_id: kind.id) if kind
+            end
+          %>
+          <%= render Proposals::MapComponent.new(map_proposals) %>
+          <%#= render Proposals::MapComponent.new(@proposals) %>
           <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
