@@ -48,7 +48,8 @@
               map_proposals = map_proposals.where(proposal_kind_id: kind.id) if kind
             end
           %>
-          <%= render Proposals::MapComponent.new(@proposals) %>
+          <%= render Proposals::MapComponent.new(map_proposals) %>
+          <%#= render Proposals::MapComponent.new(@proposals) %>
           <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
@@ -111,17 +112,8 @@
       <% if params[:retired].blank? %>
         <%= render "categories" %>
         <%= render "shared/tag_cloud", taggable: "Proposal" %>
-        <div class="sidebar-divider"></div>
-        <div class="proposals-geozones">
-          <h2 class="sidebar-title"><%= link_to t("shared.tags_cloud.districts_list"), map_proposals_path, id: "map", title: t("shared.tags_cloud.districts_list") %></h2>
-          <br>
-          <ul id="geozones" class="no-bullet">
-            <% @geozones.each do |geozone| %>
-              <li><%= link_to geozone.name, proposals_path(search: geozone.name) %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %> <%# Closing the params[:retired].blank? condition %>
+        <%= render Proposals::GeozonesComponent.new %>
+      <% end %>
 
       <%= render "retired" %>
       <%= render "proposals_lists" %>
