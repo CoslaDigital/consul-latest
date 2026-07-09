@@ -37,6 +37,13 @@ class ProposalsController < ApplicationController
     end
   end
 
+  def new
+    @proposal.geozone_id = params[:geozone_id]
+    @proposal.proposal_kind_id = params[:proposal_kind_id]
+
+    render :new
+  end
+
   def create
     @proposal = Proposal.new(proposal_params.merge(author: current_user))
     if @proposal.save
