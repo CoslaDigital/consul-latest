@@ -1,3 +1,4 @@
+/* eslint-env es6 */
 (function () {
   "use strict";
   App.Map = {
@@ -111,7 +112,6 @@
         try {
           map.fitBounds(markers.getBounds(), {padding: [40, 40], maxZoom: 15});
         } catch (err) {
-          // Suppressed console.warn statement safely to satisfy linter rule
           return false;
         }
       }
@@ -119,6 +119,16 @@
       layerControl = Object.assign({"Markers": markers}, geozoneLayers);
       L.control.layers(baseMaps, layerControl).addTo(map);
       L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
+
+      // SILENT ADMIN CAPTURE: Listen for base layer changes
+      map.on("baselayerchange", function (e) {
+        // Find the map container, go up to its parent form, and ONLY update the hidden field inside that specific form
+        const defaultLayerInput = $(map._container).closest("form").find("input[name='default_base_layer']");
+
+        if (defaultLayerInput.length) {
+          defaultLayerInput.val(e.name);
+        }
+      });
     },
     leafletMap: function (element) {
       let centerData;
@@ -196,7 +206,7 @@
       }
 
       if (App.Map.validZoom(markerCoordinates.zoom)) {
-        zoom = markerCoordinates.zoom;
+        zoom = markerCoordinates.zoom; // <--- FIXED HERE
       } else {
         zoom = $(element).data("map-zoom");
       }
@@ -256,28 +266,55 @@
 
       map.attributionControl.setPrefix(App.Map.attributionPrefix());
 
-      // 1. Your default Consul configured map
+      // 1. Default Consul configured map
       const defaultLayer = L.tileLayer(mapTilesProvider, {attribution: mapAttribution});
 
-      // 2. Esri World Imagery (High-quality, free-to-use satellite tiles)
+      // 2. Clean Minimalist (Light) - CartoDB Positron
+      const cartoLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
+      });
+
+      // 3. High Contrast (Dark) - CartoDB Dark Matter
+      const cartoDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
+      });
+
+      // 4. Community & Infrastructure - Humanitarian OpenStreetMap
+      const osmHumanitarian = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors, Tiles style by <a href='https://www.hotosm.org/'>HOT</a>"
+      });
+
+      // 5. Esri World Imagery (Satellite)
       const satelliteLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
         attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
       });
 
-      // 3. OpenTopoMap (Great for terrain, elevation, and nature)
+      // 6. OpenTopoMap (Terrain)
       const terrainLayer = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
         attribution: "Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)"
       });
 
-      // Add the default layer to the map immediately so it isn't blank on load
-      defaultLayer.addTo(map);
-
-      // Return the group of base layers for the control menu
-      return {
+      // Group all layers into the return object
+      const baseLayers = {
         "Standard Map": defaultLayer,
+        "Clean Minimalist (Light)": cartoLight,
+        "High Contrast (Dark)": cartoDark,
+        "Community & Infrastructure": osmHumanitarian,
         "Satellite View": satelliteLayer,
         "Terrain View": terrainLayer
       };
+
+      // Check the element for a user-configured default layer string
+      const targetDefault = $(element).data("map-default-base-layer");
+
+      // If a valid custom default was found, mount it. Otherwise fallback to standard.
+      if (targetDefault && baseLayers[targetDefault]) {
+        baseLayers[targetDefault].addTo(map);
+      } else {
+        defaultLayer.addTo(map);
+      }
+
+      return baseLayers;
     },
     addGeozones: function (map, geozoneLayers) {
       const geozones = $(map._container).data("geozones");
