@@ -2,6 +2,7 @@
 (function () {
   "use strict";
 
+  // Self-contained utility bridge: Ensures map.js works even if global utils aren't loaded
   if (typeof App.Utils === "undefined") {
     App.Utils = {
       isNumeric: function (n) {
@@ -91,7 +92,7 @@
       map = App.Map.leafletMap(element);
       App.Map.maps.push(map);
 
-      // PHASE 1 ENHANCEMENT: Setup Multiple Base Layers instead of simple addAttribution
+      // PHASE 1 ENHANCEMENT: Setup Multiple Base Layers
       const baseMaps = App.Map.setupBaseLayers(map, element);
 
       markerData = App.Map.markerData(element);
@@ -122,17 +123,25 @@
         try {
           map.fitBounds(markers.getBounds(), {padding: [40, 40], maxZoom: 15});
         } catch (err) {
-          // Suppress error if bounds cannot be calculated
           return false;
         }
       }
 
-      // PHASE 1 ENHANCEMENT: Merge markers and geozones into one unified checkbox menu
+      // PHASE 1 ENHANCEMENT: Split data controls (Top Right) and base map controls (Bottom Right)
       const overlays = Object.assign({"Markers": markers}, geozoneLayers);
-      L.control.layers(baseMaps, overlays).addTo(map);
+
+      const layersControl = L.control.layers(null, overlays, {position: "topright"}).addTo(map);
+      const baseControl = L.control.layers(baseMaps, null, {position: "bottomright"}).addTo(map);
       L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
 
-      // PHASE 1 ENHANCEMENT: Silent admin capture for base layer form
+      // Inject headers after the controls are added to the DOM
+      $(layersControl.getContainer()).find('.leaflet-control-layers-list')
+        .prepend('<div class="layer-control-header">Layers</div>');
+      $(baseControl.getContainer()).find('.leaflet-control-layers-list')
+        .prepend('<div class="layer-control-header">Maps</div>');
+
+
+      // ADMIN CAPTURE: Silent admin capture for base layer form
       map.on("baselayerchange", function (e) {
         const defaultLayerInput = $(map._container).closest("form").find("input[name='default_base_layer']");
         if (defaultLayerInput.length) {
@@ -262,7 +271,7 @@
         $(element).attr("data-marker-investments-coordinates", clean_markers);
       }
     },
-    // PHASE 1 ENHANCEMENT: Replaces addAttribution with robust Base Layers setup
+    // PHASE 1 ENHANCEMENT: Base Layers setup
     setupBaseLayers: function (map, element) {
       const mapTilesProvider = $(element).data("map-tiles-provider");
       const mapAttribution = $(element).data("map-tiles-provider-attribution");
@@ -293,11 +302,11 @@
 
       const baseLayers = {
         "Standard Map": defaultLayer,
-        "Clean Minimalist (Light)": cartoLight,
-        "High Contrast (Dark)": cartoDark,
-        "Community & Infrastructure": osmHumanitarian,
+        //"Clean Minimalist (Light)": cartoLight,
+        //"High Contrast (Dark)": cartoDark,
         "Satellite View": satelliteLayer,
-        "Terrain View": terrainLayer
+        "Terrain View": terrainLayer,
+        "Community & Infrastructure": osmHumanitarian
       };
 
       const targetDefault = $(element).data("map-default-base-layer");
@@ -310,7 +319,6 @@
 
       return baseLayers;
     },
-    // UPSTREAM: Clean modular geozone iteration
     addGeozones: function (map, geozoneLayers) {
       $.each(geozoneLayers, function (_, geozoneLayer) {
         App.Map.addGeozone(map, geozoneLayer);
@@ -362,10 +370,10 @@
       return "<a href='" + data.link + "'>" + data.title + "</a>";
     },
     validZoom: function (zoom) {
-      return App.Utils.isNumeric(zoom); // UPSTREAM: Global Utils
+      return App.Utils.isNumeric(zoom);
     },
     validCoordinates: function (coordinates) {
-      return App.Utils.isNumeric(coordinates.lat) && App.Utils.isNumeric(coordinates.long); // UPSTREAM: Global Utils
+      return App.Utils.isNumeric(coordinates.lat) && App.Utils.isNumeric(coordinates.long);
     }
   };
 }).call(this);
