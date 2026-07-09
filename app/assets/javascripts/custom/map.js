@@ -16,19 +16,8 @@
       App.Map.maps = [];
     },
     initializeMap: function (element) {
-      let createMarker;
-      let editable;
-      let investmentsMarkers;
-      let map;
-      let marker;
-      let markerClustering;
-      let markerData;
-      let removeMarker;
-      let removeMarkerSelector;
-      let markers;
-      let moveOrPlaceMarker;
-      const geozoneLayers = {};
-      let layerControl = {};
+      let createMarker, editable, geozoneLayers, investmentsMarkers, map, marker, markerClustering,
+        markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector;
 
       App.Map.cleanInvestmentCoordinates(element);
       removeMarkerSelector = $(element).data("marker-remove-selector");
@@ -36,26 +25,32 @@
       editable = $(element).data("marker-editable");
       markerClustering = $(element).data("marker-clustering");
 
-      markers = markerClustering ? L.markerClusterGroup({chunkedLoading: true}) : L.layerGroup();
+      if (markerClustering) {
+        markers = L.markerClusterGroup({chunkedLoading: true});
+      } else {
+        markers = L.layerGroup();
+      }
 
-      createMarker = function (latitude, longitude, titleText) {
-        let newMarker;
-        let markerLatLng;
-        let cleanTitle;
-        markerLatLng = new L.LatLng(latitude, longitude);
-        cleanTitle = titleText || "Map Location Indicator";
+      marker = null;
 
-        const markerIcon = L.divIcon({
+      // PHASE 1 ENHANCEMENT: Accessible ARIA marker
+      markerIcon = function (alt_text) {
+        const cleanTitle = alt_text || "Map Location Indicator";
+        return L.divIcon({
           className: "map-marker",
           iconSize: [30, 30],
           iconAnchor: [15, 40],
           html: '<div class="map-icon" tabindex="0" role="img" aria-label="' + cleanTitle + '"></div>'
         });
+      };
 
+      createMarker = function (latitude, longitude, text) {
+        let newMarker, markerLatLng;
+        markerLatLng = new L.LatLng(latitude, longitude);
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon,
+          icon: markerIcon(text),
           draggable: editable,
-          title: cleanTitle
+          title: text || "Map Location Indicator"
         });
 
         if (editable) {
@@ -86,6 +81,8 @@
 
       map = App.Map.leafletMap(element);
       App.Map.maps.push(map);
+
+      // PHASE 1 ENHANCEMENT: Setup Multiple Base Layers instead of simple addAttribution
       const baseMaps = App.Map.setupBaseLayers(map, element);
 
       markerData = App.Map.markerData(element);
@@ -104,40 +101,43 @@
       }
 
       App.Map.addInvestmentsMarkers(investmentsMarkers, createMarker);
+
+      // UPSTREAM: Modular geozone handling
+      geozoneLayers = App.Map.geozoneLayers(map);
       App.Map.addGeozones(map, geozoneLayers);
 
       map.addLayer(markers);
 
+      // PHASE 1 ENHANCEMENT: Auto-zoom / fitBounds calculation
       if (investmentsMarkers && investmentsMarkers.length > 0) {
         try {
           map.fitBounds(markers.getBounds(), {padding: [40, 40], maxZoom: 15});
         } catch (err) {
+          // Suppress error if bounds cannot be calculated
           return false;
         }
       }
 
-      layerControl = Object.assign({"Markers": markers}, geozoneLayers);
-      L.control.layers(baseMaps, layerControl).addTo(map);
+      // PHASE 1 ENHANCEMENT: Merge markers and geozones into one unified checkbox menu
+      const overlays = Object.assign({"Markers": markers}, geozoneLayers);
+      L.control.layers(baseMaps, overlays).addTo(map);
       L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
 
-      // SILENT ADMIN CAPTURE: Listen for base layer changes
+      // PHASE 1 ENHANCEMENT: Silent admin capture for base layer form
       map.on("baselayerchange", function (e) {
-        // Find the map container, go up to its parent form, and ONLY update the hidden field inside that specific form
         const defaultLayerInput = $(map._container).closest("form").find("input[name='default_base_layer']");
-
         if (defaultLayerInput.length) {
           defaultLayerInput.val(e.name);
         }
       });
     },
     leafletMap: function (element) {
-      let centerData;
-      let mapCenterLatLng;
-      let map;
+      let centerData, mapCenterLatLng, map;
 
       centerData = App.Map.centerData(element);
       mapCenterLatLng = new L.LatLng(centerData.lat, centerData.long);
 
+      // PHASE 1 ENHANCEMENT: Enforce HTML5 Canvas rendering context
       map = L.map(element.id, {
         scrollWheelZoom: false,
         renderer: L.canvas()
@@ -153,14 +153,10 @@
       return map;
     },
     attributionPrefix: function () {
-      return '<a href="https://leafletjs.com" title="A JS library for maps">Leaflet</a>';
+      return '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>';
     },
     markerData: function (element) {
-      let dataCoordinates;
-      let formCoordinates;
-      let inputs;
-      let latitude;
-      let longitude;
+      let dataCoordinates, formCoordinates, inputs, latitude, longitude;
       inputs = App.Map.coordinatesInputs(element);
 
       dataCoordinates = {
@@ -185,15 +181,12 @@
       return {
         lat: latitude,
         long: longitude,
-        zoom: formCoordinates.zoom,
-        title: dataCoordinates.title
+        title: dataCoordinates.title,
+        zoom: formCoordinates.zoom
       };
     },
     centerData: function (element) {
-      let markerCoordinates;
-      let latitude;
-      let longitude;
-      let zoom;
+      let markerCoordinates, latitude, longitude, zoom;
 
       markerCoordinates = App.Map.markerData(element);
 
@@ -206,7 +199,7 @@
       }
 
       if (App.Map.validZoom(markerCoordinates.zoom)) {
-        zoom = markerCoordinates.zoom; // <--- FIXED HERE
+        zoom = markerCoordinates.zoom;
       } else {
         zoom = $(element).data("map-zoom");
       }
@@ -245,6 +238,7 @@
 
           if (App.Map.validCoordinates(coordinates)) {
             marker = createMarker(coordinates.lat, coordinates.long, coordinates.title);
+            // PHASE 1 ENHANCEMENT: Maintain investment ID attachment
             marker.options.id = coordinates["investment_id"];
             marker.bindPopup(App.Map.getPopupContent(coordinates));
           }
@@ -252,49 +246,42 @@
       }
     },
     cleanInvestmentCoordinates: function (element) {
-      let clean_markers;
-      let markers;
+      let clean_markers, markers;
       markers = $(element).attr("data-marker-investments-coordinates");
       if (markers != null) {
         clean_markers = markers.replace(/-?(\*+)/g, null);
         $(element).attr("data-marker-investments-coordinates", clean_markers);
       }
     },
+    // PHASE 1 ENHANCEMENT: Replaces addAttribution with robust Base Layers setup
     setupBaseLayers: function (map, element) {
       const mapTilesProvider = $(element).data("map-tiles-provider");
       const mapAttribution = $(element).data("map-tiles-provider-attribution");
 
       map.attributionControl.setPrefix(App.Map.attributionPrefix());
 
-      // 1. Default Consul configured map
       const defaultLayer = L.tileLayer(mapTilesProvider, {attribution: mapAttribution});
 
-      // 2. Clean Minimalist (Light) - CartoDB Positron
       const cartoLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
       });
 
-      // 3. High Contrast (Dark) - CartoDB Dark Matter
       const cartoDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
       });
 
-      // 4. Community & Infrastructure - Humanitarian OpenStreetMap
       const osmHumanitarian = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
         attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a> contributors, Tiles style by <a href='https://www.hotosm.org/'>HOT</a>"
       });
 
-      // 5. Esri World Imagery (Satellite)
       const satelliteLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
         attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
       });
 
-      // 6. OpenTopoMap (Terrain)
       const terrainLayer = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
         attribution: "Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)"
       });
 
-      // Group all layers into the return object
       const baseLayers = {
         "Standard Map": defaultLayer,
         "Clean Minimalist (Light)": cartoLight,
@@ -304,10 +291,8 @@
         "Terrain View": terrainLayer
       };
 
-      // Check the element for a user-configured default layer string
       const targetDefault = $(element).data("map-default-base-layer");
 
-      // If a valid custom default was found, mount it. Otherwise fallback to standard.
       if (targetDefault && baseLayers[targetDefault]) {
         baseLayers[targetDefault].addTo(map);
       } else {
@@ -316,53 +301,62 @@
 
       return baseLayers;
     },
+    // UPSTREAM: Clean modular geozone iteration
     addGeozones: function (map, geozoneLayers) {
+      $.each(geozoneLayers, function (_, geozoneLayer) {
+        App.Map.addGeozone(map, geozoneLayer);
+      });
+    },
+    geozoneLayers: function (map) {
       const geozones = $(map._container).data("geozones");
+      const layers = {};
 
       if (geozones) {
         geozones.forEach(function (geozone) {
-          App.Map.addGeozone(geozone, map, geozoneLayers);
+          if (geozone.outline_points) {
+            let layerName = geozone.name;
+            if (!layerName) {
+              const headingsArray = geozone["headings"];
+              layerName = (headingsArray && headingsArray.length > 0) ? headingsArray.join(", ") : "Geozone " + (Object.keys(layers).length + 1);
+            }
+            layers[layerName] = App.Map.geozoneLayer(geozone);
+          }
         });
       }
-    },
-    addGeozone: function (geozone, map, geozoneLayers) {
-      const geojsonData = JSON.parse(geozone["outline_points"]);
 
-      const geoJsonLayer = L.geoJSON(geojsonData, {
+      return layers;
+    },
+    geozoneLayer: function (geozone) {
+      const geojsonData = JSON.parse(geozone.outline_points);
+
+      return L.geoJSON(geojsonData, {
         style: function (feature) {
           return {
-            color: geozone.color || feature.properties.color || "blue",
+            color: feature.properties.color || geozone.color || "blue",
             fillOpacity: 0.3,
             className: "map-polygon"
           };
         },
         onEachFeature: function (feature, layer) {
-          if (feature.properties.headings || geozone["headings"]) {
-            const headings = feature.properties.headings || geozone["headings"];
+          const headings = feature.properties.headings || geozone.headings;
+
+          if (headings) {
             layer.bindPopup(headings.join("<br>"));
           }
         }
       });
-
-      const headingsArray = geozone["headings"];
-      const layerName = (headingsArray && headingsArray.length > 0)
-        ? headingsArray.join(", ")
-        : "Geozone " + (Object.keys(geozoneLayers).length + 1);
-
-      geozoneLayers[layerName] = geoJsonLayer;
-      geoJsonLayer.addTo(map);
+    },
+    addGeozone: function (map, geozoneLayer) {
+      geozoneLayer.addTo(map);
     },
     getPopupContent: function (data) {
       return "<a href='" + data.link + "'>" + data.title + "</a>";
     },
     validZoom: function (zoom) {
-      return App.Map.isNumeric(zoom);
+      return App.Utils.isNumeric(zoom); // UPSTREAM: Global Utils
     },
     validCoordinates: function (coordinates) {
-      return App.Map.isNumeric(coordinates.lat) && App.Map.isNumeric(coordinates.long);
-    },
-    isNumeric: function (n) {
-      return !isNaN(parseFloat(n)) && isFinite(n);
+      return App.Utils.isNumeric(coordinates.lat) && App.Utils.isNumeric(coordinates.long); // UPSTREAM: Global Utils
     }
   };
 }).call(this);
