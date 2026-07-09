@@ -27,7 +27,8 @@
     },
     initializeMap: function (element) {
       let createMarker, editable, geozoneLayers, investmentsMarkers, map, marker, markerClustering,
-        markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector;
+        markerData, markerIcon, moveOrPlaceMarker, removeMarker, removeMarkerSelector,
+        layersToCreate, layerControlOverlays, globalBounds;
 
       App.Map.cleanInvestmentCoordinates(element);
       removeMarkerSelector = $(element).data("marker-remove-selector");
@@ -35,30 +36,26 @@
       editable = $(element).data("marker-editable");
       markerClustering = $(element).data("marker-clustering");
 
-      if (markerClustering) {
-        markers = L.markerClusterGroup({chunkedLoading: true});
-      } else {
-        markers = L.layerGroup();
-      }
-
       marker = null;
 
-      // PHASE 1 ENHANCEMENT: Accessible ARIA marker
-      markerIcon = function (alt_text) {
+      // PHASE 1 ENHANCEMENT: Accessible ARIA marker accepting dynamic icon classes
+      markerIcon = function (alt_text, custom_class) {
         const cleanTitle = alt_text || "Map Location Indicator";
+        const markerClass = custom_class ? "map-marker " + custom_class : "map-marker";
         return L.divIcon({
-          className: "map-marker",
+          className: markerClass,
           iconSize: [30, 30],
           iconAnchor: [15, 40],
           html: '<div class="map-icon" tabindex="0" role="img" aria-label="' + cleanTitle + '"></div>'
         });
       };
 
-      createMarker = function (latitude, longitude, text) {
+      // Refactored to append to targeted dynamic layer groups instead of a single global tracking object
+      createMarker = function (latitude, longitude, targetLayerGroup, text, custom_class) {
         let newMarker, markerLatLng;
         markerLatLng = new L.LatLng(latitude, longitude);
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon(text),
+          icon: markerIcon(text, custom_class),
           draggable: editable,
           title: text || "Map Location Indicator"
         });
@@ -68,7 +65,7 @@
             App.Map.updateFormfields(map, newMarker);
           });
         }
-        markers.addLayer(newMarker);
+        targetLayerGroup.addLayer(newMarker);
         return newMarker;
       };
 
@@ -80,24 +77,53 @@
         App.Map.clearFormfields(element);
       };
 
-      moveOrPlaceMarker = function (e) {
-        if (marker) {
-          marker.setLatLng(e.latlng);
-        } else {
-          marker = createMarker(e.latlng.lat, e.latlng.lng);
-        }
-        App.Map.updateFormfields(map, marker);
-      };
-
       map = App.Map.leafletMap(element);
       App.Map.maps.push(map);
 
       // PHASE 1 ENHANCEMENT: Setup Multiple Base Layers
       const baseMaps = App.Map.setupBaseLayers(map, element);
 
+      // SPECIFICATION PART 2: Sniff and normalize incoming dataset structure safely
+      layersToCreate = {};
+      layerControlOverlays = {};
+      globalBounds = L.latLngBounds([]);
+
+      if (Array.isArray(investmentsMarkers)) {
+        // BACKWARDS COMPATIBILITY: Wrap a flat array in a default layer namespace automatically
+        layersToCreate["Markers"] = investmentsMarkers;
+      } else if (typeof investmentsMarkers === "object" && investmentsMarkers !== null) {
+        // FUTURE STATE: Use multi-layer grouping layout natively
+        layersToCreate = investmentsMarkers;
+      }
+
+      // Populate separate layers dynamically
+      Object.keys(layersToCreate).forEach(function (layerName) {
+        let currentLayerGroup = markerClustering ? L.markerClusterGroup({chunkedLoading: true}) : L.layerGroup();
+        let points = layersToCreate[layerName];
+
+        points.forEach(function (point) {
+          let customMarker;
+          if (App.Map.validCoordinates(point)) {
+            customMarker = createMarker(point.lat, point.long, currentLayerGroup, point.title, point.icon_class);
+            customMarker.options.id = point.investment_id || point.id;
+            customMarker.bindPopup(App.Map.getPopupContent(point));
+
+            // Collect coordinates for universal fitBounds processing downstream
+            globalBounds.extend([point.lat, point.long]);
+          }
+        });
+
+        map.addLayer(currentLayerGroup);
+        layerControlOverlays[layerName] = currentLayerGroup;
+      });
+
+      // Handle singular non-grouped view forms fallback markers
       markerData = App.Map.markerData(element);
       if (markerData.lat && markerData.long && !investmentsMarkers) {
-        marker = createMarker(markerData.lat, markerData.long, markerData.title);
+        let fallbackGroup = L.layerGroup().addTo(map);
+        marker = createMarker(markerData.lat, markerData.long, fallbackGroup, markerData.title);
+        layerControlOverlays["Markers"] = fallbackGroup;
+        globalBounds.extend([markerData.lat, markerData.long]);
       }
 
       if (editable) {
@@ -107,39 +133,42 @@
             App.Map.updateFormfields(map, marker);
           }
         });
+
+        moveOrPlaceMarker = function (e) {
+          let editingGroup = layerControlOverlays["Markers"] || L.layerGroup().addTo(map);
+          layerControlOverlays["Markers"] = editingGroup;
+          if (marker) {
+            marker.setLatLng(e.latlng);
+          } else {
+            marker = createMarker(e.latlng.lat, e.latlng.lng, editingGroup);
+          }
+          App.Map.updateFormfields(map, marker);
+        };
         map.on("click", moveOrPlaceMarker);
       }
 
-      App.Map.addInvestmentsMarkers(investmentsMarkers, createMarker);
-
-      // UPSTREAM: Modular geozone handling
+      // UPSTREAM: Modular geozone handling combined with marker layers
       geozoneLayers = App.Map.geozoneLayers(map);
       App.Map.addGeozones(map, geozoneLayers);
+      Object.assign(layerControlOverlays, geozoneLayers);
 
-      map.addLayer(markers);
-
-      // PHASE 1 ENHANCEMENT: Auto-zoom / fitBounds calculation
-      if (investmentsMarkers && investmentsMarkers.length > 0) {
+      // Auto-zoom / fitBounds unified calculation across all active groups
+      if (globalBounds.isValid()) {
         try {
-          map.fitBounds(markers.getBounds(), {padding: [40, 40], maxZoom: 15});
+          map.fitBounds(globalBounds, {padding: [40, 40], maxZoom: 15});
         } catch (err) {
-          return false;
+          // Suppress error if sizing fails
         }
       }
 
-      // PHASE 1 ENHANCEMENT: Split data controls (Top Right) and base map controls (Bottom Right)
-      const overlays = Object.assign({"Markers": markers}, geozoneLayers);
-
-      const layersControl = L.control.layers(null, overlays, {position: "topright"}).addTo(map);
+      // Split data controls (Top Right) and base map controls (Bottom Right)
+      const layersControl = L.control.layers(null, layerControlOverlays, {position: "topright"}).addTo(map);
       const baseControl = L.control.layers(baseMaps, null, {position: "bottomright"}).addTo(map);
       L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
 
-      // Inject headers after the controls are added to the DOM
-      $(layersControl.getContainer()).find('.leaflet-control-layers-list')
-        .prepend('<div class="layer-control-header">Layers</div>');
-      $(baseControl.getContainer()).find('.leaflet-control-layers-list')
-        .prepend('<div class="layer-control-header">Maps</div>');
-
+      // Inject clean text labels after the controls are added to the DOM
+      $(layersControl.getContainer()).find('.leaflet-control-layers-list').prepend('<div class="layer-control-header">Layers</div>');
+      $(baseControl.getContainer()).find('.leaflet-control-layers-list').prepend('<div class="layer-control-header">Maps</div>');
 
       // ADMIN CAPTURE: Silent admin capture for base layer form
       map.on("baselayerchange", function (e) {
@@ -155,7 +184,6 @@
       centerData = App.Map.centerData(element);
       mapCenterLatLng = new L.LatLng(centerData.lat, centerData.long);
 
-      // PHASE 1 ENHANCEMENT: Enforce HTML5 Canvas rendering context
       map = L.map(element.id, {
         scrollWheelZoom: false,
         renderer: L.canvas()
@@ -249,20 +277,6 @@
       inputs.long.val("");
       inputs.zoom.val("");
     },
-    addInvestmentsMarkers: function (markers, createMarker) {
-      if (markers) {
-        markers.forEach(function (coordinates) {
-          let marker;
-
-          if (App.Map.validCoordinates(coordinates)) {
-            marker = createMarker(coordinates.lat, coordinates.long, coordinates.title);
-            // PHASE 1 ENHANCEMENT: Maintain investment ID attachment
-            marker.options.id = coordinates["investment_id"];
-            marker.bindPopup(App.Map.getPopupContent(coordinates));
-          }
-        });
-      }
-    },
     cleanInvestmentCoordinates: function (element) {
       let clean_markers, markers;
       markers = $(element).attr("data-marker-investments-coordinates");
@@ -271,7 +285,6 @@
         $(element).attr("data-marker-investments-coordinates", clean_markers);
       }
     },
-    // PHASE 1 ENHANCEMENT: Base Layers setup
     setupBaseLayers: function (map, element) {
       const mapTilesProvider = $(element).data("map-tiles-provider");
       const mapAttribution = $(element).data("map-tiles-provider-attribution");
@@ -302,11 +315,11 @@
 
       const baseLayers = {
         "Standard Map": defaultLayer,
-        //"Clean Minimalist (Light)": cartoLight,
-        //"High Contrast (Dark)": cartoDark,
+        "Clean Minimalist (Light)": cartoLight,
+        "High Contrast (Dark)": cartoDark,
+        "Community & Infrastructure": osmHumanitarian,
         "Satellite View": satelliteLayer,
-        "Terrain View": terrainLayer,
-        "Community & Infrastructure": osmHumanitarian
+        "Terrain View": terrainLayer
       };
 
       const targetDefault = $(element).data("map-default-base-layer");
