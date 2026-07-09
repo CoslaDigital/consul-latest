@@ -22,20 +22,32 @@
       </div>
     </div>
 
-    <%# Action Card: Target Neighborhood Filter Menu %>
+    <%# Action Card: Target Neighborhood & Kind Filter Menu %>
     <div class="row card margin-bottom padding">
       <div class="small-12 column">
         <h2><%= t("map.proposal_for_district") %></h2>
         <p class="help-text"><%= t("proposals.form.geozone_help") %></p>
 
-        <%= form_for(@proposal, url: new_proposal_path, method: :get, html: { class: "custom-form" }) do |f| %>
-          <div class="row align-middle">
-            <div class="small-12 medium-8 column">
+        <%= form_with(url: new_proposal_path, method: :get, local: true, class: "custom-form") do |f| %>
+          <div class="row">
+
+            <%# 1. District Selection (Consul injects label natively) %>
+            <div class="small-12 medium-4 column">
               <%= f.select :geozone_id, geozone_select_options,
-                           include_blank: t("geozones.none"),
-                           label: false %>
+                           label: t("proposals.form.geozone"),
+                           include_blank: t("geozones.none") %>
             </div>
-            <div class="small-12 medium-4 column text-right">
+
+            <%# 2. Proposal Kind Selection (Consul injects label natively) %>
+            <div class="small-12 medium-5 column">
+              <%= f.select :proposal_kind_id,
+                           options_from_collection_for_select(ProposalKind.all, :id, :name),
+                           label: t("proposals.form.select_kind_label", default: "Type of Proposal"),
+                           include_blank: t("proposals.form.select_kind", default: "Select Type...") %>
+            </div>
+
+            <%# 3. Action Button (Anchored cleanly at the baseline of the select boxes) %>
+            <div class="small-12 medium-3 column text-right" style="display: flex; align-items: flex-end; margin-bottom: 1rem;">
               <%= f.submit(class: "button radius expanded margin-none", value: t("map.start_proposal")) %>
             </div>
           </div>
