@@ -19,6 +19,7 @@ class Admin::SettingsController < Admin::BaseController
     Setting["map.latitude"] = params[:map_location][:latitude].to_f
     Setting["map.longitude"] = params[:map_location][:longitude].to_f
     Setting["map.zoom"] = params[:map_location][:zoom].to_i
+    Setting["map.default_base_layer"] = params[:default_base_layer] if params[:default_base_layer].present?
     redirect_to request_referer, notice: t("admin.settings.index.map.flash.update")
   end
 
@@ -33,9 +34,9 @@ class Admin::SettingsController < Admin::BaseController
   end
 
   private
-  
+
     def verify_administrator
-      raise CanCan::AccessDenied if current_user&.process_manager? 
+      raise CanCan::AccessDenied if current_user&.process_manager?
     end
 
     def settings_params
