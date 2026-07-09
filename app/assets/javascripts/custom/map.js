@@ -85,7 +85,7 @@
 
       map = App.Map.leafletMap(element);
       App.Map.maps.push(map);
-      App.Map.addAttribution(map);
+      const baseMaps = App.Map.setupBaseLayers(map, element);
 
       markerData = App.Map.markerData(element);
       if (markerData.lat && markerData.long && !investmentsMarkers) {
@@ -117,7 +117,8 @@
       }
 
       layerControl = Object.assign({"Markers": markers}, geozoneLayers);
-      L.control.layers(null, layerControl).addTo(map);
+      L.control.layers(baseMaps, layerControl).addTo(map);
+      L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
     },
     leafletMap: function (element) {
       let centerData;
@@ -249,17 +250,34 @@
         $(element).attr("data-marker-investments-coordinates", clean_markers);
       }
     },
-    addAttribution: function (map) {
-      let element;
-      let mapTilesProvider;
-      let mapAttribution;
-
-      element = map._container;
-      mapTilesProvider = $(element).data("map-tiles-provider");
-      mapAttribution = $(element).data("map-tiles-provider-attribution");
+    setupBaseLayers: function (map, element) {
+      const mapTilesProvider = $(element).data("map-tiles-provider");
+      const mapAttribution = $(element).data("map-tiles-provider-attribution");
 
       map.attributionControl.setPrefix(App.Map.attributionPrefix());
-      L.tileLayer(mapTilesProvider, {attribution: mapAttribution}).addTo(map);
+
+      // 1. Your default Consul configured map
+      const defaultLayer = L.tileLayer(mapTilesProvider, {attribution: mapAttribution});
+
+      // 2. Esri World Imagery (High-quality, free-to-use satellite tiles)
+      const satelliteLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+      });
+
+      // 3. OpenTopoMap (Great for terrain, elevation, and nature)
+      const terrainLayer = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+        attribution: "Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)"
+      });
+
+      // Add the default layer to the map immediately so it isn't blank on load
+      defaultLayer.addTo(map);
+
+      // Return the group of base layers for the control menu
+      return {
+        "Standard Map": defaultLayer,
+        "Satellite View": satelliteLayer,
+        "Terrain View": terrainLayer
+      };
     },
     addGeozones: function (map, geozoneLayers) {
       const geozones = $(map._container).data("geozones");
