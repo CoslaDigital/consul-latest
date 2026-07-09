@@ -1,6 +1,15 @@
 /* eslint-env es6 */
 (function () {
   "use strict";
+
+  if (typeof App.Utils === "undefined") {
+    App.Utils = {
+      isNumeric: function (n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      }
+    };
+  }
+
   App.Map = {
     maps: [],
     initialize: function () {
