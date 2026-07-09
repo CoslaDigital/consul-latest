@@ -90,6 +90,7 @@ class ProposalsController < ApplicationController
 
   def map
     @proposal = Proposal.new
+    @proposals = Proposal.published.geolocated
     @tag_cloud = tag_cloud
   end
 
