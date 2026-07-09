@@ -54,6 +54,7 @@ class Shared::MapLocationComponent < ApplicationComponent
         map: "",
         map_center_latitude: latitude,
         map_center_longitude: longitude,
+        map_default_base_layer: Setting["map.default_base_layer"].presence || "Standard Map",
         map_zoom: zoom,
         map_tiles_provider: Rails.application.secrets.map_tiles_provider,
         map_tiles_provider_attribution: Rails.application.secrets.map_tiles_provider_attribution,
