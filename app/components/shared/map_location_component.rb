@@ -3,6 +3,7 @@ class Shared::MapLocationComponent < ApplicationComponent
 
   def initialize(map_location, investments_coordinates: nil, form: nil, geozones_data: nil)
     @map_location = map_location
+    # Accept strings, arrays, or hashed payload trees directly
     @investments_coordinates = investments_coordinates
     @form = form
     @geozones_data = geozones_data
@@ -60,7 +61,8 @@ class Shared::MapLocationComponent < ApplicationComponent
         map_tiles_provider_attribution: Rails.application.secrets.map_tiles_provider_attribution,
         marker_editable: editable?,
         marker_remove_selector: "##{remove_marker_id}",
-        marker_investments_coordinates: investments_coordinates,
+        # Cast explicitly to native values or JSON strings depending on layout engine
+        marker_investments_coordinates: investments_coordinates.is_a?(String) ? JSON.parse(investments_coordinates) : investments_coordinates,
         marker_latitude: map_location.latitude.presence,
         marker_longitude: map_location.longitude.presence,
         marker_title: marker_coordinates_text,
