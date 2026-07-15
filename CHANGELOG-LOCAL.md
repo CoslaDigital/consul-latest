@@ -2,9 +2,36 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
-
 ## What's Changed
+
+## [2.5.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.5.1-local.1) (2026-7-15)
+
+### Added
+
+* Add kind to Proposals to allow filtering of proposals by type
+* Add filter to Proposals Admin to show proposals by kind
+* Ai moderation
+* Link to custom documentation added to Admin dash
+* Auto create milestones when mutual aid phase changes
+* Add milestone status link to admin menu
+
+### Changed
+
+* change behaviour of mapping add accessibilty and auto bounds to map
+* add terrain and satellite base layers to map
+* improved behaviour of import users rake script
+* add updated_at to proposals admin table view
+* improvements to Mutual Aid dashboard and emails
+
+### Fixed
+
+* Enforce Ownership Isolation for Process Managers (Budgets & Legislation) - process managers can only manage their own
+  processes
+* Update custom branding for efficiency
+
+* [Full Changelog:](https://github.com/CoslaDigital/consul-latest/compare/v2.4.1-local-4...2.5.1-local.1)
+
+## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
 
 ### Added
 * Add pexel image suggestions
@@ -106,5 +133,3 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 ### Fixed
-
-
