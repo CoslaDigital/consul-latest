@@ -9,7 +9,7 @@ namespace :votes do
       Tenant.run_on_each do
         model.find_each do |resource|
           new_hot_score = resource.calculate_hot_score
-          resource.update_columns(hot_score: new_hot_score, updated_at: Time.current)
+          resource.update_columns(hot_score: new_hot_score)
         end
       end
       puts " ✅ "

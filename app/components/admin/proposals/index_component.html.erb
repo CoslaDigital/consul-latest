@@ -3,7 +3,7 @@
 <%= header do %>
   <%= successful_proposals_link %>
 <% end %>
-<%# --- ADDED: HIGH-LEVEL PROJECT TRACK UTILITY PANEL --- %>
+
 <% if ProposalKind.count > 1 %>
   <div class="subnavigation structural-filter" style="margin-bottom: 1.5rem; background: #f4f4f4; padding: 1rem; border-radius: 4px; border: 1px solid #e1e1e1;">
     <strong style="margin-right: 1rem; color: #555;">Filter by Project Type:</strong>
@@ -23,18 +23,16 @@
     <% end %>
   </div>
 <% end %>
-<%# --- END PANEL --- %>
+
 <% if proposals.any? %>
   <%= render Admin::SearchComponent.new(label: t("admin.shared.search.label.proposals")) %>
 
 
-  <%# The single button bar containing your two primary utilities %>
   <div class="page-actions" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
     <%= link_to t("admin.proposals.index.download_csv"),
                 url_for(params.permit!.merge(format: :csv)),
                 class: "button clear-margin-bottom" %>
 
-    <%# ONLY ONE: Replaced with a clean, secondary-styled management shortcut %>
     <%= link_to "Manage Proposal Types",
                 admin_proposal_kinds_path,
                 class: "button hollow secondary clear-margin-bottom" %>
@@ -50,6 +48,7 @@
       <th><%= Proposal.human_attribute_name(:title) %></th>
       <th><%= t("admin.proposals.index.author") %></th>
       <th><%= t("admin.proposals.index.status") %></th>
+      <th><%= t("admin.proposals.index.updated_at") %></th>
       <th><%= t("admin.proposals.index.milestones") %></th>
       <th><%= t("admin.proposals.index.selected") %></th>
     </tr>
@@ -62,6 +61,7 @@
         <td><%= link_to proposal.title, admin_proposal_path(proposal) %></td>
         <td><%= proposal.author.username %></td>
         <td><%= proposal.published? ? t("admin.proposals.index.published") : t("admin.proposals.index.draft") %></td>
+        <td><%= proposal.updated_at.strftime('%Y-%m-%d %H:%M') %></td>
         <td><%= proposal.milestones.count %></td>
         <td><%= render Admin::Proposals::ToggleSelectionComponent.new(proposal) %></td>
       </tr>
