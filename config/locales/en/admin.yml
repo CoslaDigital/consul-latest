@@ -1378,6 +1378,7 @@ en:
           title: Proposal
           author: Author
           summary: Summary
+        updated_at: "Updated At"
       show:
         create_question: Add this proposal to a poll to be voted
       form:
