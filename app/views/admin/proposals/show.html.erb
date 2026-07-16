@@ -9,17 +9,29 @@
     <div class="callout success">
       <%= t("proposals.proposal.successful") %>
 
-      <div class="float-right">
+      <div class="float-right" style="display: flex; gap: 1rem;">
+        <% if can?(:update, @proposal) %>
+          <%= link_to t("dashboard.index.edit_proposal_link"),
+                      edit_proposal_path(@proposal),
+                      class: "button" %>
+        <% end %>
+
         <%= link_to t("admin.proposals.show.create_question"),
                     new_admin_question_path(proposal_id: @proposal.id),
-                    class: "button medium" %>
+                    class: "button" %>
       </div>
     </div>
   <% else %>
-    <div class="float-right">
+    <div class="float-right" style="display: flex; gap: 1rem;">
+      <% if can?(:update, @proposal) %>
+        <%= link_to t("dashboard.index.edit_proposal_link"),
+                    edit_proposal_path(@proposal),
+                    class: "button" %>
+      <% end %>
+
       <%= link_to t("admin.proposals.show.create_question"),
                   new_admin_question_path(proposal_id: @proposal.id),
-                  class: "button hollow medium" %>
+                  class: "button" %>
     </div>
   <% end %>
 
