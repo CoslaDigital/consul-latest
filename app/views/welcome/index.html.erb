@@ -7,32 +7,92 @@
 <%= render Shared::BannerComponent.new("homepage") %>
 
 <% provide :social_media_meta_tags do %>
-  <%= render "shared/social_media_meta_tags",
-             social_url: root_url %>
+  <%= render "shared/social_media_meta_tags", social_url: root_url %>
 <% end %>
 
 <%= render "shared/header", header: @header %>
 
-<%= render "feeds" %>
+<%
+  # Extract feeds individually so we can place them in our smart grid
+  processes_feed = @feeds.find { |f| f.kind == "processes" }
+  upcoming_feed = @feeds.find { |f| f.kind == "upcoming" }
+  proposals_feed = @feeds.find { |f| f.kind == "proposals" }
+  debates_feed = @feeds.find { |f| f.kind == "debates" }
+%>
 
-<div class="row">
-  <% if @cards.any? %>
-    <div class="small-12 column <%= "large-8" if feed_processes_enabled? %>">
-      <h2 class="title"><%= t("welcome.cards.title") %></h2>
+<%# --- ROW 1: Citizen Voices (Proposals & Debates) --- %>
+<% if (proposals_feed && proposals_feed.items.any?) || (debates_feed && debates_feed.items.any?) %>
+  <div class="row">
 
-      <%= render "shared/cards", cards: @cards %>
+    <% if proposals_feed && proposals_feed.items.any? %>
+      <div class="small-12 <%= (debates_feed && debates_feed.items.any?) ? 'large-8' : 'large-12' %> column feeds-list">
+        <%= render Widget::Feeds::FeedComponent.new(proposals_feed) %>
+      </div>
+    <% end %>
+
+    <% if debates_feed && debates_feed.items.any? %>
+      <%# Debates are mostly text, so if Proposals are missing, center them at 8 columns instead of stretching to 12 %>
+      <div class="small-12 <%= (proposals_feed && proposals_feed.items.any?) ? 'large-4' : 'large-8 large-centered' %> column feeds-list">
+        <%= render Widget::Feeds::FeedComponent.new(debates_feed) %>
+      </div>
+    <% end %>
+
+  </div>
+<% end %>
+
+
+<%# --- ROW 2: Platform Initiatives (Processes & Upcoming Events) --- %>
+<% if (processes_feed && processes_feed.items.any?) || (upcoming_feed && upcoming_feed.items.any?) %>
+  <div class="row">
+
+    <% if processes_feed && processes_feed.items.any? %>
+      <div class="small-12 <%= (upcoming_feed && upcoming_feed.items.any?) ? 'large-8' : 'large-12' %> column feeds-list">
+        <%= render Legislation::OpenProcessesCarouselComponent.new(processes: processes_feed.items) %>
+      </div>
+    <% end %>
+
+    <% if upcoming_feed && upcoming_feed.items.any? %>
+      <%# Events are short text. If Processes are missing, center Events at 6 columns %>
+      <div class="small-12 <%= (processes_feed && processes_feed.items.any?) ? 'large-4' : 'large-6 large-centered' %> column feeds-list">
+        <%= render Widget::Feeds::FeedComponent.new(upcoming_feed) %>
+      </div>
+    <% end %>
+
+  </div>
+<% end %>
+
+
+<%# --- CATCH-ALL: Custom Feeds --- %>
+<%# Renders any other feeds safely in case Consul adds more or you create custom ones %>
+<% remaining_feeds = @feeds.reject { |f| %w[processes proposals upcoming debates].include?(f.kind) } %>
+<% if remaining_feeds.any? %>
+  <div class="row">
+    <div class="small-12 column feeds-list">
+      <% remaining_feeds.each do |feed| %>
+        <%= render Widget::Feeds::FeedComponent.new(feed) %>
+      <% end %>
     </div>
-  <% end %>
+  </div>
+<% end %>
 
-  <% if feed_processes_enabled? %>
-    <div class="small-12 large-4 column">
-      <%= render "processes" %>
+
+<%# --- ROW 3: Featured Content Cards --- %>
+<% if @cards.any? %>
+  <div class="row">
+    <div class="small-12 column">
+      <%# Keeping the widget-feed class here gives the title consistent spacing/styling %>
+      <div class="widget-feed">
+        <h2 class="title"><%= t("welcome.cards.title") %></h2>
+        <%= render "shared/cards", cards: @cards %>
+      </div>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
-<% if feature?("user.recommendations") && (@recommended_debates.present? || @recommended_proposals.present?) %>
-  <%= render "recommended",
+
+<%# --- ROW 4: Recommendations (Commented out) --- %>
+<%# if feature?("user.recommendations") && (@recommended_debates.present? || @recommended_proposals.present?) %>
+<%#= render "recommended",
              recommended_debates: @recommended_debates,
              recommended_proposals: @recommended_proposals %>
-<% end %>
+<%# end %>
