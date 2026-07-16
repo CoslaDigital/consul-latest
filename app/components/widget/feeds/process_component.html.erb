@@ -1,13 +1,28 @@
-<div class="legislation-process card">
+<div class="legislation-process card" style="margin-bottom: 0;">
   <%= link_to url_for(process) do %>
     <figure class="figure-card">
-      <%= image_tag(image_path_for("welcome_process.png"), alt: "") %>
+
+      <% if process.image.present? %>
+        <%= image_tag process.image.variant(:feed_thumb), alt: process.image.title.unicode_normalize %>
+      <% else %>
+        <%= image_tag image_path_for("welcome_process.png"), alt: process.title %>
+      <% end %>
+
       <figcaption>
         <span><%= t("welcome.feed.process_label") %></span><br>
-        <h3><%= process.title %></h3>
+        <%# 1. Truncate title to ~70 characters (approx 2 lines) %>
+        <h3 title="<%= process.title %>">
+          <%= truncate(process.title, length: 70) %>
+        </h3>
       </figcaption>
     </figure>
-    <p class="description small"><%= process.summary %></p>
+
+    <%# 2. Truncate summary to ~130 chars and add a min-height shock absorber %>
+    <%# The min-height ensures a 1-line summary still takes up the space of 3 lines %>
+    <p class="description small" style="min-height: 4.5em;" title="<%= process.summary %>">
+      <%= truncate(process.summary, length: 130) %>
+    </p>
+
     <%= render SDG::TagListComponent.new(process, linkable: false) %>
     <p class="small"><%= t("welcome.feed.see_process") %></p>
   <% end %>
