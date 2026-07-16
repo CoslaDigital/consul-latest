@@ -12,9 +12,10 @@
           <%= t("legislation.questions.show.next_question") %>
           <span class="icon-angle-right" aria-hidden="true"></span>
         <% end %>
-      <% elsif @question.first_question_id %>
-        <%= link_to legislation_process_question_path(@process, @question.first_question_id), class: "quiz-next-link" do %>
-          <%= t("legislation.questions.show.first_question") %>
+      <% else %>
+        <%# Replaced the infinite loop with an exit path %>
+        <%= link_to legislation_process_path(@process), class: "quiz-next-link" do %>
+          <%= t("legislation.questions.show.return_to_process", default: "Submit Responses") %>
           <span class="icon-angle-right" aria-hidden="true"></span>
         <% end %>
       <% end %>
@@ -30,8 +31,6 @@
     </div>
 
     <aside class="small-12 medium-3 column">
-      <%= render Sensemaker::ReportLinkComponent.new(@question) %>
-
       <div id="social-share" class="sidebar-divider"></div>
       <h2><%= t("legislation.questions.show.share") %></h2>
       <%= render "/shared/social_share", title: @question.title, url: legislation_process_question_url(@question.process, @question) %>

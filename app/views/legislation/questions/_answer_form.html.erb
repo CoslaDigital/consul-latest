@@ -17,14 +17,23 @@
     <form class="controls-stacked disabled">
       <% question.question_options.each do |question_option| %>
         <label class="control radio <%= "is-active" if answer.persisted? && (answer.legislation_question_option_id == question_option.id) %>">
-          <input id="quiz-1" name="radio" type="radio" disabled="true">
+          <input id="quiz-<%= question_option.id %>" name="radio" type="radio" disabled="true">
           <span class="control-indicator"></span>
           <%= question_option.value %>
         </label>
       <% end %>
     </form>
 
+    <%# The completion banner: updated to use callout primary %>
+    <% if answer.persisted? && question.next_question_id.nil? %>
+      <div class="callout primary margin-top" style="margin-top: 2rem;">
+        <strong><%= t("legislation.questions.completion.title", default: "Thank you for participating!") %></strong>
+        <p><%= t("legislation.questions.completion.body", default: "You have reached the end of the consultation questions.") %></p>
+        <%= link_to t("legislation.questions.completion.return", default: "Return to consultation"), legislation_process_path(process), class: "button margin-top" %>
+      </div>
+    <% end %>
+
   <% end %>
 
-  <%= render "participation_not_allowed" %>
+  <%= render "participation_not_allowed" unless process.debate_phase.open? %>
 <% end %>
