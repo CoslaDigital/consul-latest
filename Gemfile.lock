@@ -107,6 +107,7 @@ GEM
       execjs (~> 2)
     base64 (0.3.0)
     bcrypt (3.1.22)
+    bcrypt_pbkdf (1.1.2)
     benchmark (0.5.0)
     better_html (2.1.1)
       actionview (>= 6.0)
@@ -211,6 +212,7 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.0)
     drb (2.2.3)
+    ed25519 (1.4.0)
     em-http-request (1.1.7)
       addressable (>= 2.3.4)
       cookiejar (!= 0.3.1)
@@ -885,6 +887,7 @@ DEPENDENCIES
   ancestry (~> 5.1.0)
   audited (~> 5.8.0)
   autoprefixer-rails (~> 10.4.21)
+  bcrypt_pbkdf
   bing_translator (~> 6.2.0)
   cancancan (~> 3.6.1)
   capistrano (~> 3.20.0)
@@ -906,6 +909,7 @@ DEPENDENCIES
   devise (~> 5.0.4)
   devise-security (~> 0.18.0)
   devise-two-factor (~> 6.1)
+  ed25519
   email_spec (~> 2.3.1)
   erb_lint (~> 0.9.0)
   exiftool_vendored (~> 13.52.0)
