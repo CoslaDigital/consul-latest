@@ -46,7 +46,7 @@ gem "paranoia", "~> 3.1.0"
 gem "pexels", "~> 0.5.0"
 gem "pg", "~> 1.6.3"
 gem "pg_search", "~> 2.3.7"
-gem "puma", "~> 6.6.1"
+gem "puma", "~> 7.2.1"
 gem "recipient_interceptor", "~> 0.3.3"
 gem "redcarpet", "~> 3.6.1"
 gem "responders", "~> 3.2.0"
@@ -63,7 +63,7 @@ gem "sprockets-rails", "~> 3.5.2", require: "sprockets/railtie"
 gem "turbolinks", "~> 5.2.1"
 gem "turnout2024", "~> 3.0.2", require: "turnout"
 gem "uglifier", "~> 4.2.1"
-gem "view_component", "~> 4.9.0"
+gem "view_component", "~> 4.12.0"
 gem "whenever", "~> 1.1.2", require: false
 gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
@@ -95,7 +95,7 @@ group :development do
   gem "capistrano-npm", "~> 1.0.3", require: false
   gem "capistrano-rails", "~> 1.7.0", require: false
   gem "capistrano3-delayed-job", "~> 1.7.6"
-  gem "capistrano3-puma", "~> 6.2.0"
+  gem "capistrano3-puma", "~> 7.1.0"
   gem "erb_lint", "~> 0.9.0", require: false
   gem "faraday-retry", "~> 2.4.0", require: false
   gem "htmlbeautifier", "~> 1.4.3", require: false
