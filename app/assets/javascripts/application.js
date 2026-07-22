@@ -11,7 +11,7 @@
 // about supported directives.
 //
 //= require jquery
-//= require jquery-ujs
+//= require rails-ujs
 //= require jquery-ui/ui/version
 //= require jquery-ui/ui/data
 //= require jquery-ui/ui/keycode
@@ -21,35 +21,9 @@
 //= require jquery-ui/ui/widget
 //= require jquery-ui/ui/widgets/menu
 //= require jquery-ui/ui/widgets/mouse
-//= require jquery-ui/ui/widgets/datepicker
-//= require jquery-ui/ui/i18n/datepicker-ar
-//= require jquery-ui/ui/i18n/datepicker-bs
-//= require jquery-ui/ui/i18n/datepicker-cs
-//= require jquery-ui/ui/i18n/datepicker-da
-//= require jquery-ui/ui/i18n/datepicker-de
-//= require jquery-ui/ui/i18n/datepicker-el
-//= require jquery-ui/ui/i18n/datepicker-es
-//= require jquery-ui/ui/i18n/datepicker-fa
-//= require jquery-ui/ui/i18n/datepicker-fr
-//= require jquery-ui/ui/i18n/datepicker-gl
-//= require jquery-ui/ui/i18n/datepicker-he
-//= require jquery-ui/ui/i18n/datepicker-hr
-//= require jquery-ui/ui/i18n/datepicker-id
-//= require jquery-ui/ui/i18n/datepicker-it
-//= require jquery-ui/ui/i18n/datepicker-nl
-//= require jquery-ui/ui/i18n/datepicker-pl
-//= require jquery-ui/ui/i18n/datepicker-pt-BR
-//= require jquery-ui/ui/i18n/datepicker-ru
-//= require jquery-ui/ui/i18n/datepicker-sl
-//= require jquery-ui/ui/i18n/datepicker-sq
-//= require jquery-ui/ui/i18n/datepicker-sv
-//= require jquery-ui/ui/i18n/datepicker-zh-CN
-//= require jquery-ui/ui/i18n/datepicker-zh-TW
-//= require jquery-ui/ui/i18n/datepicker-en-GB
 //= require jquery-ui/ui/widgets/autocomplete
 //= require jquery-ui/ui/widgets/sortable
-//= require blueimp-file-upload/js/jquery.iframe-transport
-//= require blueimp-file-upload/js/jquery.fileupload
+//= require @deltablot/dropzone/dist/dropzone-min
 //= require foundation-sites
 //= require turbolinks
 //= require turbolinks_anchors
@@ -57,6 +31,7 @@
 //= require_directory ./ckeditor
 //= require social-share-button
 //= require app
+//= require utils
 //= require check_all_none
 //= require comments
 //= require foundation_extras
@@ -89,6 +64,7 @@
 //= require legislation_annotatable
 //= require legislation_draft_versions
 //= require followable
+//= require attachable
 //= require documentable
 //= require imageable
 //= require tree_navigator
@@ -109,7 +85,6 @@
 //= require columns_selector
 //= require budget_edit_associations
 //= require budget_hide_money
-//= require datepicker
 //= require account_menu
 //= require authenticity_token_refresh
 //= require_tree ./admin
@@ -173,7 +148,6 @@ var initialize_modules = function() {
   App.AdminSensemakerScripts.initialize();
   App.BudgetEditAssociations.initialize();
   App.BudgetHideMoney.initialize();
-  App.Datepicker.initialize();
   App.PollsForm.initialize();
   App.SDGRelatedListSelector.initialize();
   App.SDGManagementRelationSearch.initialize();
@@ -187,7 +161,6 @@ var destroy_non_idempotent_modules = function() {
   "use strict";
 
   App.ColumnsSelector.destroy();
-  App.Datepicker.destroy();
   App.HTMLEditor.destroy();
   App.LegislationAnnotatable.destroy();
   App.Map.destroy();
