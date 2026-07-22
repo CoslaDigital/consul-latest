@@ -44,19 +44,13 @@
 @mixin admin-action-icons {
 
   .accept-link {
-    @include has-fa-icon(check-circle, regular);
+    @include has-fa-icon(circle-check, regular);
     color: $color-success;
   }
 
   .reject-link {
-    @include has-fa-icon(times-circle, regular);
-    /* Note: .reject-link is already in your SCSS color list for $alert-color */
-  }
+    @include has-fa-icon(circle-xmark, regular);
 
-  /* If you add Confirm or Fulfill later: */
-  .confirm-link {
-    @include has-fa-icon(handshake, regular);
-    color: $color-success;
   }
 
   .confirm-link {
@@ -65,7 +59,7 @@
   }
 
   .fulfill-link {
-    @include has-fa-icon(check-circle, solid);
+    @include has-fa-icon(circle-check, solid);
     color: $color-success;
   }
 

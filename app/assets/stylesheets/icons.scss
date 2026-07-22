@@ -6,9 +6,9 @@
   font-weight: normal;
   src: font-url("icons.eot");
   src: font-url("icons.eot?#iefix") format("embedded-opentype"),
-    font-url("icons.woff") format("woff"),
-    font-url("icons.ttf") format("truetype"),
-    font-url("icons.svg#icons") format("svg");
+  font-url("icons.woff") format("woff"),
+  font-url("icons.ttf") format("truetype"),
+  font-url("icons.svg#icons") format("svg");
 }
 
 $fa-font-display: block;
@@ -20,7 +20,7 @@ $fa-font-path: "fontawesome-free/webfonts";
   font-style: normal;
   font-weight: 900;
   src: font-url("#{$fa-font-path}/fa-solid-900.woff2") format("woff2"),
-    font-url("#{$fa-font-path}/fa-solid-900.ttf") format("truetype");
+  font-url("#{$fa-font-path}/fa-solid-900.ttf") format("truetype");
 }
 
 @font-face {
@@ -29,7 +29,7 @@ $fa-font-path: "fontawesome-free/webfonts";
   font-style: normal;
   font-weight: 400;
   src: font-url("#{$fa-font-path}/fa-regular-400.woff2") format("woff2"),
-    font-url("#{$fa-font-path}/fa-regular-400.ttf") format("truetype");
+  font-url("#{$fa-font-path}/fa-regular-400.ttf") format("truetype");
 }
 
 @font-face {
@@ -38,7 +38,7 @@ $fa-font-path: "fontawesome-free/webfonts";
   font-style: normal;
   font-weight: 400;
   src: font-url("#{$fa-font-path}/fa-brands-400.woff2") format("woff2"),
-    font-url("#{$fa-font-path}/fa-brands-400.ttf") format("truetype");
+  font-url("#{$fa-font-path}/fa-brands-400.ttf") format("truetype");
 }
 
 [data-icon]::before,
@@ -311,35 +311,6 @@ $fa-font-path: "fontawesome-free/webfonts";
   &::before {
     font-family: "Font Awesome 6 Brands";
   }
-}
-
-.icon-google, /* New */
-.icon-apple, /* New */
-.icon-google-play { /* New */
-
-  &::before {
-    font-family: "Font Awesome 5 Brands";
-    font-weight: 400; /* Brands are typically a normal font-weight */
-  }
-}
-
-.icon-google::before {
-  content: "\f1a0";
-}
-
-.icon-apple::before {
-  content: "\f179";
-}
-
-.icon-google-play::before {
-  content: "\f3ab";
-}
-
-
-.icon-shield::before {
-  content: "\f3ed"; /* This is the code for 'shield-alt' */
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900; /* Solid icons require a heavy font-weight */
 }
 
 .icon-quote-before::before {

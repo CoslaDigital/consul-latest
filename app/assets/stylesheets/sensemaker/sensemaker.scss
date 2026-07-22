@@ -77,7 +77,7 @@
   .italic { font-style: italic; }
 
   .tip {
-    @include has-fa-icon(info-circle, solid);
+    @include has-fa-icon(circle-info, solid);
     margin-right: 0.5rem;
   }
 
