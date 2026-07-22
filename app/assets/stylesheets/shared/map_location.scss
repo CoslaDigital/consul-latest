@@ -71,7 +71,7 @@
 
   &::after {
     content: "\f0ae"; // fa-tasks
-    font-family: "Font Awesome 5 Free", "FontAwesome";
+    font-family: "Font Awesome 6 Free", "FontAwesome";
     font-weight: 900; // CRITICAL: Must be 900 for the free version
     color: #777; // Lighter color makes it look less bold
     font-size: 16px;
@@ -112,7 +112,7 @@
 
   // The Icon next to the text
   &::before {
-    font-family: "Font Awesome 5 Free", "FontAwesome";
+    font-family: "Font Awesome 6 Free", "FontAwesome";
     font-weight: 900; // Must be 900 for the free version
     color: #777;
     margin-right: 8px;
