@@ -34,6 +34,7 @@ RSpec.configure do |config|
   config.before do |example|
     Globalize.set_fallbacks_to_all_available_locales
     Setting["feature.user.skip_verification"] = nil
+    Setting["feature.gdpr.require_consent_for_notifications"] = nil
   end
 
   config.around do |example|
@@ -186,6 +187,12 @@ RSpec.configure do |config|
 
   config.after(:each, :remote_census) do
     savon.unmock!
+  end
+
+  config.around(:each, :with_cache) do |example|
+    ActionController::Base.with(perform_caching: true) do
+      example.run
+    end
   end
 
   config.before(:each, :with_cache) do

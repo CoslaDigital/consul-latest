@@ -203,6 +203,7 @@ tr:
       participation_text: Yaşamak istediğiniz şehri nasıl şekillendireceğinize karar verin.
       participation_title: Katılım
       privacy: Gizlilik ilkesi
+      source_code: Kaynak kodu
     header:
       administration_menu: Menü
       administration: Yönetim
@@ -653,6 +654,10 @@ tr:
     show:
       back: "İçeriğime dön"
   shared:
+    embedded_video:
+      accept: "Videoyu seyredin"
+      warning: "Bu sayfada üçüncü taraf bir hizmet sağlayıcıdan alınan bir video bulunuyor İçeriğe erişerek, verilerinizin üçüncü taraf hizmet sağlayıcılara aktarılabileceğini kabul etmiş olursunuz."
+    warning_for_external_links: "Onaylayarak, siteden ayrılmayı kabul etmiş olursunuz."
     actions:
       label: "%{action} %{name}"
     edit: "Düzenle"
@@ -928,8 +933,8 @@ tr:
     poll:
       take_part: '%{from} ile %{to} arasında katılın'
   remote_translations:
-    text: Bu sayfanın içeriği sizin dilinizde hazırlanmamış
-    all_remote_translations_enqueued_text: Sayfayı yeniledikten kısa bir süre sonra tüm içeriği dilinizde görebileceksiniz.
+    text: Bu sayfanın içeriği sizin dilinizde hazırlanmamış. Çevirmek ister misiniz?
+    all_remote_translations_enqueued_text: Çevrilmiş içeriğin görüntülenmesi için lütfen 5 saniye bekleyin ve siteyi yenileyin.
     create:
       enqueue_remote_translation: Çeviriler doğru şekilde istendi.
     button: Sayfanın dilini çevir

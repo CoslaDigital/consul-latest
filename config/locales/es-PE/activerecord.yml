@@ -74,24 +74,6 @@ es-PE:
       legislation/proposal:
         one: "la propuesta"
         other: "Propuestas"
-      legislation/draft_versions:
-        one: "Versión borrador"
-        other: "Versiones del borrador"
-      legislation/questions:
-        one: "Pregunta"
-        other: "Preguntas ciudadanas"
-      legislation/question_options:
-        one: "Opción de respuesta cerrada"
-        other: "Opciones de respuesta"
-      legislation/answers:
-        one: "Respuesta"
-        other: "Respuestas"
-      documents:
-        one: "el documento"
-        other: "Documentos"
-      images:
-        one: "Imagen"
-        other: "Imágenes"
       topic:
         one: "Tema"
         other: "Temas"
@@ -263,7 +245,6 @@ es-PE:
         title: "Título"
       site_customization/page:
         content: Contenido
-        created_at: Creado
         subtitle: Subtítulo
         status: Estado
         status_draft: "Borrador"
