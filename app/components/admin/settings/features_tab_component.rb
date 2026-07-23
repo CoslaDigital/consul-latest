@@ -27,7 +27,6 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
       feature.graphql_api
       feature.sdg
       feature.machine_learning
-      feature.sensemaker
       feature.force_2factor
       feature.remove_investments_supports
       feature.gdpr.require_consent_for_notifications
