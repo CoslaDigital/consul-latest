@@ -5,9 +5,8 @@ Rails.application.config.to_prepare do
 
     private
 
-      # 1. The main gatekeeper (This is guaranteed to run on every admin request)
+      # 1. The main gatekeeper
       def verify_administrator
-        # Check basic access first
         unless current_user.administrator? || current_user.process_manager?
           raise CanCan::AccessDenied.new(
             I18n.t("flash.actions.errors.not_allowed"),
@@ -16,13 +15,11 @@ Rails.application.config.to_prepare do
           )
         end
 
-        # If they are allowed into the admin panel, instantly run the firewall check!
         enforce_strict_editing_firewall
       end
 
-      # 2. The unified firewall (No longer an independent before_action)
+      # 2. The unified firewall
       def enforce_strict_editing_firewall
-        # Only restrict Process Managers who are not full Administrators
         return unless current_user&.process_manager? && !current_user&.administrator?
 
         # --- BUDGET FIREWALL ---
@@ -33,7 +30,8 @@ Rails.application.config.to_prepare do
           return unless target_id
 
           budget = Budget.find_by(id: target_id)
-          if budget && budget.author_id != current_user.id
+          # NEW: Only block if the budget explicitly belongs to someone else
+          if budget && budget.author_id.present? && budget.author_id != current_user.id
             raise CanCan::AccessDenied.new(I18n.t("flash.actions.errors.not_allowed"))
           end
         end
@@ -46,7 +44,8 @@ Rails.application.config.to_prepare do
           return unless target_id
 
           process = Legislation::Process.find_by(id: target_id)
-          if process && process.author_id != current_user.id
+          # NEW: Only block if the process explicitly belongs to someone else
+          if process && process.author_id.present? && process.author_id != current_user.id
             raise CanCan::AccessDenied.new(I18n.t("flash.actions.errors.not_allowed"))
           end
         end
