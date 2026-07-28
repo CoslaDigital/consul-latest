@@ -38,6 +38,7 @@
 // Leaflet Control Overrides (Foundation & UI Fixes)
 // --------------------------------------------------------
 
+// Fix for checkbox/radio button alignment
 .leaflet-control-layers {
   label {
     display: flex !important;
@@ -54,9 +55,10 @@
 }
 
 // --------------------------------------------------------
-// Layer Control Toggle Buttons
+// Layer Control Toggle Buttons (The external icons)
 // --------------------------------------------------------
 
+// Base alignment
 .leaflet-control-layers-toggle {
   display: flex;
   justify-content: center;
@@ -65,33 +67,34 @@
 
 // TOP RIGHT (Data Overlay) -> FontAwesome Checklist
 .leaflet-top .leaflet-control-layers-toggle {
-  background-image: none !important;
-
-  // Font Awesome 6 version:
-  // @include has-fa-icon("list-check", solid, "after");
-
-  // Font Awesome 5 version (Active):
-  @include has-fa-icon("tasks", solid, "after");
+  background-image: none !important; // Strip the native icon
 
   &::after {
-    color: #777;
+    content: "\f0ae"; // fa-tasks
+    font-family: "Font Awesome 6 Free", "FontAwesome";
+    font-weight: 900; // CRITICAL: Must be 900 for the free version
+    color: #777; // Lighter color makes it look less bold
     font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-// BOTTOM RIGHT (Base Maps)
+// BOTTOM RIGHT (Base Maps) -> Restore Native Leaflet Icon
 .leaflet-bottom .leaflet-control-layers-toggle {
+  /* By NOT setting background-image: none, Leaflet's delicate gray stack returns */
   &::after {
     content: none !important;
   }
 }
 
+// CRITICAL FIX: Force the original button to hide when the menu opens
 .leaflet-control-layers-expanded .leaflet-control-layers-toggle {
   display: none !important;
 }
 
 // --------------------------------------------------------
-// Layer Control Expanded Panel
+// Layer Control Expanded Panel (The internal headers)
 // --------------------------------------------------------
 
 .layer-control-header {
@@ -107,10 +110,15 @@
   letter-spacing: 0.5px;
   background: none !important;
 
+  // The Icon next to the text
   &::before {
+    font-family: "Font Awesome 6 Free", "FontAwesome";
+    font-weight: 900; // Must be 900 for the free version
     color: #777;
     margin-right: 8px;
     font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   &::after {
@@ -118,23 +126,16 @@
   }
 }
 
-// Assign the correct SVG masks to the specific headers
-.leaflet-top .layer-control-header {
-  // Font Awesome 6 version:
-  // @include has-fa-icon("list-check", solid);
-
-  // Font Awesome 5 version (Active):
-  @include has-fa-icon("tasks", solid);
+// Assign the correct icon to the correct header
+.leaflet-top .layer-control-header::before {
+  content: "\f0ae";
 }
 
-.leaflet-bottom .layer-control-header {
-  // Font Awesome 6 version:
-  // @include has-fa-icon("layer-group", solid);
-
-  // Font Awesome 5 version (Active):
-  @include has-fa-icon("layer-group", solid);
+.leaflet-bottom .layer-control-header::before {
+  content: "\f5fd";
 }
 
+// Clean up the expanded panel
 .leaflet-control-layers-expanded {
   padding: 10px !important;
   min-width: 150px;
