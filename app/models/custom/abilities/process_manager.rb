@@ -69,26 +69,26 @@ module Abilities
       can :manage, Dashboard::Action
 
       # ====================================================================
-      # BUDGET CORE RULES — author-scoped
+      # BUDGET CORE RULES — author-scoped (Allows owner + legacy nil)
       # ====================================================================
       can :read, :admin_dashboard
       can [:index, :create, :budget_headings, :select, :select_headings], Budget
 
       cannot [:update, :destroy, :publish, :calculate_winners, :read_results, :read_admin_stats], Budget
-      can [:read, :update, :destroy], Budget, author_id: user.id
+      can [:read, :update, :destroy], Budget, author_id: [user.id, nil]
 
-      can :publish, Budget, id: Budget.drafting.where(author_id: user.id).ids
+      can :publish, Budget, id: Budget.drafting.where(author_id: [user.id, nil]).ids
 
       can :calculate_winners, Budget do |budget|
-        budget.author_id == user.id && budget.reviewing_ballots?
+        [user.id, nil].include?(budget.author_id) && budget.reviewing_ballots?
       end
 
       can :read_results, Budget do |budget|
-        budget.author_id == user.id && budget.balloting_finished? && budget.has_winning_investments?
+        [user.id, nil].include?(budget.author_id) && budget.balloting_finished? && budget.has_winning_investments?
       end
 
       can :read_admin_stats, Budget do |budget|
-        budget.author_id == user.id && budget.balloting_or_later?
+        [user.id, nil].include?(budget.author_id) && budget.balloting_or_later?
       end
 
       # ====================================================================
@@ -99,8 +99,8 @@ module Abilities
       # 1. Nuke ALL core engine rules (including :edit and :new)
       cannot :manage, Budget::Phase
 
-      # 2. Re-grant using ONLY Hash conditions (CanCanCan handles both SQL and memory checks with this)
-      can [:create, :update, :destroy], Budget::Phase, budget: { author_id: user.id }
+      # 2. Re-grant using ONLY Hash conditions (Allows owner + legacy nil)
+      can [:create, :update, :destroy], Budget::Phase, budget: { author_id: [user.id, nil] }
 
       # ====================================================================
       # BUDGET GROUP RULES — isolation override
@@ -111,7 +111,7 @@ module Abilities
       cannot :manage, Budget::Group
 
       # 2. Re-grant using ONLY Hash conditions
-      can [:create, :update, :destroy], Budget::Group, budget: { author_id: user.id }
+      can [:create, :update, :destroy], Budget::Group, budget: { author_id: [user.id, nil] }
 
       # ====================================================================
       # BUDGET HEADING RULES — isolation override via deep association
@@ -122,7 +122,7 @@ module Abilities
       cannot :manage, Budget::Heading
 
       # 2. Re-grant using ONLY Hash conditions
-      can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: user.id }}
+      can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: [user.id, nil] } }
 
       can :create, Budget::ValuatorAssignment
       # ====================================================================
@@ -165,14 +165,33 @@ module Abilities
       can :access, :ckeditor
       can :manage, Ckeditor::Picture
 
-      can [:read, :debate, :draft_publication, :allegations, :result_publication,
-           :milestones], Legislation::Process
-      can [:create, :update, :destroy], Legislation::Process
-      can [:manage], ::Legislation::DraftVersion
-      can [:manage], ::Legislation::Question
-      can [:manage], ::Legislation::Proposal
+      # ====================================================================
+      # LEGISLATION CORE & SUB-COMPONENT RULES — author-scoped
+      # ====================================================================
+
+      # Allow viewing the main index and public-facing phases
+      can [:read, :debate, :draft_publication, :allegations, :result_publication, :milestones], Legislation::Process
+
+      # 1. Restrict the Process itself
+      cannot [:update, :destroy], Legislation::Process
+      can [:create, :update, :destroy], Legislation::Process, author_id: [user.id, nil]
+
+      # 2. Restrict Draft Versions
+      cannot :manage, ::Legislation::DraftVersion
+      can [:create, :update, :destroy], ::Legislation::DraftVersion, process: { author_id: [user.id, nil] }
+
+      # 3. Restrict Questions
+      cannot :manage, ::Legislation::Question
+      can [:create, :update, :destroy], ::Legislation::Question, process: { author_id: [user.id, nil] }
+
+      # 4. Restrict Proposals
+      cannot :manage, ::Legislation::Proposal
+      can [:update, :hide, :restore], ::Legislation::Proposal, process: { author_id: [user.id, nil] }
+
       cannot :comment_as_moderator,
              [::Legislation::Question, Legislation::Annotation, ::Legislation::Proposal]
+
+      # ====================================================================
 
       can [:create], Document
       can [:destroy], Document do |document|
