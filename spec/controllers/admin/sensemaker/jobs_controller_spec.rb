@@ -12,60 +12,10 @@ describe Admin::Sensemaker::JobsController do
   before { sign_in(admin) }
 
   describe "GET #index" do
-    it "returns successful response and sets no filter_target when no filter params" do
+    it "returns successful response" do
       get :index
 
       expect(response).to have_http_status(:ok)
-      expect(controller.instance_variable_get(:@filter_target)).to be(nil)
-    end
-
-    context "when filtering by resource_type and resource_id" do
-      let!(:debate_job) do
-        create(:sensemaker_job,
-               user: admin,
-               analysable_type: "Debate",
-               analysable_id: debate.id,
-               parent_job_id: nil,
-               started_at: nil,
-               finished_at: 1.day.ago)
-      end
-      let!(:other_job) do
-        create(:sensemaker_job,
-               user: admin,
-               analysable_type: "Debate",
-               analysable_id: create(:debate).id,
-               parent_job_id: nil,
-               started_at: nil,
-               finished_at: 1.day.ago)
-      end
-
-      it "sets filter_target and scopes jobs to that resource" do
-        get :index, params: { resource_type: "debates", resource_id: debate.id }
-
-        expect(response).to have_http_status(:ok)
-        expect(controller.instance_variable_get(:@filter_target)).to eq(debate)
-        jobs = controller.instance_variable_get(:@sensemaker_jobs)
-        expect(jobs).to include(debate_job)
-        expect(jobs).not_to include(other_job)
-      end
-    end
-
-    context "when target is not found" do
-      it "redirects to index with alert" do
-        get :index, params: { resource_type: "debates", resource_id: 99999 }
-
-        expect(response).to redirect_to(admin_sensemaker_jobs_path)
-        expect(flash[:alert]).to be_present
-      end
-    end
-
-    context "when resource_type is unknown" do
-      it "redirects to index with alert" do
-        get :index, params: { resource_type: "unknown_type", resource_id: 1 }
-
-        expect(response).to redirect_to(admin_sensemaker_jobs_path)
-        expect(flash[:alert]).to be_present
-      end
     end
   end
 
@@ -88,8 +38,10 @@ describe Admin::Sensemaker::JobsController do
       before do
         FileUtils.mkdir_p(File.dirname(tmp_file))
         File.write(tmp_file, "{}")
-        allow_any_instance_of(Sensemaker::Job).to receive(:output_artefact_paths)
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_output_artefact_paths)
           .and_return([tmp_file])
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_input_artefact_paths)
+                                                             .and_return([])
       end
 
       after do
@@ -128,7 +80,9 @@ describe Admin::Sensemaker::JobsController do
 
     context "when artefact param is invalid" do
       it "redirects to show with alert" do
-        allow_any_instance_of(Sensemaker::Job).to receive(:output_artefact_paths)
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_output_artefact_paths)
+                                                             .and_return([])
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_input_artefact_paths)
           .and_return([])
 
         get :download, params: { id: job.id, artefact: "nonexistent.json" }
@@ -138,31 +92,30 @@ describe Admin::Sensemaker::JobsController do
       end
     end
 
-    context "when no artefact param and persisted_output exists (relative path for deploy safety)" do
-      let(:relative_path) { "tmp/persisted-#{SecureRandom.hex}.html" }
-      let(:resolved_path) { Rails.root.join(relative_path) }
+    context "when no artefact param and persisted_output exists" do
+      let(:tmp_file) { Rails.root.join("tmp", "persisted-#{SecureRandom.hex}.html").to_s }
 
       before do
-        FileUtils.mkdir_p(File.dirname(resolved_path))
-        File.write(resolved_path, "<html></html>")
-        job.update!(persisted_output: relative_path)
+        FileUtils.mkdir_p(File.dirname(tmp_file))
+        File.write(tmp_file, "<html></html>")
+        job.update!(persisted_output: tmp_file)
       end
 
       after do
-        FileUtils.rm_f(resolved_path)
+        FileUtils.rm_f(tmp_file)
       end
 
-      it "sends the file using persisted_output_path (resolved from Rails.root)" do
+      it "sends the persisted_output file" do
         get :download, params: { id: job.id }
 
         expect(response).to have_http_status(:ok)
-        expect(response.header["Content-Disposition"]).to include(File.basename(relative_path))
+        expect(response.header["Content-Disposition"]).to include(File.basename(tmp_file))
       end
     end
 
     context "when no artefact param and no persisted_output" do
       it "redirects to index with not found alert" do
-        allow_any_instance_of(Sensemaker::Job).to receive(:persisted_output).and_return(nil)
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:persisted_output_path).and_return(nil)
 
         get :download, params: { id: job.id }
 

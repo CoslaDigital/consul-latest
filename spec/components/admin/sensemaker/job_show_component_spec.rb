@@ -44,7 +44,7 @@ describe Admin::Sensemaker::JobShowComponent do
         File.join(Sensemaker::Paths.sensemaker_data_folder, "input-#{sensemaker_job.id}.csv")
       end
       let(:artefact_path) do
-        File.join(Sensemaker::Paths.sensemaker_data_folder, sensemaker_job.output_file_name)
+        File.join(Sensemaker::Paths.sensemaker_data_folder, sensemaker_job.artefacts.output_file_name)
       end
       before do
         sensemaker_job.update!(
