@@ -11,7 +11,6 @@
         <h3><%= t("admin.sensemaker.job_show.details") %></h3>
         <div>
           <%= link_to t("admin.sensemaker.job_show.back_to_jobs"), admin_sensemaker_jobs_path, class: "margin-right" %>
-          <%= link_to t("admin.sensemaker.job_show.published_reports_link"), jobs_index_path_for(sensemaker_job.analysable), class: "margin-right" if is_published? %>
           <% if can_publish? %>
             <% if is_published? %>
               <%= button_to t("admin.sensemaker.job_row.unpublish"), unpublish_admin_sensemaker_job_path(sensemaker_job), form_class: "inline", class: "button", method: :patch %>
@@ -71,6 +70,7 @@
                 </td>
               </tr>
             <% end %>
+
             <tr>
               <td><strong><%= t("admin.sensemaker.job_show.target_type") %></strong></td>
               <td><%= sensemaker_job.analysable_type %></td>
@@ -131,7 +131,7 @@
 
         <h4><%= t("admin.sensemaker.job_show.input_files") %></h4>
         <ul>
-          <% input_paths = sensemaker_job.existing_input_artefact_paths %>
+          <% input_paths = sensemaker_job.artefacts.existing_input_artefact_paths %>
           <% if input_paths.any? %>
             <% input_paths.each do |path| %>
               <li>
@@ -145,7 +145,7 @@
 
         <h4><%= t("admin.sensemaker.job_show.output_files") %></h4>
         <ul>
-          <% output_paths = sensemaker_job.existing_output_artefact_paths %>
+          <% output_paths = sensemaker_job.artefacts.existing_output_artefact_paths %>
           <% if output_paths.any? %>
             <% output_paths.each do |path| %>
               <li>

@@ -1,6 +1,5 @@
 module Admin::Sensemaker::JobComponentHelpers
   extend ActiveSupport::Concern
-  include Sensemaker::ReportComponentHelpers
 
   def job_status_class
     "job-status-#{job.status.downcase}"
