@@ -1,34 +1,10 @@
 class Admin::Sensemaker::JobsController < Admin::BaseController
-  include Sensemaker::ResourceTypeResolution
-
   def index
     @running_jobs = Sensemaker::Job.running.includes(:children).order(created_at: :desc)
-
-    @filter_resource_type, @filter_resource_id = normalized_filter_params
-    if @filter_resource_type.present? && @filter_resource_id.present?
-      @filter_target = sensemaker_find_resource(@filter_resource_type, @filter_resource_id)
-      unless @filter_target
-        redirect_to admin_sensemaker_jobs_path, alert: t("admin.sensemaker.index.target_not_found")
-        return
-      end
-      base_scope = Sensemaker::Job.for_analysable(@filter_target, published_only: false)
-    elsif @filter_resource_type.present?
-      resource_class = sensemaker_model_for_resource_type(@filter_resource_type)
-      unless resource_class
-        redirect_to admin_sensemaker_jobs_path, alert: t("admin.sensemaker.index.target_not_found")
-        return
-      end
-      base_scope = Sensemaker::Job.by_analysable_type(resource_class.to_s)
-    else
-      base_scope = Sensemaker::Job
-    end
-
-    @sensemaker_jobs = base_scope.where(parent_job_id: nil)
-                                 .includes(:children)
-                                 .where.not(id: @running_jobs.pluck(:id))
-                                 .order(created_at: :desc)
-
-    @sensemaker_resource_types = Sensemaker::ResourceTypeResolution::SENSEMAKER_RESOURCE_TYPES
+    @sensemaker_jobs = Sensemaker::Job.where(parent_job_id: nil)
+                                      .includes(:children)
+                                      .where.not(id: @running_jobs.pluck(:id))
+                                      .order(created_at: :desc)
   end
 
   def show
@@ -66,12 +42,6 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
       processes.each do |process|
         collection = []
-
-        collection << { title: I18n.t("admin.sensemaker.new.analyse_all_questions",
-                                      model_label: I18n.t("activerecord.models.legislation/question.other"),
-                                      default: "Analyse all questions"),
-                        object: process }
-        @result_count += 1
 
         unless process.proposals.empty?
           collection << {
@@ -250,7 +220,8 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
   def download
     @sensemaker_job = Sensemaker::Job.find(params[:id])
-    artefacts = @sensemaker_job.existing_input_artefact_paths + @sensemaker_job.existing_output_artefact_paths
+    job_artefacts = @sensemaker_job.artefacts
+    artefacts = job_artefacts.existing_input_artefact_paths + job_artefacts.existing_output_artefact_paths
 
     if params[:artefact].present?
       requested = File.join(Sensemaker::Paths.sensemaker_data_folder, params[:artefact])
@@ -262,10 +233,9 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
       end
     end
 
-    path = @sensemaker_job.persisted_output_path
+    path = job_artefacts.persisted_output_path
     if path.present? && File.exist?(path)
-      return send_file path,
-                       filename: File.basename(path)
+      return send_file path.to_s, filename: File.basename(path)
     end
 
     redirect_to admin_sensemaker_jobs_path,
@@ -304,10 +274,6 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
   end
 
   private
-
-    def normalized_filter_params
-      [params[:resource_type].presence, params[:resource_id].presence]
-    end
 
     def sensemaker_job_params
       params.require(:sensemaker_job).permit(:analysable_type, :analysable_id, :script, :additional_context)
