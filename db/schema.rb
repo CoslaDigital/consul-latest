@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_30_112213) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -238,6 +238,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_112213) do
     t.datetime "updated_at", precision: nil
     t.boolean "geozone_restricted", default: false
     t.integer "geozone_ids", default: [], array: true
+    t.integer "max_winners"
     t.index ["geozone_id"], name: "index_budget_headings_on_geozone_id"
     t.index ["group_id"], name: "index_budget_headings_on_group_id"
   end
