@@ -231,6 +231,7 @@ en:
       budget/group/translation:
         name: "Group name"
       budget/heading:
+        max_winners: "Seats / Winners"
         allow_custom_content: "Allow content block"
         latitude: "Latitude (optional)"
         longitude: "Longitude (optional)"

@@ -225,6 +225,8 @@ en:
         create: "Create new heading"
         edit: "Edit heading"
         submit: "Save heading"
+        max_winners: "Number of winners (seats)"
+        max_winners_info: "Leave blank to use the budget default (%{default_winners} winners)"
       group_switcher:
         currently_showing: "Showing headings from the <strong>%{group}</strong> group."
         the_other_group: "Manage headings from the %{group} group."
