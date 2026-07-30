@@ -21,9 +21,6 @@ class Budget
     end
 
     def calculate_stv_winners
-      # ----------------------------------------------------------------
-      # Gather all the initial data for the election.
-      # ----------------------------------------------------------------
       reset_winners
 
       summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".parameterize
@@ -31,8 +28,15 @@ class Budget
       summary_title = "Election Results: #{@budget.name}"
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
-      seats = budget.stv_winners
-      votes_cast = @heading.effective_max_winners
+      # 1. Ask the heading for its specific seat count
+      seats = @heading.effective_max_winners
+
+      # 2. Get the cleanly filtered ballot data
+      ballot_data = get_votes_data
+
+      # 3. Calculate votes cast based ONLY on this specific heading's voters
+      votes_cast = ballot_data.size
+
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
       quota = droop_quota(votes_cast, seats)
       investment_titles = candidates.pluck(:id, :title).to_h
@@ -260,29 +264,17 @@ class Budget
 
     def transfer_eliminated_votes(votes_data, eliminated_investment_id)
       reallocated_votes = []
-      exhausted_ballot_count = 0
 
       votes_data.each do |vote|
-        if vote[:rankings].first == eliminated_investment_id
-          next_preference_index = 1
-          loop do
-            next_preference = vote[:rankings][next_preference_index]
-            if next_preference && !elected_or_eliminated?(next_preference)
-              reallocated_votes << next_preference
-              break
-            elsif next_preference.nil?
-              exhausted_ballot_count += 1
-              break
-            end
-            next_preference_index += 1
-          end
-          vote[:rankings].shift
+        # 1. Find where the eliminated candidate actually sits in this ballot's rankings (index 0, 1, 2, etc.)
+        index = vote[:rankings].index(eliminated_investment_id)
+        if index
+          # 2. Look ahead at all subsequent preferences and find the first one that is still active
+          next_pref = vote[:rankings][(index + 1)..-1]&.find { |id| !elected_or_eliminated?(id) }
+          reallocated_votes << next_pref if next_pref
         end
       end
 
-      if exhausted_ballot_count > 0
-        write_to_output("<p><em>(#{exhausted_ballot_count} votes could not be transferred as they had no further valid preferences.)</em></p>")
-      end
       reallocated_votes
     end
 
@@ -325,46 +317,25 @@ class Budget
       Rails.logger.info "--- [DEBUG] FINISHED update_winning_investments. ---"
     end
 
-    def oldupdate_winning_investments(winning_investment_ids)
-      Budget::Investment.where(id: winning_investment_ids).update_all(winner: true)
-    end
-
     def get_votes_data(ballots = get_ballots)
-      # Get all the ballot IDs for the current budget in one query
       ballot_ids = ballots.pluck(:id)
 
-      # Get all the lines for ALL those ballots in a single query
-      all_lines = Budget::Ballot::Line.where(ballot_id: ballot_ids)
-                                      .select(:ballot_id, :investment_id)
+      # Strictly scope lines to the current heading, and ensure they are sorted by rank!
+      all_lines = Budget::Ballot::Line.where(ballot_id: ballot_ids, heading_id: @heading.id)
+                                      .order(:position)
 
-      # Group the lines by their ballot_id in memory (very fast)
       lines_by_ballot = all_lines.group_by(&:ballot_id)
 
-      # Transform the grouped data into the required array of hashes format,
-      # preserving the original order of ballots.
-      ballot_ids.map do |id|
-        # Find the lines for the current ballot id, convert them to an array of investment_ids,
-        # or return an empty array if the ballot had no lines.
+      # Transform into the required array format, dropping any ballot that didn't vote here
+      valid_ballots = []
+      ballot_ids.each do |id|
         rankings = lines_by_ballot[id]&.map(&:investment_id) || []
-        { rankings: rankings }
+        valid_ballots << { rankings: rankings } if rankings.any?
       end
+
+      valid_ballots
     end
 
-    def old_get_votes_data(ballots = get_ballots)
-      votes_data = []
-      ballots.each do |ballot|
-        votes_data.concat(get_ballot_lines(ballot.id))
-      end
-      votes_data
-    end
-
-    def old_get_ballot_lines(ballot_id)
-      ballot_lines = Budget::Ballot::Line.where(ballot_id: ballot_id)
-      votes_data = []
-      rankings = ballot_lines.pluck(:investment_id)
-      votes_data << { rankings: rankings }
-      votes_data
-    end
 
     def update_custom_page(html_content, page_title, page_slug)
       file_name_for_slug = "stv_voting_#{@budget.name}_#{@heading.name}"
