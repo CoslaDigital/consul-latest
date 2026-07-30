@@ -76,7 +76,7 @@ class Admin::BudgetsController < Admin::BaseController
     @heading = @budget.headings.find(params[:heading_id]) # Assumes heading_id is passed
 
     # --- Re-run the STV data gathering process ---
-    seats = @budget.stv_winners
+    seats = @heading.effective_max_winners
     votes_cast = @budget.ballots.count
     @candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
     @quota = Budget::Stvresult.new(@budget, @heading).droop_quota(votes_cast, seats)

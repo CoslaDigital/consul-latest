@@ -32,7 +32,7 @@ class Budget
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
       seats = budget.stv_winners
-      votes_cast = budget.ballots.count
+      votes_cast = @heading.effective_max_winners
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
       quota = droop_quota(votes_cast, seats)
       investment_titles = candidates.pluck(:id, :title).to_h
