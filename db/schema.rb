@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_30_112213) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -713,6 +713,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
     t.string "census_code"
     t.text "geojson"
     t.string "color"
+    t.bigint "parent_id"
+    t.index ["parent_id"], name: "index_geozones_on_parent_id"
   end
 
   create_table "geozones_polls", id: :serial, force: :cascade do |t|
@@ -1987,6 +1989,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
   add_foreign_key "failed_census_calls", "users"
   add_foreign_key "flags", "users"
   add_foreign_key "follows", "users"
+  add_foreign_key "geozones", "geozones", column: "parent_id"
   add_foreign_key "geozones_polls", "geozones"
   add_foreign_key "geozones_polls", "polls"
   add_foreign_key "identities", "users"
