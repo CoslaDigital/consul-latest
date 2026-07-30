@@ -308,66 +308,43 @@ class User < ApplicationRecord
 
   private
 
-  def self.log_in_or_create_ys_user(username)
-    Rails.logger.info("YS inside log in or create")
-    if (existing_user = User.find_by(username: username))
-      Rails.logger.info("YS Existing user")
-      # Log in the existing user
-      return existing_user # Assuming successful login
-    else
-      # Create a new user
-      Rails.logger.info("Create YS - NOT EXISTING USER")
-      ys_username = username
-      ys_password = username
-      ys_document_number = username
-      ys_email = "#{username}@consul.dev"
-      ys_confirmed_at = Time.now
-      #    ys_geozone = 1
-      prefix = username.to_s[0, 6]
-      council_name = NEC_PREFIX_MAPPING[prefix]
-
-      # Construct the geozone name, defaulting to "ys" if prefix is unknown
-      geozone_name = council_name ? "ys_#{council_name}" : "ys"
-
-      ys_geozone_id = Geozone.find_or_create_by(name: geozone_name).id
-      # ---------------------------------
-
-      Rails.logger.info("YS Trying to create new user with Geozone: #{geozone_name}")
-      user = User.new(
-        username: ys_username,
-        email: ys_email,
-        password: ys_password,
-        geozone_id: ys_geozone_id, # Updated to use dynamic geozone
-        terms_of_service: "1",
-        document_number: ys_document_number,
-        confirmed_at: DateTime.current,
-      # verified_at: DateTime.current,
-      # residence_verified_at: DateTime.current
-      )
-
-      Rails.logger.info("User save errors: #{user.errors.full_messages.join(", ")}")
-      Rails.logger.info("YS About to try to sign in the user #{user.inspect}")
-      user.valid?
-      # Check if there are errors NOT related to the password
-      # We ignore errors on :password, but keep errors on :email, :username, etc.
-      other_errors = user.errors.messages.except(:password)
-      if other_errors.empty?
-        # 3. If the only issues were password-related, force save
-        if user.save(validate: false)
-          Rails.logger.info("Create YS - USER created (Password complexity bypassed)")
-          user.errors.clear
-          return user
-        else
-          Rails.logger.info("Create YS - System Error during save")
-        end
-      else
-        # 4. If there were real errors (like duplicate email), fail as normal
-        Rails.logger.info("Create YS - USER NOT created due to: #{other_errors}")
+    def self.log_in_or_create_ys_user(username)
+      if (existing_user = User.find_by(username: username))
+        return existing_user
       end
 
-      nil # Return nil if save failed
+      prefix = username.to_s[0, 6]
+      council_name = NEC_PREFIX_MAPPING[prefix]
+      geozone_name = "ys_#{council_name}"
+
+      user = User.new(
+        username: username,
+        email: "#{username}@consul.dev",
+        password: username,
+        document_number: username,
+        geozone_id: Geozone.find_by!(name: geozone_name).id,
+        terms_of_service: "1",
+        confirmed_at: Time.current,
+        verified_at: Time.current,
+        residence_verified_at: Time.current
+      )
+
+      user.valid?
+
+      # We ignore password complexity errors for YS users, but keep other validations
+      other_errors = user.errors.messages.except(:password)
+
+      if other_errors.empty?
+        if user.save(validate: false)
+          user.errors.clear
+          return user
+        end
+      else
+        Rails.logger.error("Failed to create YS user #{username}: #{other_errors}")
+      end
+
+      nil
     end
-  end
 
   def self.validate_document_number(document_number)
     return false if document_number.blank?
@@ -384,21 +361,21 @@ class User < ApplicationRecord
   end
 
   def self.valid_ys_document?(document_number)
-    valid_prefixes = Rails.application.secrets.ys_prefixes || []
-
-    if valid_prefixes.empty?
-      Rails.logger.warn("No valid document prefixes found in secrets.")
-      return false
-    end
-
-    # Perform the specific YS checks
     return false unless document_number.to_s.length == 16
 
     prefix = document_number.to_s[0, 6]
     middle = document_number.to_s[6, 8]
     suffix = document_number.to_s[14, 2]
 
-    return false unless valid_prefixes.include?(prefix)
+    # 1. Check if the prefix exists in our known mapping
+    council_name = NEC_PREFIX_MAPPING[prefix]
+    return false unless council_name # Reject immediately if prefix is unknown
+
+    # 2. Check if the corresponding Geozone actually exists in the database
+    expected_geozone = "ys_#{council_name}"
+    return false unless Geozone.exists?(name: expected_geozone)
+
+    # 3. Perform the standard YS digit structure checks
     return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
 
     true
