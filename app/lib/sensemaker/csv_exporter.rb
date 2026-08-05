@@ -36,39 +36,44 @@ module Sensemaker
       end
     end
 
-    def self.filter_zero_vote_comments_from_csv(csv_file_path)
+    # Ensures every comment row has at least one vote signal for advanced_runner.
+    # Rows with zero agrees, disagrees, and passes get a default passes value of 1
+    # so they are not dropped by vote-dependent processing.
+    def self.provide_defaults_for_zero_vote_comments(csv_file_path)
       return unless File.exist?(csv_file_path)
 
-      filtered_rows = []
-      filtering_required = false
+      rows = []
+      defaults_applied = false
       comments_count = 0
 
       CSV.foreach(csv_file_path, headers: true) do |row|
+        comments_count += 1
         agrees = (row["agrees"] || 0).to_i
         disagrees = (row["disagrees"] || 0).to_i
         passes = (row["passes"] || 0).to_i
 
-        if agrees > 0 || disagrees > 0 || passes > 0
-          filtered_rows << row
-          comments_count += 1
-        else
-          filtering_required = true
+        if agrees.zero? && disagrees.zero? && passes.zero?
+          row["agrees"] = "0" if row["agrees"].nil?
+          row["disagrees"] = "0" if row["disagrees"].nil?
+          row["passes"] = "1"
+          defaults_applied = true
         end
+
+        rows << row
       end
 
-      if filtering_required
-        comments_count = 0
+      if defaults_applied
         FileUtils.cp(csv_file_path, "#{csv_file_path}.unfiltered")
         headers = CSV.read("#{csv_file_path}.unfiltered", headers: true).headers
+        headers = (headers + %w[agrees disagrees passes]).uniq
         CSV.open(csv_file_path, "w", write_headers: true, headers: headers) do |csv|
-          filtered_rows.each do |row|
-            comments_count += 1
-            csv << row
-          end
+          rows.each { |row| csv << headers.map { |header| row[header] } }
         end
-        Rails.logger.debug("Filtered CSV: #{filtered_rows.length} comments without votes")
+        Rails.logger.debug(
+          "Default vote passes applied for zero-vote comments in #{csv_file_path}"
+        )
       else
-        Rails.logger.debug("All comments have votes, no filtering required")
+        Rails.logger.debug("All comments have votes, no defaults required")
       end
 
       comments_count

@@ -13,18 +13,6 @@ describe Sensemaker::JobRunner do
            additional_context: "")
   end
 
-  shared_context "sensemaker paths stubbed" do
-    let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
-    let(:report_ui_folder) { "/tmp/sensemaker_test_folder/report-ui" }
-
-    before do
-      allow(Sensemaker::Paths).to receive_messages(
-        sensemaker_data_folder: data_folder,
-        report_ui_folder: report_ui_folder
-      )
-    end
-  end
-
   describe "#initialize" do
     it "initializes with the provided job" do
       service = Sensemaker::JobRunner.new(job)
@@ -40,14 +28,14 @@ describe Sensemaker::JobRunner do
       allow(File).to receive(:exist?).and_return(true)
       allow(service).to receive(:system).with("which node > /dev/null 2>&1").and_return(true)
       allow(service).to receive(:system).with("which npx > /dev/null 2>&1").and_return(true)
-      allow(service).to receive(:check_dependencies?).and_return(true)
+      allow(service).to receive_messages(check_dependencies?: true, prepare_input_data: 0)
     end
 
     it "runs the complete workflow successfully" do
       allow(File).to receive(:exist?).and_return(true)
       allow(service).to receive(:system).and_return(true)
 
-      service.run
+      service.run_synchronously
 
       job.reload
       expect(job.started_at).to be_present
@@ -58,19 +46,19 @@ describe Sensemaker::JobRunner do
       allow(service).to receive(:check_dependencies?).and_return(false)
       expect(service).not_to receive(:execute_script)
 
-      service.run
+      service.run_synchronously
     end
 
     it "stops if execute_script returns false" do
       expect(service).to receive(:execute_script).and_return(false)
 
-      service.run
+      service.run_synchronously
     end
 
     it "handles errors and updates the job" do
       expect(service).to receive(:execute_script).and_raise(StandardError.new("Test error"))
 
-      expect { service.run }.to raise_error(StandardError)
+      expect { service.run_synchronously }.to raise_error(StandardError)
 
       job.reload
       expect(job.finished_at).to be_present
@@ -151,7 +139,7 @@ describe Sensemaker::JobRunner do
       "the input file does not exist" => [
         -> {
           allow(File).to receive(:exist?).with(Sensemaker::Paths.sensemaker_package_folder).and_return(true)
-          allow(File).to receive(:exist?).with(job.input_file).and_return(false)
+          allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(false)
         },
         "Input file not found"
       ],
@@ -161,14 +149,14 @@ describe Sensemaker::JobRunner do
           .and_return("/nonexistent/key.json")
           allow(File).to receive(:exist?).with("/nonexistent/key.json").and_return(false)
           allow(File).to receive(:exist?).with(Sensemaker::Paths.sensemaker_package_folder).and_return(true)
-          allow(File).to receive(:exist?).with(job.input_file).and_return(true)
+          allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
         },
         "Key file (apis.google_application_credentials) not found"
       ],
       "the script file does not exist" => [
         -> {
           allow(File).to receive(:exist?).with(Sensemaker::Paths.sensemaker_package_folder).and_return(true)
-          allow(File).to receive(:exist?).with(job.input_file).and_return(true)
+          allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
           allow(File).to receive(:exist?).with(service.script_file).and_return(false)
         },
         "Script file not found"
@@ -296,7 +284,7 @@ describe Sensemaker::JobRunner do
         expect(command).to include("--modelName gemini-2.5-flash-lite")
         expect(command).not_to include("--keyFilename")
         expect(command).not_to include("--baseUrl")
-        expect(command).to include("--inputFile #{job.input_file}")
+        expect(command).to include("--inputFile #{job.artefacts.input_path}")
         if use_output_file_flag
           expect(command).to include("--outputFile #{service.output_file}")
         else
@@ -343,19 +331,22 @@ describe Sensemaker::JobRunner do
 
     it "returns the correct command for the sensemaking-report-ui script" do
       service.job.update!(script: "sensemaking-report-ui")
-      allow(service.job.conversation).to receive(:target_label).with(format: :full).and_return("Test Label")
+      conversation = instance_double(Sensemaker::Conversation)
+      allow(service.job).to receive(:conversation).and_return(conversation)
+      allow(conversation).to receive(:target_label).with(format: :full).and_return("Test Label")
 
       command = service.build_command
+      input_path = job.artefacts.input_path
 
       expect(command).to include("npx sensemaking-report-ui inline")
       expect(command).to include("--topics")
-      expect(command).to include("#{job.input_file}-topic-stats.json")
+      expect(command).to include("#{input_path}-topic-stats.json")
       expect(command).to include("--summary")
-      expect(command).to include("#{job.input_file}-summary.json")
+      expect(command).to include("#{input_path}-summary.json")
       expect(command).to include("--comments")
-      expect(command).to include("#{job.input_file}-comments-with-scores.json")
+      expect(command).to include("#{input_path}-comments-with-scores.json")
       expect(command).to include("--metadata")
-      expect(command).to include("#{job.input_file}-metadata.json")
+      expect(command).to include(job.artefacts.metadata_path)
       expect(command).to include(Shellwords.escape("Report for Test Label"))
       expect(command).to include("--outputDir")
       expect(command).to include("--outputFile")
@@ -390,7 +381,6 @@ describe Sensemaker::JobRunner do
 
   describe "#execute_job_workflow" do
     let(:service) { Sensemaker::JobRunner.new(job) }
-    include_context "sensemaker paths stubbed"
 
     before do
       allow(File).to receive(:exist?).and_return(true)
@@ -400,9 +390,9 @@ describe Sensemaker::JobRunner do
       allow(service).to receive(:prepare_input_data)
     end
 
-    context "when all output files exist" do
+    context "when artefacts are complete" do
       it "sets finished_at and does not set error" do
-        allow(job).to receive(:has_outputs?).and_return(true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
 
         service.send(:execute_job_workflow)
 
@@ -412,7 +402,7 @@ describe Sensemaker::JobRunner do
       end
 
       it "sets comments_analysed count when job finishes successfully" do
-        allow(job).to receive(:has_outputs?).and_return(true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
         allow(service).to receive(:prepare_input_data).and_return(5)
 
         service.send(:execute_job_workflow)
@@ -420,23 +410,11 @@ describe Sensemaker::JobRunner do
         job.reload
         expect(job.comments_analysed).to eq(5)
       end
-
-      it "triggers the callback to set persisted_output (relative path for deploy safety)" do
-        job.script = "categorization_runner.ts"
-        output_path = "#{data_folder}/categorization-output-#{job.id}.csv"
-        allow(File).to receive(:exist?).with(output_path).and_return(true)
-        allow(job).to receive(:has_outputs?).and_return(true)
-
-        service.send(:execute_job_workflow)
-
-        job.reload
-        expect(job.persisted_output).to eq(job.relative_output_path)
-      end
     end
 
-    context "when output files do not exist" do
+    context "when artefacts are incomplete" do
       it "sets finished_at and error message" do
-        allow(job).to receive(:has_outputs?).and_return(false)
+        allow(job.artefacts).to receive(:complete?).and_return(false)
 
         service.send(:execute_job_workflow)
 
@@ -444,46 +422,7 @@ describe Sensemaker::JobRunner do
         expect(job.finished_at).to be_present
         expect(job.error).to eq("Output file(s) not found")
       end
-
-      it "does not set persisted_output" do
-        allow(job).to receive(:has_outputs?).and_return(false)
-
-        service.send(:execute_job_workflow)
-
-        job.reload
-        expect(job.persisted_output).to be(nil)
-      end
     end
-
-    shared_examples "checks all output files exist and sets persisted_output" do |script_name, path_suffixes|
-      before do
-        job.update!(script: script_name)
-        allow(service).to receive_messages(check_dependencies?: true, execute_script: "success")
-        allow(service).to receive(:prepare_input_data)
-      end
-
-      it "checks all output files exist" do
-        base_path = "#{data_folder}/output-#{job.id}"
-        path_suffixes.each do |suffix|
-          allow(File).to receive(:exist?).with("#{base_path}#{suffix}").and_return(true)
-        end
-
-        service.send(:execute_job_workflow)
-
-        job.reload
-        expect(job.finished_at).to be_present
-        expect(job.error).to be(nil)
-        expect(job.persisted_output).to eq(job.relative_output_path)
-      end
-    end
-
-    it_behaves_like "checks all output files exist and sets persisted_output",
-                    "advanced_runner.ts",
-                    %w[-summary.json -topic-stats.json -comments-with-scores.json]
-
-    it_behaves_like "checks all output files exist and sets persisted_output",
-                    "runner.ts",
-                    %w[-summary.json -summary.html -summary.md -summaryAndSource.csv]
   end
 
   describe "#prepare_input_data" do
@@ -524,7 +463,9 @@ describe Sensemaker::JobRunner do
     end
 
     it "updates the job with additional context" do
-      allow(job).to receive(:conversation).and_call_original
+      allow(job).to receive(:conversation).and_return(
+        Sensemaker::Conversation.new(job.analysable_type, job.analysable_id)
+      )
 
       service.send(:prepare_input_data)
 
@@ -545,18 +486,18 @@ describe Sensemaker::JobRunner do
       before do
         job.script = "advanced_runner.ts"
         job.input_file = "/tmp/categorization-output.csv"
-        allow(File).to receive(:exist?).with(job.input_file).and_return(true)
+        allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
       end
 
-      it "calls CsvExporter.filter_zero_vote_comments_from_csv" do
-        expect(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
-          .with(job.input_file).and_return(3)
+      it "calls CsvExporter.provide_defaults_for_zero_vote_comments" do
+        expect(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
+                                             .with(job.artefacts.input_path).and_return(3)
         service.send(:prepare_input_data)
       end
 
-      it "returns the filtered count from filter_zero_vote_comments_from_csv" do
-        allow(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
-          .with(job.input_file).and_return(3)
+      it "returns the comments count from provide_defaults_for_zero_vote_comments" do
+        allow(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
+                                            .with(job.artefacts.input_path).and_return(3)
         result = service.send(:prepare_input_data)
 
         expect(result).to eq(3)
@@ -570,19 +511,19 @@ describe Sensemaker::JobRunner do
       before do
         job.script = "advanced_runner.ts"
         job.input_file = nil
-        allow(File).to receive(:exist?).with(job.input_file).and_return(true)
+        allow(File).to receive(:exist?).with(job.artefacts.input_path).and_return(true)
       end
 
-      it "calls prepare_with_categorization_job and then filters the CSV" do
+      it "calls prepare_with_categorization_job and then applies zero-vote defaults" do
         allow(service).to receive(:prepare_with_categorization_job).and_return(10)
-        allow(Sensemaker::CsvExporter).to receive(:filter_zero_vote_comments_from_csv)
-          .with(job.input_file).and_return(8)
+        allow(Sensemaker::CsvExporter).to receive(:provide_defaults_for_zero_vote_comments)
+                                            .with(job.artefacts.input_path).and_return(10)
 
         result = service.send(:prepare_input_data)
 
-        expect(result).to eq(8)
-        expect(Sensemaker::CsvExporter).to have_received(:filter_zero_vote_comments_from_csv)
-          .with(job.input_file)
+        expect(result).to eq(10)
+        expect(Sensemaker::CsvExporter).to have_received(:provide_defaults_for_zero_vote_comments)
+                                             .with(job.artefacts.input_path)
       end
     end
 

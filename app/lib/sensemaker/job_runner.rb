@@ -26,16 +26,16 @@ module Sensemaker
       execute_job_workflow
     end
 
-    def max_attempts
-      1
+    def artefacts
+      job.artefacts
     end
 
     def output_file_name
-      job.output_file_name
+      artefacts.output_file_name
     end
 
     def output_file
-      "#{Sensemaker::Paths.sensemaker_data_folder}/#{output_file_name}"
+      artefacts.default_output_path
     end
 
     def script_file
@@ -70,7 +70,7 @@ module Sensemaker
       if job.script == "sensemaking-report-ui"
         conversation = job.conversation
         target_label = conversation.target_label(format: :full)
-        base = job.input_file
+        base = artefacts.input_path
         data_folder = Sensemaker::Paths.sensemaker_data_folder
 
         return [
@@ -78,7 +78,7 @@ module Sensemaker
           "--topics #{Shellwords.escape("#{base}-topic-stats.json")}",
           "--summary #{Shellwords.escape("#{base}-summary.json")}",
           "--comments #{Shellwords.escape("#{base}-comments-with-scores.json")}",
-          "--metadata #{Shellwords.escape("#{base}-metadata.json")}",
+          "--metadata #{Shellwords.escape(artefacts.metadata_path)}",
           "--reportTitle #{Shellwords.escape("Report for #{target_label}")}",
           "--outputDir #{Shellwords.escape(data_folder.to_s)}",
           "--outputFile #{Shellwords.escape(output_file_name)}"
@@ -107,7 +107,7 @@ module Sensemaker
       command_parts << "--baseUrl #{Shellwords.escape(sensemaker_base_url)}" if sensemaker_base_url.present?
 
       command = command_parts.join(" ")
-      command += " --inputFile #{job.input_file}" unless job.script == "health_check_runner.ts"
+      command += " --inputFile #{artefacts.input_path}" unless job.script == "health_check_runner.ts"
       if additional_context.present?
         command += " --additionalContext #{Shellwords.escape(additional_context.to_s)}"
       end
@@ -138,7 +138,7 @@ module Sensemaker
         return if execute_script.blank?
 
         attribs = { finished_at: Time.current }
-        if job.has_outputs?
+        if artefacts.complete?
           attribs[:comments_analysed] = comments_prepared_count
         else
           attribs = attribs.merge(error: "Output file(s) not found")
@@ -210,14 +210,16 @@ module Sensemaker
           comments_prepared_count = prepare_with_advanced_runner_job
         elsif persisted_input_missing
           comments_prepared_count = conversation.comments.size
-          generated_input_path = job.input_file
+          generated_input_path = artefacts.input_path
           exporter = Sensemaker::CsvExporter.new(conversation)
           exporter.export_to_csv(generated_input_path)
           job.update!(input_file: generated_input_path)
         end
 
         if job.script.eql?("advanced_runner.ts")
-          comments_prepared_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(job.input_file)
+          comments_prepared_count = Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(
+            artefacts.input_path
+          )
         end
 
         write_report_metadata if job.script.eql?("sensemaking-report-ui")
@@ -226,7 +228,7 @@ module Sensemaker
       end
 
       def write_report_metadata
-        metadata_path = "#{job.input_file}-metadata.json"
+        metadata_path = artefacts.metadata_path
         return if File.exist?(metadata_path)
 
         conversation = job.conversation
@@ -305,11 +307,11 @@ module Sensemaker
           return false unless file_exists?(Sensemaker::Paths.report_ui_folder,
                                            description: "sensemaking-report-ui package folder")
 
-          job.input_artefact_paths.each do |artefact_path|
+          artefacts.input_artefact_paths.each do |artefact_path|
             return false unless file_exists?(artefact_path, description: "Report input artefact")
           end
         else
-          return false unless file_exists?(job.input_file, description: "Input file")
+          return false unless file_exists?(artefacts.input_path, description: "Input file")
         end
 
         return false unless file_exists?(script_file, description: "Script file")
