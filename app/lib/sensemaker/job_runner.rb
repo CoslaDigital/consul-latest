@@ -217,7 +217,7 @@ module Sensemaker
         end
 
         if job.script.eql?("advanced_runner.ts")
-          comments_prepared_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(
+          comments_prepared_count = Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(
             artefacts.input_path
           )
         end

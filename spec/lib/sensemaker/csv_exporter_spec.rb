@@ -39,11 +39,11 @@ describe Sensemaker::CsvExporter do
     end
   end
 
-  describe ".filter_zero_vote_comments_from_csv" do
+  describe ".provide_defaults_for_zero_vote_comments" do
     let(:csv_file_path) { "/tmp/test-categorization-output.csv" }
     let(:temp_csv_file) { Tempfile.new(["test-categorization-output", ".csv"]) }
-    let(:filter_csv_header) { "comment-id,comment_text,agrees,disagrees,passes,author-id,topics\n" }
-    let(:expected_filter_headers) { %w[comment-id comment_text agrees disagrees passes author-id topics] }
+    let(:csv_header) { "comment-id,comment_text,agrees,disagrees,passes,author-id,topics\n" }
+    let(:expected_headers) { %w[comment-id comment_text agrees disagrees passes author-id topics] }
 
     def with_temp_csv(*lines)
       temp = Tempfile.new(["test-csv", ".csv"])
@@ -55,12 +55,12 @@ describe Sensemaker::CsvExporter do
       temp&.unlink
     end
 
-    def read_filtered_csv
+    def read_csv
       CSV.read(csv_file_path, headers: true)
     end
 
     before do
-      temp_csv_file.write(filter_csv_header)
+      temp_csv_file.write(csv_header)
       temp_csv_file.write("comment_1,First comment,5,2,1,user_1,Transportation:PublicTransit\n")
       temp_csv_file.write("comment_2,Second comment,0,0,0,user_2,Transportation:Parking\n")
       temp_csv_file.write("comment_3,Third comment,3,0,0,user_3,Technology:Internet\n")
@@ -78,44 +78,51 @@ describe Sensemaker::CsvExporter do
       FileUtils.rm_f("#{csv_file_path}.unfiltered")
     end
 
-    it "preserves all columns in the filtered CSV" do
-      Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+    it "preserves all columns" do
+      Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
-      expect(read_filtered_csv.first.headers).to include(*expected_filter_headers)
+      expect(read_csv.first.headers).to include(*expected_headers)
     end
 
     it "preserves the topics column from categorization" do
-      Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+      Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
-      topics = read_filtered_csv.map { |row| row["topics"] }
+      topics = read_csv.map { |row| row["topics"] }
 
       expect(topics).to include("Transportation:PublicTransit", "Technology:Internet",
                                 "Transportation:Cycling", "Technology:Mobile")
     end
 
-    it "filters out all zero votes" do
+    it "keeps all rows and sets passes to 1 for zero-vote rows" do
       with_temp_csv(
-        filter_csv_header,
+        csv_header,
         "comment_pass,Pass only,0,0,1,user_1,Transportation:PublicTransit\n",
         "comment_disagree,Disagree only,0,2,0,user_1,Transportation:PublicTransit\n",
         "comment_zero,Zero votes,0,0,0,user_2,Transportation:Parking\n"
       ) do
-        comments_count = Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+        comments_count = Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
-        filtered_data = read_filtered_csv
-        expect(filtered_data.length).to eq(2)
-        expect(filtered_data.first["comment-id"]).to eq("comment_pass")
-        expect(comments_count).to eq(2)
+        data = read_csv
+        expect(data.length).to eq(3)
+        expect(comments_count).to eq(3)
+
+        zero_row = data.find { |row| row["comment-id"] == "comment_zero" }
+        expect(zero_row["passes"]).to eq("1")
+        expect(zero_row["agrees"]).to eq("0")
+        expect(zero_row["disagrees"]).to eq("0")
+
+        pass_row = data.find { |row| row["comment-id"] == "comment_pass" }
+        expect(pass_row["passes"]).to eq("1")
       end
     end
 
     it "handles empty CSV files gracefully" do
-      with_temp_csv(filter_csv_header) do
+      with_temp_csv(csv_header) do
         expect do
-          Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+          Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
         end.not_to raise_error
 
-        expect(read_filtered_csv.length).to eq(0)
+        expect(read_csv.length).to eq(0)
       end
     end
 
@@ -125,44 +132,49 @@ describe Sensemaker::CsvExporter do
       expect(File).to receive(:exist?).with(non_existent_file).and_return(false)
       expect(CSV).not_to receive(:foreach)
 
-      Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(non_existent_file)
+      Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(non_existent_file)
     end
 
-    it "creates an unfiltered backup when filtering is required" do
-      Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+    it "creates an unfiltered backup when defaults are applied" do
+      Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
       expect(File.exist?("#{csv_file_path}.unfiltered")).to be true
 
       unfiltered_data = CSV.read("#{csv_file_path}.unfiltered", headers: true)
       expect(unfiltered_data.length).to eq(6)
 
-      expect(read_filtered_csv.length).to eq(4)
+      data = read_csv
+      expect(data.length).to eq(6)
+      zero_vote_passes = data.select { |row| %w[comment_2 comment_6].include?(row["comment-id"]) }
+                             .map { |row| row["passes"] }
+      expect(zero_vote_passes).to all(eq("1"))
     end
 
-    it "does not create an unfiltered backup when no filtering is required" do
+    it "does not create an unfiltered backup when no defaults are required" do
       with_temp_csv(
-        filter_csv_header,
+        csv_header,
         "comment_1,First comment,5,2,1,user_1,Transportation:PublicTransit\n",
         "comment_2,Second comment,0,3,0,user_2,Transportation:Parking\n",
         "comment_3,Third comment,3,0,0,user_3,Technology:Internet\n"
       ) do
-        Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
+        Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
         expect(File.exist?("#{csv_file_path}.unfiltered")).to be false
       end
     end
 
-    it "handles missing vote columns gracefully" do
+    it "handles missing vote columns by defaulting passes to 1" do
       with_temp_csv(
         "comment-id,comment_text,author-id,topics\n",
         "comment_1,First comment,user_1,Transportation:PublicTransit\n",
         "comment_2,Second comment,user_2,Transportation:Parking\n"
       ) do
-        expect do
-          Sensemaker::CsvExporter.filter_zero_vote_comments_from_csv(csv_file_path)
-        end.not_to raise_error
+        comments_count = Sensemaker::CsvExporter.provide_defaults_for_zero_vote_comments(csv_file_path)
 
-        expect(read_filtered_csv.length).to eq(0)
+        data = read_csv
+        expect(comments_count).to eq(2)
+        expect(data.length).to eq(2)
+        expect(data.map { |row| row["passes"] }).to all(eq("1"))
       end
     end
   end
