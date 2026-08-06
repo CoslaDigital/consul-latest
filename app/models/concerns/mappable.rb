@@ -36,8 +36,8 @@ module Mappable
       # Group by the association object (e.g. proposal_kind) rather than just the raw ID column
       geolocated.includes(group_attribute.to_sym).group_by(&group_attribute.to_sym).each do |kind, items|
         # Grab the human-readable title or name method off the associated configuration model safely
-        kind_name = kind.respond_to?(:name) ? kind.name : kind.to_s.humanize
-        kind_slug = kind.respond_to?(:slug) ? kind.slug : kind.to_s.parameterize
+        kind_name = kind&.name || "Proposal"
+        kind_slug = kind&.slug || "proposal"
 
         layer_name = "#{model_name.human.pluralize}: #{kind_name}"
         icon_class = "#{icon_class_prefix}-#{kind_slug}"

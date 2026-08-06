@@ -467,7 +467,7 @@
     border: 1px solid #ccc;
   }
 
-
+}
   .admin-sidebar {
     background: linear-gradient(to bottom, var(--brand) 0%, var(--brand-secondary) 100%);
   }
@@ -721,7 +721,7 @@
   .map {
     --map-height: 650px;
     --marker-size: 30px;
-    --marker-color: #00cae9;
+    --marker-color: #00cae9; /* Default Consul Blue */
     --marker-inner-size: 14px;
     --marker-inner-color: #fff;
 
@@ -741,35 +741,46 @@
       top: 50%;
       visibility: visible;
 
+      /* -------------------------------------------
+         Override the color variable based on the class
+         ------------------------------------------- */
+      &.proposal-pin-proposal {
+        --marker-color: #95a5a6;
+      }
+
+      /* Grey */
+      &.proposal-pin-mutual-aid {
+        --marker-color: #e67e22;
+      }
+
+      /* Orange */
+      &.proposal-pin-infrastructure {
+        --marker-color: #8e44ad;
+      }
+
+      /* Purple */
+
       .map-icon {
-        background: #00cae9;
+        background: var(--marker-color);
         border-radius: 50% 50% 50% 0;
-        height: 30px;
+        height: var(--marker-size);
         transform: rotate(-45deg);
-        width: 30px;
+        width: var(--marker-size);
+        transition: background-color 0.3s ease; /* Smooth color transition */
       }
 
       .map-icon::after {
-        background: #fff;
+        background: var(--marker-inner-color);
         border-radius: 50%;
         content: "";
-        height: 14px;
+        height: var(--marker-inner-size);
         margin: 8px 0 0 8px;
         position: absolute;
-        width: 14px;
+        width: var(--marker-inner-size);
       }
     }
   }
-  .leaflet-control-layers-toggle {
-    background-image: image-url("leaflet/layers.png");
-    width: 36px;
-    height: 36px;
-  }
-  .leaflet-retina .leaflet-control-layers-toggle {
-    background-image: image-url("leaflet/layers-2x.png");
-    background-size: 26px 26px;
-  }
-}
+
 
 /* For debugging the hero-header background issue */
 body .site-dev .hero-header.hero-header .row::before {
