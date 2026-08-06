@@ -294,7 +294,7 @@ namespace :admin do
 
     resource :locales, only: [:show, :update]
 
-    resources :postcodes, only: [:index, :new, :create, :edit, :update, :destroy, :ncsv, :process_csv, :ncsv_review] do
+    resources :postcodes, except: [:show] do
       collection do
         get :ncsv
         post :process_csv

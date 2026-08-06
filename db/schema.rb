@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_28_143353) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -238,6 +238,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_143353) do
     t.datetime "updated_at", precision: nil
     t.boolean "geozone_restricted", default: false
     t.integer "geozone_ids", default: [], array: true
+    t.integer "max_winners"
     t.index ["geozone_id"], name: "index_budget_headings_on_geozone_id"
     t.index ["group_id"], name: "index_budget_headings_on_group_id"
   end
@@ -712,6 +713,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_143353) do
     t.string "census_code"
     t.text "geojson"
     t.string "color"
+    t.bigint "parent_id"
+    t.index ["parent_id"], name: "index_geozones_on_parent_id"
   end
 
   create_table "geozones_polls", id: :serial, force: :cascade do |t|
@@ -1986,6 +1989,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_143353) do
   add_foreign_key "failed_census_calls", "users"
   add_foreign_key "flags", "users"
   add_foreign_key "follows", "users"
+  add_foreign_key "geozones", "geozones", column: "parent_id"
   add_foreign_key "geozones_polls", "geozones"
   add_foreign_key "geozones_polls", "polls"
   add_foreign_key "identities", "users"
