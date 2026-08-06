@@ -63,7 +63,7 @@ gem "sprockets", "~> 4.2.2"
 gem "sprockets-rails", "~> 3.5.2", require: "sprockets/railtie"
 gem "turbolinks", "~> 5.2.1"
 gem "turnout2024", "~> 3.0.2", require: "turnout"
-gem "uglifier", "~> 4.2.1"
+gem "terser"
 gem "view_component", "~> 4.12.0"
 gem "whenever", "~> 1.1.2", require: false
 gem "wicked_pdf", "~> 2.8.2"
