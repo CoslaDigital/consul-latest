@@ -10,6 +10,8 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_votes
                           feature.restrict_debate_creation
                           feature.user_milestones
+                          feature.restrict_login_to_officials
+                          feature.require_login_to_view_processes
                           feature.enable_card_login
                           feature.my_area_landing_page
                           feature.geofence_card_login

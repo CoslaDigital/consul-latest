@@ -29,11 +29,15 @@ class Setting
       else
         consul_defaults.merge({
           # Overwrite default CONSUL DEMOCRACY settings or add new settings here
+          "feature.events": false,
           "feature.hide_comments": false,
           "feature.hide_votes": false,
           "feature.hide_local_login": false,
           "feature.demographics": false,
           "feature.restrict_debate_creation": false,
+          "feature.user_milestones": false,
+          "feature.restrict_login_to_officials": false,
+          "feature.require_login_to_view_processes": false
           "feature.user_milestones": false,
           "feature.enable_card_login": false,
           "feature.my_area_landing_page": false,
