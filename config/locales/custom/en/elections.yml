@@ -66,7 +66,7 @@ en:
       prev_phase: Previous phase
       current_phase: Current phase
       map: candidates  located geographically
-      finished_budgets: Finished electionss
+      finished_budgets: Finished elections
       see_results: See results
       section_footer:
         title: About SYP elections
@@ -227,7 +227,7 @@ en:
     executions:
       link: "Milestones"
       page_title: "%{budget} - Milestones"
-      heading: "Participatory budget Milestones"
+      heading: " Milestones"
       heading_selection_title: "By district"
       no_winner_investments: "No winning candidates in this state"
       filters:
@@ -254,13 +254,13 @@ en:
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
           questions: "Create form fields to be displayed on budget investments"
-        edit: "Edit budget"
+        edit: "Edit Election"
         preview: "Preview"
         preview_results: "Preview results"
         questions: "Manage Questions"
       index:
-        title: Participatory budgets
-        new_link: Create new budget
+        title: Elections
+        new_link: Create new election
         filter: Filter
         filters:
           all: All
@@ -278,18 +278,18 @@ en:
         type_pending: "Pending: No headings yet"
         type_single: "Single heading"
         admin_ballots: Ballots
-        no_budgets: "There are no budgets."
+        no_budgets: "There are no elections."
       create:
         notice: New election created successfully!
       update:
         notice: election updated successfully
       publish:
-        notice: "Electionpublished successfully"
+        notice: "Election published successfully"
       edit:
         title: Edit Election
         drafting: "This participatory budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
         publish: "Publish election"
-        delete: Delete budget
+        delete: Delete election
         phase: Phase
         phases_caption: "Phases"
         phases_table_help_text: "The configuration of these phases is used for information purposes only. Its function is to define the phases information displayed on the public page of the participatory budget."
@@ -312,7 +312,7 @@ en:
         name_description: "This is the name of the participatory budget used on the header and cards whenever it is active"
         image_description: "If an image is uploaded it will be used as the banner on top of this participatory budget, otherwise the default color for budgets will be used."
         main_call_to_action: "Main call to action (optional)"
-        main_call_to_action_description: "This link will appear on main banner of this participatory budget and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
+        main_call_to_action_description: "This link will appear on main banner of this election and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
         info:
           budget_settings: "General election settings"
           staff_settings: "Administrators and Valuators assigned to the election"
@@ -327,7 +327,7 @@ en:
         stv_winners: "Number of seats"
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
-        success_notice: Budget deleted successfully
+        success_notice: Election deleted successfully
         unable_notice: You cannot delete a budget that has associated investments
         unable_notice_polls: You cannot delete a budget that has an associated poll
       new:
@@ -386,7 +386,7 @@ en:
         success_notice: "Heading deleted successfully"
         unable_notice: "You cannot delete a Heading that has associated investments"
       form:
-        geozone_info: "When a heading is associated with a geozone, the geozone will appear on this budget's map if the geozone includes GeoJSON data."
+        geozone_info: "When a heading is associated with a geozone, the geozone will appear on this elections map if the geozone includes GeoJSON data."
         max_ballot_lines_info: 'Maximum number of projects a user can vote on this heading during the "Voting projects" phase. Only for budgets using approval voting.'
         population_info: "Budget Heading population field is used for Statistic purposes at the end of the Budget to show for each Heading that represents an area with population what percentage voted. The field is optional so you can leave it empty if it doesn't apply."
         coordinates_info: "If latitude and longitude are provided, the investments page for this heading will include a map. This map will be centered using those coordinates."
@@ -408,10 +408,10 @@ en:
         description_help_text: This text will appear in the header when the phase is active
         duration: "Phase's duration"
         duration_description: "These fields are used for information purposes only and <strong>do not trigger an automatic update of the active phase.</strong> In order to update it, edit the budget and select the active phase."
-        enabled_help_text: "This phase will be public in the budget's phases timeline"
+        enabled_help_text: "This phase will be public in the elections phases timeline"
         image_description: "If an image is uploaded it will be displayed next to the description of this phase."
         main_call_to_action: "Main call to action (optional)"
-        main_call_to_action_description: "This link will appear on main banner of this participatory budget when this phase is enabled and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
+        main_call_to_action_description: "This link will appear on main banner of this election when this phase is enabled and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
         name_help_text: "This is the title of the phase users will read on the header whenever this phase is active."
         save_changes: Save changes
       index:
@@ -476,7 +476,7 @@ en:
           author_email: Email
           ballot_lines_count: Votes
           winner: Winner
-        cannot_calculate_winners: The budget has to stay on phase "%{phase}" in order to calculate winners projects
+        cannot_calculate_winners: The election has to stay on phase "%{phase}" in order to calculate winners projects
         see_results: "See results"
         milestone_tags_filter_all: "All milestone tags"
       show:

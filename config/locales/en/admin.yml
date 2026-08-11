@@ -158,7 +158,7 @@ en:
         stv_winners: "Number of seats"
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
-        success_notice: Budget deleted successfully
+        success_notice: Election deleted successfully
         unable_notice: You cannot delete a budget that has associated investments
         unable_notice_polls: You cannot delete a budget that has an associated poll
       new:
