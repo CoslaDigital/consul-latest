@@ -16,7 +16,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if resource.valid?
       super
     else
-      render :new
+      # 1. Clean up passwords so they don't render hashed data in the form
+      clean_up_passwords resource
+      set_minimum_password_length if respond_to?(:set_minimum_password_length)
+
+      # 2. CRITICAL FIX: Add the 422 status code required by Turbo
+      render :new, status: :unprocessable_entity
     end
   end
 

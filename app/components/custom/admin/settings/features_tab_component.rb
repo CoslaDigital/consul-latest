@@ -10,6 +10,8 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_votes
                           feature.restrict_debate_creation
                           feature.user_milestones
+                          feature.restrict_login_to_officials
+                          feature.require_login_to_view_processes
                         ]
     original_settings + custom_settings
   end

@@ -1,6 +1,8 @@
 # Additional translations at https://github.com/plataformatec/devise/wiki/I18n
 en:
   devise:
+    failure:
+      unauthorized_domain: "Your email domain is not authorized to access this application."
     sessions:
       local_sign_in_title: "Log in with a local account"
       local_sign_in_description: "Use this form to sign in with a locally created account"

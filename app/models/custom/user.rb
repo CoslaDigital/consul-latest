@@ -9,6 +9,19 @@ class User < ApplicationRecord
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
+  # 1. Registration Restriction
+  validate :email_belongs_to_allowed_domain, if: -> { email.present? && email_changed? }
+
+  # 2. Login Restriction
+  def active_for_authentication?
+    super && allowed_email_domain?
+  end
+
+  # Provide a specific error message when login fails due to domain
+  def inactive_message
+    allowed_email_domain? ? super : :unauthorized_domain
+  end
+
   def masked_username
     return username if username.blank?
 
@@ -365,5 +378,35 @@ class User < ApplicationRecord
 
       # Check if the document number matches ANY of the formats
       allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
+    end
+
+    def allowed_email_domain?
+
+      return true unless Setting["feature.restrict_login_to_officials"]
+
+      # 1. Admin Safeguard: Administrators can ALWAYS log in/register,
+      # regardless of their email domain.
+      return true if administrator?
+
+      # 2. Fetch the allowed domain setting
+      allowed_domain = Setting["email_domain_for_officials"].to_s.strip.downcase.sub(/\A@/, "")
+
+      # 3. If the setting is empty, there is no restriction
+      return true if allowed_domain.blank?
+
+      # 4. If the setting exists but the user has no email, block them
+      return false if email.blank?
+
+      # 5. Check the domain
+      user_domain = email.split('@').last.downcase
+
+      # Allow exact match OR subdomains (e.g., if allowed is "gov.uk", allow "staff.gov.uk")
+      user_domain == allowed_domain || user_domain.end_with?(".#{allowed_domain}")
+    end
+
+    def email_belongs_to_allowed_domain
+      unless allowed_email_domain?
+        errors.add(:email, "must belong to the authorized domain (#{Setting['email_domain_for_officials']})")
+      end
     end
 end
