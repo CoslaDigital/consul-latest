@@ -15,20 +15,28 @@
 }
 
 .site-dev {
-  --anchor-color: #372;
-  --anchor-color-hover: #137;
+  // 1. Override the variables you care about
   --brand: #153;
   --brand-secondary: #134a00;
+  --brand-contrast: #FFFFFF;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Custom colors specifically for the experimental box
+  --experimental-bg: #ffe0b2;
+  --experimental-text: #e65100;
+  --experimental-border: #f57c00;
+
+  // Other dev specific variables
+  --anchor-color: #372;
+  --anchor-color-hover: #137;
   --button-background-hover: #fa0;
   --button-background-hover-contrast: #FFF;
-  --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
   --main-header: #351;
   --top-links: var(--main-header);
   --subnavigation: #ffd;
-  --background-color: var(--brand-secondary);
-  --text-color: var(--brand-contrast);
 }
 
 .site-dev2 {
