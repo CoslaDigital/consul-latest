@@ -154,6 +154,10 @@ en:
       my_area_landing_page_description: "Users logging in with a NEC Card will be redirected to a landing page specifically for their geozone"
       geofence_card_login: "Geofence card login"
       geofence_card_login_description: "Restrict card login attempts to permitted geographic territories"
+      restrict_login_to_officials: "Restrict login and registration to official domains"
+      restrict_login_to_officials_description: "When active, only users with an email address matching the 'Email domain for officials' setting will be allowed to create an account or sign in. Administrators bypass this restriction."
+      require_login_to_view_processes: "Require login to view processes"
+      require_login_to_view_processes_description: "When active, unregistered guests will not be able to read debates, proposals, budgets, or polls. They will be prompted to log in to view the content."
     remote_census:
       general:
         endpoint: "Endpoint"
