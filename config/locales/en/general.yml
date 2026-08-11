@@ -824,6 +824,9 @@ en:
     unauthorized: "Access denied. Your IP address is not allowed."
   unauthorized:
     default: You do not have permission to access this page.
+    read:
+      debate: "You must be logged in to view debates."
+      proposal: "You must be logged in to view proposals."
     manage:
       all: "You do not have permission to carry out the action '%{action}' on %{subject}."
   users:
