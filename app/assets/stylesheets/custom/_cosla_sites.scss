@@ -4,21 +4,65 @@
 // ==========================================================================
 // SITE VARIABLE CONFIGURATIONS (Pure Data Data-Store)
 // ==========================================================================
+// Standardized Structure:
+// - Core Branding
+// - Header
+// - Navigation
+// - Footer
+// - Content & Callouts
+// - Interactive Elements
+// ==========================================================================
 
 .site-coslatest {
+  // Core Branding
   --brand: #c5ead5;
   --brand-secondary: #f4b56e;
-  --footer: var(--brand-secondary);
-  --top-links: var(--brand-secondary);
-  --main-header: var(--brand);
   --brand-contrast: #da95a7;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: var(--brand-contrast);
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: #FFFFFF;
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-dev {
-  // 1. Override the variables you care about
+  // Core Branding
   --brand: #153;
   --brand-secondary: #134a00;
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: #351;
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--main-header);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #ffd;
+
+  // Footer
+  --footer: #D0E0F4;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
   --background-color: var(--brand-secondary);
   --text-color: var(--brand-contrast);
 
@@ -27,182 +71,467 @@
   --experimental-text: #e65100;
   --experimental-border: #f57c00;
 
-  // Other dev specific variables
+  // Interactive Elements
   --anchor-color: #372;
   --anchor-color-hover: #137;
   --button-background-hover: #fa0;
-  --button-background-hover-contrast: #FFF;
-  --footer: #D0E0F4;
-  --main-header-contrast: #FFFFFF;
-  --main-header: #351;
-  --top-links: var(--main-header);
-  --subnavigation: #ffd;
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-dev2 {
+  // Core Branding
   --brand: #FF3366;
-  --footer: #FCE4EC;
-  --top-links: var(--footer);
-  --top-links-contrast: #FFF;
   --brand-secondary: #f4b56e;
-  --footer: var(--brand-secondary);
-  --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
   --background-color: var(--brand-secondary);
   --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-jdev {
+  // Core Branding
   --brand: #a783e6;
-  --main-header: var(--brand);
   --brand-secondary: #e624ae;
-  --top-links: var(--brand-secondary);
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--top-links);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-glasgow {
+  // Core Branding
   --brand: #2f7276;
   --brand-secondary: #83a8ab;
-  --footer: var(--brand-secondary);
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-perthandkinross {
+  // Core Branding
   --brand: #001489;
   --brand-secondary: #000853;
   --brand-contrast: #FFFFFF;
-  --footer: #D0E0F4;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #D0E0F4;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-eastlothian {
+  // Core Branding
   --brand: #005293;
   --brand-secondary: #002F59;
-  --footer: #CEDBEA;
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #CEDBEA;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-southayrshire {
+  // Core Branding
   --brand: #005293;
   --brand-secondary: #002F59;
-  --footer: #CEDBEA;
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #CEDBEA;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-northayrshire {
+  // Core Branding
   --brand: #0065BD;
   --brand-secondary: #0057A4;
   --brand-contrast: #FFFFFF;
-  --footer: #D0E0F4;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #D0E0F4;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-edinburgh {
+  // Core Branding
   --brand: #6D3465;
   --brand-secondary: #492445;
   --brand-contrast: #FFFFFF;
-  --footer: #D0E0F4;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #D0E0F4;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-orkney {
+  // Core Branding
   --brand: #000000;
   --brand-secondary: #f10505;
   --brand-contrast: #FFFFFF;
-  --footer: #cacaca;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #222222fc;
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #cacaca;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-inverclyde {
+  // Core Branding
   --brand: #36808c;
   --brand-secondary: #75a5ad;
   --brand-contrast: #FFFFFF;
-  --footer: #d7e5e7;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #d7e5e7;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-arb {
+  // Core Branding
   --brand: #10069F;
   --brand-secondary: #00B140;
   --brand-contrast: #FFFFFF;
-  --footer: #023C19;
-  --footer-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #023C19;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-wdn {
+  // Core Branding
   --brand: #0063be;
   --brand-secondary: #002664;
   --brand-contrast: #FFFFFF;
-  --footer: #009a49;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #009a49;
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #009a49;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-dundee {
+  // Core Branding
   --brand: #593F73;
-  --main-header: var(--brand);
   --brand-secondary: #7e59a3;
-  --top-links: var(--brand-secondary);
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--top-links);
   --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-aberdeen {
-  --main-header: #EC008B;
+  // Core Branding
   --brand: #55366B;
   --brand-secondary: #EE7522;
   --brand-contrast: #FFFFFF;
-  --footer: #eee6db;
+
+  // Header
+  --main-header: #EC008B;
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #a9c731;
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #eee6db;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .site-ren {
+  // Core Branding
   --brand: #363281;
   --brand-secondary: #D01678;
   --brand-contrast: #FFFFFF;
+  // Custom ren-specific contrasts
   --brand-contrast2: #00959E;
   --brand-contrast3: #009ACD;
   --brand-contrast4: #F4E63C;
-  --background-color: #363281;
-  --text-color: #363281;
+
+  // Header
   --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-contrast2);
   --top-links-contrast: #FFFFFF;
   --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: #7F3089;
   --footer-contrast: #FFFFFF;
-  --button-background-hover: #00B140;
-  --button-background-hover-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: #363281;
+  --text-color: #FFFFFF;
+
+  // Interactive Elements
   --anchor-color: var(--brand);
   --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: #00B140;
+  --button-background-hover-contrast: #FFFFFF;
 
+  // Custom structural override for Renfrewshire
   .hero-header .row::before {
     width: 100%;
     height: 100%;
@@ -213,14 +542,33 @@
 }
 
 .site-highland {
+  // Core Branding
   --brand: #522e91;
   --brand-secondary: #00833e;
   --brand-contrast: #FFFFFF;
-  --footer: #0069aa;
-  --footer-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #00833e;
   --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #0069aa;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 
