@@ -146,6 +146,10 @@ en:
       restrict_debate_creation_description: "Debate questions can only be created by admins when this setting is enabled"
       user_milestones: "Allow authors to update milestones"
       user_milestones_description: "Authors of Proposals or Budget Investments may create new milestones or update existing milestones ofn processes they own"
+      restrict_login_to_officials: "Restrict login and registration to official domains"
+      restrict_login_to_officials_description: "When active, only users with an email address matching the 'Email domain for officials' setting will be allowed to create an account or sign in. Administrators bypass this restriction."
+      require_login_to_view_processes: "Require login to view processes"
+      require_login_to_view_processes_description: "When active, unregistered guests will not be able to read debates, proposals, budgets, or polls. They will be prompted to log in to view the content."
     remote_census:
       general:
         endpoint: "Endpoint"
