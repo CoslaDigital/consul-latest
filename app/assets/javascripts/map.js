@@ -183,8 +183,10 @@
     updateFormfields: function(map, marker) {
       var inputs = App.Map.coordinatesInputs(map._container);
 
-      inputs.lat.val(marker.getLatLng().lat);
-      inputs.long.val(marker.getLatLng().lng);
+      const normalizedLatLng = marker.getLatLng().wrap();
+
+      inputs.lat.val(normalizedLatLng.lat);
+      inputs.long.val(normalizedLatLng.lng);
       inputs.zoom.val(map.getZoom());
     },
     clearFormfields: function(element) {
