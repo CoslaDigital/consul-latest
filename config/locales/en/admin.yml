@@ -38,7 +38,7 @@ en:
           homepage: Homepage
           debates: Debates
           proposals: Proposals
-          budgets: Participatory budgeting
+          budgets: Elections
           help_page: Help page
           sdg: SDG
       create:
@@ -90,8 +90,8 @@ en:
         preview_results: "Preview results"
         questions: "Manage Questions"
       index:
-        title: Participatory budgets
-        new_link: Create new budget
+        title: Elections
+        new_link: Create new Election
         filter: Filter
         filters:
           all: All
