@@ -381,9 +381,8 @@ class User < ApplicationRecord
     end
 
     def allowed_email_domain?
-      # FUTURE FEATURE SWITCH:
-      # When you add the setting, you just uncomment the line below.
-      # return true unless Setting["feature.restrict_login_to_officials"]
+
+      return true unless Setting["feature.restrict_login_to_officials"]
 
       # 1. Admin Safeguard: Administrators can ALWAYS log in/register,
       # regardless of their email domain.
