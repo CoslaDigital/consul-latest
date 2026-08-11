@@ -1,47 +1,10 @@
-// If you're using multitenancy, you can override styles for a certain
-// tenant by styling the `<html>` element with the class
-// `tenant-<tenant_name>`. For example, to style the public (main)
-// tenant without these styles affecting any other tenants, use the
-// `.tenant-public` selector.
-//
-// You can use CSS variables to customize the colors. Here's an example
-// changing the brand, buttons, links and main layout colors for just
-// the main tenant.
-//
-// .tenant-public {
-//   --anchor-color: #372;
-//   --anchor-color-hover: #137;
-//   --brand: #153;
-//   --brand-secondary: #134a00;
-//   --button-background-hover: #fa0;
-//   --button-background-hover-contrast: #{$black};
-//   --footer: #e6e6e6;
-//   --main-header: #351;
-//   --top-links: var(--main-header);
-//   --subnavigation: #ffd;
-// }
-//
-// Some colors default to another color, so you don't have to change
-// both colors if you'd like them to be the same. For instance, the
-// `--main-header` and `--anchor-color` colors will use the `--brand`
-// color if `--main-header` or `--anchor-color` are not defined, while
-// the `--top-links` color will use the `--brand-secondary` color if
-// `--top-links` is not defined.
-//
-// If, for instance, you're using a light color for the main header when
-// the default color is a dark one, you should also change the text
-// color. You can do that with a variable ending in `-contrast`, like:
-//
-// .tenant-public {
-//   --main-header: #{$white};
-//   --main-header-contrast: #{$black};
-// }
-//
-// NOTE: If you are **not** using mulitenancy, we recommend overwriting
-// SCSS variables in the `_consul_custom_overrides.scss` file instead
+// 1. Move the import to the very top
+@import "cosla_shared";
 
+// ==========================================================================
+// SITE VARIABLE CONFIGURATIONS (Pure Data Data-Store)
+// ==========================================================================
 
-// Define site-specific variables
 .site-coslatest {
   --brand: #c5ead5;
   --brand-secondary: #f4b56e;
@@ -49,29 +12,31 @@
   --top-links: var(--brand-secondary);
   --main-header: var(--brand);
   --brand-contrast: #da95a7;
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-dev {
-  --anchor-color: #372;
-  --anchor-color-hover: #137;
+  // 1. Override the variables you care about
   --brand: #153;
   --brand-secondary: #134a00;
+  --brand-contrast: #FFFFFF;
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Custom colors specifically for the experimental box
+  --experimental-bg: #ffe0b2;
+  --experimental-text: #e65100;
+  --experimental-border: #f57c00;
+
+  // Other dev specific variables
+  --anchor-color: #372;
+  --anchor-color-hover: #137;
   --button-background-hover: #fa0;
   --button-background-hover-contrast: #FFF;
-  --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
   --main-header: #351;
   --top-links: var(--main-header);
   --subnavigation: #ffd;
-  --background-color: var(--brand-secondary);
-  --text-color: var(--brand-contrast);
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-dev2 {
@@ -86,9 +51,6 @@
   --main-header-contrast: #FFFFFF;
   --background-color: var(--brand-secondary);
   --text-color: var(--brand-contrast);
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-jdev {
@@ -99,12 +61,7 @@
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
   --footer: var(--top-links);
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
-
 }
-
 
 .site-glasgow {
   --brand: #2f7276;
@@ -112,8 +69,6 @@
   --footer: var(--brand-secondary);
   --brand-contrast: #FFFFFF;
   --main-header-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-perthandkinross {
@@ -122,8 +77,6 @@
   --brand-contrast: #FFFFFF;
   --footer: #D0E0F4;
   --main-header-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-eastlothian {
@@ -134,8 +87,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-southayrshire {
@@ -146,8 +97,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-northayrshire {
@@ -158,8 +107,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-edinburgh {
@@ -170,10 +117,7 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
-
 
 .site-orkney {
   --brand: #000000;
@@ -183,8 +127,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: #222222fc;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-inverclyde {
@@ -195,8 +137,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-arb {
@@ -208,8 +148,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-wdn {
@@ -220,8 +158,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: #009a49;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-dundee {
@@ -233,8 +169,6 @@
   --main-header-contrast: #FFFFFF;
   --footer: var(--top-links);
   --footer-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-aberdeen {
@@ -246,21 +180,36 @@
   --main-header-contrast: #FFFFFF;
   --top-links: #a9c731;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-ren {
-  --brand: #10069F;
-  --brand-secondary: #00B140;
+  --brand: #363281;
+  --brand-secondary: #D01678;
   --brand-contrast: #FFFFFF;
-  --footer: #023C19;
-  --footer-contrast: #FFFFFF;
+  --brand-contrast2: #00959E;
+  --brand-contrast3: #009ACD;
+  --brand-contrast4: #F4E63C;
+  --background-color: #363281;
+  --text-color: #363281;
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
-  --top-links: var(--brand-secondary);
+  --top-links: var(--brand-contrast2);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+  --footer: #7F3089;
+  --footer-contrast: #FFFFFF;
+  --button-background-hover: #00B140;
+  --button-background-hover-contrast: #FFFFFF;
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+
+  .hero-header .row::before {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%);
+    opacity: 0.8;
+    border-radius: inherit;
+  }
 }
 
 .site-highland {
@@ -272,8 +221,6 @@
   --main-header-contrast: #FFFFFF;
   --top-links: #00833e;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
 }
 
 .site-elections {
@@ -285,8 +232,5 @@
   --main-header-contrast: #FFFFFF;
   --top-links: #a9c731;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+
 }
-
-
