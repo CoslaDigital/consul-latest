@@ -108,17 +108,8 @@
 <hr>
 
 <% @result.rounds.each do |round| %>
-  <br><h2>Round <%= round[:iteration] %>:</h2>
+  <br><h2>Round <%= round[:iteration] || round[:number] %>:</h2>
   <p>Quota to be elected: <strong><%= round[:quota] %></strong></p>
-
-  <% if round[:quota_calculation] %>
-    <% calc = round[:quota_calculation] %>
-    <p style="font-size: 0.9em; color: #555;">
-      <em>
-        Calculation: floor(<%= calc[:votes].round(2) %> votes / (<%= calc[:seats] %> seats + 1)) + 1
-      </em>
-    </p>
-  <% end %>
 
   <p><strong>Current Standings:</strong></p>
   <table style="width: 100%; border-collapse: collapse;">
@@ -132,7 +123,7 @@
     <% round[:standings].each do |id, count| %>
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;"><%= @investment_titles[id] || "Unknown" %> (<%= id %>)</td>
-        <td style="padding: 8px; border: 1px solid #ddd;"><%= count.round(2) %></td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><%= count.to_f.round(2) %></td>
       </tr>
     <% end %>
     </tbody>
@@ -140,35 +131,31 @@
   <br>
 
   <% action = round[:action] %>
-  <% if action[:type] == :election %>
-    <strong>Action: Candidate(s) Elected</strong>
-    <% action[:details].each do |detail| %>
+  <% if action.is_a?(Hash) %>
+    <% if action[:type] == :election %>
+      <strong>Action: Candidate Elected</strong>
       <p style="margin-left: 20px;">
-        ➡️ <strong>Elected: <%= detail[:title] %> (<%= detail[:id] %>)</strong> with <%= detail[:count].round(2) %>
-        votes.<br>
-        <% if detail[:surplus] > 0 %>
-          <em>Transferring <%= detail[:surplus].round(2) %> surplus votes.</em>
+        ➡️ <strong>Elected: <%= action[:title] %> (<%= action[:candidate_id] %>)</strong>
+        with <%= action[:count].to_f.round(2) %> votes.<br>
+        <% if action[:surplus] && action[:surplus] > 0 %>
+          <em>Transferring <%= action[:surplus].to_f.round(2) %> surplus votes.</em>
         <% end %>
       </p>
+    <% elsif action[:type] == :elimination %>
+      <strong>Action: Candidate Eliminated</strong>
+      <p style="margin-left: 20px;">
+        ❌ <strong>Eliminated: <%= action[:title] %> (<%= action[:candidate_id] %>)</strong>
+        with <%= action[:count].to_f.round(2) %> votes.<br>
+      </p>
+    <% elsif action[:type] == :auto_election %>
+      <strong>Action: Candidate Auto-Elected</strong>
+      <p style="margin-left: 20px;">
+        ✅ <strong>Elected: <%= action[:title] %> (<%= action[:candidate_id] %>)</strong>
+        (Automatically elected to fill remaining seat)
+      </p>
     <% end %>
-  <% elsif action[:type] == :elimination %>
-    <strong>Action: Candidate Eliminated</strong>
-    <% details = action[:details] %>
-    <% if details[:tie_break_message] %>
-      <div style="border: 1px solid #cc0000; padding: 10px; margin: 10px 0; background-color: #fff5f5;">
-        <strong style="color: #cc0000;">Tie-Break Occurred:</strong><br>
-        <em><%= details[:tie_break_message] %></em>
-      </div>
-    <% end %>
-    <p style="margin-left: 20px;">
-      ❌ <strong>Eliminated: <%= details[:title] %> (<%= details[:id] %>)</strong> with <%= details[:count].round(2) %>
-      votes.<br>
-      <em>Transferring <%= details[:reallocated_count] %> votes.</em><br>
-      <% if details[:exhausted_count] > 0 %>
-        <em>(<strong><%= details[:exhausted_count] %></strong> votes became exhausted and could not be
-          transferred.)</em>
-      <% end %>
-    </p>
+  <% else %>
+    <p><strong><%= action %></strong></p>
   <% end %>
   <hr>
 <% end %>
