@@ -6,7 +6,6 @@ class Proposals::ProposalKindComponent < ApplicationComponent
     @form = form
   end
 
-  # FIXED: Only render the visible form dropdown fields if multiple tracks exist.
   def render?
     ProposalKind.count > 1
   end
