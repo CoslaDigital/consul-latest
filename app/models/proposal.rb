@@ -62,6 +62,8 @@ class Proposal < ApplicationRecord
             presence: true,
             inclusion: { in: ->(*) { RETIRE_OPTIONS }}, unless: -> { retired_at.blank? }
 
+  validates :proposal_kind_id, presence: true, if: -> { ProposalKind.count > 1 }
+
   validates :terms_of_service, acceptance: { allow_nil: false }, on: :create
 
   before_validation :set_responsible_name
