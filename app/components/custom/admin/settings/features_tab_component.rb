@@ -4,7 +4,8 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
   alias_method :original_settings, :settings
 
   def settings
-    custom_settings = %w[ feature.demographics
+    custom_settings = %w[ feature.offers
+                          feature.demographics
                           feature.hide_local_login
                           feature.hide_comments
                           feature.hide_votes
