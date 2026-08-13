@@ -60,12 +60,18 @@
                                 accesskey: "6" %>
       </li>
     <% end %>
+    <li>
+      <%= layout_menu_link_to t("layouts.header.offers"),
+                              offers_path,
+                              controller_name == "offers",
+                              accesskey: "7" %>
+    </li>
     <% if feature?(:sdg) %>
       <li>
         <%= layout_menu_link_to t("layouts.header.sdg"),
                                 sdg_goals_path,
                                 controller_path == "sdg/goals" && action_name != "help",
-                                accesskey: "7" %>
+                                accesskey: "8" %>
       </li>
     <% end %>
     <% if feature?(:help_page) %>
@@ -73,7 +79,7 @@
         <%= layout_menu_link_to t("layouts.header.help"),
                                 help_path,
                                 current_page?(help_path),
-                                accesskey: "7" %>
+                                accesskey: "9" %>
       </li>
     <% end %>
 
