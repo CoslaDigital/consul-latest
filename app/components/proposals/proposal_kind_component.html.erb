@@ -1,9 +1,8 @@
-<!-- app/components/proposals/proposal_kind_component.html.erb -->
 <div>
-  <%= form.label :proposal_kind_id, "Project Type / Scope" %>
-  <p class="help-text">Select which project or matching system this proposal belongs to.</p>
+  <%= form.label :proposal_kind_id, t("proposals.form.proposal_kind") %>
+  <p class="help-text"><%= t("proposals.form.proposal_kind_note") %></p>
 
   <%= form.select :proposal_kind_id, proposal_kind_options,
-                  { prompt: "Please select a category..." },
-                  { label: false } %>
+                  prompt: t("proposals.form.proposal_kind_prompt"),
+                  label: false %>
 </div>
