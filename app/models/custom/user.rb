@@ -38,7 +38,8 @@ class User < ApplicationRecord
     "633231" => "south_lanarkshire",
     "633739" => "stirling",
     "633580" => "west_dunbartonshire",
-    "633676" => "west_lothian"
+    "633676" => "west_lothian",
+    "999111" => "trumptonshire"
   }.freeze
 
   has_one :process_manager
