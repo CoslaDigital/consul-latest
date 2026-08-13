@@ -309,20 +309,47 @@ class User < ApplicationRecord
 
   private
 
-    def self.log_in_or_create_ys_user(username)
-      if (existing_user = User.find_by(username: username))
+    def self.log_in_or_create_ys_user(document_number)
+      # 1. Exact match fallback (handles standard logins fast)
+      if (existing_user = User.find_by(username: document_number))
         return existing_user
       end
 
-      prefix = username.to_s[0, 6]
+      # 2. Base 14-digit match for YS cards (handles different issue numbers)
+      if valid_ys_document?(document_number)
+        base_number = document_number.to_s[0, 14]
+
+        # Search for a legacy user using a SQL wildcard on the 14-digit base
+        if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
+
+          # BYPASS DEVISE MAILER: Tell Devise not to require re-confirmation for this email change
+          legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
+          legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
+
+          # Update their credentials to match the physical card they just used
+          legacy_user.username = document_number
+          legacy_user.document_number = document_number
+          legacy_user.email = "#{document_number}@consul.dev"
+          legacy_user.password = document_number # Critical: Updates their password to the new card
+
+          if legacy_user.save(validate: false)
+            return legacy_user
+          else
+            Rails.logger.error("Failed to update YS user issue number for #{base_number}: #{legacy_user.errors.messages}")
+          end
+        end
+      end
+
+      # 3. Create brand new user if no base match was found
+      prefix = document_number.to_s[0, 6]
       council_name = NEC_PREFIX_MAPPING[prefix]
       geozone_name = "ys_#{council_name}"
 
       user = User.new(
-        username: username,
-        email: "#{username}@consul.dev",
-        password: username,
-        document_number: username,
+        username: document_number,
+        email: "#{document_number}@consul.dev",
+        password: document_number,
+        document_number: document_number,
         geozone_id: Geozone.find_by!(name: geozone_name).id,
         terms_of_service: "1",
         confirmed_at: Time.current,
@@ -341,7 +368,7 @@ class User < ApplicationRecord
           return user
         end
       else
-        Rails.logger.error("Failed to create YS user #{username}: #{other_errors}")
+        Rails.logger.error("Failed to create YS user #{document_number}: #{other_errors}")
       end
 
       nil
