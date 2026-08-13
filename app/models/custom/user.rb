@@ -361,26 +361,28 @@ class User < ApplicationRecord
     end
   end
 
-  def self.valid_ys_document?(document_number)
-    return false unless document_number.to_s.length == 16
+    def self.valid_ys_document?(document_number)
+      return false unless document_number.to_s.length == 16
 
-    prefix = document_number.to_s[0, 6]
-    middle = document_number.to_s[6, 8]
-    suffix = document_number.to_s[14, 2]
+      prefix = document_number.to_s[0, 6]
+      middle = document_number.to_s[6, 8]
+      suffix = document_number.to_s[14, 2]
 
-    # 1. Check if the prefix exists in our known mapping
-    council_name = NEC_PREFIX_MAPPING[prefix]
-    return false unless council_name # Reject immediately if prefix is unknown
+      # 1. Check if the prefix exists in our known mapping
+      council_name = NEC_PREFIX_MAPPING[prefix]
+      return false unless council_name # Reject immediately if prefix is unknown
 
-    # 2. Check if the corresponding Geozone actually exists in the database
-    expected_geozone = "ys_#{council_name}"
-    return false unless Geozone.exists?(name: expected_geozone)
+      # 2. Check if the corresponding Geozone actually exists in the database
+      expected_geozone = "ys_#{council_name}"
+      return false unless Geozone.exists?(name: expected_geozone)
 
-    # 3. Perform the standard YS digit structure checks
-    return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
+      # 3. Perform the standard YS digit structure checks
+      # The middle must be exactly 8 digits.
+      # The suffix (issue number) must specifically be between 01 and 05.
+      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A0[1-5]\z/)
 
-    true
-  end
+      true
+    end
 
   def self.valid_na_document?(document_number)
     # Define the allowed formats
