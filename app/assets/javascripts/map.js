@@ -36,13 +36,23 @@
         html: '<div class="map-icon"></div>'
       });
 
-      createMarker = function(latitude, longitude) {
-        var newMarker, markerLatLng;
+      createMarker = function (latitude, longitude, iconClass) {
+        var newMarker, markerLatLng, specificIcon;
         markerLatLng = new L.LatLng(latitude, longitude);
+
+        // Build the icon dynamically using the passed class
+        specificIcon = L.divIcon({
+          className: "map-marker " + (iconClass || ""), // e.g. "map-marker proposal-pin-mutual-aid"
+          iconSize: [30, 30],
+          iconAnchor: [15, 40],
+          html: '<div class="map-icon"></div>'
+        });
+
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon,
+          icon: specificIcon,
           draggable: editable
         });
+
         if (editable) {
           newMarker.on("dragend", function() {
             App.Map.updateFormfields(map, newMarker);
@@ -200,7 +210,8 @@
           var marker;
 
           if (App.Map.validCoordinates(coordinates)) {
-            marker = createMarker(coordinates.lat, coordinates.long);
+            // Pass the icon_class from the payload!
+            marker = createMarker(coordinates.lat, coordinates.long, coordinates.icon_class);
             marker.options.id = coordinates.investment_id;
             marker.bindPopup(App.Map.getPopupContent(coordinates));
           }
