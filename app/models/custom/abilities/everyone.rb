@@ -28,6 +28,8 @@ module Abilities
         can [:read], Budget
         can [:read], Budget::Group
         can [:read, :print], Budget::Investment
+        can :read, Budget::Question, is_private: false
+        can :read, Budget::Investment::Answer, budget_question: { is_private: false }
         can :read_results, Budget, id: Budget.finished.results_enabled.ids
 
         if Sensemaker.enabled?
