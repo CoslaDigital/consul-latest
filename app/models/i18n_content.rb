@@ -86,6 +86,7 @@ class I18nContent < ApplicationRecord
       devise.sessions.local_sign_in_description
       devise.sessions.ys_sign_in_description
       geozones.none
+      images.form.title
       map.title
       map.proposal_for_district
       map.start_proposal
@@ -121,7 +122,7 @@ class I18nContent < ApplicationRecord
       dashboard.mailer.forward.share
     ]
   end
-  
+
   def self.dashboard_translations
     %w[
       dashboard.poster.index.poster_title
@@ -138,7 +139,6 @@ class I18nContent < ApplicationRecord
     ]
   end
 
-  
   def self.machine_learning_translations
     %w[
       admin.machine_learning.title
