@@ -24,6 +24,8 @@ en:
       recommendation_one: "Be specific about what you are offering (e.g., '10 hours of design work' instead of 'design')."
       recommendation_two: "Specify your availability and timeframe."
       recommendation_three: "Tag your offer accurately so proposals can find you."
+      recommendation_four: ""
+      recommendation_five: ""
       form:
         submit_button: "Publish Offer"
 
