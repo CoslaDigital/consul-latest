@@ -17,15 +17,11 @@ class YsLoginController < Devise::SessionsController
         # 1. Sign the user in without automatically redirecting
         sign_in(user, event: :authentication)
 
-        # 2. Check verification status and redirect accordingly
-        if user.unverified?
-          # This hits your VerificationController#show, which handles routing
-          # them to the exact step they need via your next_step_path logic.
-          redirect_to verification_path
-        else
-          # Fallback to standard Devise redirect if they are already verified
-          redirect_to after_sign_in_path_for(user)
-        end
+        # 2. Clear Devise's stored location so it doesn't hijack our route
+        session["user_return_to"] = nil
+
+        # 3. Route the user based on our protected method below
+        redirect_to after_sign_in_path_for(user)
       else
         error_message = user&.errors&.full_messages&.join(', ') || "Please try again."
         flash[:alert] = "Could not sign you in. #{error_message}"
@@ -35,5 +31,15 @@ class YsLoginController < Devise::SessionsController
       flash[:alert] = "The number you entered is not valid. Please enter a valid 16-digit number."
       render :new, status: :unprocessable_entity
     end
+  end
+
+  protected
+
+  def after_sign_in_path_for(resource)
+    # If the user is NOT unverified (i.e., they ARE verified)
+    return my_area_path unless resource.unverified?
+
+    # If the user IS unverified, go to verification
+    verification_path
   end
 end

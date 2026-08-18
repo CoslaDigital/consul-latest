@@ -354,6 +354,7 @@ class User < ApplicationRecord
         terms_of_service: "1",
         confirmed_at: Time.current,
         verified_at: Time.current,
+        level_two_verified_at: Time.current,
         residence_verified_at: Time.current
       )
 
