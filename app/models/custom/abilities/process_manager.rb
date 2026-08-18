@@ -51,6 +51,8 @@ module Abilities
       can :confirm_hide, User
       cannot :confirm_hide, User, hidden_at: nil
 
+      can [:search, :index, :show], ::User
+
       can :mark_featured, Debate
       can :unmark_featured, Debate
 
