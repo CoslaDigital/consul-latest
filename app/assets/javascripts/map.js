@@ -17,8 +17,8 @@
     initializeMap: function(element) {
       var createMarker, editable, investmentsMarkers, map, marker, markerClustering,
         markerData, markerIcon, markers, moveOrPlaceMarker, removeMarker, removeMarkerSelector,
-        geozoneLayers = {}, // Object to hold geozone layers
-        layerControl = {}; // Object to hold control layers
+        geozoneLayers = {},
+        layerControl = {};
 
       App.Map.cleanInvestmentCoordinates(element);
       removeMarkerSelector = $(element).data('marker-remove-selector');
@@ -26,26 +26,24 @@
       editable = $(element).data("marker-editable");
       markerClustering = $(element).data("marker-clustering");
 
-      // Define markers layer
       markers = markerClustering ? L.markerClusterGroup({ chunkedLoading: true }) : L.layerGroup();
 
-      markerIcon = L.divIcon({
-        className: "map-marker",
-        iconSize: [30, 30],
-        iconAnchor: [15, 40],
-        html: '<div class="map-icon"></div>'
-      });
-
-      createMarker = function (latitude, longitude, iconClass) {
+      // ES5 Safe Marker Generation
+      createMarker = function (latitude, longitude, color, icon) {
         var newMarker, markerLatLng, specificIcon;
         markerLatLng = new L.LatLng(latitude, longitude);
 
-        // Build the icon dynamically using the passed class
+        var pinColor = color || "#00cae9";
+        var pinIcon = icon || "map-marker-alt";
+
+        // ES5 Safe String Concatenation (No Backticks)
         specificIcon = L.divIcon({
-          className: "map-marker " + (iconClass || ""), // e.g. "map-marker proposal-pin-mutual-aid"
+          className: "map-marker",
           iconSize: [30, 30],
           iconAnchor: [15, 40],
-          html: '<div class="map-icon"></div>'
+          html: '<div class="map-icon" style="--marker-color: ' + pinColor + ';">' +
+            '<i class="fa fa-' + pinIcon + ' custom-pin-icon"></i>' +
+            '</div>'
         });
 
         newMarker = L.marker(markerLatLng, {
@@ -99,16 +97,12 @@
       }
 
       App.Map.addInvestmentsMarkers(investmentsMarkers, createMarker);
-      App.Map.addGeozones(map, geozoneLayers); // Pass the geozoneLayers object
+      App.Map.addGeozones(map, geozoneLayers);
 
-      // Add markers layer
       map.addLayer(markers);
 
-      // Add Layer Control
-      layerControl = {
-        "Markers": markers,
-        ...geozoneLayers // Add geozone layers to the control
-      };
+      // ES5 Safe Object Merging (No Spread Operator)
+      layerControl = $.extend({"Markers": markers}, geozoneLayers);
 
       L.control.layers(null, layerControl).addTo(map);
     },
@@ -193,8 +187,11 @@
     updateFormfields: function(map, marker) {
       var inputs = App.Map.coordinatesInputs(map._container);
 
-      inputs.lat.val(marker.getLatLng().lat);
-      inputs.long.val(marker.getLatLng().lng);
+      // ES5 Safe (Using var instead of const)
+      var normalizedLatLng = marker.getLatLng().wrap();
+
+      inputs.lat.val(normalizedLatLng.lat);
+      inputs.long.val(normalizedLatLng.lng);
       inputs.zoom.val(map.getZoom());
     },
     clearFormfields: function(element) {
@@ -204,18 +201,27 @@
       inputs.long.val("");
       inputs.zoom.val("");
     },
-    addInvestmentsMarkers: function(markers, createMarker) {
-      if (markers) {
-        markers.forEach(function(coordinates) {
-          var marker;
-
-          if (App.Map.validCoordinates(coordinates)) {
-            // Pass the icon_class from the payload!
-            marker = createMarker(coordinates.lat, coordinates.long, coordinates.icon_class);
-            marker.options.id = coordinates.investment_id;
-            marker.bindPopup(App.Map.getPopupContent(coordinates));
-          }
-        });
+    addInvestmentsMarkers: function (markersData, createMarker) {
+      if (markersData) {
+        if (typeof markersData === 'object' && !Array.isArray(markersData)) {
+          Object.keys(markersData).forEach(function (layerName) {
+            markersData[layerName].forEach(function (coordinates) {
+              if (App.Map.validCoordinates(coordinates)) {
+                var marker = createMarker(coordinates.lat, coordinates.long, coordinates.color, coordinates.icon);
+                marker.options.id = coordinates.investment_id;
+                marker.bindPopup(App.Map.getPopupContent(coordinates));
+              }
+            });
+          });
+        } else if (Array.isArray(markersData)) {
+          markersData.forEach(function (coordinates) {
+            if (App.Map.validCoordinates(coordinates)) {
+              var marker = createMarker(coordinates.lat, coordinates.long, coordinates.color, coordinates.icon);
+              marker.options.id = coordinates.investment_id;
+              marker.bindPopup(App.Map.getPopupContent(coordinates));
+            }
+          });
+        }
       }
     },
     cleanInvestmentCoordinates: function(element) {
@@ -246,10 +252,8 @@
       }
     },
     addGeozone: function(geozone, map, geozoneLayers) {
-      // Parse the GeoJSON string
       var geojsonData = JSON.parse(geozone.outline_points);
 
-      // Create a GeoJSON layer
       var geoJsonLayer = L.geoJSON(geojsonData, {
         style: function(feature) {
           return {
@@ -260,22 +264,18 @@
         },
         onEachFeature: function(feature, layer) {
           if (feature.properties.headings || geozone.headings) {
-            // Use feature properties headings if provided, else fallback to geozone headings
             var headings = feature.properties.headings || geozone.headings;
             layer.bindPopup(headings.join("<br>"));
           }
         }
       });
 
-      // Use geozone headings as the name for the layer, fallback to a default name
+      // ES5 Safe String Concatenation
       var layerName = (geozone.headings && geozone.headings.length > 0)
         ? geozone.headings.join(", ")
-        : `Geozone ${Object.keys(geozoneLayers).length + 1}`;
+        : "Geozone " + (Object.keys(geozoneLayers).length + 1);
 
-      // Store the GeoJSON layer in the geozoneLayers object with the actual name
       geozoneLayers[layerName] = geoJsonLayer;
-
-      // Add the GeoJSON layer to the map
       geoJsonLayer.addTo(map);
     },
     getPopupContent: function(data) {

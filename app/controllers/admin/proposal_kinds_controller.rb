@@ -53,6 +53,6 @@ class Admin::ProposalKindsController < Admin::BaseController
     end
 
     def proposal_kind_params
-      params.require(:proposal_kind).permit(:name, :default)
+      params.require(:proposal_kind).permit(:name, :default, :color, :icon)
     end
 end

@@ -8,7 +8,7 @@ module Mappable
     scope :geolocated, -> { joins(:map_location).where.not(map_locations: { latitude: nil, longitude: nil }) }
   end
 
-  def map_payload(icon_class = "default-pin")
+  def map_payload(layer_color = nil, layer_icon = nil)
     return nil unless map_location&.available?
 
     {
@@ -16,7 +16,8 @@ module Mappable
       long: map_location.longitude,
       title: try(:title) || try(:name) || "Location",
       link: Rails.application.routes.url_helpers.polymorphic_path(self, only_path: true),
-      icon_class: icon_class, # Passes the CSS class to the Javascript!
+      color: layer_color, # Pass the database hex code!
+      icon: layer_icon, # Pass the database icon name!
       id: id
     }
   end
@@ -30,14 +31,15 @@ module Mappable
       grouped_payload = {}
 
       geolocated.includes(group_attribute.to_sym).group_by(&group_attribute.to_sym).each do |kind, items|
-        # Merged approach: Safely tries to get the name, but falls back to "General" if it's nil
         kind_name = (kind.respond_to?(:name) ? kind.name : kind.to_s.humanize).presence || "General"
-        kind_slug = (kind.respond_to?(:slug) ? kind.slug : kind.to_s.parameterize).presence || "general"
 
         layer_name = "#{model_name.human.pluralize}: #{kind_name}"
-        icon_class = "#{icon_class_prefix}-#{kind_slug}"
 
-        grouped_payload[layer_name] = items.map { |item| item.map_payload(icon_class) }.compact
+        # Grab the color/icon from the DB, with fallbacks if they are nil
+        db_color = kind.respond_to?(:color) ? kind.color : "#00cae9"
+        db_icon = kind.respond_to?(:icon) ? kind.icon : "map-marker-alt"
+
+        grouped_payload[layer_name] = items.map { |item| item.map_payload(db_color, db_icon) }.compact
       end
 
       grouped_payload

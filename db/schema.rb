@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
-
+ActiveRecord::Schema[7.2].define(version: 2026_08_18_162016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -239,6 +238,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
     t.datetime "updated_at", precision: nil
     t.boolean "geozone_restricted", default: false
     t.integer "geozone_ids", default: [], array: true
+    t.integer "max_winners"
     t.index ["geozone_id"], name: "index_budget_headings_on_geozone_id"
     t.index ["group_id"], name: "index_budget_headings_on_group_id"
   end
@@ -595,7 +595,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
     t.integer "cached_votes_down", default: 0
     t.integer "comments_count", default: 0
     t.datetime "confirmed_hide_at", precision: nil
-    t.integer "cached_anonymous_votes_total", default: 0
     t.integer "cached_votes_score", default: 0
     t.bigint "hot_score", default: 0
     t.integer "confidence_score", default: 0
@@ -714,6 +713,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
     t.string "census_code"
     t.text "geojson"
     t.string "color"
+    t.bigint "parent_id"
+    t.index ["parent_id"], name: "index_geozones_on_parent_id"
   end
 
   create_table "geozones_polls", id: :serial, force: :cascade do |t|
@@ -1410,6 +1411,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "default", default: false, null: false
+    t.string "color", default: "#00cae9"
+    t.string "icon", default: "map-marker-alt"
   end
 
   create_table "proposal_matches", force: :cascade do |t|
@@ -1988,6 +1991,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_11_104548) do
   add_foreign_key "failed_census_calls", "users"
   add_foreign_key "flags", "users"
   add_foreign_key "follows", "users"
+  add_foreign_key "geozones", "geozones", column: "parent_id"
   add_foreign_key "geozones_polls", "geozones"
   add_foreign_key "geozones_polls", "polls"
   add_foreign_key "identities", "users"

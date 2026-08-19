@@ -9,6 +9,19 @@
       <%= f.text_field :name, placeholder: "e.g., Youth Participatory Grant", required: true %>
     </div>
   </div>
+  <div class="row">
+    <div class="small-12 medium-6 columns">
+      <%= f.label :color, "Map Pin Color" %>
+      <!-- type: "color" renders a native browser color picker! -->
+      <%= f.color_field :color, required: true %>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+      <%= f.label :icon, "Map Pin Icon (FontAwesome name)" %>
+      <%= f.text_field :icon, placeholder: "e.g., leaf, hands-helping, building" %>
+      <p class="help-text">Leave out the 'fa-' prefix.</p>
+    </div>
+  </div>
 
   <% unless proposal_kind.default? || proposal_kind.new_record? %>
     <div class="row">
