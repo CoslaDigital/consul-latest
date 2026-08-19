@@ -2,7 +2,6 @@
 (function () {
   "use strict";
 
-  // Self-contained utility bridge: Ensures map.js works even if global utils aren't loaded
   if (typeof App.Utils === "undefined") {
     App.Utils = {
       isNumeric: function (n) {
@@ -38,24 +37,29 @@
 
       marker = null;
 
-      // PHASE 1 ENHANCEMENT: Accessible ARIA marker accepting dynamic icon classes
-      markerIcon = function (alt_text, custom_class) {
+      markerIcon = function (alt_text, color, icon) {
         const cleanTitle = alt_text || "Map Location Indicator";
-        const markerClass = custom_class ? "map-marker " + custom_class : "map-marker";
+        const pinColor = color || "#00cae9";
+
+        let pinIcon = icon || "map-marker-alt";
+        pinIcon = pinIcon.replace(/^(fas\s|far\s|fa\s|fa-)/, "");
+
         return L.divIcon({
-          className: markerClass,
+          className: "map-marker",
           iconSize: [30, 30],
           iconAnchor: [15, 40],
-          html: '<div class="map-icon" tabindex="0" role="img" aria-label="' + cleanTitle + '"></div>'
+          // Change the <i> tag to a <div> using our new custom prefix
+          html: '<div class="map-icon" style="--marker-color: ' + pinColor + ';" tabindex="0" role="img" aria-label="' + cleanTitle + '">' +
+            '<div class="custom-pin-icon-' + pinIcon + '"></div>' +
+            '</div>'
         });
       };
 
-      // Refactored to append to targeted dynamic layer groups instead of a single global tracking object
-      createMarker = function (latitude, longitude, targetLayerGroup, text, custom_class) {
+      createMarker = function (latitude, longitude, targetLayerGroup, text, color, icon) {
         let newMarker, markerLatLng;
         markerLatLng = new L.LatLng(latitude, longitude);
         newMarker = L.marker(markerLatLng, {
-          icon: markerIcon(text, custom_class),
+          icon: markerIcon(text, color, icon),
           draggable: editable,
           title: text || "Map Location Indicator"
         });
@@ -80,23 +84,18 @@
       map = App.Map.leafletMap(element);
       App.Map.maps.push(map);
 
-      // PHASE 1 ENHANCEMENT: Setup Multiple Base Layers
       const baseMaps = App.Map.setupBaseLayers(map, element);
 
-      // SPECIFICATION PART 2: Sniff and normalize incoming dataset structure safely
       layersToCreate = {};
       layerControlOverlays = {};
       globalBounds = L.latLngBounds([]);
 
       if (Array.isArray(investmentsMarkers)) {
-        // BACKWARDS COMPATIBILITY: Wrap a flat array in a default layer namespace automatically
         layersToCreate["Markers"] = investmentsMarkers;
       } else if (typeof investmentsMarkers === "object" && investmentsMarkers !== null) {
-        // FUTURE STATE: Use multi-layer grouping layout natively
         layersToCreate = investmentsMarkers;
       }
 
-      // Populate separate layers dynamically
       Object.keys(layersToCreate).forEach(function (layerName) {
         let currentLayerGroup = markerClustering ? L.markerClusterGroup({chunkedLoading: true}) : L.layerGroup();
         let points = layersToCreate[layerName];
@@ -104,11 +103,10 @@
         points.forEach(function (point) {
           let customMarker;
           if (App.Map.validCoordinates(point)) {
-            customMarker = createMarker(point.lat, point.long, currentLayerGroup, point.title, point.icon_class);
+            customMarker = createMarker(point.lat, point.long, currentLayerGroup, point.title, point.color, point.icon);
             customMarker.options.id = point.investment_id || point.id;
             customMarker.bindPopup(App.Map.getPopupContent(point));
 
-            // Collect coordinates for universal fitBounds processing downstream
             globalBounds.extend([point.lat, point.long]);
           }
         });
@@ -117,7 +115,6 @@
         layerControlOverlays[layerName] = currentLayerGroup;
       });
 
-      // Handle singular non-grouped view forms fallback markers
       markerData = App.Map.markerData(element);
       if (markerData.lat && markerData.long && !investmentsMarkers) {
         let fallbackGroup = L.layerGroup().addTo(map);
@@ -147,30 +144,26 @@
         map.on("click", moveOrPlaceMarker);
       }
 
-      // UPSTREAM: Modular geozone handling combined with marker layers
       geozoneLayers = App.Map.geozoneLayers(map);
       App.Map.addGeozones(map, geozoneLayers);
-      Object.assign(layerControlOverlays, geozoneLayers);
 
-      // Auto-zoom / fitBounds unified calculation across all active groups
+      // Restore Object.assign for clean Leaflet object merging
+      layerControlOverlays = Object.assign({}, layerControlOverlays, geozoneLayers);
+
       if (globalBounds.isValid()) {
         try {
           map.fitBounds(globalBounds, {padding: [40, 40], maxZoom: 15});
         } catch (err) {
-          // Suppress error if sizing fails
         }
       }
 
-      // Split data controls (Top Right) and base map controls (Bottom Right)
       const layersControl = L.control.layers(null, layerControlOverlays, {position: "topright"}).addTo(map);
       const baseControl = L.control.layers(baseMaps, null, {position: "bottomright"}).addTo(map);
       L.control.scale({position: "bottomleft", metric: true, imperial: true}).addTo(map);
 
-      // Inject clean text labels after the controls are added to the DOM
       $(layersControl.getContainer()).find('.leaflet-control-layers-list').prepend('<div class="layer-control-header">Layers</div>');
       $(baseControl.getContainer()).find('.leaflet-control-layers-list').prepend('<div class="layer-control-header">Maps</div>');
 
-      // ADMIN CAPTURE: Silent admin capture for base layer form
       map.on("baselayerchange", function (e) {
         const defaultLayerInput = $(map._container).closest("form").find("input[name='default_base_layer']");
         if (defaultLayerInput.length) {
@@ -186,6 +179,7 @@
 
       map = L.map(element.id, {
         scrollWheelZoom: false,
+        maxZoom: 18,
         renderer: L.canvas()
       }).setView(mapCenterLatLng, centerData.zoom);
 
@@ -265,14 +259,14 @@
     },
     updateFormfields: function (map, marker) {
       const inputs = App.Map.coordinatesInputs(map._container);
+      const normalizedLatLng = marker.getLatLng().wrap();
 
-      inputs.lat.val(marker.getLatLng().lat);
-      inputs.long.val(marker.getLatLng().lng);
+      inputs.lat.val(normalizedLatLng.lat);
+      inputs.long.val(normalizedLatLng.lng);
       inputs.zoom.val(map.getZoom());
     },
     clearFormfields: function (element) {
       const inputs = App.Map.coordinatesInputs(element);
-
       inputs.lat.val("");
       inputs.long.val("");
       inputs.zoom.val("");
@@ -315,12 +309,11 @@
 
       const baseLayers = {
         "Standard Map": defaultLayer,
-        "Satellite View": satelliteLayer,
-        "Terrain View": terrainLayer,
         "Clean Minimalist (Light)": cartoLight,
-        //"High Contrast (Dark)": cartoDark,
-        //"Community & Infrastructure": osmHumanitarian,
-
+        "High Contrast (Dark)": cartoDark,
+        "Community & Infrastructure": osmHumanitarian,
+        "Satellite View": satelliteLayer,
+        "Terrain View": terrainLayer
       };
 
       const targetDefault = $(element).data("map-default-base-layer");

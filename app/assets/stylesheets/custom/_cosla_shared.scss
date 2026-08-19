@@ -622,30 +622,27 @@
         background: var(--marker-color);
         border-radius: 50% 50% 50% 0;
         height: var(--marker-size);
-        transform: rotate(-45deg);
         width: var(--marker-size);
+        transform: rotate(-45deg); /* The standard Leaflet tilt */
+        position: relative;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .custom-pin-icon {
-          transform: rotate(45deg); /* Counter-act the parent's rotation */
-          color: var(--marker-inner-color, #fff);
-          font-size: 14px;
-          z-index: 2; /* Keep it above the white circle ::after element */
+        /* The White Inner Circle */
+        &::after {
+          background: var(--marker-inner-color, #fff);
+          border-radius: 50%;
+          content: "";
+          height: 18px; /* Room for the icon */
+          width: 18px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%); /* Perfect absolute centering */
+          margin: 0;
+          z-index: 1;
         }
       }
 
-      .map-icon::after {
-        background: var(--marker-inner-color);
-        border-radius: 50%;
-        content: "";
-        height: var(--marker-inner-size);
-        margin: 8px 0 0 8px;
-        position: absolute;
-        width: var(--marker-inner-size);
-      }
+
     }
   }
   .leaflet-control-layers-toggle {

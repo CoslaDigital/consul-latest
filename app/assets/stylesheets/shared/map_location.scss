@@ -139,3 +139,28 @@
   padding: 10px !important;
   min-width: 150px;
 }
+
+/// --------------------------------------------------------
+// Dynamic Map Pin Icons (Generated via Consul's SVG Mixin)
+// --------------------------------------------------------
+
+$map-icons: "map-marker-alt", "leaf", "building", "users", "hands-helping", "bus", "bicycle", "graduation-cap", "heart", "palette", "futbol", "wheelchair", "paw", "lightbulb", "map-pin";
+
+@each $icon in $map-icons {
+  .custom-pin-icon-#{$icon} {
+    @include has-fa-icon($icon, solid);
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg); // Counter-rotate so it stands straight
+    z-index: 10;
+
+    // CRITICAL FIX: The mixin creates a ::before element.
+    // We apply the color and size directly to the mask, leaving the background transparent!
+    &::before {
+      color: var(--marker-color) !important;
+      font-size: 13px !important; // Fits perfectly inside the 18px white circle
+    }
+  }
+}
