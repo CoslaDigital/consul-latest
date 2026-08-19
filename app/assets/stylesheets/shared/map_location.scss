@@ -71,7 +71,7 @@
   // @include has-fa-icon("list-check", solid, "after");
 
   // Font Awesome 5 version (Active):
-  @include has-fa-icon("tasks", solid, "after");
+  @include has-fa-icon("list-check", solid, "after");
 
   &::after {
     color: #777;
@@ -124,7 +124,7 @@
   // @include has-fa-icon("list-check", solid);
 
   // Font Awesome 5 version (Active):
-  @include has-fa-icon("tasks", solid);
+  @include has-fa-icon("list-check", solid);
 }
 
 .leaflet-bottom .layer-control-header {
