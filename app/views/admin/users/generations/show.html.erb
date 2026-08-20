@@ -1,0 +1,28 @@
+<% if @batch.status == "processing" %>
+  <% provide :meta_refresh, "10" %>
+  <meta http-equiv="refresh" content="10">
+<% end %>
+
+<h2><%= t("admin.users.generations.show.title", default: "Batch Generation Status") %></h2>
+
+<div class="callout <%= @batch.status == 'completed' ? 'success' : 'warning' %>">
+  <h3><%= t("admin.users.generations.show.status", default: "Status: %{status}") % { status: @batch.status.titleize } %></h3>
+
+  <p>
+    <%= t("admin.users.generations.show.progress", default: "Successfully generated %{success} out of %{target} users.") % { success: @batch.success_count, target: @batch.target_count } %>
+  </p>
+
+  <% if @batch.status == "processing" %>
+    <p>
+      <em><%= t("admin.users.generations.show.wait", default: "Processing in the background. This page will automatically refresh every 10 seconds. Please do not close it.") %></em>
+    </p>
+  <% elsif @batch.status == "completed" && @batch.credentials_file.attached? %>
+    <div class="margin-top">
+      <%= link_to t("admin.users.generations.show.download", default: "Download Credentials CSV"),
+                  rails_blob_path(@batch.credentials_file, disposition: "attachment"),
+                  class: "button success" %>
+    </div>
+  <% end %>
+</div>
+
+<%= link_to t("admin.shared.back"), admin_users_path, class: "button hollow" %>
