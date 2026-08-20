@@ -1,15 +1,22 @@
-<h2><%= t("admin.users.index.title") %></h2>
-
 <h2 class="inline-block"><%= t("admin.users.index.title") %></h2>
 
-<%= link_to t("admin.users.index.create", default: "Create User"),
-            new_admin_user_path,
-            class: "button float-right" %>
+<%= link_to t("admin.users.index.create", default: "Create User"), new_admin_user_path, class: "button float-right" %>
+<%= link_to t("admin.users.index.bulk_create", default: "Bulk Generate"), new_admin_users_generation_path, class: "button float-right hollow margin-right" %>
 
-<%= render Admin::SearchComponent.new(
-  label: t("admin.users.search.placeholder"),
-  remote: true
-) %>
+<%# Custom Search and Geozone Filter %>
+<%= form_tag admin_users_path, method: :get do %>
+  <div class="row">
+    <div class="small-12 medium-6 large-4">
+      <%= text_field_tag :search, params[:search], placeholder: t("admin.users.search.placeholder") %>
+    </div>
+    <div class="small-12 medium-4 large-3">
+      <%= select_tag :geozone_id, options_from_collection_for_select(Geozone.all.order(:name), :id, :name, params[:geozone_id]), include_blank: "All Geozones" %>
+    </div>
+    <div class="small-12 medium-2 large-2">
+      <%= submit_tag t("shared.search"), class: "button expanded" %>
+    </div>
+  </div>
+<% end %>
 
 <div id="users">
   <%= render "users" %>

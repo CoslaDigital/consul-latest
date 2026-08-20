@@ -1,0 +1,32 @@
+<h2><%= t("admin.users.generations.new.title", default: "Bulk Generate Users") %></h2>
+
+<%= form_tag admin_users_generations_path, method: :post do %>
+  <div class="row">
+    <div class="small-12 medium-6">
+      <%= label_tag :prefix, t("admin.users.generations.new.prefix", default: "Username Prefix") %>
+      <%= text_field_tag :prefix, "demo", required: true %>
+      <p class="help-text">Users will be named prefixYY1, prefixYY2, etc.</p>
+    </div>
+    <div class="small-12 medium-6">
+      <%= label_tag :number, t("admin.users.generations.new.number", default: "Number of Users") %>
+      <%= number_field_tag :number, 6, min: 1, max: 2000, required: true %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 medium-6">
+      <%= label_tag :geozone_id, Geozone.model_name.human %>
+      <%= select_tag :geozone_id, options_from_collection_for_select(Geozone.all.order(:name), :id, :name), include_blank: true %>
+    </div>
+    <div class="small-12 medium-6">
+      <%= label_tag :password_type, t("admin.users.generations.new.password_type", default: "Password Complexity") %>
+      <%= select_tag :password_type, options_for_select([["Simple", "simple"], ["Medium", "medium"], ["Complex", "complex"]], "complex") %>
+    </div>
+  </div>
+
+  <div class="row margin-top">
+    <div class="small-12 medium-4 large-3">
+      <%= submit_tag t("admin.users.generations.new.submit", default: "Generate Users"), class: "button success expanded", data: { disable_with: "Starting..." } %>
+    </div>
+  </div>
+<% end %>

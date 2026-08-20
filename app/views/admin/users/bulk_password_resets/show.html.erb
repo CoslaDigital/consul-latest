@@ -1,0 +1,19 @@
+<% if @batch.status == "processing" %>
+  <meta http-equiv="refresh" content="10">
+<% end %>
+
+<h2>Bulk Password Reset Status</h2>
+
+<div class="callout <%= @batch.status == 'completed' ? 'success' : 'warning' %>">
+  <h3>Status: <%= @batch.status.titleize %></h3>
+  <p>Successfully reset <%= @batch.success_count %> out of <%= @batch.target_count %> users.</p>
+
+  <% if @batch.status == "processing" %>
+    <p><em>Processing in the background. This page will automatically refresh every 10 seconds.</em></p>
+  <% elsif @batch.status == "completed" && @batch.credentials_file.attached? %>
+    <div class="margin-top">
+      <%= link_to "Download Credentials CSV", rails_blob_path(@batch.credentials_file, disposition: "attachment"), class: "button success" %>
+    </div>
+  <% end %>
+</div>
+<%= link_to t("admin.shared.back"), admin_users_path, class: "button hollow" %>

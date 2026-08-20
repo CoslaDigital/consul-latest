@@ -450,6 +450,23 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_124914) do
     t.string "kind", default: "budget", null: false
     t.integer "author_id"
     t.index ["author_id"], name: "index_budgets_on_author_id"
+    t.boolean "part_fund"
+    t.boolean "stv"
+    t.integer "stv_winners"
+    t.boolean "stv_dynamic_quota"
+    t.string "kind", default: "budget", null: false
+    t.integer "author_id"
+    t.index ["author_id"], name: "index_budgets_on_author_id"
+  end
+
+  create_table "bulk_password_resets", force: :cascade do |t|
+    t.bigint "admin_user_id"
+    t.string "status", default: "processing"
+    t.integer "target_count", default: 0
+    t.integer "success_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_bulk_password_resets_on_admin_user_id"
   end
 
   create_table "bulk_password_resets", force: :cascade do |t|
