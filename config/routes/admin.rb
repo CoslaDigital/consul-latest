@@ -178,6 +178,7 @@ namespace :admin do
 
     resources :users, only: [:index, :new, :create, :edit, :update] do
       member do
+        get :credentials
         put :lock
         put :unlock
         get :credentials
