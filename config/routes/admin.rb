@@ -182,6 +182,15 @@ namespace :admin do
         put :lock
         put :unlock
       end
+
+      collection do
+        post :bulk_action
+      end
+    end
+
+    namespace :users do
+      resources :generations, only: [:new, :create, :show]
+      resources :bulk_password_resets, only: [:show]
     end
 
     scope module: :poll do
