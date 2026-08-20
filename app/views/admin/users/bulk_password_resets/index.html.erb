@@ -1,0 +1,33 @@
+<h2>Bulk Password History</h2>
+
+<table>
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Admin</th>
+    <th>Target</th>
+    <th>Success</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @batches.each do |batch| %>
+    <tr>
+      <td><%= l batch.created_at, format: :short %></td>
+      <td><%= batch.admin_user.name %></td>
+      <td><%= batch.target_count %></td>
+      <td><%= batch.success_count %></td>
+      <td><%= batch.status.titleize %></td>
+      <td>
+        <%= link_to "View Status", admin_users_bulk_password_reset_path(batch), class: "button tiny hollow" %>
+        <% if batch.status == "completed" && batch.credentials_file.attached? %>
+          <%= link_to "Download CSV", rails_blob_path(batch.credentials_file, disposition: "attachment"), class: "button tiny success" %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= link_to t("admin.shared.back"), admin_users_path, class: "button hollow" %>
