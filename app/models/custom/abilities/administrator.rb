@@ -7,7 +7,7 @@ module CustomAdministratorAbilities
     super
 
     # Add our new custom abilities for User CRUD
-    can [:create, :update, :credentials], User
+    can [:create, :update, :credentials, :bulk_action], User
   end
 end
 
