@@ -189,8 +189,8 @@ namespace :admin do
     end
 
     namespace :users do
-      resources :generations, only: [:new, :create, :show]
-      resources :bulk_password_resets, only: [:show]
+      resources :generations, only: [:index, :new, :create, :show]
+      resources :bulk_password_resets, only: [:index, :show]
     end
 
     scope module: :poll do

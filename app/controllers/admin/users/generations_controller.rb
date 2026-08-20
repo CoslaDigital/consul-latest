@@ -5,6 +5,9 @@ class Admin::Users::GenerationsController < Admin::BaseController
     @geozones = Geozone.all.order(:name)
   end
 
+  def index
+    @batches = UserGenerationBatch.order(created_at: :desc).page(params[:page])
+  end
   def create
     batch = UserGenerationBatch.create!(
       admin_user: current_user,
