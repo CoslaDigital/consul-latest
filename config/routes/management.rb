@@ -1,6 +1,8 @@
 namespace :management do
   root to: "dashboard#index"
 
+  resources :user_searches, only: [:index, :create]
+
   resources :document_verifications, only: [:index, :new, :create] do
     post :check, on: :collection
   end
