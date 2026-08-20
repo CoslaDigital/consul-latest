@@ -180,6 +180,7 @@ namespace :admin do
       member do
         put :lock
         put :unlock
+        get :credentials
       end
     end
 
