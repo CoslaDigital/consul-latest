@@ -1,0 +1,44 @@
+<%= form_for [:admin, @user] do |f| %>
+  <%= render "shared/errors", resource: @user %>
+
+  <div class="row">
+    <div class="small-12 medium-6">
+      <%= f.text_field :username %>
+    </div>
+    <div class="small-12 medium-6">
+      <%= f.email_field :email %>
+    </div>
+  </div>
+
+  <div class="row margin-top">
+    <div class="small-12 medium-6">
+      <%= f.label :password %>
+      <p class="help-text"><%= t("management.account.edit.password.print_help") %></p>
+
+      <div class="input-group">
+        <%= f.password_field :password,
+                             class: "input-group-field",
+                             label: false,
+                             placeholder: (@user.persisted? ? t("admin.users.form.leave_blank", default: "Leave blank to keep current") : ""),
+                             value: nil %>
+        <span class="input-group-label">
+  <button type="button" class="show-password" aria-pressed="false">
+    <span class="icon-eye" aria-hidden="true"></span> <!-- ADD THIS LINE -->
+    <span class="show-for-sr"><%= t("management.account.edit.password.show") %></span>
+  </button>
+</span>
+      </div>
+
+      <%= link_to t("management.account.edit.password.random"),
+                  "#",
+                  class: "generate-random-value float-right",
+                  data: { "password-complexity": User.password_complexity } %>
+    </div>
+
+
+    <div class="row margin-top">
+      <div class="small-12 medium-4 large-2">
+        <%= f.submit t("shared.save"), class: "button success expanded" %>
+      </div>
+    </div>
+<% end %>

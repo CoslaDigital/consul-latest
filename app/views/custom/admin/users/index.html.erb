@@ -1,0 +1,16 @@
+<h2><%= t("admin.users.index.title") %></h2>
+
+<h2 class="inline-block"><%= t("admin.users.index.title") %></h2>
+
+<%= link_to t("admin.users.index.create", default: "Create User"),
+            new_admin_user_path,
+            class: "button float-right" %>
+
+<%= render Admin::SearchComponent.new(
+  label: t("admin.users.search.placeholder"),
+  remote: true
+) %>
+
+<div id="users">
+  <%= render "users" %>
+</div>
