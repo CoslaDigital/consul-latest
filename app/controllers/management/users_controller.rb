@@ -50,6 +50,7 @@ class Management::UsersController < Management::BaseController
     def destroy_session
       session[:document_type] = nil
       session[:document_number] = nil
+      session[:managed_user_id] = nil
       clear_password
     end
 

@@ -1,0 +1,25 @@
+<h2><%= t("management.users.search_results", default: "Search Results") %></h2>
+
+<table>
+  <thead>
+  <tr>
+    <th><%= t("shared.username") %></th>
+    <th><%= t("shared.email") %></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @users.each do |user| %>
+    <tr>
+      <td><%= user.username %></td>
+      <td><%= user.email %></td>
+      <td>
+        <%= button_to t("management.users.manage_user", default: "Manage User"),
+                      management_user_searches_path(user_id: user.id),
+                      class: "button hollow",
+                      method: :post %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
