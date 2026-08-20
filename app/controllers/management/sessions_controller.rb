@@ -25,6 +25,7 @@ class Management::SessionsController < ActionController::Base
       session[:manager] = nil
       session[:document_type] = nil
       session[:document_number] = nil
+      session[:managed_user_id] = nil
     end
 
     def admin?
