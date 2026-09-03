@@ -17,9 +17,6 @@ class ProposalsController
       # 2. Extract by ID directly using the slug parameter to avoid join/load dependency crashes
       if params[:project].present?
         kind_id = ProposalKind.find_by(slug: params[:project])&.id
-
-        # We pass the resolved ID integer or a fallback 0 if it doesn't exist
-        # so an invalid project slug correctly returns an empty list instead of a crash.
         target_id = kind_id || 0
 
         # Filter the main relation stack directly via the foreign key column name
@@ -30,5 +27,9 @@ class ProposalsController
           @featured_proposals = @featured_proposals.where(proposal_kind_id: target_id)
         end
       end
+
+      # 3. NEW: Capture the full, unpaginated dataset specifically for the map.
+      # .geolocated ensures we only pass records that actually have map coordinates.
+      @map_proposals = @resources.geolocated.unscope(:limit, :offset)
     end
 end
