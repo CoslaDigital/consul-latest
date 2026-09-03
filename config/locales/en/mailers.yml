@@ -120,6 +120,12 @@ en:
       action_text: "You can review this request and accept or decline it from your dashboard."
       button: "Go to my dashboard"
       footer_text: "Thank you for participating in the Mutual Aid network!"
+      title_requested: "New Collaboration Request"
+      title_offered: "New Support Offered for Your Proposal"
+      respond_button: "View Request & Respond"
+      view_offer_button: "View Offer Details"
+      accept_help_text: "You can accept this request in your dashboard to start the coordination process."
+      dashboard_help_text: "Once confirmed, you will both receive contact details to begin collaborating."
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"
@@ -161,6 +167,8 @@ en:
       sincerely: "The Community Team"
     proposal_match_created:
       subject: "New Mutual Aid Request"
+      requested_subject: "%{requester} requested your offer: %{offer_title}"
+      offered_subject: "%{provider} offered support for your proposal: %{proposal_title}"
     proposal_match_confirmed:
       subject: "Collaboration Confirmed: Time to start!"
       title: "Handshake Complete!"

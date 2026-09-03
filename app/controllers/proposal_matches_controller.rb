@@ -6,11 +6,14 @@ class ProposalMatchesController < ApplicationController
 
   def create
     if @proposal_match.save
-      recipient = (@proposal_match.proposal.author == current_user) ? @proposal_match.offer.author : @proposal_match.proposal.author
+      # Identify who initiated and who should receive the email
+      initiated_by_proposal_author = (@proposal_match.proposal.author == current_user)
+      recipient = initiated_by_proposal_author ? @proposal_match.offer.author : @proposal_match.proposal.author
+
       Notification.add(recipient, @proposal_match)
 
-      # 1. INITIAL REQUEST: Pass the ID for background serialization safety
-      Mailer.proposal_match_created(@proposal_match.id).deliver_later
+      # Pass who initiated the match so the mailer sends the right message to the right person
+      Mailer.proposal_match_created(@proposal_match.id, current_user.id).deliver_later
 
       redirect_back fallback_location: root_path, notice: t("proposal_matches.create.success")
     else

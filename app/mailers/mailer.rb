@@ -173,26 +173,38 @@ class Mailer < ApplicationMailer
     end
   end
 
-  def proposal_match_created(match_or_id)
-    # 1. Hydrate the record safely regardless of background worker payload state
+  def proposal_match_created(match_or_id, initiator_or_id = nil)
     @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
-
-    # 2. Extract the associated relationships needed by your html.erb template
     @proposal = @match.proposal
     @offer = @match.offer
-    @provider = @offer.author
-    @requester = @proposal.author
 
-    # 3. Explicitly hook the recipient user profile mapping
-    @recipient = @provider # This maps to 'Hi <%= @provider.name %>' from your view file
+    initiator = if initiator_or_id.present?
+                  initiator_or_id.is_a?(ActiveRecord::Base) ? initiator_or_id : User.find(initiator_or_id)
+                else
+                  @proposal.author
+                end
+
+    @initiated_by_proposal = (initiator.id == @proposal.author_id)
+    @actor = initiator
+    @recipient = @initiated_by_proposal ? @offer.author : @proposal.author
     @email_to = @recipient.email
 
     with_user(@recipient) do
-      mail(to: @email_to, subject: t("mailers.proposal_match_created.subject"))
+      # Ensure the keys passed here match en.yml exactly:
+      subject = if @initiated_by_proposal
+                  t("mailers.proposal_match_created.requested_subject",
+                    requester: @actor.name,
+                    offer_title: @offer.title)
+                else
+                  t("mailers.proposal_match_created.offered_subject",
+                    provider: @actor.name,
+                    proposal_title: @proposal.title)
+                end
+
+      mail(to: @email_to, subject: subject)
     end
   rescue ActiveRecord::RecordNotFound => e
-    # Prevent background jobs from retrying infinitely if a record gets deleted quickly
-    Rails.logger.error("Mailer failed: ProposalMatch ##{match_or_id} no longer exists. #{e.message}")
+    Rails.logger.error("Mailer failed: Record missing for proposal_match_created (#{e.message})")
     mail.perform_deliveries = false
   end
 
