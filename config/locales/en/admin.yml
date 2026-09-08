@@ -165,7 +165,7 @@ en:
         title_multiple: New multiple headings budget
         title_single: New single heading budget
       help:
-        budgets: "Participatory budgets allow citizens to propose and decide directly how to spend part of the budget, with monitoring and rigorous evaluation of proposals by the institution."
+        budgets: "This module can be used for both Elections and Participatory budgets. The workflow allows citizens to propose Candidates or Projects and then vote to choose which are selected, with monitoring and rigorous evaluation of by the institution."
         budget_questions: "Here you can create, edit, and manage the questions that will be presented as part of the application form for this budget."
         groups:
           multiple: "Groups are meant to organize headings. After a group is created and it contains headings, it's possible to determine in how many headings a user can vote per group."
