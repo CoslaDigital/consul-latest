@@ -33,7 +33,7 @@ class Budget
       summary_title = "Election Results: #{@budget.name}"
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
-      seats = @heading.max_winners
+      seats = @heading.effective_max_winners.to_i
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
       investment_titles = candidates.pluck(:id, :title).to_h
 
