@@ -85,7 +85,7 @@ class Comment < ApplicationRecord
   end
 
   def human_name
-    body.truncate(32)
+    body.to_s.truncate(50)
   end
 
   def total_votes
