@@ -80,9 +80,6 @@ module AiModeratable
       data = JSON.parse(json_match[0])
       scores = data["categories"] || {}
 
-      touch
-      commentable&.touch if respond_to?(:commentable)
-
       # --- AGGREGATION & THRESHOLD CHECKING LOGIC ---
       is_flagged = false
       is_hidden = false
@@ -124,7 +121,7 @@ module AiModeratable
         hidden: is_hidden
       }
 
-      update_columns(
+      update!(
         flags_count: calculated_flags,
         hidden_at: is_hidden ? Time.current : hidden_at,
         ai_moderation_meta: meta_payload
