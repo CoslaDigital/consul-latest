@@ -26,7 +26,6 @@
           <%= translations_form.text_field :name, maxlength: Budget.title_max_length, hint: custom_t("admin.budgets.edit.name_description") %>
         </div>
       </div>
-      <%# ... other translatable fields like main_link_text/url ... %>
     <% end %>
   </fieldset>
 
@@ -77,8 +76,6 @@
       </div>
       <div class="row expanded highlight">
         <div class="small-12 medium-6 column">
-          <%# --- CHANGED THIS TO A BASIC TAG --- %>
-          <%# This keeps the UI exactly the same, but stops Rails from generating bad parameters %>
           <%= check_box_tag :hide_money_visual_only, "1", true, disabled: true %>
           <label for="hide_money_visual_only">Hide money</label>
           <p class="help-text"><%= custom_t("admin.budgets.edit.hide_money_election_help_text") %></p>
@@ -96,18 +93,6 @@
       </div>
     </div>
   </fieldset>
-
-  <%# --- Phase Settings --- %>
-  <% unless wizard? %>
-    <fieldset>
-      <legend><%= custom_t("admin.budgets.edit.phases_caption") %></legend>
-      <div class="row expanded">
-        <div class="small-12 medium-6 column">
-          <%= f.select :phase, phases_select_options %>
-        </div>
-      </div>
-    </fieldset>
-  <% end %>
 
   <%# --- Image Settings --- %>
   <% if feature?(:allow_images) %>
