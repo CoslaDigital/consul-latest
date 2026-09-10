@@ -10,17 +10,21 @@
   </div>
 </div>
 
-<%# Custom Search and Geozone Filter %>
+<h3 class="margin-bottom-half"><%= t("admin.shared.search.label.users", default: "Find users") %></h3>
+
 <%= form_tag admin_users_path, method: :get do %>
-  <div class="row">
-    <div class="small-12 medium-6 large-4">
-      <%= text_field_tag :search, params[:search], placeholder: t("admin.users.search.placeholder") %>
+  <!-- 'collapse' removes Foundation's negative row margins so it aligns flush left -->
+  <div class="row collapse margin-bottom">
+    <div class="small-12 medium-5 columns" style="padding-right: 15px;">
+      <%= text_field_tag :search, params[:search], placeholder: t("admin.users.index.search"), style: "margin: 0;" %>
     </div>
-    <div class="small-12 medium-4 large-3">
-      <%= select_tag :geozone_id, options_from_collection_for_select(Geozone.all.order(:name), :id, :name, params[:geozone_id]), include_blank: "All Geozones" %>
+
+    <div class="small-12 medium-4 columns" style="padding-right: 15px;">
+      <%= select_tag :geozone_id, options_from_collection_for_select(Geozone.all.order(:name), :id, :name, params[:geozone_id]), prompt: "All Geozones", style: "margin: 0;" %>
     </div>
-    <div class="small-12 medium-2 large-2">
-      <%= submit_tag t("shared.search"), class: "button expanded" %>
+
+    <div class="small-12 medium-3 columns">
+      <%= submit_tag t("admin.shared.search"), class: "button expanded", style: "margin: 0;" %>
     </div>
   </div>
 <% end %>
