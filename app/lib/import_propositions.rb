@@ -2,8 +2,7 @@
 require 'csv'
 
 def import_propositions_to_legislation(csv_path)
-  # 1. Force the database translation context to UK English
-  I18n.locale = :'en-GB'
+  I18n.locale = I18n.default_locale
 
   # 2. Grab a valid administrative account to set as the author anchor
   admin_user = User.administrators.first
