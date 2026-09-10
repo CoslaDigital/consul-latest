@@ -6,15 +6,9 @@
   <%= form_tag bulk_action_admin_users_path, method: :post, id: "bulk-users-form" do %>
 
     <% if @current_filter != "erased" %>
-      <div class="row margin-bottom">
-        <div class="small-12 medium-4">
-          <div class="input-group">
-            <%= select_tag :action_type, options_for_select([['Reset Passwords', 'reset_password'], ['Erase Users', 'erase']]), prompt: "Select Bulk Action...", class: "input-group-field" %>
-            <div class="input-group-button">
-              <%= submit_tag "Apply", class: "button warning", data: { confirm: "Are you sure you want to apply this action to the selected users?" } %>
-            </div>
-          </div>
-        </div>
+      <div class="margin-bottom" style="display: flex; gap: 15px; align-items: stretch;">
+        <%= select_tag :action_type, options_for_select([['Verify Users', 'verify'], ['Reset Passwords', 'reset_password'], ['Erase Users', 'erase']]), prompt: "Select Bulk Action...", style: "margin: 0; width: 250px;" %>
+        <%= submit_tag "Apply", class: "button", style: "margin: 0;", data: { confirm: "Are you sure you want to apply this action to the selected users?" } %>
       </div>
     <% end %>
 
@@ -22,7 +16,7 @@
       <thead>
       <tr>
         <% if @current_filter != "erased" %>
-          <th scope="col"><input type="checkbox" id="select-all-users"></th>
+          <th scope="col" style="width: 50px; text-align: center;"><input type="checkbox" id="select-all-users"></th>
         <% end %>
 
         <% if @current_filter == "erased" %>
@@ -36,6 +30,10 @@
           <th scope="col"><%= t("admin.users.columns.roles") %></th>
           <th scope="col"><%= t("admin.users.columns.verification_level") %></th>
           <th scope="col"><%= t("admin.users.columns.activation_status") %></th>
+          <% if User.devise_modules.include?(:lockable) %>
+            <th scope="col"><%= t("admin.users.columns.locked_status") %></th>
+          <% end %>
+          <th scope="col"><%= t("admin.actions.actions") %></th>
         <% end %>
       </tr>
       </thead>
@@ -43,7 +41,7 @@
       <% @users.each do |user| %>
         <tr>
           <% if @current_filter != "erased" %>
-            <td><%= check_box_tag "user_ids[]", user.id, false, class: "user-checkbox" %></td>
+            <td style="text-align: center;"><%= check_box_tag "user_ids[]", user.id, false, class: "user-checkbox" %></td>
           <% end %>
 
           <% if @current_filter == "erased" %>
@@ -55,8 +53,16 @@
             <td><%= user.geozone&.name || "None" %></td>
             <td><%= user.document_number %></td>
             <td><%= display_user_roles(user) %></td>
-            <td><%= user.user_type %></td>
+            <td><%= t("admin.users.verification_levels.#{user.user_type}", default: user.user_type.to_s.titleize) %></td>
             <td><%= user.confirmed_at? ? t("admin.users.account.active_status") : t("admin.users.account.inactive_status") %></td>
+
+            <% if User.devise_modules.include?(:lockable) %>
+              <td><%= user.access_locked? ? t("admin.shared.yes") : t("admin.shared.no") %></td>
+            <% end %>
+
+            <td>
+              <%= render Admin::Users::TableActionsComponent.new(user) %>
+            </td>
           <% end %>
         </tr>
       <% end %>
@@ -68,7 +74,7 @@
   <%= paginate @users %>
 
   <script>
-    document.getElementById('select-all-users').addEventListener('change', function (e) {
+    document.getElementById('select-all-users')?.addEventListener('change', function (e) {
       document.querySelectorAll('.user-checkbox').forEach(function (checkbox) {
         checkbox.checked = e.target.checked;
       });

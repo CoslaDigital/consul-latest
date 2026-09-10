@@ -409,4 +409,20 @@ class User < ApplicationRecord
         errors.add(:email, "must belong to the authorized domain (#{Setting['email_domain_for_officials']})")
       end
     end
+
+    def bulk_verify!
+      self.verified_at = Time.current
+      self.residence_verified_at = Time.current
+      self.confirmed_at = Time.current
+
+      self.skip_confirmation_notification! if respond_to?(:skip_confirmation_notification!)
+      self.skip_reconfirmation! if respond_to?(:skip_reconfirmation!)
+
+      self.terms_of_service = '1'
+      if self.email.blank?
+        self.email = nil
+      end
+
+      self.save!
+    end
 end

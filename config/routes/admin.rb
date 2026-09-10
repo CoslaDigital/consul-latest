@@ -184,7 +184,7 @@ namespace :admin do
       end
 
       collection do
-        post :bulk_action
+        match :bulk_action, via: [:post, :put, :patch]
       end
     end
 

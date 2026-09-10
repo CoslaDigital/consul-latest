@@ -104,6 +104,11 @@ class Admin::UsersController
       User.where(id: user_ids).each { |u| u.delay.erase }
       redirect_to admin_users_path, notice: "Selected users are being erased in the background."
 
+    elsif params[:action_type] == "verify"
+      # Background verify
+      User.where(id: user_ids).each { |u| u.delay.bulk_verify! }
+      redirect_to admin_users_path, notice: "Selected users are being verified in the background."
+
     elsif params[:action_type] == "reset_password"
       # Background password reset with CSV tracking
       batch = BulkPasswordReset.create!(
