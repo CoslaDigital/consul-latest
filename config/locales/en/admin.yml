@@ -1447,6 +1447,7 @@ en:
       no_description: "No description"
     shared:
       search: "Search"
+      search_label: "Find"
       search_results: "Search results"
       no_search_results: "No results found."
       actions: Actions
