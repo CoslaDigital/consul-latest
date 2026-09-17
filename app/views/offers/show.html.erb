@@ -118,8 +118,8 @@
     <% unless preview %>
       <aside class="small-12 medium-3 column">
 
-        <div class="callout primary">
-          <h3><%= t("offers.show.need_this", default: "Need this resource?") %></h3>
+        <div class="margin-bottom">
+          <p class="sidebar-title"><%= t("offers.show.need_this", default: "Need this resource?") %></p>
 
           <% if current_user.nil? %>
             <p><%= t("offers.show.login_to_request", default: "Sign in to request this offer for your proposal.") %></p>
