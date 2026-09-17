@@ -1,70 +1,32 @@
 <td style="<%= css_for_mailer_content %>">
   <h1 style="<%= css_for_mailer_heading %>">
-    <% if @initiated_by_proposal %>
-      <%= t("mailers.collaboration_request.title_requested", default: "New Collaboration Request") %>
-    <% else %>
-      <%= t("mailers.collaboration_request.title_offered", default: "New Offer of Support for Your Proposal") %>
-    <% end %>
+    <%= @initiated_by_proposal ? t("mailers.collaboration_request.title_requested") : t("mailers.collaboration_request.title_offered") %>
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    Hi <%= @recipient.name %>,
+    <%= t("mailers.collaboration_request.hi", name: @recipient.name) %>
   </p>
 
-  <% if @initiated_by_proposal %>
-    <%# Case A: Proposal author requested assistance from an existing offer %>
-    <p style="<%= css_for_mailer_text %>">
-      <strong><%= @actor.name %></strong> is interested in your offer:
-      "<em><%= @offer.title %></em>".
-    </p>
+  <p style="<%= css_for_mailer_text %>">
+    <% if @initiated_by_proposal %>
+      <%= sanitize(t("mailers.collaboration_request.main_text", requester_name: "<strong>#{@actor.name}</strong>", proposal_title: "<strong>#{@proposal.title}</strong>")) %>
+    <% else %>
+      <strong><%= @actor.name %></strong> has offered their resource "<em><%= @offer.title %></em>" to support your
+      proposal: <strong><%= @proposal.title %></strong>.
+    <% end %>
+  </p>
 
-    <p style="<%= css_for_mailer_text %>">
-      They would like to use this resource for their proposal:
-      <strong><%= @proposal.title %></strong>.
-    </p>
+  <p style="<%= css_for_mailer_text %>">
+    <%= @initiated_by_proposal ? t("mailers.collaboration_request.accept_help_text") : t("mailers.collaboration_request.review_offer_text") %>
+  </p>
 
-    <table style="width: 100%;">
-      <tbody>
-      <tr>
-        <td style="padding-bottom: 12px; text-align: center;">
-          <%= link_to mine_offers_url, style: css_for_mailer_button do %>
-            <%= t("mailers.collaboration_request.respond_button", default: "View Request & Respond") %>
-          <% end %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to (@initiated_by_proposal ? t("mailers.collaboration_request.respond_button") : t("mailers.collaboration_request.view_offer_button")),
+                mine_offers_url(filter: (@initiated_by_proposal ? nil : 'help_received')),
+                style: css_for_mailer_link %>
+  </p>
 
-    <p style="<%= css_for_mailer_text %>">
-      <%= t("mailers.collaboration_request.accept_help_text", default: "You can accept this request in your dashboard to start the coordination process.") %>
-    </p>
-
-  <% else %>
-    <%# Case B: Offer creator reached out to offer support to a proposal %>
-    <p style="<%= css_for_mailer_text %>">
-      <strong><%= @actor.name %></strong> has offered their resource
-      "<em><%= @offer.title %></em>" to support your proposal:
-      <strong><%= @proposal.title %></strong>.
-    </p>
-
-    <p style="<%= css_for_mailer_text %>">
-      You can review this offer and finalize the collaboration through your dashboard.
-    </p>
-
-    <table style="width: 100%;">
-      <tbody>
-      <tr>
-        <td style="padding-bottom: 12px; text-align: center;">
-          <%= link_to mine_offers_url(filter: "help_received"), style: css_for_mailer_button do %>
-            <%= t("mailers.collaboration_request.view_offer_button", default: "View Offer Details") %>
-          <% end %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <p style="<%= css_for_mailer_text %>">
-      <%= t("mailers.collaboration_request.dashboard_help_text", default: "Once confirmed, you will both receive contact details to begin collaborating.") %>
-    </p>
-  <% end %>
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.collaboration_request.dashboard_help_text") %>
+  </p>
 </td>

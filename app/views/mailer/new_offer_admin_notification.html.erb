@@ -1,7 +1,6 @@
 <td style="<%= css_for_mailer_content %>">
-
   <h1 style="<%= css_for_mailer_heading %>">
-    New Resource Offer Created
+    <%= t("mailers.new_offer_admin_notification.subject") %>
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
@@ -11,19 +10,10 @@
   <p style="<%= css_for_mailer_text %>">
     <strong>Author:</strong> <%= @offer.author.name %><br>
     <strong>Title:</strong> <%= @offer.title %><br>
-    <strong>Description:</strong> <%= sanitize(truncate(@offer.description, length: 150)).html_safe %>
+    <strong>Description:</strong> <%= @offer.description %>
   </p>
 
-  <table style="width: 100%;">
-    <tbody>
-    <tr>
-      <td style="padding-bottom: 12px; text-align: center;">
-        <%= link_to admin_collaborations_url, style: css_for_mailer_button do %>
-          Review in Admin Dashboard
-        <% end %>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to "Review in Admin Dashboard", admin_collaborations_url, style: css_for_mailer_link %>
+  </p>
 </td>

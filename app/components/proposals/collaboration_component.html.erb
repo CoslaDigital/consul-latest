@@ -1,14 +1,18 @@
-<div class="collaboration-status-sidebar admin" style="display: block; clear: both; position: relative; width: 100%;">
-  <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status") %></h2>
+<div class="collaboration-status-sidebar">
+  <%# 1. Standard CONSUL top divider (matches the social share and votes divider) %>
+  <div class="sidebar-divider"></div>
 
-  <%# 1. Success History (Static List) %>
-  <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
+  <%# 2. Standard CONSUL sidebar heading %>
+  <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status", default: "Mutual Aid Status") %></h2>
 
-  <%# 2. Active Tasks (Author vs Visitor logic) %>
-  <%= render Proposals::Collaboration::ActiveTasksComponent.new(@proposal, @current_user) %>
+  <div class="margin-bottom">
+    <%# 3. Success History (Static List) %>
+    <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
 
-  <%# 3. Visitor Action (The form or the status badge) %>
-  <%= render Proposals::Collaboration::VisitorActionComponent.new(@proposal, @current_user) %>
+    <%# 4. Active Tasks (Author vs Visitor logic) %>
+    <%= render Proposals::Collaboration::ActiveTasksComponent.new(@proposal, @current_user) %>
 
-  <div style="clear: both; height: 1px;"></div>
+    <%# 5. Visitor Action (The form or the status badge) %>
+    <%= render Proposals::Collaboration::VisitorActionComponent.new(@proposal, @current_user) %>
+  </div>
 </div>

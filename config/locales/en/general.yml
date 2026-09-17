@@ -465,13 +465,20 @@ en:
       title_video_url: "External video"
       author: Author
       draft: Proposal in draft. Cannot yet get supports, nor does it appear in the list of proposals.
-      select_offer_prompt: Select an available offer
       propose_button: "Make an Offer"
-      collaboration_actions: "Finalise Support"
       finalizing_with: "Arranging help with"
-      is_supporting: "is providing help"
-      finalize_author_action: "Finalize connection with %{name}"
-      active_author_action: "Active connection: %{name}"
+      collaboration_status: "Mutual Aid Status"
+      offer_help_title: "Offer your resources"
+      select_offer_prompt: "Select an offer..."
+      no_offers_to_link: "You don't have any active offers to link."
+      your_link_status: "Your offer is currently:"
+      collaboration_actions: "Collaboration Actions"
+      finalize_author_action: "Finalise collaboration with %{name}"
+      active_author_action: "Active collaboration with %{name}"
+      active_collabs: "Active Collaborations"
+      is_supporting: "is supporting this project"
+      fulfilled_collabs: "Fulfilled Collaborations"
+      supported_by: "Supported by"
     update:
       form:
         submit_button: Save changes

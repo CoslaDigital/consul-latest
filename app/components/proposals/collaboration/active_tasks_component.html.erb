@@ -1,14 +1,15 @@
-<div class="active-tasks-container">
+<div class="active-tasks-container margin-bottom">
   <% if author? %>
     <%# AUTHOR VIEW %>
     <% if @proposal.proposal_matches.confirmed.any? || @proposal.proposal_matches.accepted.any? %>
-      <div class="callout primary tiny">
-        <h6 class="sidebar-title margin-bottom-s">
-          <i class="fa fa-tasks"></i> <%= t("proposals.show.collaboration_actions") %>
-        </h6>
+      <div class="callout primary">
+        <p>
+          <i class="fa fa-tasks" aria-hidden="true"></i>
+          <strong><%= t("proposals.show.collaboration_actions") %></strong>
+        </p>
 
         <% @proposal.proposal_matches.accepted.each do |match| %>
-          <div class="text-center margin-bottom-s border-bottom padding-bottom-s">
+          <div class="text-center margin-bottom-s">
             <p class="small margin-bottom-s">
               <%= t("proposals.show.finalize_author_action", name: match.offer.author.name) %>
             </p>
@@ -17,7 +18,7 @@
         <% end %>
 
         <% @proposal.proposal_matches.confirmed.each do |match| %>
-          <div class="text-center padding-top-s">
+          <div class="text-center margin-top-s">
             <p class="small margin-bottom-s">
               <%= t("proposals.show.active_author_action", name: match.offer.author.name) %>
             </p>
@@ -30,31 +31,32 @@
   <% else %>
     <%# VISITOR VIEW %>
     <% if @proposal.proposal_matches.accepted.any? || @proposal.proposal_matches.confirmed.any? %>
-      <div class="collaboration-ongoing margin-bottom-l">
-        <h3 class="sidebar-title">
-          <i class="fa fa-refresh text-warning"></i> <%= t("proposals.show.active_collabs") %>
-        </h3>
+      <div class="collaboration-ongoing margin-top">
+        <p class="sidebar-title">
+          <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
+          <%= t("proposals.show.active_collabs") %>
+        </p>
 
         <ul class="no-bullet margin-bottom-0">
           <%# Finalizing Status %>
           <% @proposal.proposal_matches.accepted.each do |match| %>
-            <li class="margin-bottom-s border-bottom padding-bottom-s">
+            <li class="margin-bottom-s">
               <p class="small margin-bottom-0">
-                <i class="fa fa-hourglass-half text-warning"></i>
+                <i class="fa fa-hourglass-half text-warning" aria-hidden="true"></i>
                 <%= t("proposals.show.finalizing_with") %> <strong><%= match.offer.author.name %></strong>
               </p>
-              <div class="text-muted small-text"><%= match.offer.title %></div>
+              <div class="help-text margin-top-0"><%= match.offer.title %></div>
             </li>
           <% end %>
 
           <%# Confirmed Status %>
           <% @proposal.proposal_matches.confirmed.each do |match| %>
-            <li class="margin-bottom-s border-bottom padding-bottom-s">
+            <li class="margin-bottom-s">
               <p class="small margin-bottom-0">
-                <i class="fa fa-check-square text-success"></i>
+                <i class="fa fa-check-square text-success" aria-hidden="true"></i>
                 <strong><%= match.offer.author.name %></strong> <%= t("proposals.show.is_supporting") %>
               </p>
-              <div class="text-muted small-text"><%= match.offer.title %></div>
+              <div class="help-text margin-top-0"><%= match.offer.title %></div>
             </li>
           <% end %>
         </ul>
