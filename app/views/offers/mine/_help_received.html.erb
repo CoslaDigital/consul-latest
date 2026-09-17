@@ -44,8 +44,10 @@
             <%# We only render the component if there is an action to take %>
             <% if match.accepted? || match.confirmed? %>
               <%= render Admin::TableActionsComponent.new(match,
-                                                          actions: (match.accepted? ? [:confirm] : [:fulfill]),
+                                                          # FIX: Added :reject so the Proposal Author can decline volunteered offers
+                                                          actions: (match.accepted? ? [:confirm, :reject] : [:fulfill]),
                                                           confirm_path: confirm_proposal_match_path(match),
+                                                          reject_path: reject_proposal_match_path(match),
                                                           fulfill_path: fulfill_proposal_match_path(match)
               ) %>
             <% else %>

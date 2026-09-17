@@ -5,14 +5,21 @@ class ProposalMatchesController < ApplicationController
   load_and_authorize_resource
 
   def create
+    # LOGIC FIX: If the person making the connection is the Offer's author,
+    # they are volunteering their resource. We bypass 'pending' and pre-accept it.
+    if @proposal_match.offer.author == current_user
+      @proposal_match.status = :accepted
+      @proposal_match.accepted_at = Time.current
+    end
+
     if @proposal_match.save
-      # Identify who initiated and who should receive the email
+      # Identify who initiated and who should receive the web notification
       initiated_by_proposal_author = (@proposal_match.proposal.author == current_user)
       recipient = initiated_by_proposal_author ? @proposal_match.offer.author : @proposal_match.proposal.author
 
       Notification.add(recipient, @proposal_match)
 
-      # Pass who initiated the match so the mailer sends the right message to the right person
+      # Pass who initiated the match so the mailer sends the correct directional message
       Mailer.proposal_match_created(@proposal_match.id, current_user.id).deliver_later
 
       redirect_back fallback_location: root_path, notice: t("proposal_matches.create.success")
@@ -25,7 +32,7 @@ class ProposalMatchesController < ApplicationController
     if @proposal_match.accept!
       Notification.add(@proposal_match.proposal.author, @proposal_match)
 
-      # 2. PROVIDER ACCEPTS: Notify the Recipient (Proposal Author) to Confirm next
+      # PROVIDER ACCEPTS: Notify the Recipient (Proposal Author) to Confirm next
       Mailer.proposal_match_accepted(@proposal_match.id).deliver_later
 
       redirect_back fallback_location: root_path, notice: t("proposal_matches.accept.success")
@@ -37,8 +44,7 @@ class ProposalMatchesController < ApplicationController
       # Web notification to the provider
       Notification.add(@proposal_match.offer.author, @proposal_match)
 
-      # 3. RECIPIENT CONFIRMS: Send introduction details to BOTH parties
-      # This satisfies the requirement that both parties receive details upon connection
+      # RECIPIENT CONFIRMS: Send mutual introduction details to BOTH parties
       Mailer.collaboration_introduction(@proposal_match.id, @proposal_match.proposal.author).deliver_later
       Mailer.collaboration_introduction(@proposal_match.id, @proposal_match.offer.author).deliver_later
 
@@ -50,7 +56,7 @@ class ProposalMatchesController < ApplicationController
     if @proposal_match.fulfill!
       Notification.add(@proposal_match.offer.author, @proposal_match)
 
-      # 4. COMPLETED: Notify the Provider that the work has been marked fulfilled
+      # COMPLETED: Notify the Provider that the work has been marked fulfilled
       Mailer.proposal_match_confirmed(@proposal_match.id).deliver_later
 
       redirect_back fallback_location: root_path, notice: t("proposal_matches.fulfill.success")

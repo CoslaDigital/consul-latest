@@ -113,6 +113,8 @@ en:
       contact_details: "You can now coordinate directly via email:"
       summary_title: "Collaboration Summary"
       next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
+
+    # --- COLLABORATION REQUESTS & OFFERS ---
     collaboration_request:
       subject: "Someone wants to collaborate on %{requester_name}'s project"
       hi: "Hi %{name},"
@@ -123,9 +125,18 @@ en:
       title_requested: "New Collaboration Request"
       title_offered: "New Support Offered for Your Proposal"
       respond_button: "View Request & Respond"
-      view_offer_button: "View Offer Details"
+
+      # Polished keys for when a Business volunteers an offer
+      view_offer_button: "Log In to Review & Respond"
       accept_help_text: "You can accept this request in your dashboard to start the coordination process."
+      review_offer_text: "Log in to your dashboard to review this offer. You can choose to Confirm or Decline the collaboration."
       dashboard_help_text: "Once confirmed, you will both receive contact details to begin collaborating."
+
+    collaboration_offer:
+      title: "New Support Offered for Your Proposal"
+      action_button: "Log In to Review & Respond"
+      instructions: "Log in to your dashboard to review this offer. You can choose to Confirm or Decline the collaboration."
+
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"

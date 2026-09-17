@@ -58,11 +58,11 @@
           <%# 5. Actions Column %>
           <td class="text-center">
             <% if offer.proposal_matches.pending.any? %>
-              <% offer.proposal_matches.pending.each do |match| %>
-                <%= render Admin::TableActionsComponent.new(match,
+              <% offer.proposal_matches.pending.each do |pending_match| %>
+                <%= render Admin::TableActionsComponent.new(pending_match,
                                                             actions: [:accept, :reject, :edit],
-                                                            accept_path: accept_proposal_match_path(match),
-                                                            reject_path: reject_proposal_match_path(match),
+                                                            accept_path: accept_proposal_match_path(pending_match),
+                                                            reject_path: reject_proposal_match_path(pending_match),
                                                             edit_path: edit_offer_path(offer)
                 ) %>
               <% end %>
