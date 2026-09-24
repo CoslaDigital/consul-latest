@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_24_124914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -328,6 +328,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
     t.index ["tsv"], name: "index_budget_investments_on_tsv", using: :gin
   end
 
+  create_table "budget_owners", force: :cascade do |t|
+    t.bigint "budget_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_budget_owners_on_budget_id"
+    t.index ["user_id"], name: "index_budget_owners_on_user_id"
+  end
+
   create_table "budget_phase_translations", id: :serial, force: :cascade do |t|
     t.integer "budget_phase_id", null: false
     t.string "locale", null: false
@@ -441,6 +450,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
     t.string "kind", default: "budget", null: false
     t.integer "author_id"
     t.index ["author_id"], name: "index_budgets_on_author_id"
+  end
+
+  create_table "bulk_password_resets", force: :cascade do |t|
+    t.bigint "admin_user_id"
+    t.string "status", default: "processing"
+    t.integer "target_count", default: 0
+    t.integer "success_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_bulk_password_resets_on_admin_user_id"
   end
 
   create_table "ckeditor_assets", id: :serial, force: :cascade do |t|
@@ -595,7 +614,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
     t.integer "cached_votes_down", default: 0
     t.integer "comments_count", default: 0
     t.datetime "confirmed_hide_at", precision: nil
-    t.integer "cached_anonymous_votes_total", default: 0
     t.integer "cached_votes_score", default: 0
     t.bigint "hot_score", default: 0
     t.integer "confidence_score", default: 0
@@ -1412,6 +1430,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "default", default: false, null: false
+    t.string "color", default: "#00cae9"
+    t.string "icon", default: "map-marker-alt"
   end
 
   create_table "proposal_matches", force: :cascade do |t|
@@ -1770,6 +1790,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
     t.index ["hidden_at"], name: "index_topics_on_hidden_at"
   end
 
+  create_table "user_generation_batches", force: :cascade do |t|
+    t.bigint "admin_user_id"
+    t.string "status", default: "processing"
+    t.integer "target_count", default: 0
+    t.integer "success_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_user_generation_batches_on_admin_user_id"
+  end
+
   create_table "users", id: :serial, force: :cascade do |t|
     t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
@@ -1979,8 +2009,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
   add_foreign_key "budget_administrators", "budgets"
   add_foreign_key "budget_headings", "geozones"
   add_foreign_key "budget_investments", "communities"
+  add_foreign_key "budget_owners", "budgets"
+  add_foreign_key "budget_owners", "users"
   add_foreign_key "budget_valuators", "budgets"
   add_foreign_key "budget_valuators", "valuators"
+  add_foreign_key "bulk_password_resets", "users", column: "admin_user_id"
   add_foreign_key "dashboard_administrator_tasks", "users"
   add_foreign_key "dashboard_executed_actions", "dashboard_actions", column: "action_id"
   add_foreign_key "dashboard_executed_actions", "proposals"
@@ -2033,6 +2066,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_125500) do
   add_foreign_key "sdg_managers", "users"
   add_foreign_key "sensemaker_jobs", "sensemaker_jobs", column: "parent_job_id"
   add_foreign_key "sensemaker_jobs", "users"
+  add_foreign_key "user_generation_batches", "users", column: "admin_user_id"
   add_foreign_key "users", "geozones"
   add_foreign_key "valuators", "users"
 end
