@@ -15,11 +15,6 @@ class Admin::BudgetsController < Admin::BaseController
   load_and_authorize_resource class: "Budget"
 
   def index
-    # --- MANUAL DEBUGGING CODE ---
-    Rails.logger.debug "--- CanCanCan Debug in BudgetsController#index ---"
-    Rails.logger.debug "Current User: #{current_user.inspect}"
-    Rails.logger.debug "Ability Class being used: #{current_ability.class.name}"
-
     # @budgets is already pre-loaded and scoped by CanCanCan here.
     # We simply chain your filters, order, and pagination onto it.
     @budgets = @budgets.send(@current_filter).order(created_at: :desc).page(params[:page])
@@ -98,6 +93,6 @@ class Admin::BudgetsController < Admin::BaseController
     alias_method :consul_allowed_params, :allowed_params
 
     def allowed_params
-      consul_allowed_params + [:stv, :stv_winners, :stv_dynamic_quota, :kind]
+      consul_allowed_params + [:stv, :stv_winners, :stv_dynamic_quota, :kind, { owner_ids: [] }]
     end
 end

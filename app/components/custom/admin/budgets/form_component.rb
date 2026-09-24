@@ -53,6 +53,10 @@ class Admin::Budgets::FormComponent < ApplicationComponent
       @valuators ||= Valuator.includes(:user).order(description: :asc).order("users.email ASC")
     end
 
+    def owners
+      @owners ||= User.joins(:process_manager)
+    end
+
     def hide_money_style
       "hide" if budget.voting_style == "knapsack"
     end
