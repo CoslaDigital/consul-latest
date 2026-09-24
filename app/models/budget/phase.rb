@@ -32,6 +32,13 @@ class Budget
     scope :enabled,           -> { where(enabled: true) }
     scope :published,         -> { enabled.where.not(kind: "drafting") }
 
+    # Override the default calendar class to include the specific phase kind
+    def calendar_class
+      # `super` grabs "event-bar type-phase" from the CalendarItem concern,
+      # and we append the specific phase name to it.
+      "#{super} phase-#{kind}"
+    end
+
     # Override the default link behavior
     def calendar_link_url
       # Construct the anchor string: phase-ID-slugified-name
