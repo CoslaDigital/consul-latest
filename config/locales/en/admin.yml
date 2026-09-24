@@ -138,6 +138,11 @@ en:
           zero: "Select valuators"
           one: "1 valuator selected"
           other: "%{count} valuators selected"
+        owners:
+          zero: "Assign Owners"
+          one: "1 Owner selected"
+          other: "%{count} owners selected"
+        empty_owners: "There are no process managers available."
         empty_administrators: "There are no administrators"
         empty_valuators: "There are no valuators"
         name_description: "This is the name of the participatory budget used on the header and cards whenever it is active"
