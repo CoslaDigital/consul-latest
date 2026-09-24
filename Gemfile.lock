@@ -1,9 +1,4 @@
 GEM
-  remote: https://rails-assets.org/
-  specs:
-    rails-assets-markdown-it (9.0.1)
-
-GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (2.0.1)
@@ -978,7 +973,6 @@ DEPENDENCIES
   puffing-billy (~> 4.0)
   puma (~> 7.2.1)
   rails (~> 8.0.5.1)
-  rails-assets-markdown-it (~> 9.0.1)!
   recipient_interceptor (~> 0.3.3)
   redcarpet (~> 3.6.1)
   responders (~> 3.2.0)

@@ -70,9 +70,6 @@ gem "wicked_pdf", "~> 2.8.2"
 gem "wkhtmltopdf-binary", "~> 0.12.6"
 gem "ed25519"
 gem "bcrypt_pbkdf"
-source "https://rails-assets.org" do
-  gem "rails-assets-markdown-it", "~> 9.0.1"
-end
 
 group :development, :test do
   gem "debug", "~> 1.11.0"
