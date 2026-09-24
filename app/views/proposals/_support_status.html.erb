@@ -2,7 +2,7 @@
   <div class="callout success">
     <strong><%= t("proposals.proposal.selected") %></strong>
   </div>
-<% else %>
+<% elsif !Setting.hide_votes? %>
   <div id="proposal_sticky" data-sticky-container>
     <div class="sticky fixed-mobile-content"
          data-sticky
