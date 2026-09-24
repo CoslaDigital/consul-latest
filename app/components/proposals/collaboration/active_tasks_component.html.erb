@@ -2,7 +2,7 @@
   <% if author? %>
     <%# AUTHOR VIEW %>
     <% if @proposal.proposal_matches.confirmed.any? || @proposal.proposal_matches.accepted.any? %>
-      <div class="callout primary">
+      <div class="callout primary margin-bottom-0">
         <p>
           <i class="fa fa-tasks" aria-hidden="true"></i>
           <strong><%= t("proposals.show.collaboration_actions") %></strong>
@@ -31,14 +31,14 @@
   <% else %>
     <%# VISITOR VIEW %>
     <% if @proposal.proposal_matches.accepted.any? || @proposal.proposal_matches.confirmed.any? %>
-      <div class="collaboration-ongoing margin-top">
-        <p class="sidebar-title">
+      <div class="collaboration-ongoing margin-bottom-0">
+        <%# Changed from sidebar-title to standard bold %>
+        <p class="margin-bottom-s">
           <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
-          <%= t("proposals.show.active_collabs") %>
+          <strong><%= t("proposals.show.active_collabs") %></strong>
         </p>
 
         <ul class="no-bullet margin-bottom-0">
-          <%# Finalizing Status %>
           <% @proposal.proposal_matches.accepted.each do |match| %>
             <li class="margin-bottom-s">
               <p class="small margin-bottom-0">
@@ -49,7 +49,6 @@
             </li>
           <% end %>
 
-          <%# Confirmed Status %>
           <% @proposal.proposal_matches.confirmed.each do |match| %>
             <li class="margin-bottom-s">
               <p class="small margin-bottom-0">

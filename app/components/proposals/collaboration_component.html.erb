@@ -1,18 +1,26 @@
 <div class="collaboration-status-sidebar">
-  <%# 1. Standard CONSUL top divider (matches the social share and votes divider) %>
+  <%# Main heavy divider and title %>
   <div class="sidebar-divider"></div>
-
-  <%# 2. Standard CONSUL sidebar heading %>
   <h2 class="sidebar-title"><%= t("proposals.show.collaboration_status", default: "Mutual Aid Status") %></h2>
 
   <div class="margin-bottom">
-    <%# 3. Success History (Static List) %>
-    <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
+    <%# --- EMPTY STATE LOGIC --- %>
+    <% has_history = @proposal.proposal_matches.fulfilled.any? %>
+    <% has_active = @proposal.proposal_matches.accepted.any? || @proposal.proposal_matches.confirmed.any? %>
 
-    <%# 4. Active Tasks (Author vs Visitor logic) %>
+    <% if !has_history && !has_active %>
+      <p class="help-text margin-bottom">
+        <%= t("proposals.show.no_collaborations", default: "There are no active collaborations for this project yet.") %>
+      </p>
+    <% end %>
+
+    <%# --- SUB-COMPONENTS --- %>
+    <%= render Proposals::Collaboration::HistoryComponent.new(@proposal) %>
     <%= render Proposals::Collaboration::ActiveTasksComponent.new(@proposal, @current_user) %>
 
-    <%# 5. Visitor Action (The form or the status badge) %>
+    <%# Subtle separator before the call-to-action %>
+    <hr class="margin-top-s margin-bottom-s">
+
     <%= render Proposals::Collaboration::VisitorActionComponent.new(@proposal, @current_user) %>
   </div>
 </div>

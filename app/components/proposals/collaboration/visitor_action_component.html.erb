@@ -1,47 +1,82 @@
-<% if @current_user && !author? %>
-  <div class="visitor-action-container margin-top">
-    <%# 1. Consistent divider matching the rest of the sidebar %>
-    <div class="sidebar-divider"></div>
-
-    <% user_match = @proposal.proposal_matches.where(offer_id: @current_user.offers.pluck(:id)).first %>
-
+<% if @current_user %>
+  <div class="action-container">
     <div class="text-center">
-      <% if user_match %>
-        <%# SCENARIO A: User has already offered a resource %>
-        <p class="margin-bottom-s">
-          <strong><%= t("proposals.show.your_link_status", default: "Your offer is currently:") %></strong>
-        </p>
+      <% if !author? %>
+        <%# ========================================== %>
+        <%# VISITOR VIEW: They can offer their resources %>
+        <%# ========================================== %>
+        <% user_match = @proposal.proposal_matches.where(offer_id: @current_user.offers.pluck(:id)).first %>
 
-        <div class="margin-bottom">
-          <span class="label <%= status_label_class(user_match.status) %>">
-            <%= t("proposal_matches.status.#{user_match.status}") %>
-          </span>
-        </div>
+        <% if user_match %>
+          <p class="margin-bottom-s">
+            <strong><%= t("proposals.show.your_link_status", default: "Your offer is currently:") %></strong>
+          </p>
 
-      <% elsif @current_user.offers.active.any? %>
-        <%# SCENARIO B: User has active offers they can volunteer %>
-        <p class="margin-bottom-s">
-          <strong><%= t("proposals.show.offer_help_title", default: "Offer your resources") %></strong>
-        </p>
-
-        <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
-          <%= f.hidden_field :proposal_id, value: @proposal.id %>
-
-          <div class="margin-bottom-s text-left">
-            <%= f.collection_select :offer_id, @current_user.offers.active, :id, :title,
-                                    { prompt: t("proposals.show.select_offer_prompt") } %>
+          <div class="margin-bottom-0">
+            <span class="label <%= status_label_class(user_match.status) %>">
+              <%= t("proposal_matches.status.#{user_match.status}") %>
+            </span>
           </div>
 
-          <%= f.submit t("proposals.show.propose_button"), class: "button success expanded margin-bottom-0" %>
+        <% elsif @current_user.offers.active.any? %>
+          <p class="margin-bottom-s">
+            <strong><%= t("proposals.show.offer_help_title", default: "Offer your resources") %></strong>
+          </p>
+
+          <%= form_with(model: ProposalMatch.new, url: proposal_matches_path, local: true) do |f| %>
+            <%= f.hidden_field :proposal_id, value: @proposal.id %>
+
+            <div class="margin-bottom-s text-left">
+              <%= f.collection_select :offer_id, @current_user.offers.active, :id, :title,
+                                      { prompt: t("proposals.show.select_offer_prompt") } %>
+            </div>
+
+            <%= f.submit t("proposals.show.propose_button"), class: "button success expanded margin-bottom-0" %>
+          <% end %>
+
+        <% else %>
+          <p class="small text-muted margin-bottom-s">
+            <%= t("proposals.show.no_offers_to_link") %>
+          </p>
+
+          <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded margin-bottom-0" %>
         <% end %>
 
       <% else %>
-        <%# SCENARIO C: User has no offers yet %>
-        <p class="small text-muted margin-bottom-s">
-          <%= t("proposals.show.no_offers_to_link") %>
-        </p>
+        <%# ========================================== %>
+        <%# AUTHOR VIEW: Prompt them to find resources %>
+        <%# ========================================== %>
+        <div class="text-left">
 
-        <%= link_to t("offers.index.start_offer"), new_offer_path, class: "button hollow expanded margin-bottom-0" %>
+          <%# 1. ALWAYS SHOW THE HELPFUL CONTEXT %>
+          <p class="margin-bottom-s">
+            <strong><%= t("proposals.show.need_resources", default: "Need resources for this project?") %></strong>
+          </p>
+          <p class="help-text margin-bottom-s">
+            <%= t("proposals.show.browse_offers_help", default: "Browse the community directory and request help directly.") %>
+          </p>
+
+          <%# 2. SHOW RECENT OFFERS IF AVAILABLE %>
+          <% recent_offers = Offer.active.order(created_at: :desc).limit(3) %>
+
+          <% if recent_offers.any? %>
+            <p class="margin-bottom-s small">
+              <strong><%= t("proposals.show.recent_offers_title", default: "Recently added:") %></strong>
+            </p>
+
+            <ul class="no-bullet margin-bottom-s">
+              <% recent_offers.each do |offer| %>
+                <li class="margin-bottom-0 text-truncate">
+                  <i class="fa fa-angle-right text-muted" aria-hidden="true"></i>
+                  <%= link_to offer.title, offer_path(offer), class: "small" %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+
+          <%# 3. THE CALL TO ACTION BUTTON %>
+          <%= link_to t("proposals.show.browse_all_offers", default: "Browse All Offers"), offers_path, class: "button hollow expanded margin-bottom-0" %>
+        </div>
       <% end %>
     </div>
   </div>
