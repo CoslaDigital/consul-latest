@@ -69,26 +69,33 @@ module Abilities
       can :manage, Dashboard::Action
 
       # ====================================================================
-      # BUDGET CORE RULES — author-scoped (Allows owner + legacy nil)
+      # BUDGET CORE RULES — Author OR Owner scoped
       # ====================================================================
       can :read, :admin_dashboard
       can [:index, :create, :budget_headings, :select, :select_headings], Budget
 
       cannot [:update, :destroy, :publish, :calculate_winners, :read_results, :read_admin_stats], Budget
-      can [:read, :update, :destroy], Budget, author_id: [user.id, nil]
 
-      can :publish, Budget, id: Budget.drafting.where(author_id: [user.id, nil]).ids
+      # 1. The original Author (or legacy nil) can manage it
+      can [:read, :update, :destroy], Budget, author_id: [user.id, nil]
+      # 2. Any assigned Owner can also manage it
+      can [:read, :update, :destroy], Budget, budget_owners: { user_id: user.id }
+
+      # Combine IDs for both authors and owners for the publish action
+      publishable_ids = Budget.drafting.where(author_id: [user.id, nil]).ids |
+                        Budget.drafting.joins(:budget_owners).where(budget_owners: { user_id: user.id }).ids
+      can :publish, Budget, id: publishable_ids
 
       can :calculate_winners, Budget do |budget|
-        [user.id, nil].include?(budget.author_id) && budget.reviewing_ballots?
+        ([user.id, nil].include?(budget.author_id) || budget.owner_ids.include?(user.id)) && budget.reviewing_ballots?
       end
 
       can :read_results, Budget do |budget|
-        [user.id, nil].include?(budget.author_id) && budget.balloting_finished? && budget.has_winning_investments?
+        ([user.id, nil].include?(budget.author_id) || budget.owner_ids.include?(user.id)) && budget.balloting_finished? && budget.has_winning_investments?
       end
 
       can :read_admin_stats, Budget do |budget|
-        [user.id, nil].include?(budget.author_id) && budget.balloting_or_later?
+        ([user.id, nil].include?(budget.author_id) || budget.owner_ids.include?(user.id)) && budget.balloting_or_later?
       end
 
       # ====================================================================
@@ -96,33 +103,30 @@ module Abilities
       # ====================================================================
       can :read, Budget::Phase
 
-      # 1. Nuke ALL core engine rules (including :edit and :new)
       cannot :manage, Budget::Phase
 
-      # 2. Re-grant using ONLY Hash conditions (Allows owner + legacy nil)
       can [:create, :update, :destroy], Budget::Phase, budget: { author_id: [user.id, nil] }
+      can [:create, :update, :destroy], Budget::Phase, budget: { budget_owners: { user_id: user.id } }
 
       # ====================================================================
       # BUDGET GROUP RULES — isolation override
       # ====================================================================
       can :read, Budget::Group
 
-      # 1. Nuke ALL core engine rules
       cannot :manage, Budget::Group
 
-      # 2. Re-grant using ONLY Hash conditions
       can [:create, :update, :destroy], Budget::Group, budget: { author_id: [user.id, nil] }
+      can [:create, :update, :destroy], Budget::Group, budget: { budget_owners: { user_id: user.id } }
 
       # ====================================================================
       # BUDGET HEADING RULES — isolation override via deep association
       # ====================================================================
       can :read, Budget::Heading
 
-      # 1. Nuke ALL core engine rules
       cannot :manage, Budget::Heading
 
-      # 2. Re-grant using ONLY Hash conditions
       can [:create, :update, :destroy], Budget::Heading, group: { budget: { author_id: [user.id, nil] } }
+      can [:create, :update, :destroy], Budget::Heading, group: { budget: { budget_owners: { user_id: user.id } } }
 
       can :create, Budget::ValuatorAssignment
       # ====================================================================
