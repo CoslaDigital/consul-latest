@@ -10,13 +10,16 @@
   </div>
 </div>
 
+<%# Subheading aligned natively with the grid collapse container %>
 <h3 class="margin-bottom-half"><%= t("admin.shared.search.label.users", default: "Find users") %></h3>
 
 <%= form_tag admin_users_path, method: :get do %>
   <!-- 'collapse' removes Foundation's negative row margins so it aligns flush left -->
   <div class="row collapse margin-bottom">
+
     <div class="small-12 medium-5 columns" style="padding-right: 15px;">
-      <%= text_field_tag :search, params[:search], placeholder: t("admin.users.index.search"), style: "margin: 0;" %>
+      <!-- Using the exact translation key revealed in the hash dump -->
+      <%= text_field_tag :search, params[:search], placeholder: t("admin.shared.search.label.users", default: "Search user by name or email"), style: "margin: 0;" %>
     </div>
 
     <div class="small-12 medium-4 columns" style="padding-right: 15px;">
@@ -24,8 +27,10 @@
     </div>
 
     <div class="small-12 medium-3 columns">
-      <%= submit_tag t("admin.shared.search"), class: "button expanded", style: "margin: 0;" %>
+      <!-- Appending .search accesses just the string "Search" instead of the whole dictionary -->
+      <%= submit_tag t("admin.shared.search.search", default: "Search"), class: "button expanded", style: "margin: 0;" %>
     </div>
+
   </div>
 <% end %>
 
