@@ -8,68 +8,52 @@
                  signup_link: link_to(t("devise_views.shared.links.signup_link"), new_user_registration_path))) %>
 </p>
 
-<%# Use display: none to completely remove the whitespace when hidden %>
-<div id="admin_login" style="<%= 'display: none;' if Setting.hide_local_login? %>">
-  <h2><%= t("devise.sessions.local_sign_in_title") %></h2>
-  <p><%= t("devise.sessions.local_sign_in_description") %></p>
+<%# 1. Only render the local login form if it's NOT hidden, OR if the URL parameter is present %>
+<% if !Setting.hide_local_login? || params[:admin_mode] == 'true' %>
+  <div id="admin_login">
+    <h2><%= t("devise.sessions.local_sign_in_title") %></h2>
+    <p><%= t("devise.sessions.local_sign_in_description") %></p>
 
-  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-    <div class="row">
-      <div class="small-12 column">
-        <%# This block will only render if your secrets are configured %>
-        <% if ys_configured? %>
-          <p class="help-text"><em><%= t("devise.sessions.ys_sign_in_description") %></em></p>
-        <% end %>
-      </div>
-
-      <div class="small-12 column">
-        <%= f.text_field :login, autofocus: true %>
-      </div>
-
-      <div class="small-12 column">
-        <%= f.password_field :password, autocomplete: "off" %>
-        <%= link_to t("devise_views.shared.links.new_password"), new_password_path(resource_name), class: "float-right" %>
-      </div>
-
-      <% if devise_mapping.rememberable? -%>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="row">
         <div class="small-12 column">
-          <%= f.check_box :remember_me, label: t("devise_views.sessions.new.remember_me") %>
+          <%# This block will only render if your secrets are configured %>
+          <% if ys_configured? %>
+            <p class="help-text"><em><%= t("devise.sessions.ys_sign_in_description") %></em></p>
+          <% end %>
         </div>
-      <% end -%>
 
-      <div class="small-12 medium-6 small-centered">
-        <%= f.submit(t("devise_views.sessions.new.submit"), class: "button expanded") %>
+        <div class="small-12 column">
+          <%= f.text_field :login, autofocus: true %>
+        </div>
+
+        <div class="small-12 column">
+          <%= f.password_field :password, autocomplete: "off" %>
+          <%= link_to t("devise_views.shared.links.new_password"), new_password_path(resource_name), class: "float-right" %>
+        </div>
+
+        <% if devise_mapping.rememberable? -%>
+          <div class="small-12 column">
+            <%= f.check_box :remember_me, label: t("devise_views.sessions.new.remember_me") %>
+          </div>
+        <% end -%>
+
+        <div class="small-12 medium-6 small-centered">
+          <%= f.submit(t("devise_views.sessions.new.submit"), class: "button expanded") %>
+        </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
-  <%= render "devise/shared/links" %>
-</div>
-
-<%# Only render the toggle link and script if the feature flag is actually set to hide it %>
-<% if Setting.hide_local_login? %>
-  <div class="text-right" style="margin-top: 2rem;">
-    <a href="#" id="admin-login-toggle" style="color: #999; font-size: 0.85em; text-decoration: none;">Consul
-      Officer</a>
+    <%= render "devise/shared/links" %>
   </div>
+<% end %>
 
-  <script>
-    // Self-executing function so it runs immediately when Turbolinks inserts it into the DOM
-    (function () {
-      const toggleLink = document.getElementById('admin-login-toggle');
-
-      if (toggleLink) {
-        // Using .onclick instead of addEventListener prevents duplicate bindings if Turbolinks caches the page
-        toggleLink.onclick = function (e) {
-          e.preventDefault(); // Prevents the URL from changing to # and jumping to the top
-
-          const adminDiv = document.getElementById('admin_login');
-          if (adminDiv && adminDiv.style.display === 'none') {
-            adminDiv.style.display = 'block';
-            this.style.display = 'none';
-          }
-        };
-      }
-    })();
-  </script>
+<%# 2. Only render the unobtrusive link if local login is hidden AND we aren't already in admin mode %>
+<% if Setting.hide_local_login? && params[:admin_mode] != 'true' %>
+  <div class="text-right" style="margin-top: 2rem;">
+    <%= link_to "Consul Officer",
+                new_session_path(resource_name, admin_mode: 'true'),
+                id: "admin-login-toggle",
+                style: "color: #999; font-size: 0.85em; text-decoration: none;" %>
+  </div>
 <% end %>
