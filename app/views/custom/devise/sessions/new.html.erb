@@ -8,8 +8,8 @@
                  signup_link: link_to(t("devise_views.shared.links.signup_link"), new_user_registration_path))) %>
 </p>
 
-<div id="admin_login" style="visibility:<%= Setting.hide_local_login? ? "hidden" : "visible" %>">
-
+<%# Use display: none to completely remove the whitespace when hidden %>
+<div id="admin_login" style="<%= 'display: none;' if Setting.hide_local_login? %>">
   <h2><%= t("devise.sessions.local_sign_in_title") %></h2>
   <p><%= t("devise.sessions.local_sign_in_description") %></p>
 
@@ -21,6 +21,7 @@
           <p class="help-text"><em><%= t("devise.sessions.ys_sign_in_description") %></em></p>
         <% end %>
       </div>
+
       <div class="small-12 column">
         <%= f.text_field :login, autofocus: true %>
       </div>
@@ -43,14 +44,32 @@
   <% end %>
 
   <%= render "devise/shared/links" %>
-
 </div>
 
-<button onclick="displayAdminLogin()">Consul Officer</button>
+<%# Only render the toggle link and script if the feature flag is actually set to hide it %>
+<% if Setting.hide_local_login? %>
+  <div class="text-right" style="margin-top: 2rem;">
+    <a href="#" id="admin-login-toggle" style="color: #999; font-size: 0.85em; text-decoration: none;">Consul
+      Officer</a>
+  </div>
 
-<script>
-  function displayAdminLogin() {
-      const div = document.getElementById("admin_login");
-      div.style.visibility = div.style.visibility == "hidden" ? "visible" : "hidden";
-  }
-</script>
+  <script>
+    // Self-executing function so it runs immediately when Turbolinks inserts it into the DOM
+    (function () {
+      const toggleLink = document.getElementById('admin-login-toggle');
+
+      if (toggleLink) {
+        // Using .onclick instead of addEventListener prevents duplicate bindings if Turbolinks caches the page
+        toggleLink.onclick = function (e) {
+          e.preventDefault(); // Prevents the URL from changing to # and jumping to the top
+
+          const adminDiv = document.getElementById('admin_login');
+          if (adminDiv && adminDiv.style.display === 'none') {
+            adminDiv.style.display = 'block';
+            this.style.display = 'none';
+          }
+        };
+      }
+    })();
+  </script>
+<% end %>
