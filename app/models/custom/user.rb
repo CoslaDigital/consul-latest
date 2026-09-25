@@ -292,17 +292,28 @@ class User < ApplicationRecord
   end
 
   # overwriting of Devise method to allow login using email OR username
+  # overwriting of Devise method to allow login using email OR username
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
+
+    # 1. GUARD: Check if it's a 16-digit card. If it is, ask the Setting model if the switch is ON.
+    # If the switch is OFF, reject immediately. (Normal emails skip this entirely).
+    if validate_document_number(login) && !Setting.enable_card_login?
+      return nil
+    end
+
+    # 2. Standard Devise lookup for existing users
     user = where(conditions.to_hash).find_by(["lower(email) = ?", login.downcase]) ||
            where(conditions.to_hash).find_by(["username = ?", login]) ||
            where(conditions.to_hash).find_by(["confirmed_phone = ?", login]) ||
            where(conditions.to_hash).find_by(["document_number = ?", login])
 
-    if user.nil? && ys_logins_enabled? && validate_document_number(login)
+    # 3. YS specific creation/migration if no user was found
+    if user.nil? && validate_document_number(login) && Setting.enable_card_login?
       user = log_in_or_create_ys_user(login)
     end
+
     user
   end
 

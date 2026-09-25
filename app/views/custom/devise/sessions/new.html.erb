@@ -35,45 +35,52 @@
                  signup_link: link_to(t("devise_views.shared.links.signup_link"), new_user_registration_path))) %>
 </p>
 
+<%# 1. Only render the local login form if it's NOT hidden, OR if the URL parameter is present %>
+<% if !Setting.hide_local_login? || params[:admin_mode] == 'true' %>
+  <div id="admin_login">
+    <h2><%= t("devise.sessions.local_sign_in_title") %></h2>
+    <p><%= t("devise.sessions.local_sign_in_description") %></p>
 
-
-<div id="admin_login" style="visibility:<%= Setting.hide_local_login? ? "hidden" : "visible" %>">
-
-  <h2><%= t("devise.sessions.local_sign_in_title") %></h2>
-  <p><%= t("devise.sessions.local_sign_in_description") %></p>
-
-  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-    <div class="row">
-      <div class="small-12 column">
-        <%= f.text_field :login, autofocus: true %>
-      </div>
-
-      <div class="small-12 column">
-        <%= f.password_field :password, autocomplete: "off" %>
-        <%= link_to t("devise_views.shared.links.new_password"), new_password_path(resource_name), class: "float-right" %>
-      </div>
-
-      <% if devise_mapping.rememberable? -%>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="row">
         <div class="small-12 column">
-          <%= f.check_box :remember_me, label: t("devise_views.sessions.new.remember_me") %>
+          <%# This block will only render if your secrets are configured %>
+          <% if ys_configured? %>
+            <p class="help-text"><em><%= t("devise.sessions.ys_sign_in_description") %></em></p>
+          <% end %>
         </div>
-      <% end -%>
 
-      <div class="small-12 medium-6 small-centered">
-        <%= f.submit(t("devise_views.sessions.new.submit"), class: "button expanded") %>
+        <div class="small-12 column">
+          <%= f.text_field :login, autofocus: true %>
+        </div>
+
+        <div class="small-12 column">
+          <%= f.password_field :password, autocomplete: "off" %>
+          <%= link_to t("devise_views.shared.links.new_password"), new_password_path(resource_name), class: "float-right" %>
+        </div>
+
+        <% if devise_mapping.rememberable? -%>
+          <div class="small-12 column">
+            <%= f.check_box :remember_me, label: t("devise_views.sessions.new.remember_me") %>
+          </div>
+        <% end -%>
+
+        <div class="small-12 medium-6 small-centered">
+          <%= f.submit(t("devise_views.sessions.new.submit"), class: "button expanded") %>
+        </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
-  <%= render "devise/shared/links" %>
+    <%= render "devise/shared/links" %>
+  </div>
+<% end %>
 
-</div>
-
-<button onclick="displayAdminLogin()">Consul Officer</button>
-
-<script>
-  function displayAdminLogin() {
-      const div = document.getElementById("admin_login");
-      div.style.visibility = div.style.visibility == "hidden" ? "visible" : "hidden";
-  }
-</script>
+<%# 2. Only render the unobtrusive link if local login is hidden AND we aren't already in admin mode %>
+<% if Setting.hide_local_login? && params[:admin_mode] != 'true' %>
+  <div class="text-right" style="margin-top: 2rem;">
+    <%= link_to "Consul Officer",
+                new_session_path(resource_name, admin_mode: 'true'),
+                id: "admin-login-toggle",
+                style: "color: #999; font-size: 0.85em; text-decoration: none;" %>
+  </div>
+<% end %>

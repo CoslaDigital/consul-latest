@@ -1,4 +1,5 @@
 class YsLoginController < Devise::SessionsController
+  before_action :ensure_card_login_enabled!
   # This action just shows the form
   def new
   end
@@ -41,5 +42,12 @@ class YsLoginController < Devise::SessionsController
 
     # If the user IS unverified, go to verification
     verification_path
+  end
+
+  def ensure_card_login_enabled!
+    unless Setting.enable_card_login?
+      # Redirect them away with a flash message if the switch is off
+      redirect_to new_user_session_path, alert: "NEC/Young Scot card login is currently disabled."
+    end
   end
 end
