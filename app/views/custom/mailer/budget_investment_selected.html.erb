@@ -5,24 +5,29 @@
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= t("mailers.budget_investment_selected.hi") %>
+    <%= t("mailers.budget_investment_selected.hi", default: "Hello,") %>
   </p>
+
+  <div style="<%= css_for_mailer_text + css_for_mailer_quote %>">
+    <p style="<%= css_for_mailer_text %> margin-bottom: 5px;">
+      <%= t("mailers.budget_investment_selected.project_title_label", default: "Project title:") %>
+      <strong><%= @investment.title %></strong>
+    </p>
+    <p style="<%= css_for_mailer_text %> margin-top: 0;">
+      <%= t("mailers.budget_investment_selected.price", default: "Assessed Price:") %>
+      <strong><%= number_to_currency(@investment.price, precision: 0) %></strong>
+    </p>
+  </div>
 
   <p style="<%= css_for_mailer_text %>">
     <%= t("mailers.budget_investment_selected.share") %>
   </p>
 
-  <table style="width: 100%;">
-    <tbody>
-    <tr>
-      <td style="padding-bottom: 12px; text-align: center;">
-        <%= link_to budget_investment_url(@investment.budget, @investment, anchor: "social-share"), style: css_for_mailer_button do %>
-          <%= t("mailers.budget_investment_selected.share_button") %>
-        <% end %>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to t("mailers.budget_investment_selected.share_button"),
+                budget_investment_url(@investment.budget, @investment, anchor: "social-share"),
+                style: css_for_mailer_link %>
+  </p>
 
   <p style="<%= css_for_mailer_text %>">
     <%= t("mailers.budget_investment_selected.thanks") %>
