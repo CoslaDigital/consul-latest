@@ -65,6 +65,26 @@
   </table>
 </div>
 
+<div class="stats-group">
+  <table class="investment-projects-summary">
+    <thead>
+    <tr>
+      <th colspan="2">
+        <%= t("admin.stats.budget_balloting.participants_by_demographic", default: "Participants by Registered Geozone") %>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <% user_count_by_geozone.each do |geozone_name, count| %>
+      <tr>
+        <td class="name"><%= geozone_name %></td>
+        <td class="name"><%= number_with_delimiter count %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
 <%# Geographic Summary Section %>
 <div id="location_summary_section" class="stats-group">
   <h3 class="section-title"><%= t("stats.budgets.participation_density_view") %></h3>

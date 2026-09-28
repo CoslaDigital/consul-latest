@@ -1605,6 +1605,8 @@ en:
         participant_count: Participants
         votes_per_heading: Votes per heading
         participants_per_district: Participants per district
+        participants_by_demographic: "Participants by Registered Geozone"
+        unassigned_geozone: "Unassigned / No Geozone"
       budget_supporting:
         title: "Supporting phase stats"
         headings: Headings

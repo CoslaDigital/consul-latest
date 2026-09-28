@@ -30,6 +30,22 @@ class Admin::Stats::BudgetBallotingComponent < ApplicationComponent
     end.select { |_, count| count > 0 }.sort
   end
 
+  def user_count_by_geozone
+    # 1. Get all ballots for this budget
+    # 2. Join the User table, and left join the Geozone table
+    # 3. Group by the Geozone's name and count them
+    counts = budget.ballots
+                   .joins(:user)
+                   .left_joins(user: :geozone)
+                   .group("geozones.name")
+                   .count
+
+    # 4. Handle users who have no geozone (the key will be nil)
+    unassigned_label = I18n.t("admin.stats.budget_balloting.unassigned_geozone", default: "Unassigned / No Geozone")
+
+    # 5. Replace nil keys with the label, and sort alphabetically
+    counts.transform_keys { |k| k || unassigned_label }.sort
+  end
   def cluster_summary
     @cluster_summary ||= ConnectionAudit.where(auditable: budget.ballots)
                                         .combined_participation_stats(precision)
