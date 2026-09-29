@@ -29,7 +29,7 @@
       <div>
         <%= f.text_area :summary,
                         label: custom_t("budgets.investments.form.summary"),
-                        rows: 4, maxlength: 500,
+                        rows: 4, maxlength: Budget::Investment.description_max_length,
                         hint: custom_t("budgets.investments.form.summary_note") %>
       </div>
 
