@@ -48,9 +48,7 @@
               <div class="answer-block panel callout light no-margin">
                 <% investment.answers.where(budget_question_id: question.id).find_each do |answer| %>
                   <% if can? :read, answer %>
-                    <div class="answer-text">
-                      <%= auto_link_already_sanitized_html wysiwyg(answer.text) %>
-                    </div>
+                    <p class="no-margin"><%= auto_link_already_sanitized_html wysiwyg(answer.text) %></p>
                   <% else %>
                     <em class="text-muted"><%= t("custom.answers.private_answer_placeholder", default: "The answer to this question is private.") %></em>
                   <% end %>
