@@ -56,6 +56,7 @@ class Setting < ApplicationRecord
           "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "xls" => "application/x-ole-storage",
           "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
           "csv" => "text/plain",
           "zip" => "application/zip"
         }
