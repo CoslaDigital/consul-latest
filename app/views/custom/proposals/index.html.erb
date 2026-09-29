@@ -42,7 +42,7 @@
       <div class="row">
         <div class="small-12 column">
           <%= render Proposals::MapComponent.new(@proposals) %>
-          <%= render "view_mode" %>
+          <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
     <% end %>
@@ -65,7 +65,7 @@
 
     <div id="proposals-list">
       <% if @proposals.any? || current_user.blank? %>
-        <% if proposals_default_view? %>
+        <% if default_view_mode? %>
           <%= render partial: "proposals/proposal", collection: @proposals, as: :proposal, locals: { layout_style: proposal_style } %>
         <% else %>
           <% @proposals.each do |proposal| %>
@@ -113,7 +113,7 @@
               <li><%= link_to geozone.name, proposals_path(search: geozone.name) %></li>
             <% end %>
           </ul>
-        </div> <%# Properly closing the proposals-geozones div %>
+        </div>
       <% end %> <%# Closing the params[:retired].blank? condition %>
 
       <%= render "retired" %>
