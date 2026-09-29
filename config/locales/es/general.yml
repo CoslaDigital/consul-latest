@@ -203,6 +203,7 @@ es:
       participation_text: Decide cómo debe ser la ciudad que quieres.
       participation_title: Participación
       privacy: Política de privacidad
+      source_code: Código fuente
     header:
       administration_menu: Menú
       administration: Administración
@@ -646,6 +647,7 @@ es:
     description:
       multiple: "Puedes seleccionar un máximo de %{maximum} respuestas."
     read_more_about: "Leer más:"
+    custom_answer_aria_label: "Respuesta para %{option}"
   proposal_notifications:
     new:
       title: "Enviar notificación"
@@ -655,6 +657,10 @@ es:
     show:
       back: "Volver a mi contenido"
   shared:
+    embedded_video:
+      accept: "Ver vídeo"
+      warning: "Esta página contiene un vídeo de un proveedor externo. Al acceder al contenido, aceptas que tus datos puedan ser transferidos a proveedores externos."
+    warning_for_external_links: "Al confirmar, aceptas salir del sitio web."
     actions:
       label: "%{action} %{name}"
     edit: "Editar"
@@ -930,8 +936,8 @@ es:
     poll:
       take_part: Participa del %{from} al %{to}
   remote_translations:
-    text: El contenido de esta página no está disponible en tu idioma
-    all_remote_translations_enqueued_text: "En un breve periodo de tiempo refrescando la página podrá ver todo el contenido en su idioma"
+    text: El contenido de esta página no está disponible en tu idioma. ¿Te gustaría traducirlo?
+    all_remote_translations_enqueued_text: "Por favor, espera 5 segundos y actualiza la página para que se muestre el contenido traducido."
     create:
       enqueue_remote_translation: Se han solicitado correctamente las traducciones.
     button: Traducir página

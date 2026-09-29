@@ -15,7 +15,14 @@ class Polls::Questions::QuestionComponent < ApplicationComponent
         id: dom_id(question),
         disabled: ("disabled" if disabled?),
         class: fieldset_class,
-        data: { max_votes: question.max_votes }
+        data: { max_votes: question.max_votes },
+        aria: {
+          labelledby: [
+            dom_id(question, :legend),
+            (dom_id(question, :help_text) if multiple_choice?),
+            (form.field_id(:"question_#{question.id}", :error) if error.present?)
+          ]
+        }
       )
     end
 
@@ -33,8 +40,12 @@ class Polls::Questions::QuestionComponent < ApplicationComponent
       end, ", ")
     end
 
+    def answers_for_question
+      form.object.answers[question.id] || []
+    end
+
     def existing_answer
-      form.object.answers[question.id]&.first&.answer
+      answers_for_question.first&.answer
     end
 
     def multiple_choice?
@@ -44,21 +55,31 @@ class Polls::Questions::QuestionComponent < ApplicationComponent
     def multiple_choice_help_text
       tag.span(
         t("poll_questions.description.multiple", maximum: question.max_votes),
-        class: "help-text"
+        class: "help-text",
+        id: dom_id(question, :help_text)
       )
     end
 
-    def multiple_choice_field(option)
-      choice_field(option) do
+    def choice_field(option)
+      safe_join([
+        option_label_with_input(option),
+        (open_text_tag(option) if option.allow_custom_text?)
+      ])
+    end
+
+    def option_label_with_input(option)
+      label_tag("web_vote_option_#{option.id}") do
+        input_tag(option) + option.title
+      end
+    end
+
+    def input_tag(option)
+      if multiple_choice?
         check_box_tag "web_vote[#{question.id}][option_id][]",
                       option.id,
                       checked?(option),
                       id: "web_vote_option_#{option.id}"
-      end
-    end
-
-    def single_choice_field(option)
-      choice_field(option) do
+      else
         radio_button_tag "web_vote[#{question.id}][option_id]",
                          option.id,
                          checked?(option),
@@ -66,13 +87,32 @@ class Polls::Questions::QuestionComponent < ApplicationComponent
       end
     end
 
-    def choice_field(option, &block)
-      label_tag("web_vote_option_#{option.id}") do
-        block.call + option.title
-      end
+    def open_text_tag(option)
+      text_area_tag(
+        "web_vote[#{question.id}][answer][#{option.id}]",
+        existing_text_for(option),
+        id: "web_vote_option_#{option.id}_answer",
+        class: "custom-answer",
+        maxlength: Poll::Answer.answer_max_length,
+        rows: 1,
+        "aria-label": t("poll_questions.custom_answer_aria_label", option: option.title),
+        data: { selects: "web_vote_option_#{option.id}" }
+      )
+    end
+
+    def existing_text_for(option)
+      answer_for(option)&.answer.to_s
     end
 
     def checked?(option)
-      form.object.answers[question.id].find { |answer| answer.option_id == option.id }
+      answer_for(option).present?
+    end
+
+    def answer_for(option)
+      answers_for_question.find { |answer| answer.option_id == option.id }
+    end
+
+    def error
+      form.error_for(:"question_#{question.id}")
     end
 end

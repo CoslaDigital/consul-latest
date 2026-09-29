@@ -11,8 +11,8 @@ describe Admin::Settings::LlmConfigurationTabComponent do
   end
   let(:models_for_openai) do
     [
-      instance_double(RubyLLM::Model::Info, name: "GPT-4o", id: "gpt-4o"),
-      instance_double(RubyLLM::Model::Info, name: "GPT-4o-mini", id: "gpt-4o-mini")
+      double(name: "GPT-4o", id: "gpt-4o"),
+      double(name: "GPT-4o-mini", id: "gpt-4o-mini")
     ]
   end
   let(:provider_setting) { Setting.find_by!(key: "llm.provider") }

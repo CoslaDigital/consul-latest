@@ -8,7 +8,6 @@ module RemotelyTranslatable
     end
 
     def remote_translation_enabled?
-      Setting["feature.remote_translations"].present? &&
-        RemoteTranslations::Caller.configured?
+      RemoteTranslations::Caller.configured?
     end
 end

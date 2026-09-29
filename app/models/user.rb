@@ -234,6 +234,19 @@ Rails.logger.info("oauth_user #{oauth_user}")
     )
   end
 
+  def self.create_from_census_response!(response, params = {})
+    create!({
+      verified_at: Time.current,
+      erased_at: Time.current,
+      password: random_password,
+      terms_of_service: "1",
+      email: nil,
+      gender: response.gender,
+      date_of_birth: response.date_of_birth.in_time_zone.to_datetime,
+      geozone: Geozone.find_by(census_code: response.district_code)
+    }.merge(params))
+  end
+
   def name
     organization? ? organization.name : username
   end
@@ -384,7 +397,19 @@ Rails.logger.info("oauth_user #{oauth_user}")
     end
 
     Budget::Ballot.where(user_id: other_user.id).update_all(user_id: id)
-    Vote.where("voter_id = ? AND voter_type = ?", other_user.id, "User").update_all(voter_id: id)
+
+    with_lock do
+      Vote.where(voter_id: other_user.id, voter_type: "User").find_each do |vote|
+        votable = vote.votable
+        if Vote.where(voter_id: id, voter_type: "User", votable: votable).any?
+          vote.delete
+          votable&.update_cached_votes
+        else
+          vote.update_column(:voter_id, id)
+        end
+      end
+    end
+
     data_log = "id: #{other_user.id} - #{Time.current.strftime("%Y-%m-%d %H:%M:%S")}"
     update!(former_users_data_log: "#{former_users_data_log} | #{data_log}")
   end

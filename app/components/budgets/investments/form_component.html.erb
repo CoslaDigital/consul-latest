@@ -24,7 +24,6 @@
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
 
-
       <div>
         <%= translations_form.text_area :description,
                                         hint: t("budgets.investments.form.description_note"),
@@ -52,7 +51,7 @@
 
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) do %>
-        <%= render Images::SuggestImagesComponent.new(f) %>
+        <%= render ImageSuggestions::SuggestButtonComponent.new(f) %>
       <% end %>
     <% end %>
 
@@ -83,11 +82,11 @@
 
       <br>
       <%= f.text_field :tag_list, value: investment.tag_list.to_s,
-                       label: false,
-                       placeholder: t("budgets.investments.form.tags_placeholder"),
-                       aria: { describedby: "tags-list-help-text" },
-                       class: "js-tag-list tag-autocomplete",
-                       data: { js_url: suggest_tags_path } %>
+                                  label: false,
+                                  placeholder: t("budgets.investments.form.tags_placeholder"),
+                                  aria: { describedby: "tags-list-help-text" },
+                                  class: "js-tag-list tag-autocomplete",
+                                  data: { js_url: suggest_tags_path } %>
     </div>
 
     <%= render SDG::RelatedListSelectorComponent.new(f) %>

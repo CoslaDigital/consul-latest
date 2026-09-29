@@ -204,6 +204,7 @@ en:
       participation_text: Decide how to shape the city you want to live in.
       participation_title: Participation
       privacy: Privacy Policy
+      source_code: Source code
     header:
       administration_menu: Menu
       administration: Administration
@@ -358,7 +359,7 @@ en:
         archival_date: archived
         recommendations: recommendations
       recommendations:
-        without_results: There are not proposals related to your interests
+        without_results: There are no proposals related to your interests
         without_interests: Follow proposals so we can give you recommendations
         disable: "Recommendations for proposals will stop showing if you dismiss them. You can enable them again in 'My account' page"
         actions:
@@ -667,6 +668,7 @@ en:
     description:
       multiple: "You can select a maximum of %{maximum} answers."
     read_more_about: "Read more about:"
+    custom_answer_aria_label: "Answer for %{option}"
   proposal_notifications:
     new:
       title: "Send notification"
@@ -676,6 +678,10 @@ en:
     show:
       back: "Go back to my content"
   shared:
+    embedded_video:
+      accept: "Watch video"
+      warning: "This page contains a video from a third-party provider. By accessing its content, you agree that your data may be transferred to third-party providers."
+    warning_for_external_links: "By confirming, you agree to leave the website."
     actions:
       label: "%{action} %{name}"
     edit: "Edit"
@@ -955,8 +961,8 @@ en:
     poll:
       take_part: Take part from %{from} to %{to}
   remote_translations:
-    text: The content of this page is not available in your language
-    all_remote_translations_enqueued_text: In a short period of time refreshing the page you will be able to see all the content in your language.
+    text: The original content of this page is not available in your language. Would you like to translate it?
+    all_remote_translations_enqueued_text: Please wait 5 seconds and refresh the website for translated content to be displayed.
     create:
       enqueue_remote_translation: Translations have been correctly requested.
     button: Translate page

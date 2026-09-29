@@ -3,19 +3,17 @@ require "rails_helper"
 describe ImageSuggestions::Llm::Client do
   let(:title) { "Test Proposal" }
   let(:description) { "Test description" }
-  let(:chat) { instance_double(RubyLLM::Chat) }
-  let(:context) { instance_double(RubyLLM::Context, chat: chat) }
-  let(:prompt_template) { "Generate a search query for: %{title} - %{description}" }
   let(:search_query) { "test proposal image" }
-  let(:pexels_results) { instance_double(::Pexels::PhotoSet, photos: []) }
+  let(:chat) { double(ask: double(content: search_query)) }
+  let(:prompt_template) { "Generate a search query for: %{title} - %{description}" }
+  let(:pexels_results) { double(photos: []) }
 
   before do
     Setting["llm.provider"] = "OpenAI"
     Setting["llm.model"] = "gpt-4o"
     Setting["llm.use_ai_image_suggestions"] = true
-    allow(Llm::Config).to receive(:context).and_return(context)
+    allow(Llm::Config).to receive(:chat).and_return(chat)
     allow(YAML).to receive(:load_file).and_return({ "image_suggestion_prompt" => prompt_template })
-    allow(chat).to receive(:ask).and_return(double(content: search_query))
     allow(ImageSuggestions::Pexels).to receive(:search).and_return(pexels_results)
   end
 
@@ -44,7 +42,7 @@ describe ImageSuggestions::Llm::Client do
     it "searches Pexels with the generated query" do
       expect(ImageSuggestions::Pexels).to receive(:search).with(
         search_query,
-        per_page: 4
+        per_page: 8
       ).and_return(pexels_results)
 
       result = client.call
@@ -97,7 +95,7 @@ describe ImageSuggestions::Llm::Client do
       it "passes stripped query to Pexels" do
         expect(ImageSuggestions::Pexels).to receive(:search).with(
           "search query",
-          per_page: 4
+          per_page: 8
         ).and_return(pexels_results)
         client.call
       end

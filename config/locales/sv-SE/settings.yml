@@ -143,6 +143,10 @@ sv:
       gdpr:
         require_consent_for_notifications: Uttryckligt samtycke för aviseringar
         require_consent_for_notifications_description: Begär uttryckligt användarsamtycke för att kunna skicka nyhetsbrev och liknande information som krävs enligt allmänna dataskyddsförordningen (DSF).
+        require_consent_for_embedded_videos: Samtycke för inbäddade videor
+        require_consent_for_embedded_videos_description: Visa en varning och kräv användarbekräftelse innan inbäddade videor laddas från externa leverantörer.
+        warning_for_external_links: "Varnar för externa länkar"
+        warning_for_external_links_description: "Aktivera ett popup-fönster som kräver att användare bekräftar innan de går till en extern webbplats."
     remote_census:
       general:
         endpoint: "Slutpunkt"
@@ -240,3 +244,13 @@ sv:
       more_info_link_description: Länk som visas i samtyckes-bannern till cookie-policy-sidan.
       version_name: Versionsnamn
       version_name_description: Ändra versionsnamnet för att tvinga alla användare att gå genom cookie-samtyckesprocessen igen. Denna funktion kan vara praktisk när införande av drastiska cookie-policy-ändringar kräver bekräftelse av ny användare.
+    llm:
+      title: LLM-inställningar
+      provider: "LLM-leverantör"
+      provider_description: "Leverantörer inaktiveras tills autentiseringsuppgifter har konfigurerats i secrets.yml."
+      use_llm_for_translations: "Innehållsöversättning"
+      use_llm_for_translations_description: "Använd LLM för innehållsöversättningar och med företräde framför Microsoft-översättningstjänster."
+      model: "Modell"
+      model_description: "LLM-modellen som ska användas."
+      use_ai_image_suggestions: "AI-bildförslag"
+      use_ai_image_suggestions_description: "Låt användare använda AI för att föreslå bilder från Pexels, istället för att ladda upp sina egna."

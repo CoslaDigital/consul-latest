@@ -88,7 +88,6 @@ sv:
         confidence_score: populära
         created_at: senaste
         hot_score: mest aktiva
-        most_commented: mest kommenterade
         relevance: relevans
         recommendations: rekommendationer
       recommendations:
@@ -124,7 +123,6 @@ sv:
       recommendations_title: Rekommendationer för debattinlägg
       start_new: Starta en debatt
     show:
-      author_deleted: Användaren är borttagen
       comments_title: Kommentarer
       edit_debate_link: Redigera
       flag: Denna debatt har flaggats som olämplig av flera användare.
@@ -205,6 +203,7 @@ sv:
       participation_text: Skapa den stad du vill ha.
       participation_title: Deltagande
       privacy: Integritetspolicy
+      source_code: Källkod
     header:
       administration_menu: Meny
       administration: Administration
@@ -329,6 +328,7 @@ sv:
       tags_placeholder: "Skriv taggarna du vill använda, avgränsade med komma (',')"
       map_location: "Kartposition"
       map_location_instructions: "Navigera till platsen på kartan och placera markören."
+      map_marker_coordinates: "Latitud: %{latitude}. Longitud: %{longitude}"
       map_remove_marker: "Ta bort kartmarkör"
     index:
       featured_proposals: Utvalda
@@ -409,12 +409,10 @@ sv:
         one: 1 röst
         other: "%{count} röster"
       supports_necessary: "behöver stöd från %{number} personer"
-      total_percent: 100 %
       archived: "Förslaget har arkiverats och kan inte längre stödjas."
       successful: "Förslaget har fått tillräckligt med stöd."
       selected: "Valt förslag"
     show:
-      author_deleted: Användaren är borttagen
       code: "Förslagskod:"
       comments_tab: Kommentarer
       dashboard_proposal_link: Dashboard
@@ -647,6 +645,7 @@ sv:
     description:
       multiple: "Du kan välja maximalt %{maximum} svar."
     read_more_about: "Läs mer om:"
+    custom_answer_aria_label: "Svar på %{option}"
   proposal_notifications:
     new:
       title: "Skicka meddelande"
@@ -656,6 +655,10 @@ sv:
     show:
       back: "Gå tillbaka till min aktivitet"
   shared:
+    embedded_video:
+      accept: "Se videon"
+      warning: "Den här sidan innehåller en video från tredje part. Genom att gå till dess innehåll samtycker du till att dina uppgifter kan överföras till tredjepartsleverantörer."
+    warning_for_external_links: "Genom att bekräfta går du med på att lämna webbplatsen."
     actions:
       label: "%{action} %{name}"
     edit: "Redigera"

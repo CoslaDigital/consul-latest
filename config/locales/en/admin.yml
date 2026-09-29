@@ -1257,6 +1257,8 @@ en:
           documents_list: Documents list
           document_title: Title
           document_actions: Actions
+          allow_custom_text:
+            help: "Allows users to write their own answer when selecting this option. Useful for options like \"Other (please specify)\"."
       no_edit: "Once the poll has started it will not be possible to create, edit or delete questions, answers or any content associated with the poll."
     answers:
       new:
@@ -1554,7 +1556,7 @@ en:
       author: Author
       created_at: Creation date
       name: Name
-      no_signature_sheets: "There are not signature_sheets"
+      no_signature_sheets: "There are no signature sheets"
       index:
         title: Signature sheets
         new: New signature sheets

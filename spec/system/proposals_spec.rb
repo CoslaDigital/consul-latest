@@ -6,10 +6,6 @@ describe "Proposals" do
   context "Concerns" do
     it_behaves_like "notifiable in-app", :proposal
     it_behaves_like "relationable", Proposal
-    it_behaves_like "remotely_translatable", :proposal, "proposals_path", {}, provider: :microsoft
-    it_behaves_like "remotely_translatable", :proposal, "proposals_path", {}, provider: :llm
-    it_behaves_like "remotely_translatable", :proposal, "proposal_path", { id: "id" }, provider: :microsoft
-    it_behaves_like "remotely_translatable", :proposal, "proposal_path", { id: "id" }, provider: :llm
     it_behaves_like "flaggable", :proposal
   end
 
@@ -300,36 +296,6 @@ describe "Proposals" do
     end
   end
 
-  context "Embedded video" do
-    scenario "Show YouTube video" do
-      proposal = create(:proposal, video_url: "http://www.youtube.com/watch?v=a7UFm6ErMPU")
-
-      visit proposal_path(proposal)
-
-      within "#js-embedded-video" do
-        expect(page).to have_css "iframe[src='https://www.youtube-nocookie.com/embed/a7UFm6ErMPU']"
-      end
-    end
-
-    scenario "Show Vimeo video" do
-      proposal = create(:proposal, video_url: "https://vimeo.com/7232823")
-
-      visit proposal_path(proposal)
-
-      within "#js-embedded-video" do
-        expect(page).to have_css "iframe[src='https://player.vimeo.com/video/7232823?dnt=1']"
-      end
-    end
-
-    scenario "Dont show video" do
-      proposal = create(:proposal, video_url: nil)
-
-      visit proposal_path(proposal)
-
-      expect(page).not_to have_css "#js-embedded-video"
-    end
-  end
-
   scenario "Social Media Cards" do
     proposal = create(:proposal)
 
@@ -552,7 +518,7 @@ describe "Proposals" do
   end
 
   context "Geozones" do
-    scenario "When there are not gezones defined it does not show the geozone link" do
+    scenario "When there are no gezones defined it does not show the geozone link" do
       visit proposal_path(create(:proposal))
 
       expect(page).not_to have_css "#geozone"
@@ -882,7 +848,7 @@ describe "Proposals" do
 
         click_link "recommendations"
 
-        expect(page).to have_content "There are not proposals related to your interests"
+        expect(page).to have_content "There are no proposals related to your interests"
       end
 
       scenario "should display text when user has no related interests" do

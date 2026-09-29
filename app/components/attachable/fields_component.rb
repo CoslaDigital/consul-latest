@@ -24,8 +24,14 @@ class Attachable::FieldsComponent < ApplicationComponent
       attachable.model_name.plural
     end
 
+    def valid_image?
+      attachable.attachment.attached? &&
+        attachable.attachment.image? &&
+        attachable.errors[:attachment].empty?
+    end
+
     def file_name
-      attachable.attachment_file_name
+      attachable.attachment_file_name if attachable.errors.empty?
     end
 
     def destroy_link
@@ -49,7 +55,6 @@ class Attachable::FieldsComponent < ApplicationComponent
       f.file_field :attachment,
                    label_options: { class: "button hollow #{klass}" },
                    accept: accepted_content_types_extensions,
-                   class: "js-#{singular_name}-attachment",
                    data: { url: direct_upload_path }
     end
 
@@ -67,5 +72,19 @@ class Attachable::FieldsComponent < ApplicationComponent
           ".#{content_type}"
         end
       end.join(",")
+    end
+
+    def progress_bar
+      tag.progress max: "100",
+                   class: progress_bar_status_class,
+                   "aria-label": t("documents.form.progress")
+    end
+
+    def progress_bar_status_class
+      if attachable.errors[:attachment].any?
+        "errors"
+      elsif attachable.cached_attachment.present?
+        "complete"
+      end
     end
 end

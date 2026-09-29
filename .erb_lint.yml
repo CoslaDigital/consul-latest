@@ -15,7 +15,7 @@ linters:
     exclude:
       - app/components/budgets/investments/content_blocks_component.html.erb
       - app/components/layout/cookies_consent/vendors/scripts_component.html.erb
-      - app/components/layout/footer_component.html.erb
+      - app/components/layout/legal_links_component.html.erb
       - app/components/layout/social_component.html.erb
       - app/components/layout/subnavigation_component.html.erb
       - app/components/layout/top_links_component.html.erb
@@ -32,6 +32,7 @@ linters:
     exclude:
       - app/views/mailer/proposal_notification_digest.html.erb
       - app/views/**/*.js.erb
+      - app/views/**/*.json.erb
   NoJavascriptTagHelper:
     enabled: true
   ParserErrors:

@@ -4,7 +4,7 @@
 
 ### 1. Servidor de producción
 
-- Distribuciones compatibles: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye o Debian Bookworm
+- Distribuciones compatibles: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye, Debian Bookworm o Debian Trixie
 - RAM: 32GB
 - Procesador: Quad core
 - Disco duro: 20 GB
@@ -12,7 +12,7 @@
 
 ### 2. Servidor de pruebas
 
-- Distribuciones compatibles: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye o Debian Bookworm
+- Distribuciones compatibles: Ubuntu 22.04, Ubuntu 24.04, Debian Bullseye, Debian Bookworm o Debian Trixie
 - RAM: 16GB
 - Procesador: Dual core
 - Disco duro: 20 GB

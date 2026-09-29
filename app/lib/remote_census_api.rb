@@ -107,7 +107,7 @@ class RemoteCensusApi
     end
 
     def parse_request_path(path_value)
-      path_value.split(".") if path_value.present?
+      path_value.presence&.split(".")
     end
 
     def update_value(structure, path, value)

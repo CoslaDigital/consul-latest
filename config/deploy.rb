@@ -22,7 +22,8 @@ set :application, deploysecret(:app_name, default: "consul")
 set :deploy_to, deploysecret(:deploy_to)
 set :ssh_options, port: deploysecret(:ssh_port)
 
-set :repo_url, "https://github.com/CoslaDigital/consul-latest.git"
+# To use your own repository, don't change this line. Change `lib/consul/repository.rb` instead.
+set :repo_url, Consul::Repository.url # Don't change this line!
 
 set :revision, `git rev-parse --short #{fetch(:branch)}`.strip
 
@@ -41,12 +42,12 @@ set :local_user, ENV["USER"]
 
 set :fnm_path, "$HOME/.fnm"
 set :fnm_install_command, "curl -fsSL https://fnm.vercel.app/install | " \
-  "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
+                          "bash -s -- --install-dir \"#{fetch(:fnm_path)}\""
 set :fnm_update_command, "#{fetch(:fnm_install_command)} --skip-shell"
 set :fnm_setup_command, -> do
-  "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
-    "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
-end
+                          "export PATH=\"#{fetch(:fnm_path)}:$PATH\" && " \
+                            "cd #{release_path} && fnm env > /dev/null && eval \"$(fnm env)\""
+                        end
 set :fnm_install_node_command, -> { "#{fetch(:fnm_setup_command)} && fnm use --install-if-missing" }
 set :fnm_map_bins, %w[node npm rake yarn]
 
@@ -54,6 +55,7 @@ set :puma_systemctl_user, :user
 set :puma_enable_socket_service, true
 set :puma_service_unit_env_vars, ["EXECJS_RUNTIME=Disabled"]
 set :puma_service_unit_name, -> { "puma_#{fetch(:application)}_#{fetch(:stage)}" }
+set :puma_service_unit_type, "simple"
 set :puma_access_log, -> { File.join(shared_path, "log", "puma_access.log") }
 set :puma_error_log, -> { File.join(shared_path, "log", "puma_error.log") }
 set :puma_systemd_watchdog_sec, 0

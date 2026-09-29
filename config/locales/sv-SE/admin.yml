@@ -62,6 +62,7 @@ sv:
         filter: Visa
         filters:
           all: Alla
+          on_budget_investments: Budgetförslag
           on_comments: Kommentarer
           on_debates: Debatter
           on_proposals: Förslag
@@ -1170,6 +1171,8 @@ sv:
           documents_list: Lista med dokument
           document_title: Titel
           document_actions: Åtgärder
+          allow_custom_text:
+            help: "Tillåter att användare skriver sina egna svar när de väljer detta alternativ. Praktiskt för alternativ som \"Annat (ange)\"."
       no_edit: "När omröstningen har inletts går det inte längre att skapa, redigera eller radera frågor, svar eller annat innehåll som kopplats till omröstningen."
     answers:
       new:
@@ -1292,6 +1295,11 @@ sv:
         selected: Valt
         milestones: Milstolpar
         no_proposals: Det finns inga förslag.
+        list:
+          id: ID
+          title: Förslag
+          author: Förslagslämnare
+          summary: Sammanfattning
       show:
         create_question: Lägg till förslaget till en omröstning
       form:
@@ -1326,6 +1334,7 @@ sv:
         participation_processes: "Deltagarprocesser"
         images_and_documents: "Bilder och dokument"
         feature_flags: Funktioner
+        blank_option: "Ingen"
         features:
           enabled: "Aktiverad funktion"
         map:
@@ -1348,6 +1357,8 @@ sv:
           title: Cookies-samtycke
         cookies_consent_banner:
           title: Banner om cookies-samtycke
+        llm:
+          title: LLM-inställningar
       remote_census_general_name: Generell information
       remote_census_request_name: Begär data
       remote_census_response_name: Svarsdata

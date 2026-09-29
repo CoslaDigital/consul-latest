@@ -19,6 +19,11 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# TODO: remove after upgrading to ruby_llm 2.0.0
+RubyLLM.configure do |config|
+  config.use_new_acts_as = true
+end
+
 module Consul
   class Application < Rails::Application
     def secrets
@@ -46,7 +51,7 @@ module Consul
     end
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.2
+    config.load_defaults 8.0
 
     # Keep belongs_to fields optional by default, because that's the way
     # Rails 4 models worked
@@ -74,11 +79,6 @@ module Consul
     # Keep reading existing data in the legislation_annotations ranges column
     config.active_record.yaml_column_permitted_classes = [ActiveSupport::HashWithIndifferentAccess, Symbol]
 
-    # Keep using `:never` because it was the default in Rails 7.1
-    # and it will be the default again in Rails 8.0.
-    # TODO: remove after upgrading to Rails 8.0
-    Rails.application.config.active_job.enqueue_after_transaction_commit = :never
-
     ###
     # Enables YJIT on production but not on development/test
     # because this will be the default in Rails 8.1
@@ -94,9 +94,12 @@ module Consul
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     # config.autoload_lib(ignore: %w[assets tasks])
 
-    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
-    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = Rails.application.secrets.time_zone.presence || "Edinburgh"
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    config.time_zone = Rails.application.secrets.time_zone.presence || "Madrid"
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
@@ -168,6 +171,7 @@ module Consul
     config.assets.paths << Rails.root.join("vendor", "assets", "fonts")
     config.assets.paths << Rails.root.join("node_modules", "jquery-ui", "themes", "base")
     config.assets.paths << Rails.root.join("node_modules", "leaflet", "dist")
+    config.assets.paths << Rails.root.join("node_modules", "@fortawesome")
     config.assets.paths << Rails.root.join("node_modules")
 
     config.active_job.queue_adapter = :delayed_job

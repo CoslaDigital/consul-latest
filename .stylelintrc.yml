@@ -29,6 +29,7 @@ rules:
   max-nesting-depth: 4
   media-feature-name-no-vendor-prefix: true
   no-invalid-position-declaration: true
+  property-layout-mappings: "physical"
   property-no-deprecated: true
   property-no-unknown: true
   property-no-vendor-prefix: true
@@ -40,11 +41,13 @@ rules:
   selector-class-pattern: "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$"
   selector-max-compound-selectors: 5
   selector-max-id: 0
+  selector-no-deprecated: true
   selector-no-vendor-prefix: true
   selector-pseudo-element-colon-notation: "double"
   selector-pseudo-element-no-unknown: true
   shorthand-property-no-redundant-values: true
   value-no-vendor-prefix: true
+  order/custom-properties-alphabetical-order: true
   order/order:
     - dollar-variables
     - type: at-rule
@@ -62,11 +65,13 @@ rules:
   scss/at-else-empty-line-before: never
   scss/at-extend-no-missing-placeholder: true
   scss/at-function-pattern: "^(-?[a-z][a-z0-9]*)(-[a-z0-9]+)*$"
+  scss/at-mixin-argumentless-call-parentheses: never
   scss/at-if-closing-brace-newline-after: always-last-in-chain
   scss/at-if-closing-brace-space-after: always-intermediate
   scss/at-mixin-no-risky-nesting-selector: true
   scss/at-mixin-pattern: "^(-?[a-z][a-z0-9]*)(-[a-z0-9]+)*$"
   scss/dollar-variable-colon-space-before: never
+  scss/dollar-variable-no-missing-interpolation: true
   scss/dollar-variable-pattern: "^(-?[a-z][a-z0-9]*)(-[a-z0-9]+)*$"
   scss/function-calculation-no-interpolation: true
   scss/load-no-partial-leading-underscore: true
@@ -91,6 +96,7 @@ rules:
   "@stylistic/media-feature-parentheses-space-inside": never
   "@stylistic/no-eol-whitespace": true
   "@stylistic/no-missing-end-of-source-newline": true
+  "@stylistic/no-multiple-whitespaces": true
   "@stylistic/number-no-trailing-zeros": true
   "@stylistic/selector-attribute-brackets-space-inside": never
   "@stylistic/selector-pseudo-class-parentheses-space-inside": never

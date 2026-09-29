@@ -4,7 +4,7 @@ class Layout::CommonHtmlAttributesComponent < ApplicationComponent
   private
 
     def attributes
-      tag.attributes(dir: dir, lang: lang, class: html_class)
+      tag.attributes(dir: dir, lang: lang, class: html_class, data: data)
     end
 
     def dir
@@ -18,5 +18,13 @@ class Layout::CommonHtmlAttributesComponent < ApplicationComponent
     def html_class
 #        "class=\"tenant-#{Tenant.current_schema}\"" if Rails.application.config.multitenancy
       "tenant-#{Tenant.current_schema}" if Rails.application.config.multitenancy
+    end
+
+    def data
+      { warning_for_external_links: warning_for_external_links_text }
+    end
+
+    def warning_for_external_links_text
+      t("shared.warning_for_external_links") if feature?("gdpr.warning_for_external_links")
     end
 end

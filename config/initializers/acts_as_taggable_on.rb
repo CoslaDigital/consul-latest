@@ -26,7 +26,7 @@ module ActsAsTaggableOn
     end
 
     def touch_taggable
-      taggable.touch if taggable.present?
+      taggable.presence&.touch
     end
 
     def increment_tag_custom_counter
