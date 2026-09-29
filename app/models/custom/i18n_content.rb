@@ -56,7 +56,7 @@ class I18nContent < ApplicationRecord
       dashboard.mailer.forward.share
     ]
   end
-  
+
   def self.elections_translations
   %w[
     elections.ballots.show.title
@@ -109,6 +109,8 @@ class I18nContent < ApplicationRecord
     elections.investments.form.map_location_instructions
     elections.investments.form.location_note
     elections.investments.form.organization_name_note
+    elections.investments.form.summary
+    elections.investments.form.summary_note
     elections.investments.form.description
     elections.investments.form.description_note
     elections.investments.form.estimated_price
@@ -186,6 +188,6 @@ def self.translations_for(tab)
   else
     flat_hash(translations_hash_for(tab)).keys
   end
-end  
+end
 
 end
