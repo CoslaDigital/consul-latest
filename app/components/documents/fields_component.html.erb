@@ -1,37 +1,35 @@
-<div class="<%= singular_name %>-fields direct-upload nested-fields" tabindex="-1">
-  <%= f.hidden_field :id %>
-  <%= f.hidden_field :user_id, value: current_user.id %>
-  <%= f.hidden_field :cached_attachment %>
+<%= render Attachable::FieldsComponent.new(
+  f,
+  resource_type: document.documentable_type,
+  resource_id: document.documentable_id,
+  relation_name: "documents"
+) do %>
 
-  <div class="small-12 column title">
-    <%= f.text_field :title %>
-  </div>
+  <p class="current-visibility-status">
+    Current status:
+    <strong>
+      <%= document.unrestricted? ? "Public" : "Private" %>
+    </strong>
+  </p>
 
-  <% if valid_image? %>
-    <%= render_image(attachable, :thumb, false) %>
-  <% end %>
+  <% if show_visibility_toggle? %>
+    <div class="field document-visibility-toggle" style="margin-top: 1rem;">
+      <strong>Visibility</strong>
 
-  <div class="small-12 column attachment-actions">
-    <p class="file-name small-9 column"><%= file_name %></p>
+      <div class="radio-option">
+        <label>
+          <%= f.radio_button :visibility, 'unrestricted', checked: document.unrestricted? %>
+          Public
+        </label>
+      </div>
 
-    <div class="small-9 column action-add <%= singular_name %>-attachment">
-      <div>
-        <%= file_field %>
+      <div class="radio-option">
+        <label>
+          <%= f.radio_button :visibility, 'restricted', checked: !document.unrestricted? %>
+          Private
+        </label>
       </div>
     </div>
+  <% end %>
 
-    <div class="small-3 column action-remove text-right">
-      <%= destroy_link %>
-    </div>
-  </div>
-
-  <div class="small-12 column">
-    <%= progress_bar %>
-  </div>
-
-  <div class="small-12 column">
-    <%= content %>
-  </div>
-
-  <hr>
-</div>
+<% end %>
