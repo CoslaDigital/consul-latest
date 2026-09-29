@@ -33,9 +33,9 @@ class Admin::SettingsController < Admin::BaseController
   end
 
   private
-  
+
     def verify_administrator
-      raise CanCan::AccessDenied if current_user&.process_manager? 
+      raise CanCan::AccessDenied if current_user&.process_manager?
     end
 
     def settings_params
@@ -47,7 +47,7 @@ class Admin::SettingsController < Admin::BaseController
     end
 
     def content_type_params
-      params.permit(:jpg, :png, :gif, :pdf, :doc, :docx, :xls, :xlsx, :csv, :zip)
+      params.permit(:jpg, :png, :gif, :pdf, :doc, :docx, :xls, :xlsx, :csv, :pptx, :zip)
     end
 
     def request_referer
