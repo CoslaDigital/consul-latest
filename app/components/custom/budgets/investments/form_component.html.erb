@@ -1,6 +1,19 @@
 <%= translatable_form_for(investment, url: url, html: { class: "budget-investment-form" }) do |f| %>
 
   <%= render "shared/errors", resource: investment %>
+  <% if f.object.errors.any? %>
+    <div style="border: 3px solid red; padding: 15px; margin: 20px 0; background: #fff;">
+      <h3 style="color: red;">DEBUG: Validation Errors</h3>
+      <ul>
+        <% f.object.errors.full_messages.each do |msg| %>
+          <li style="font-weight: bold;"><%= msg %></li>
+        <% end %>
+      </ul>
+
+      <h3 style="color: red; margin-top: 15px;">DEBUG: Incoming Nested Parameters</h3>
+      <pre style="background: #eee; padding: 10px;"><%= JSON.pretty_generate(params.fetch(f.object.model_name.param_key, {}).fetch(:documents_attributes, {}).permit!.to_h) rescue "No document params" %></pre>
+    </div>
+  <% end %>
 
   <fieldset class="required-fields">
     <legend><%= t("shared.required") %></legend>
