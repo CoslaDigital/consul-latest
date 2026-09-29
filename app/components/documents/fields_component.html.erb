@@ -3,32 +3,33 @@
   resource_type: document.documentable_type,
   resource_id: document.documentable_id,
   relation_name: "documents"
-) %>
+) do %>
 
-<p class="current-visibility-status">
-  Current status:
-  <strong>
-    <%= document.unrestricted? ? "Public" : "Private" %>
-  </strong>
-</p>
+  <p class="current-visibility-status">
+    Current status:
+    <strong>
+      <%= document.unrestricted? ? "Public" : "Private" %>
+    </strong>
+  </p>
 
-<% if show_visibility_toggle? %>
-  <div class="field document-visibility-toggle">
-    <strong>Visibility</strong>
+  <% if show_visibility_toggle? %>
+    <div class="field document-visibility-toggle" style="margin-top: 15px;">
+      <strong>Visibility</strong>
 
-    <div class="radio-option">
-      <label>
-        <%= f.radio_button :visibility, 'unrestricted', checked: document.unrestricted? %>
-        Public
-      </label>
+      <div class="radio-option">
+        <label>
+          <%= f.radio_button :visibility, 'unrestricted', checked: document.unrestricted? %>
+          Public
+        </label>
+      </div>
+
+      <div class="radio-option">
+        <label>
+          <%= f.radio_button :visibility, 'restricted', checked: !document.unrestricted? %>
+          Private
+        </label>
+      </div>
     </div>
+  <% end %>
 
-    <div class="radio-option">
-      <label>
-        <%= f.radio_button :visibility, 'restricted', checked: !document.unrestricted? %>
-        Private
-      </label>
-    </div>
-
-  </div>
 <% end %>
