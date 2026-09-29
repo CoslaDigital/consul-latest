@@ -32,11 +32,6 @@ class ConsulFormBuilder < FoundationRailsHelper::FormBuilder
         label_options: { class: "checkbox-label" }.merge(label_options_for(options))
       ))
     end
-    help_text_html = help_text(attribute, options)
-
-    # Combine the checkbox and its help text.
-    checkbox_with_label + help_text_html
-
   end
 
   def radio_button(attribute, tag_value, options = {})
@@ -48,39 +43,9 @@ class ConsulFormBuilder < FoundationRailsHelper::FormBuilder
   def select(attribute, choices, options = {}, html_options = {})
     label_with_hint(attribute, options.merge(label_options: label_options_for(options))) +
       super(attribute, choices, options.merge(label: false, hint: nil), html_options.merge({
-        aria: { describedby: help_text_id(attribute, options) }
-      }))
+                                                                                             aria: { describedby: help_text_id(attribute, options) }
+                                                                                           }))
   end
-
-  # Generates a select dropdown based on a collection of objects.
-  # Integrates with label_with_hint for consistent label and hint display.
-  #
- def collection_select(attribute, collection, value_method, text_method, options = {}, html_options = {})
-  # Extract include_blank option if present
-  include_blank = options.delete(:include_blank)
-
-  # Generate the label and hint text using the existing helper
-  label_and_hint_html = label_with_hint(attribute, options.merge(label_options: label_options_for(options)))
-
-  # Generate the collection_select input using the parent implementation
-  # Merge options:
-  # - label: false, hint: nil -> Prevent duplicate rendering as they are handled above.
-  # - aria: describedby -> Link hint text for accessibility.
-  select_html = super(
-    attribute,
-    collection,
-    value_method,
-    text_method,
-    options.merge(label: false, hint: nil, include_blank: include_blank), # Options for the core helper
-    html_options.merge(aria: { describedby: help_text_id(attribute, options) }) # HTML attributes for the tag
-  )
-
-  # Combine the label/hint and the select input
-  label_and_hint_html + select_html
-end
-
-  # --- END NEW collection_select METHOD ---
-
 
   def error_for(attribute, ...)
     if error?(attribute)
@@ -95,6 +60,36 @@ end
       super(attribute, aria_error_options(attribute).merge(options))
     end
   end
+
+  # Generates a select dropdown based on a collection of objects.
+  # Integrates with label_with_hint for consistent label and hint display.
+  #
+  def collection_select(attribute, collection, value_method, text_method, options = {}, html_options = {})
+    # Extract include_blank option if present
+    include_blank = options.delete(:include_blank)
+
+    # Generate the label and hint text using the existing helper
+    label_and_hint_html = label_with_hint(attribute, options.merge(label_options: label_options_for(options)))
+
+    # Generate the collection_select input using the parent implementation
+    # Merge options:
+    # - label: false, hint: nil -> Prevent duplicate rendering as they are handled above.
+    # - aria: describedby -> Link hint text for accessibility.
+    select_html = super(
+      attribute,
+      collection,
+      value_method,
+      text_method,
+      options.merge(label: false, hint: nil, include_blank: include_blank), # Options for the core helper
+      html_options.merge(aria: { describedby: help_text_id(attribute, options) }) # HTML attributes for the tag
+    )
+
+    # Combine the label/hint and the select input
+    label_and_hint_html + select_html
+  end
+
+  # --- END NEW collection_select METHOD ---
+
 
   private
 

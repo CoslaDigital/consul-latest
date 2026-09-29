@@ -1,4 +1,4 @@
-resource :account, controller: "account", only: [:show, :update, :delete] do
+resource :account, controller: "account", only: [:show, :update, :destroy] do
   get :erase, on: :collection
   resource :two_factor_authentication, only: [:show, :create, :destroy] do
     post :enable, on: :member
