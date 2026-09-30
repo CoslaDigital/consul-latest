@@ -42,7 +42,7 @@ en:
           homepage: Homepage
           debates: Debates
           proposals: Proposals
-          budgets: Elections
+          budgets: Participatory Budgets
           help_page: Help page
           sdg: SDG
       create:
@@ -94,8 +94,8 @@ en:
         preview_results: "Preview results"
         questions: "Manage Questions"
       index:
-        title: Elections
-        new_link: Create new Election
+        title: Participatory Budgets
+        new_link: Create new Budget (Election)
         filter: Filter
         filters:
           all: All
@@ -167,7 +167,7 @@ en:
         stv_winners: "Number of seats"
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
-        success_notice: Election deleted successfully
+        success_notice: Process deleted successfully
         unable_notice: You cannot delete a budget that has associated investments
         unable_notice_polls: You cannot delete a budget that has an associated poll
       new:

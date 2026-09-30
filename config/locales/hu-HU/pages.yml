@@ -91,23 +91,17 @@ hu:
           key_header: Billentyű
           page_header: Oldal
           rows:
-            - 
-              key_column: 0
+            - key_column: 0
               page_column: Főoldal
-            - 
-              key_column: 1
+            - key_column: 1
               page_column: Viták
-            - 
-              key_column: 2
+            - key_column: 2
               page_column: Javaslatok
-            - 
-              key_column: 3
+            - key_column: 3
               page_column: Szavazások
-            - 
-              key_column: 4
+            - key_column: 4
               page_column: Részvételi költségvetések
-            - 
-              key_column: 5
+            - key_column: 5
               page_column: Jogalkotási folyamatok
         browser_table:
           description: "Az operációs rendszertől és a használt böngészőtől függően a billentyűkombináció a következő:"
@@ -115,20 +109,15 @@ hu:
           browser_header: Böngésző
           key_header: Billentyűkombináció
           rows:
-            - 
-              browser_column: Explorer
+            - browser_column: Explorer
               key_column: ALT + gyorsbillentyű, majd ENTER
-            - 
-              browser_column: Firefox
+            - browser_column: Firefox
               key_column: ALT + SHIFT + gyorsbillentyű
-            - 
-              browser_column: Chrome
+            - browser_column: Chrome
               key_column: ALT + gyorsbillentyű (MAC-en CTRL + ALT + gyorsbillentyű)
-            - 
-              browser_column: Safari
+            - browser_column: Safari
               key_column: ALT + gyorsbillentyű (MAC-en CMD + gyorsbillentyű)
-            - 
-              browser_column: Opera
+            - browser_column: Opera
               key_column: SHIFT + ESC + gyorsbillentyű
       textsize:
         title: Szövegméret
@@ -137,29 +126,22 @@ hu:
           browser_header: Böngésző
           action_header: Szükséges művelet
           rows:
-            - 
-              browser_column: Explorer
+            - browser_column: Explorer
               action_column: Nézet > Szövegméret
-            - 
-              browser_column: Firefox
+            - browser_column: Firefox
               action_column: Nézet > Méret
-            - 
-              browser_column: Chrome
+            - browser_column: Chrome
               action_column: Beállítások (ikon) > Beállítások > Speciális > Webes tartalom > Szövegméret
-            - 
-              browser_column: Safari
+            - browser_column: Safari
               action_column: Nézet > Nagyítás / Kicsinyítés
-            - 
-              browser_column: Opera
+            - browser_column: Opera
               action_column: Nézet > Méretezés
         browser_shortcuts_table:
           description: "A szövegméret módosításának másik módja a böngészőkben definiált billentyűparancsok használata, különösen a következő kombináció:"
           rows:
-            - 
-              shortcut_column: CTRL és + (MAC-en CMD és +)
+            - shortcut_column: CTRL és + (MAC-en CMD és +)
               description_column: Növeli a szöveg méretét
-            - 
-              shortcut_column: CTRL és - (MAC-en CMD és -)
+            - shortcut_column: CTRL és - (MAC-en CMD és -)
               description_column: Csökkenti a szöveg méretét
       compatibility:
         title: Szabványokkal és vizuális megjelenéssel való kompatibilitás

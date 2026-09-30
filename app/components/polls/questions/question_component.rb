@@ -62,9 +62,9 @@ class Polls::Questions::QuestionComponent < ApplicationComponent
 
     def choice_field(option)
       safe_join([
-        option_label_with_input(option),
-        (open_text_tag(option) if option.allow_custom_text?)
-      ])
+                  option_label_with_input(option),
+                  (open_text_tag(option) if option.allow_custom_text?)
+                ])
     end
 
     def option_label_with_input(option)

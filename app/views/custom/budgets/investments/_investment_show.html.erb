@@ -132,9 +132,9 @@
                            handle: setting["twitter_handle"]) %>
       <% if @budget&.kind != "election" %>
       <% if current_user %>
-        
-        <div class="sidebar-divider"></div>
-        <p class="sidebar-title"><%= custom_t("shared.follow") %></p>
+
+          <div class="sidebar-divider"></div>
+          <p class="sidebar-title"><%= custom_t("shared.follow") %></p>
         <%= render "follows/follow_button", follow: find_or_build_follow(current_user, investment) %>
       <% end %>
 
