@@ -1423,22 +1423,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "proposal_matches", force: :cascade do |t|
-    t.bigint "proposal_id", null: false
-    t.bigint "offer_id", null: false
-    t.integer "status", default: 0, null: false
-    t.datetime "accepted_at"
-    t.datetime "confirmed_at"
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "rejected_at"
-    t.index ["offer_id"], name: "index_proposal_matches_on_offer_id"
-    t.index ["proposal_id", "offer_id"], name: "index_proposal_matches_on_proposal_id_and_offer_id", unique: true
-    t.index ["proposal_id"], name: "index_proposal_matches_on_proposal_id"
-    t.index ["status"], name: "index_proposal_matches_on_status"
-  end
-
   create_table "proposal_kinds", force: :cascade do |t|
     t.string "name"
     t.string "slug"

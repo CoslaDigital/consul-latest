@@ -25,12 +25,15 @@
                                          maxlength: Budget::Investment.title_max_length,
                                          data: suggest_data(investment) %>
       </div>
+
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
+
       <div>
-        <%= f.text_area :summary,
-                        label: custom_t("budgets.investments.form.summary"),
-                        rows: 4, maxlength: Budget::Investment.description_max_length,
-                        hint: custom_t("budgets.investments.form.summary_note") %>
+        <%= translations_form.text_area :summary,
+                                        label: custom_t("budgets.investments.form.summary"),
+                                        rows: 4,
+                                        maxlength: Budget::Investment.description_max_length,
+                                        hint: custom_t("budgets.investments.form.summary_note") %>
       </div>
 
       <div>
@@ -40,9 +43,7 @@
                                         maxlength: Budget::Investment.description_max_length,
                                         class: "html-area" %>
       </div>
-
-
-  <% end %>
+    <% end %>
 
     <%# Dynamic Questions Section %>
     <%= f.fields_for :answers do |builder| %>
@@ -130,7 +131,6 @@
     </div>
 
     <%= render SDG::RelatedListSelectorComponent.new(f) %>
-<% end %>
   </fieldset>
 
   <div class="actions">
