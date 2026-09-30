@@ -1471,7 +1471,6 @@ en:
           proposals: "Search proposals by title, code, description or question"
           proposal_notifications: "Search notifications by title or description"
           users: "Search user by name or email"
-        search: "Search"
       search_results: "Search results"
       no_search_results: "No results found."
       actions: Actions
