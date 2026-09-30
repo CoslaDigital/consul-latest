@@ -28,6 +28,9 @@ class Budgets::Ballot::BallotComponent < ApplicationComponent
     end
 
     def group_investments(group)
-      ballot.investments.by_group(group.id).sort_by_ballot_lines
+#      ballot.investments.by_group(group.id).sort_by_ballot_lines
+       @ballot.investments
+         .where(budget_ballot_lines: { group_id: group.id })
+         .order('budget_ballot_lines.position ASC')
     end
 end

@@ -120,7 +120,7 @@
     }
   }
 
-  // --- Text styles (Unchanged) ---
+  // Move the text and link styles in here too so they target safely
   .homepage-title {
     display: block;
     font-size: clamp(1rem, 2.5vw, 1.5rem);

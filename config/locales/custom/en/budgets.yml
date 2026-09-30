@@ -2,15 +2,45 @@ en:
   budgets:
 
     ballots:
+      show:
+        title: Your ballot
+        amount_progress: "%{amount_spent} / %{amount_limit}"
+        amount_available:
+          knapsack: "Still available to you <span>%{count}</span>"
+          approval:
+            zero: "You can still cast <span>%{count}</span> votes."
+            one: "You can still cast <span>%{count}</span> vote."
+            other: "You can still cast <span>%{count}</span> votes."
+        amount_spent:
+          knapsack: "Amount spent <span>%{count}</span>"
+          approval:
+            zero: "Votes cast: <span>%{count}</span>"
+            one: "Votes cast: <span>%{count}</span>"
+            other: "Votes cast: <span>%{count}</span>"
+        amount_limit:
+          knapsack: "Total budget <span>%{count}</span>"
+          approval:
+            one: "You can vote <span>1</span> project"
+            other: "You can vote up to <span>%{count}</span> candidates"
+        no_balloted_group_yet: "You have not voted on this group yet, go vote!"
+        remove: Remove vote
+        remove_label: "Remove your vote for %{investment}"
+        voted:
+          one: "You have voted for<span>one</span> candidate."
+          other: "You have voted for<span>%{count}</span> candidates."
+        voted_info: "Your ballot is confirmed!"
+        voted_info_2: "But you can change your vote at any time until this phase is closed."
+        zero: You have not voted for any candidate project.
       reasons_for_not_balloting:
         invalid_geozone: "You cannot vote on this project because your location is not valid. Your geozone is %{user_geozone}, but this project requires one of the following: %{required_geozones}."
 
     index:
       milestones: Progress Updates
+      geozone_info: Only residents in the following areas can participate
+      ys_name: Young Scot Card Holders
     investments:
       form:
-        title: "Submit a Project Proposal"
-        description: "Project Description"
+        title: "Submit a candidate Proposal"
         heading_note: "Select the area this proposal applies to"
         subtitle: "%{heading} (%{price})"
         subtitle_note: "What is your project or application called?"
@@ -19,6 +49,17 @@ en:
         summary: "Project Summary"
         summary_note: "Give a brief summary of you project (maximum 200 characters)"
         estimated_cost_title: "Estimated Cost of Project"
+        tag_category_label: "Categories"
+        tags_instructions: "Tag this proposal. You can choose from proposed categories or add your own"
+        tags_label: Tagssubmit_button
+        tags_placeholder: "Enter the tags you would like to use, separated by commas (',')"
+        map_location: "Map location"
+        map_location_instructions: "Navigate the map to the location and place the marker."
+        location_note: "Tell us which place this proposal affects"
+        organization_name_note: "Tell us about your organization and any partners involved in this project"
+        estimated_price: "Estimated Cost"
+        estimated_price_note: "How much will this project cost?"
+        submit_button: "Submit Application Form"
     select:
       title: "Select Budget"
       proposal_name: "Proposal Name"
@@ -44,4 +85,3 @@ en:
     actions:
       errors:
         not_allowed: "You do not have permission for this action"
-

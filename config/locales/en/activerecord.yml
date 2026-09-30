@@ -229,6 +229,7 @@ en:
       budget/group/translation:
         name: "Group name"
       budget/heading:
+        max_winners: "Seats / Winners"
         allow_custom_content: "Allow content block"
         latitude: "Latitude (optional)"
         longitude: "Longitude (optional)"
@@ -467,13 +468,14 @@ en:
       image:
         title: Title
         attachment: "Choose image"
-      poll/question/answer:
+      poll/question/option:
         title: Answer
         description: Description
-      poll/question/answer/translation:
+        allow_custom_text: "Allow custom text"
+      poll/question/option/translation:
         title: Answer
         description: "Description (optional)"
-      poll/question/answer/video:
+      poll/question/option/video:
         title: Title
         url: External video
       newsletter:

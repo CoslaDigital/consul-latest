@@ -181,6 +181,7 @@ namespace :admin do
         get :credentials
         put :lock
         put :unlock
+        get :credentials
       end
 
       collection do

@@ -1,0 +1,36 @@
+<%# Add data-id and data-reorder-target to the li %>
+<li id="<%= list_item_id %>" data-id="<%= investment.id %>" data-reorder-target="item">
+
+  <%# Wrapper for all right-aligned content %>
+  <div class="float-right text-right">
+
+    <%# 1. The Delete Button %>
+    <% if budget.balloting? %>
+      <%= button_to delete_path,
+                    title: t("budgets.ballots.show.remove"),
+                    class: "remove-budget-investment",
+                    method: :delete,
+                    remote: true do %>
+        <span class="show-for-sr"><%= t("budgets.ballots.show.remove") %></span>
+      <% end %>
+    <% end %>
+
+    <%# 2. The Preference Number %>
+    <% if preference_number %>
+      <%# Add data-pref-text attribute for the JS %>
+      <div class="preference-order"
+           data-pref-text="<%= t('budgets.ballots.show.preference', default: 'Preference') %>">
+        (<%= t("budgets.ballots.show.preference", default: "Preference") %> <%= preference_number %>)
+      </div>
+    <% end %>
+  </div>
+
+  <%# === ADD A DRAG HANDLE === %>
+  <% if budget.balloting? %>
+    <span class="drag-handle" data-reorder-target="handle" title="Drag to reorder">☰</span>
+  <% end %>
+
+  <%# Original title and price %>
+  <%= investment_title %>
+  <%= investment_price %>
+</li>

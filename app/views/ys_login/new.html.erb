@@ -1,0 +1,53 @@
+<style>
+  .image-background-box {
+    background-image: url(<%= asset_path 'saltire.jpg' %>);
+    background-size: cover;
+    background-position: center;
+    padding: 60px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  /* The new shaded background for the text */
+  .text-overlay-box {
+    background-color: rgba(0, 0, 0, 0.6); /* Black with 60% opacity */
+    display: inline-block; /* Makes the box shrink to wrap the text */
+    padding: 25px 40px;
+    border-radius: 8px;
+  }
+
+  /* Ensure the text inside the box is white */
+  .text-overlay-box h2,
+  .text-overlay-box p {
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .text-overlay-box p {
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+</style>
+
+<div class="image-background-box">
+  <div class="text-overlay-box">
+    <h2>Sign in with your Young Scot Number</h2>
+    <p>Please enter your 16-digit number to sign in or create an account.</p>
+  </div>
+</div>
+
+<%= form_with url: ys_login_path, scope: :user, local: true do |f| %>
+  <div class="row">
+    <div class="small-12 column">
+      <%= f.text_field :username,
+                       autofocus: true,
+                       required: true,
+                       label: t('ys_login.form.username_label', default: 'Young Scot Number') %>
+    </div>
+
+    <div class="small-12 medium-6 column">
+      <%= f.submit "Sign In", class: "button expanded" %>
+    </div>
+  </div>
+<% end %>

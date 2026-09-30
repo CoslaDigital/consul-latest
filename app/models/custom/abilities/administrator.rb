@@ -9,6 +9,8 @@ module Abilities
       merge Abilities::Moderation.new(user)
       merge Abilities::SDG::Manager.new(user)
 
+      can [:search, :create, :index, :destroy], ::ProcessManager
+
       can :manage, Legislation::PropositionsImport
 
       can [:search, :create, :index, :destroy], ::ProcessManager
@@ -74,6 +76,7 @@ module Abilities
       can [:search, :create, :index, :destroy], ::Manager
       can [:create, :read, :destroy], ::SDG::Manager
       can [:search, :index, :lock, :unlock], ::User
+      can [:create, :update, :credentials], User
 
       can :manage, Dashboard::Action
 
@@ -171,6 +174,9 @@ module Abilities
       can [:manage, :publish, :unpublish], Sensemaker::Job
 
       can :manage, Milestone
+
+      can :read, Budget::Question
+      can :read, Budget::Investment::Answer
 
       if Rails.application.config.multitenancy && Tenant.default?
         can [:create, :read, :update, :hide, :restore], Tenant

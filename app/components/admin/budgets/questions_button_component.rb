@@ -2,9 +2,7 @@
 class Admin::Budgets::QuestionsButtonComponent < ApplicationComponent
   attr_reader :budget
 
-#  use_helpers :can?
-
-  def initialize(budget) 
+  def initialize(budget)
     @budget = budget
   end
 
@@ -32,6 +30,6 @@ class Admin::Budgets::QuestionsButtonComponent < ApplicationComponent
   # Provides any specific CSS classes for the button/link.
   # You can customize this as needed.
   def html_class
-    "button_to hollow float-right" 
+    "button_to hollow float-right"
   end
 end

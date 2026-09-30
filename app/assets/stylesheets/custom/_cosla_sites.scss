@@ -571,6 +571,35 @@
   --button-background-hover-contrast: #FFFFFF;
 }
 
+.site-elections {
+  --main-header: #EC008B;
+  --brand: #55366B;
+  --brand-secondary: #EE7522;
+  --brand-contrast: #FFFFFF;
+  --footer: #eee6db;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+  --top-links: #a9c731;
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #0069aa;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
+}
+
 
 // ==========================================================================
 // GLOBAL APPLICATION
@@ -595,4 +624,6 @@
 .site-ren,
 .site-highland {
   @include shared-styles;
+}
+
 }

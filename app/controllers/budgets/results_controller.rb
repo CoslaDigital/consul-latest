@@ -9,6 +9,10 @@ module Budgets
       authorize! :read_results, @budget
       @investments = Budget::Result.new(@budget, @heading).investments
       @headings = @budget.headings.sort_by_name
+      if @budget.stv?
+        @summary_slug = "stv_results_#{@budget.name}_#{@heading.name}".parameterize
+        @detail_slug = "stv_details_#{@budget.name}_#{@heading.name}".parameterize
+      end
     end
 
     private

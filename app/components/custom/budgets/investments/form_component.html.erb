@@ -20,27 +20,29 @@
     <%= f.translatable_fields do |translations_form| %>
       <div>
         <%= translations_form.text_field :title,
-                                         hint: t("budgets.investments.form.subtitle_note"),
+                                         label: custom_t("budgets.investments.form.form_title"),
+                                         hint: custom_t("budgets.investments.form.subtitle_note"),
                                          maxlength: Budget::Investment.title_max_length,
                                          data: suggest_data(investment) %>
       </div>
       <div class="js-suggest" data-locale="<%= translations_form.locale %>"></div>
-
       <div>
-        <%# If summary is translatable, change 'f' to 'translations_form' below %>
         <%= f.text_area :summary,
-                        label: t("budgets.investments.form.summary"),
-                        rows: 4, maxlength: 500,
-                        hint: t("budgets.investments.form.summary_note") %>
+                        label: custom_t("budgets.investments.form.summary"),
+                        rows: 4, maxlength: Budget::Investment.description_max_length,
+                        hint: custom_t("budgets.investments.form.summary_note") %>
       </div>
 
       <div>
         <%= translations_form.text_area :description,
-                                        hint: t("budgets.investments.form.description_note"),
+                                        label: custom_t("budgets.investments.form.description"),
+                                        hint: custom_t("budgets.investments.form.description_note"),
                                         maxlength: Budget::Investment.description_max_length,
                                         class: "html-area" %>
       </div>
-    <% end %>
+
+
+  <% end %>
 
     <%# Dynamic Questions Section %>
     <%= f.fields_for :answers do |builder| %>
@@ -72,13 +74,12 @@
     <legend><%= t("shared.optional") %></legend>
     <p class="help-text"><%= t("shared.optional_note") %></p>
 
-    <%# Moved Estimated Cost Here %>
-    <div id="estimated_cost">
-      <h2><%= t("budgets.investments.form.estimated_cost_title") %></h2>
-      <%= f.number_field :estimated_price,
-                         label: t("budgets.investments.form.estimated_price_label", default: "Estimated Price"),
-                         hint: t("budgets.investments.form.estimated_price_note") %>
-    </div>
+    <% unless budget.hide_money %>
+      <div>
+        <h2><%= t("budgets.investments.form.estimated_cost_title") %></h2>
+        <%= f.number_field :estimated_price, hint: t("budgets.investments.form.estimated_price_note") %>
+      </div>
+    <% end %>
 
     <div id="video_url">
       <%= f.text_field :video_url, hint: t("proposals.form.proposal_video_url_note") %>
@@ -86,7 +87,7 @@
 
     <% if feature?(:allow_images) %>
       <%= render Images::NestedComponent.new(f) do %>
-        <%= render ImageSuggestions::SuggestButtonComponent.new(f) %>
+        <%= render Images::SuggestImagesComponent.new(f) %>
       <% end %>
     <% end %>
 
@@ -129,16 +130,17 @@
     </div>
 
     <%= render SDG::RelatedListSelectorComponent.new(f) %>
+<% end %>
   </fieldset>
 
   <div class="actions">
-    <% unless investment.persisted? %>
-      <div class="terms-check">
+    <% unless current_user.manager? || investment.persisted? %>
+      <div>
         <%= render Shared::AgreeWithTermsOfServiceFieldComponent.new(f) %>
-
       </div>
     <% end %>
-
-    <%= f.submit t("budgets.investments.form.submit_button"), class: "button success" %>
+    <p>I confirm that I have read, understand and agree to the application criteria and have all relevant policies and
+      processes in place.</p>
+    <%= f.submit t("budgets.investments.form.submit_button") %>
   </div>
 <% end %>

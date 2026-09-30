@@ -35,6 +35,7 @@ en:
         login: Sign in
         logout: Sign out
         signup: Register
+        ys_login: "Sign in with Young Scot"
     organizations:
       registrations:
         new:

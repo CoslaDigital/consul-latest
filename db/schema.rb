@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -328,6 +328,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.index ["tsv"], name: "index_budget_investments_on_tsv", using: :gin
   end
 
+  create_table "budget_owners", force: :cascade do |t|
+    t.bigint "budget_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_budget_owners_on_budget_id"
+    t.index ["user_id"], name: "index_budget_owners_on_user_id"
+  end
+
   create_table "budget_phase_translations", id: :serial, force: :cascade do |t|
     t.integer "budget_phase_id", null: false
     t.string "locale", null: false
@@ -434,13 +443,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.string "voting_style", default: "knapsack"
     t.boolean "published"
     t.boolean "hide_money", default: false
-    t.boolean "part_fund"
-    t.boolean "stv"
-    t.integer "stv_winners"
-    t.boolean "stv_dynamic_quota"
-    t.string "kind", default: "budget", null: false
-    t.integer "author_id"
-    t.index ["author_id"], name: "index_budgets_on_author_id"
     t.boolean "part_fund"
     t.boolean "stv"
     t.integer "stv_winners"
@@ -1171,7 +1173,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.index ["author_id"], name: "index_poll_answers_on_author_id"
     t.index ["option_id", "author_id"], name: "index_poll_answers_on_option_id_and_author_id", unique: true
     t.index ["option_id"], name: "index_poll_answers_on_option_id"
-    t.index ["question_id", "answer"], name: "index_poll_answers_on_question_id_and_answer"
     t.index ["question_id"], name: "index_poll_answers_on_question_id"
   end
 
@@ -1238,7 +1239,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.text "officer_assignment_id_log", default: ""
     t.text "author_id_log", default: ""
     t.bigint "option_id"
-    t.index ["answer"], name: "index_poll_partial_results_on_answer"
     t.index ["author_id"], name: "index_poll_partial_results_on_author_id"
     t.index ["booth_assignment_id", "date", "option_id"], name: "idx_on_booth_assignment_id_date_option_id_2ffcf6ea3b", unique: true
     t.index ["booth_assignment_id", "date"], name: "index_poll_partial_results_on_booth_assignment_id_and_date"
@@ -1269,6 +1269,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.integer "question_id"
     t.integer "given_order", default: 1
     t.boolean "most_voted", default: false
+    t.boolean "allow_custom_text", default: false
     t.index ["question_id"], name: "index_poll_question_answers_on_question_id"
   end
 
@@ -1422,12 +1423,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "proposal_matches", force: :cascade do |t|
+    t.bigint "proposal_id", null: false
+    t.bigint "offer_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "accepted_at"
+    t.datetime "confirmed_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "rejected_at"
+    t.index ["offer_id"], name: "index_proposal_matches_on_offer_id"
+    t.index ["proposal_id", "offer_id"], name: "index_proposal_matches_on_proposal_id_and_offer_id", unique: true
+    t.index ["proposal_id"], name: "index_proposal_matches_on_proposal_id"
+    t.index ["status"], name: "index_proposal_matches_on_status"
+  end
+
   create_table "proposal_kinds", force: :cascade do |t|
     t.string "name"
     t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "default", default: false, null: false
+    t.string "color", default: "#00cae9"
+    t.string "icon", default: "map-marker-alt"
   end
 
   create_table "proposal_matches", force: :cascade do |t|
@@ -2005,6 +2024,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
   add_foreign_key "budget_administrators", "budgets"
   add_foreign_key "budget_headings", "geozones"
   add_foreign_key "budget_investments", "communities"
+  add_foreign_key "budget_owners", "budgets"
+  add_foreign_key "budget_owners", "users"
   add_foreign_key "budget_valuators", "budgets"
   add_foreign_key "budget_valuators", "valuators"
   add_foreign_key "bulk_password_resets", "users", column: "admin_user_id"
@@ -2060,6 +2081,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_125500) do
   add_foreign_key "sdg_managers", "users"
   add_foreign_key "sensemaker_jobs", "sensemaker_jobs", column: "parent_job_id"
   add_foreign_key "sensemaker_jobs", "users"
+  add_foreign_key "user_generation_batches", "users", column: "admin_user_id"
   add_foreign_key "users", "geozones"
   add_foreign_key "valuators", "users"
 end

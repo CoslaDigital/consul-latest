@@ -41,6 +41,8 @@ class Budget < ApplicationRecord
   has_many :administrators, through: :budget_administrators
   has_many :budget_valuators, dependent: :destroy
   has_many :valuators, through: :budget_valuators
+  has_many :budget_owners, dependent: :destroy
+  has_many :owners, through: :budget_owners, source: :user
 
   has_one :poll
 

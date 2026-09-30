@@ -32,6 +32,11 @@ namespace :admin do
   end
 end
 
+devise_scope :user do
+  resource :ys_login, only: [:new, :create], controller: 'ys_login'
+end
+
+get 'my_area', to: 'my_area#show', as: :my_area
 
 constraints lambda { |request| !Rails.application.multitenancy_management_mode? } do
   # The routes defined within this block will not be accessible if multitenancy

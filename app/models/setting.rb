@@ -56,6 +56,7 @@ class Setting < ApplicationRecord
           "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "xls" => "application/x-ole-storage",
           "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
           "csv" => "text/plain",
           "zip" => "application/zip"
         }
@@ -96,6 +97,8 @@ class Setting < ApplicationRecord
         "feature.gdpr.require_consent_for_notifications": true,
         "feature.gdpr.require_consent_for_embedded_videos": false,
         "feature.gdpr.warning_for_external_links": false,
+        "feature.sensemaker": false,
+        "feature.events": true,
         "homepage.widgets.feeds.debates": true,
         "homepage.widgets.feeds.processes": true,
         "homepage.widgets.feeds.proposals": true,

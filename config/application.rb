@@ -94,29 +94,32 @@ module Consul
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     # config.autoload_lib(ignore: %w[assets tasks])
 
-    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
-    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = Rails.application.secrets.time_zone.presence || "Edinburgh"
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    config.time_zone = Rails.application.secrets.time_zone.presence || "Madrid"
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = :en
     available_locales = [
-      "ar",
+      #      "ar",
 #      "bg",
 #      "bs",
 #      "ca",
 #      "cs",
 #      "da",
-      "de",
+      #      "de",
 #      "el",
       "en",
-      "es",
+      #      "es",
 #      "es-PE",
 #      "eu",
 #      "fa",
-      "fr",
-      "gd",
+      #      "fr",
+      "gd"
 #      "gl",
 #      "he",
 #      "hr",
@@ -130,17 +133,17 @@ module Consul
 #      "pt",
 #      "pt-BR",
 #      "ro",
-      "ru",
+      #      "ru",
 #      "sl",
 #      "sq",
 #      "so",
 #      "sr",
 #      "sv",
 #      "tr",
-      "uk-UA",
+      #      "uk-UA",
 #      "val",
-      "zh-CN",
-      "zh-TW"
+      #      "zh-CN",
+      #      "zh-TW"
     ]
     config.i18n.available_locales = available_locales
     config.i18n.fallbacks = [I18n.default_locale, {

@@ -25,10 +25,12 @@ gem "devise", "~> 5.0.4"
 gem "devise-security", "~> 0.18.0"
 gem "exiftool_vendored", "~> 13.52.0"
 gem "file_validators", "~> 3.0.0"
+gem "font-awesome-sass", "~> 5.15.1" # Remember to update vendor/assets/images/fontawesome when updating this gem
+gem "geocoder", "~> 1.8"
 gem "globalize", "~> 7.1.1"
 gem "globalize-accessors", "~> 0.3.0"
 gem "googleauth", "~> 1.16.2"
-gem "graphiql-rails", "~> 1.8.0"
+gem "graphiql-rails", "~> 1.10.5"
 gem "graphql", "~> 2.6.1"
 gem "groupdate", "~> 6.7.0"
 gem "image_processing", "~> 1.14.0"
@@ -61,9 +63,9 @@ gem "sitemap_generator", "~> 7.0.1"
 gem "social-share-button", "~> 1.2.4"
 gem "sprockets", "~> 4.2.2"
 gem "sprockets-rails", "~> 3.5.2", require: "sprockets/railtie"
+gem "terser", "~> 1.2.7"
 gem "turbolinks", "~> 5.2.1"
 gem "turnout2024", "~> 3.0.2", require: "turnout"
-gem "terser"
 gem "view_component", "~> 4.12.0"
 gem "whenever", "~> 1.1.2", require: false
 gem "wicked_pdf", "~> 2.8.2"
@@ -114,7 +116,7 @@ group :development do
   gem "rubocop-rails", "~> 2.34.3", require: false
   gem "rubocop-rspec", "~> 3.9.0", require: false
   gem "rubocop-rspec_rails", "~> 2.32.0", require: false
-  gem "rvm1-capistrano3", "1.4.0", require: false
+  gem "rvm1-capistrano3", "~> 1.4.0", require: false
   gem "web-console", "~> 4.2.1"
 end
 

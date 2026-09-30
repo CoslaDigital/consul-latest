@@ -1,0 +1,22 @@
+en:
+  my_area:
+    show:
+      title: "Welcome to %{authority}"
+      lead: "This is your local hub for democratic processes in your area."
+      sections:
+        active_voting: "Open for Voting"
+        upcoming: "Upcoming Processes"
+        past_results: "Past Results"
+      cards:
+        open_now: "Open for voting now!"
+        cast_vote: "Cast your vote"
+        view_details: "View details"
+        phase_label: "Phase:"
+        status_label: "Status:"
+        finished: "Finished"
+        view_results: "View results"
+      empty_state:
+        title: "No processes found"
+        description: "There are currently no active or past processes registered for %{authority}."
+      flash:
+        access_denied: "This dashboard is for Young Scot users."

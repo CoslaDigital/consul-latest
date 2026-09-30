@@ -1,0 +1,11 @@
+<%# Only show this option if the budget is an election type %>
+<% if @budget.kind == "election" %>
+  <div class="row">
+    <div class="small-12 medium-6 column">
+      <%= f.number_field :max_winners,
+                         label: custom_t("admin.budgets.headings.form.max_winners", default: "Number of Winners (Seats)"),
+                         hint: "Leave blank to use the budget default (#{@budget.stv_winners} winners).",
+                         min: 1 %>
+    </div>
+  </div>
+<% end %>

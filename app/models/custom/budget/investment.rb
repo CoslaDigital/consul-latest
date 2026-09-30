@@ -2,7 +2,11 @@ load Rails.root.join("app", "models", "budget", "investment.rb")
 
 class Budget
   class Investment < ApplicationRecord
+    has_many :lines, class_name: "Budget::Ballot::Line", foreign_key: "investment_id",
+             dependent: :destroy, inverse_of: :investment
+
     has_many :answers, class_name: "Investment::Answer"
+    scope :sort_by_votes, -> { order(votes: :desc) }
     accepts_nested_attributes_for :answers
 
     validates_translation :description, presence: false,
@@ -15,8 +19,6 @@ class Budget
     end
 
     def has_all_answers?
-  # 1. Get the IDs of all mandatory and enabled questions for this budget.
-  # This remains an efficient database query.
       mandatory_question_ids = budget.questions
                                      .where(is_mandatory: true, enabled: true)
                                      .pluck(:id)
@@ -24,15 +26,13 @@ class Budget
   # 2. Count the answers currently in memory that are for a mandatory question
   #    and have non-blank text. This avoids querying the database for unsaved records.
       answered_mandatory_count = answers.count do |answer|
-        # Skip answers that are blank or marked for deletion
         next if answer.marked_for_destruction? || answer.text.blank?
-
-        # Check if the answer's question_id is in our mandatory list
         mandatory_question_ids.include?(answer.budget_question_id)
       end
   result = (answered_mandatory_count == mandatory_question_ids.count)
 
-  # 3. The validation passes if the counts are equal.
+      result = (answered_mandatory_count == mandatory_question_ids.count)
+
       result
     end
   end

@@ -6,6 +6,42 @@ class User < ApplicationRecord
     :valid_na_document?
   ].freeze
 
+  NEC_PREFIX_MAPPING = {
+    "633718" => "aberdeen_city",
+    "633727" => "aberdeenshire",
+    "633719" => "angus",
+    "633644" => "argyll_and_bute",
+    "633668" => "city_of_edinburgh",
+    "633741" => "clackmannanshire",
+    "633624" => "western_isles", # Comhairle nan Eilean Siar
+    "633670" => "dumfries_and_galloway",
+    "633720" => "dundee_city",
+    "633728" => "east_ayrshire",
+    "633590" => "east_dunbartonshire",
+    "633675" => "east_lothian",
+    "633570" => "east_renfrewshire",
+    "633733" => "falkirk",
+    "633250" => "fife",
+    "633740" => "glasgow_city",
+    "633603" => "highland",
+    "633560" => "inverclyde",
+    "633678" => "midlothian",
+    "633604" => "moray",
+    "633680" => "north_ayrshire",
+    "633284" => "north_lanarkshire",
+    "633605" => "orkney_islands",
+    "633722" => "perth_and_kinross",
+    "633289" => "renfrewshire",
+    "633743" => "scottish_borders",
+    "633606" => "shetland_islands",
+    "633682" => "south_ayrshire",
+    "633231" => "south_lanarkshire",
+    "633739" => "stirling",
+    "633580" => "west_dunbartonshire",
+    "633676" => "west_lothian",
+    "999111" => "trumptonshire"
+  }.freeze
+
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
@@ -205,8 +241,8 @@ class User < ApplicationRecord
     extracted_values = self.class.extract_saml_attributes(auth)
 
     Rails.logger.info("extracted values: #{extracted_values.inspect}")
-    extracted_values["saml_date_of_birth"]
-    extracted_values["saml_gender"]
+    saml_date_of_birth = extracted_values["saml_date_of_birth"]
+    saml_gender = extracted_values["saml_gender"]
     saml_postcode = extracted_values["saml_postcode"]
     # Normalize the saml_postcode by stripping spaces and converting to lowercase
     normalized_saml_postcode = saml_postcode.strip.downcase if saml_postcode.present?
@@ -219,7 +255,7 @@ class User < ApplicationRecord
     # Add more fields if necessary
 
     # Save only if any changes have been made
-    save! if changed?
+    save if changed?
   end
 
   # send the notification using AdminNotification system
@@ -281,57 +317,70 @@ class User < ApplicationRecord
 
   private
 
-    def self.log_in_or_create_ys_user(username)
-      Rails.logger.info("YS inside log in or create")
-      if (existing_user = User.find_by(username: username))
-        Rails.logger.info("YS Existing user")
-        # Log in the existing user
-        existing_user # Assuming successful login
-      else
-        # Create a new user
-        Rails.logger.info("Create YS - NOT EXISTING USER")
-        ys_username = username
-        ys_password = username
-        ys_document_number = username
-        ys_email = "#{username}@consul.dev"
-        Time.zone.now
-        #    ys_geozone = 1
-        ys_geozone = Geozone.find_or_create_by!(name: "ys").id
-        Rails.logger.info("YS Trying to create new user")
-        user = User.new(
-          username: ys_username,
-          email: ys_email,
-          password: ys_password,
-          geozone_id: ys_geozone,
-          terms_of_service: "1",
-          document_number: ys_document_number,
-          confirmed_at: DateTime.current,
-          verified_at: DateTime.current,
-          residence_verified_at: DateTime.current
-        )
-
-        Rails.logger.info("User save errors: #{user.errors.full_messages.join(", ")}")
-        Rails.logger.info("YS About to try to sign in the user #{user.inspect}")
-        user.valid?
-        # Check if there are errors NOT related to the password
-        # We ignore errors on :password, but keep errors on :email, :username, etc.
-        other_errors = user.errors.messages.except(:password)
-        if other_errors.empty?
-          # 3. If the only issues were password-related, force save
-          if user.save(validate: false)
-            Rails.logger.info("Create YS - USER created (Password complexity bypassed)")
-            user.errors.clear
-            return user
-          else
-            Rails.logger.info("Create YS - System Error during save")
-          end
-        else
-          # 4. If there were real errors (like duplicate email), fail as normal
-          Rails.logger.info("Create YS - USER NOT created due to: #{other_errors}")
-        end
-
-        nil # Return nil if save failed
+    def self.log_in_or_create_ys_user(document_number)
+      # 1. Exact match fallback (handles standard logins fast)
+      if (existing_user = User.find_by(username: document_number))
+        return existing_user
       end
+
+      # 2. Base 14-digit match for YS cards (handles different issue numbers)
+      if valid_ys_document?(document_number)
+        base_number = document_number.to_s[0, 14]
+
+        # Search for a legacy user using a SQL wildcard on the 14-digit base
+        if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
+
+          # BYPASS DEVISE MAILER: Tell Devise not to require re-confirmation for this email change
+          legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
+          legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
+
+          # Update their credentials to match the physical card they just used
+          legacy_user.username = document_number
+          legacy_user.document_number = document_number
+          legacy_user.email = "#{document_number}@consul.dev"
+          legacy_user.password = document_number # Critical: Updates their password to the new card
+
+          if legacy_user.save(validate: false)
+            return legacy_user
+          else
+            Rails.logger.error("Failed to update YS user issue number for #{base_number}: #{legacy_user.errors.messages}")
+          end
+        end
+      end
+
+      # 3. Create brand new user if no base match was found
+      prefix = document_number.to_s[0, 6]
+      council_name = NEC_PREFIX_MAPPING[prefix]
+      geozone_name = "ys_#{council_name}"
+
+      user = User.new(
+        username: document_number,
+        email: "#{document_number}@consul.dev",
+        password: document_number,
+        document_number: document_number,
+        geozone_id: Geozone.find_by!(name: geozone_name).id,
+        terms_of_service: "1",
+        confirmed_at: Time.current,
+        verified_at: Time.current,
+        level_two_verified_at: Time.current,
+        residence_verified_at: Time.current
+      )
+
+      user.valid?
+
+      # We ignore password complexity errors for YS users, but keep other validations
+      other_errors = user.errors.messages.except(:password)
+
+      if other_errors.empty?
+        if user.save(validate: false)
+          user.errors.clear
+          return user
+        end
+      else
+        Rails.logger.error("Failed to create YS user #{document_number}: #{other_errors}")
+      end
+
+      nil
     end
 
     def self.validate_document_number(document_number)
@@ -349,22 +398,24 @@ class User < ApplicationRecord
     end
 
     def self.valid_ys_document?(document_number)
-      valid_prefixes = Rails.application.secrets.ys_prefixes || []
-
-      if valid_prefixes.empty?
-        Rails.logger.warn("No valid document prefixes found in secrets.")
-        return false
-      end
-
-      # Perform the specific YS checks
       return false unless document_number.to_s.length == 16
 
       prefix = document_number.to_s[0, 6]
       middle = document_number.to_s[6, 8]
       suffix = document_number.to_s[14, 2]
 
-      return false unless valid_prefixes.include?(prefix)
-      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A\d{2}\z/)
+      # 1. Check if the prefix exists in our known mapping
+      council_name = NEC_PREFIX_MAPPING[prefix]
+      return false unless council_name # Reject immediately if prefix is unknown
+
+      # 2. Check if the corresponding Geozone actually exists in the database
+      expected_geozone = "ys_#{council_name}"
+      return false unless Geozone.exists?(name: expected_geozone)
+
+      # 3. Perform the standard YS digit structure checks
+      # The middle must be exactly 8 digits.
+      # The suffix (issue number) must specifically be between 01 and 05.
+      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A0[1-5]\z/)
 
       true
     end

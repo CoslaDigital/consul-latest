@@ -48,7 +48,7 @@ class Admin::SettingsController < Admin::BaseController
     end
 
     def content_type_params
-      params.permit(:jpg, :png, :gif, :pdf, :doc, :docx, :xls, :xlsx, :csv, :zip)
+      params.permit(:jpg, :png, :gif, :pdf, :doc, :docx, :xls, :xlsx, :csv, :pptx, :zip)
     end
 
     def request_referer

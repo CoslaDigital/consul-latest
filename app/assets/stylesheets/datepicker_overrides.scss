@@ -10,6 +10,32 @@
   padding: 0;
   z-index: 4 !important;
 
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    color: inherit;
+    cursor: pointer;
+    font-family: "icons" !important;
+    font-size: rem-calc(24);
+    font-weight: normal;
+    height: rem-calc(30);
+    line-height: $line-height;
+    position: absolute;
+    top: 4px;
+    width: rem-calc(30);
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .ui-datepicker-prev::after {
+    content: "\62";
+  }
+
+  .ui-datepicker-next::after {
+    content: "\63";
+  }
+
   table {
     border: 1px solid $border;
     border-collapse: collapse;
