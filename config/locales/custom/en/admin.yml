@@ -38,7 +38,7 @@ en:
           homepage: Homepage
           debates: Debates
           proposals: Proposals
-          budgets: Elections
+          budgets: Budgets
           help_page: Help page
           sdg: SDG
       create:
@@ -85,19 +85,19 @@ en:
           calculate_winners: 'After calculating the results, only administrators will be able to access them. They will be public when the project reaches the "%{phase}" phase <strong>if the option "Show results" is enabled</strong> when editing the budget.'
           destroy: "This will delete the budget and all its associated groups and headings. This action cannot be undone."
           questions: "Create form fields to be displayed on application forms"
-        edit: "Edit Election"
+        edit: "Edit Budget"
         preview: "Preview"
         preview_results: "Preview results"
         questions: "Manage Questions"
       index:
-        title: Elections
-        new_link: Create new election
+        title: Budgets
+        new_link: Create new Budget(Election)
         filter: Filter
         filters:
           all: All
           open: Open
           finished: Finished
-        budget_investments: Election Candidates
+        budget_investments: Budget Candidates
         table_budget_type: "Type"
         table_completed: Completed
         table_draft: "Draft"
@@ -111,15 +111,15 @@ en:
         admin_ballots: Ballots
         no_budgets: "There are no budgets."
       create:
-        notice: New election created successfully!
+        notice: New budget created successfully!
       update:
-        notice: Election updated successfully
+        notice: Budget updated successfully
       publish:
         notice: "election published successfully"
       edit:
-        title: Edit Election
-        drafting: "This election is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
-        publish: "Publish election"
+        title: Edit Budget
+        drafting: "This budget is in draft mode, only administrators can see it in the public site. Once it's published it cannot be changed to draft mode again."
+        publish: "Publish budget"
         delete: Delete budget
         phase: Phase
         phases_caption: "Phases"
@@ -145,7 +145,7 @@ en:
         main_call_to_action: "Main call to action (optional)"
         main_call_to_action_description: "This link will appear on main banner of this participatory budget and encourages your user to perform a specific action like creating a proposal, voting for existing ones, or learn more about the process."
         info:
-          budget_settings: "General election settings"
+          budget_settings: "General Budget settings"
           staff_settings: "Administrators and Valuators assigned to the budget"
         hide_money: "Hide money"
         hide_money_help_text: "If this option is checked, all fields showing the amount of money will be hidden throughout the process."
