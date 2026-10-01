@@ -34,6 +34,8 @@ class Setting
           "feature.user_milestones": false,
           "feature.restrict_login_to_officials": false,
           "feature.require_login_to_view_processes": false
+                              "feature.user_milestones": false,
+                              "feature.enable_card_login": false
         })
       end
     end
@@ -60,6 +62,11 @@ class Setting
 
     def can_edit_milestones?
       Setting["feature.user_milestones"] == "active"
+    end
+
+    def enable_card_login?
+
+      Setting["feature.enable_card_login"] == "active"
     end
 
   end

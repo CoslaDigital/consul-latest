@@ -13,6 +13,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.user_milestones
                           feature.restrict_login_to_officials
                           feature.require_login_to_view_processes
+                          feature.enable_card_login
                         ]
     original_settings + custom_settings
   end
