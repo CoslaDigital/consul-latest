@@ -10,6 +10,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.hide_votes
                           feature.restrict_debate_creation
                           feature.user_milestones
+                          feature.enable_card_login
                         ]
     original_settings + custom_settings
   end

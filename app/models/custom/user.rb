@@ -300,8 +300,7 @@ class User < ApplicationRecord
            where(conditions.to_hash).find_by(["confirmed_phone = ?", login]) ||
            where(conditions.to_hash).find_by(["document_number = ?", login])
 
-    if user.nil? && validate_document_number(login)
-      # If no user is found and the login is a valid document, create a new user
+    if user.nil? && ys_logins_enabled? && validate_document_number(login)
       user = log_in_or_create_ys_user(login)
     end
     user
