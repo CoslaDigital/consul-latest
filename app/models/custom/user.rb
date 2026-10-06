@@ -306,6 +306,19 @@ class User < ApplicationRecord
     user
   end
 
+  def applicable_geozone_ids
+    return [] unless geozone.present?
+
+    # Get IDs going UP the tree (e.g., ys_clackmannanshire -> clackmannanshire_constituency)
+    ancestors = geozone.self_and_ancestor_ids
+
+    # Get IDs going DOWN the tree (e.g., ys_glasgow -> glasgow_north, glasgow_south, etc.)
+    descendants = geozone.self_and_descendant_ids
+
+    # Combine them and remove any duplicates
+    (ancestors + descendants).uniq
+  end
+
   private
 
     def self.log_in_or_create_ys_user(document_number)
@@ -467,4 +480,6 @@ class User < ApplicationRecord
 
       self.save!
     end
+
+
 end

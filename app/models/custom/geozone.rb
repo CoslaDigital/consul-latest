@@ -9,7 +9,17 @@ class Geozone < ApplicationRecord
 
   # --- NEW HIERARCHY METHODS ---
 
-  # Recursively fetches all children, grandchildren, etc.
+  # Recursively fetches parent, grandparent, etc. (Going UP)
+  def ancestors
+    parent ? [parent] + parent.ancestors : []
+  end
+
+  # Returns an array of IDs for this zone AND all zones above it
+  def self_and_ancestor_ids
+    [id] + ancestors.map(&:id)
+  end
+
+  # Recursively fetches all children, grandchildren, etc. (Going DOWN)
   def descendants
     children + children.flat_map(&:descendants)
   end
