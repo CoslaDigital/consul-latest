@@ -1,0 +1,19 @@
+<div class="margin-bottom" style="max-width: 400px;">
+  <%= form_tag url, method: :get do %>
+
+    <% if params[:filter].present? %>
+      <%= hidden_field_tag :filter, params[:filter] %>
+    <% end %>
+
+    <div class="input-group">
+      <%= text_field_tag :search,
+                         params[:search],
+                         class: "input-group-field",
+                         placeholder: local_assigns.fetch(:placeholder, t("admin.shared.search.placeholder", default: "Search...")) %>
+      <div class="input-group-button">
+        <%= submit_tag t("admin.shared.search.search", default: "Search"), class: "button" %>
+      </div>
+    </div>
+
+  <% end %>
+</div>
