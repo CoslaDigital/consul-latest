@@ -1,14 +1,19 @@
 .budget-phases {
-  margin-top: $line-height;
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 
-  /*    @include grid-column-gutter; */
-  /*    @include full-width-background; */
-  @include full-width-border(top, 2px solid $border);
+  /* FIX: Generous internal padding (2.5rem top/bottom) stops the content feeling squashed,
+     while keeping the box safely inside the parent row. */
+  padding: 2.5rem 1.5rem !important;
+
   background: $light;
-  padding-bottom: $line-height * 2;
-  padding-top: $line-height * 2; /* Added padding at the top for better spacing */
-  border-radius: .5rem; /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border-radius: .5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+
+  /* FIX: Removed @include full-width-border.
+     That mixin forces elements to break out of the grid row, which ruins card layouts. */
 
   .before {
     bottom: 0;
@@ -19,22 +24,28 @@
     position: absolute;
     right: 0;
     top: 0;
-    background-color: transparent; /* Set background color to transparent */
+    background-color: transparent;
     z-index: -1;
   }
-
 
   h2 {
     font-size: $base-font-size;
     text-align: center;
-    margin-bottom: $line-height; /* Added margin for spacing */
+    margin-bottom: 2rem; /* A little extra space below the main title */
   }
 
   .phases-list {
     counter-reset: phases;
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem; /* Added gap between items */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+
+    @supports (clip-path: polygon(0 0, 50% 50%, 0% 100%)) {
+      padding-right: calc(1em - 1px);
+    }
 
     .phase-name::before {
       content: counter(phases);
@@ -48,18 +59,16 @@
 
   .phase-title {
     @include tabs-title;
-    margin: calc(#{$line-height} / 6);
-    margin-left: 0;
+    flex: 1 1 140px;
+    min-width: 0;
+    margin: 0;
+    margin-bottom: 0.5rem;
     position: relative;
     text-align: center;
-    padding: 1rem; /* Added padding for better spacing */
-    border-radius: .5rem; /* Rounded corners */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    background-color: var(--brand-secondary); /* White background for contrast */
 
     @supports (clip-path: polygon(0 0, 50% 50%, 0% 100%)) {
       $triangle-width: 1em;
-      $item-margin: rem-calc(3);
+      $item-margin: 1px;
 
       margin-left: calc(-1 * (#{$triangle-width} - #{$item-margin}));
       margin-right: 0;
@@ -99,9 +108,11 @@
       background: $body-background;
       color: inherit;
       height: 100%;
-      padding: $line-height $line-height * 1.5;
-      border-radius: .5rem; /* Rounded corners for links */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: background-color 0.2s ease;
 
       &:hover {
         background: #e6e6e6;
@@ -115,7 +126,8 @@
       &[aria-selected="true"],
       &.is-active {
         @include brand-secondary-background;
-        font-weight: normal;
+        color: #fff;
+        font-weight: bold;
       }
 
       &[aria-selected="true"]::after,
@@ -127,6 +139,7 @@
     &.current-phase-tab a {
       @include brand-secondary-background;
       padding-top: calc(#{$line-height} / 2);
+      color: #fff;
     }
   }
 
@@ -138,14 +151,24 @@
     text-transform: uppercase;
   }
 
-  .tabs,
-  .tabs-content {
+  .tabs {
     background: none;
     border: 0;
   }
 
+  .tabs-content {
+    background: none;
+    border: 0;
+    margin: 2.5rem 0 0 0; /* Ensures the information box is perfectly separated from the chevrons above */
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .tabs-panel {
     padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 
     h3 {
       font-size: rem-calc(36);
@@ -154,7 +177,8 @@
 
   .tabs-controls {
     display: flex;
-    gap: 0.5rem; /* Added gap between controls */
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
 
     .budget-prev-phase,
     .budget-next-phase,
@@ -163,10 +187,12 @@
       @extend %brand-background;
       border-radius: rem-calc(3);
       display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: rem-calc(36);
       height: calc(4em / 3);
       width: calc(4em / 3);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
       &::before {
         margin: auto;
@@ -181,6 +207,7 @@
     .budget-next-phase-disabled {
       background: none;
       color: #acb6b6;
+      box-shadow: none;
     }
 
     .budget-prev-phase,
@@ -195,16 +222,18 @@
   }
 
   .budget-phase {
-    margin-top: $line-height;
-    padding: 1rem; /* Added padding for better spacing */
-    border-radius: .5rem; /* Rounded corners */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    background-color: #fff; /* White background for contrast */
-    margin-left: 1rem; /* Added margin to prevent overlap */
-    margin-right: 1rem; /* Added margin for symmetry */
+    margin: 0;
+    padding: 1.5rem;
+    border-radius: .5rem;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
 
     @include breakpoint(medium) {
-      /*            @include flex-with-gap; */
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
 
       > * {
         width: 50%;
@@ -212,6 +241,10 @@
 
       .budget-phase-image {
         text-align: center;
+
+        img {
+          border-radius: 0.25rem;
+        }
       }
     }
 
