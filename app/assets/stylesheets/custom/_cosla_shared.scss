@@ -435,7 +435,7 @@
     margin: 1rem 0;
     justify-content: center;
     background-color: var(--brand-secondary, #005f99);
-    color: white;
+    color: var(--brand-contrast, #ffffff);
     padding: 0.75rem 1.5rem;
     text-align: center;
     text-decoration: none;
@@ -467,8 +467,7 @@
   }
 
   // -- Debates & Comments --
-  // Note: These were hardcoded colors in your original. I've mapped some to custom variables
-  // so you can override them via your site files if desired.
+
   .debate-questions .control {
     background: var(--custom-section-bg, #f9f9f9);
     border: 1px solid var(--custom-border-color, #ccc);
