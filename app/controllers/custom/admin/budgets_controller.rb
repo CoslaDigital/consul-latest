@@ -5,6 +5,7 @@ class Admin::BudgetsController < Admin::BaseController
   include ReportAttributes
   include ImageAttributes
   include FeatureFlags
+  include Search
 
   feature_flag :budgets
 
@@ -15,9 +16,20 @@ class Admin::BudgetsController < Admin::BaseController
   load_and_authorize_resource class: "Budget"
 
   def index
-    # @budgets is already pre-loaded and scoped by CanCanCan here.
-    # We simply chain your filters, order, and pagination onto it.
-    @budgets = @budgets.send(@current_filter).order(created_at: :desc).page(params[:page])
+    # 1. Apply the current filter (All / Open / Finished)
+    filtered_budgets = @budgets.send(@current_filter)
+
+    # 2. Use the @search_terms variable provided by the Search concern
+    if @search_terms.present?
+      search_term = @search_terms.downcase
+      filtered_budgets = filtered_budgets.select do |budget|
+        budget.name.to_s.downcase.include?(search_term)
+      end
+    end
+
+    # 3. Sort alphabetically and Paginate
+    filtered_budgets = filtered_budgets.sort_by { |budget| budget.name.to_s.downcase }
+    @budgets = Kaminari.paginate_array(filtered_budgets).page(params[:page])
   end
 
   def show

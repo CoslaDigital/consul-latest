@@ -4,6 +4,9 @@
 
 <%= render Admin::Budgets::HeadingModeComponent.new %>
 <%= render Admin::Budgets::HelpComponent.new("budgets") %>
+<%= render "admin/shared/search",
+           url: admin_budgets_path,
+           placeholder: t("admin.shared.search.placeholder", default: "Search budgets...") %>
 <%= render "shared/filter_subnav", i18n_namespace: "admin.budgets.index" %>
 
 <% if budgets.any? %>
