@@ -16,8 +16,9 @@ class MyAreaController < ApplicationController
     @local_authority_name = @geozone.name.gsub("ys_", "").titleize
 
     # Fetch all budgets that have at least one heading assigned to the user's geozone
+    # OR any of its parent/child geozones in the hierarchy.
     @local_budgets = Budget.joins(groups: :headings)
-                           .where(budget_headings: { geozone_id: @geozone.id })
+                       .where(budget_headings: { geozone_id: current_user.applicable_geozone_ids })
                            .where(published: true) # Only show published budgets
                            .distinct
                            .order(created_at: :desc)
