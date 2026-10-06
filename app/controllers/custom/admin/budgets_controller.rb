@@ -15,9 +15,12 @@ class Admin::BudgetsController < Admin::BaseController
   load_and_authorize_resource class: "Budget"
 
   def index
-    # @budgets is already pre-loaded and scoped by CanCanCan here.
-    # We simply chain your filters, order, and pagination onto it.
-    @budgets = @budgets.send(@current_filter).order(created_at: :desc).page(params[:page])
+    # @budgets is pre-loaded and scoped by CanCanCan.
+    # 1. Apply the current filter
+    # 2. Sort alphabetically in Ruby (respects translation fallbacks safely)
+    # 3. Paginate the resulting array
+    filtered_budgets = @budgets.send(@current_filter).sort_by { |budget| budget.name.to_s.downcase }
+    @budgets = Kaminari.paginate_array(filtered_budgets).page(params[:page])
   end
 
   def show
@@ -35,13 +38,6 @@ class Admin::BudgetsController < Admin::BaseController
     else
       render :new
     end
-  end
-
-  def edit
-    @budgets = Budget.send(@current_filter).order(created_at: :desc).page(params[:page])
-  end
-
-  def show
   end
 
   def edit
