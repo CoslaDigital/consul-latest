@@ -152,6 +152,17 @@
       App.Map.addGeozones(map, geozoneLayers);
       Object.assign(layerControlOverlays, geozoneLayers);
 
+      // EXTEND BOUNDS TO INCLUDE GEOZONES
+      Object.keys(geozoneLayers).forEach(function (layerName) {
+        const layer = geozoneLayers[layerName];
+        if (layer && typeof layer.getBounds === "function") {
+          const bounds = layer.getBounds();
+          if (bounds.isValid()) {
+            globalBounds.extend(bounds);
+          }
+        }
+      });
+
       // Auto-zoom / fitBounds unified calculation across all active groups
       if (globalBounds.isValid()) {
         try {
