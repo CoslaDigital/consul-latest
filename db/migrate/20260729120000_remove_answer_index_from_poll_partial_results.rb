@@ -1,6 +1,6 @@
 class RemoveAnswerIndexFromPollPartialResults < ActiveRecord::Migration[7.2]
   def up
-    remove_index :poll_partial_results, name: "index_poll_partial_results_on_answer", if_exists: true
+    execute "DROP INDEX IF EXISTS index_poll_partial_results_on_answer"
   end
 
   def down
