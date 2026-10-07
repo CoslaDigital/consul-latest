@@ -88,13 +88,16 @@
     </div>
   <% end %>
 
-  <%# --- EMPTY STATE FALLBACK --- %>
+  <<%# --- EMPTY STATE FALLBACK --- %>
   <% if @active_voting.empty? && @upcoming.empty? && @past_results.empty? %>
     <div class="row margin-top margin-bottom">
       <div class="small-12 column text-center">
         <div class="callout primary">
           <h3><%= t(".empty_state.title") %></h3>
           <p><%= t(".empty_state.description", authority: @local_authority_name) %></p>
+          <div class="margin-top">
+            <%= link_to t(".empty_state.back_to_home", default: "Return to Homepage"), root_path, class: "button" %>
+          </div>
         </div>
       </div>
     </div>
