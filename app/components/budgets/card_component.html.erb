@@ -1,0 +1,26 @@
+<div class="card margin-bottom" style="display: flex; flex-direction: column; height: 100%;">
+
+  <%# --- Card Image Header --- %>
+  <%# The container holds the brand color (#e40046). If the image fails to load, the onerror script hides it, revealing the color! %>
+  <div class="card-image" style="height: 180px; background-color: #e40046; overflow: hidden;">
+    <%= image_tag(image_url,
+                  alt: budget.name,
+                  style: "width: 100%; height: 100%; object-fit: cover;",
+                  onerror: "this.style.display='none';") %>
+  </div>
+
+  <%# --- Card Content --- %>
+  <div class="card-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h3 class="margin-bottom"><%= link_to budget.name, budget_path(budget) %></h3>
+      <p>
+        <strong><%= t("budgets.index.cards.phase_label", default: "Current Phase:") %></strong><br>
+        <%= t("budgets.phase.#{budget.phase}") %>
+      </p>
+    </div>
+
+    <div class="margin-top">
+      <%= link_to t("budgets.index.cards.take_part", default: "Take Part"), budget_path(budget), class: "button expanded success" %>
+    </div>
+  </div>
+</div>

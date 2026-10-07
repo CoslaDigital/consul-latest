@@ -1,0 +1,50 @@
+<% provide :title, t("budgets.index.title") %>
+<% provide :main_class, "budgets-index" %>
+
+<%= render Shared::BannerComponent.new("budgets") %>
+
+<% content_for :canonical do %>
+  <%= render "shared/canonical", href: budgets_url %>
+<% end %>
+
+<%# --- MULTIPLE OPEN BUDGETS (GRID VIEW) --- %>
+<% if @budgets.size > 1 %>
+  <div class="row margin-top">
+    <div class="small-12 column">
+      <header>
+        <h1><%= t("budgets.index.open_budgets", default: "Active Elections") %></h1>
+      </header>
+      <div class="row small-up-1 medium-up-2 large-up-3">
+        <% @budgets.each do |budget| %>
+          <div class="column">
+            <%= render Budgets::CardComponent.new(budget) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# --- EXACTLY ONE OPEN BUDGET (FULL PAGE) --- %>
+<% elsif @budgets.size == 1 %>
+  <%= render Budgets::BudgetComponent.new(@budgets.first) %>
+
+  <%# --- NO OPEN BUDGETS (EMPTY STATE) --- %>
+<% else %>
+  <header>
+    <h1><%= t("budgets.index.title") %></h1>
+  </header>
+  <div class="row">
+    <div class="small-12 column">
+      <div class="callout primary">
+        <%= t("budgets.index.empty_budgets") %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%# --- FINISHED BUDGETS (ALWAYS SHOW AT BOTTOM IF PRESENT) --- %>
+<% if @finished_budgets.present? %>
+  <%= render "finished", budgets: @finished_budgets %>
+<% end %>
+
+<%= render Budgets::FooterComponent.new %>
