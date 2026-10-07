@@ -9,6 +9,7 @@
 
 <%# --- MULTIPLE OPEN BUDGETS (GRID VIEW) --- %>
 <% if @budgets.size > 1 %>
+  <%= render Budgets::IndexMapComponent.new(@budgets) %>
   <div class="row margin-top">
     <div class="small-12 column">
       <header>
