@@ -9,6 +9,8 @@ class Budget
     scope :sort_by_votes, -> { order(votes: :desc) }
     accepts_nested_attributes_for :answers
 
+    translates :summary, touch: true
+
     validates_translation :description, presence: false,
                                         length: { maximum: Budget::Investment.description_max_length }
 
