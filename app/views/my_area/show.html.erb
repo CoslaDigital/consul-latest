@@ -12,7 +12,11 @@
       </div>
     </div>
   </div>
-
+  <%# --- NEW: MAP OVERVIEW FOR USER'S AREA --- %>
+  <% map_budgets = @active_voting + @upcoming %>
+  <% if map_budgets.any? %>
+    <%= render Budgets::IndexMapComponent.new(map_budgets) %>
+  <% end %>
   <%# --- ACTIVE VOTING SECTION --- %>
   <% if @active_voting.any? %>
     <div class="row margin-top">
