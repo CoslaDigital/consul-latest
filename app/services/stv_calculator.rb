@@ -68,6 +68,7 @@ class StvCalculator
       @elimination_log = []
       @rounds_data = []
       @exhausted_total = 0.0
+      @retained_values = {}
       @history = Hash.new { |h, k| h[k] = [] }
     end
 
@@ -120,19 +121,22 @@ class StvCalculator
     # ------------------------------------------------------------------
 
     def handle_election(candidates_over_quota, totals)
-      # Sort deterministically: highest total first, tie-break by id ascending.
       ordered = candidates_over_quota.sort_by { |id, total| [-total, id] }
       elected_id, elected_total = ordered.first
 
       surplus = elected_total - @current_quota
       title = @investment_titles[elected_id]
 
-      # Guard against re-election of an already-elected candidate.
       unless @elected_investments.include?(elected_id)
         @elected_investments << elected_id
         @empty_seats -= 1
       end
       @active_candidates.delete(elected_id)
+
+      # Retain the elected candidate's ballot value for vote-accounting.
+      # Once elected, their ballots no longer count toward "active" but are
+      # not exhausted either — they are retained by the elected candidate.
+      @retained_values[elected_id] = elected_total
 
       transfer_fraction = (surplus > 0 && elected_total > 0) ? (surplus.to_f / elected_total) : nil
       transfers_to = Hash.new(0.0)
@@ -321,13 +325,16 @@ class StvCalculator
     end
 
     def log_round(totals, action, transfers:)
+      retained_sum = @retained_values.values.sum
+
       @rounds_data << {
         iteration: @iteration,
         quota: @current_quota,
         standings: totals.sort_by { |id, total| [-total, id] }.to_h,
         action: action,
         transfers: transfers,
-        exhausted_total: @exhausted_total
+        exhausted_total: @exhausted_total,
+        retained_total: retained_sum
       }
     end
 end
