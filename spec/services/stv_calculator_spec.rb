@@ -410,4 +410,49 @@ RSpec.describe StvCalculator do
       end
     end
   end
+  # ==================================================================
+  # Deterministic tie-breaking
+  # ==================================================================
+  describe "deterministic tie-breaking" do
+    # A tie scenario: four candidates at 2 votes each, plus one at 4.
+    # Forces a random-lot elimination to break the four-way tie.
+    let(:tied_ballots) do
+      ballot_tally(
+        [4, [1, 5]],
+        [2, [2, 5]],
+        [2, [3, 5]],
+        [2, [4, 5]]
+      )
+    end
+
+    let(:tied_candidates) { { 1 => "A", 2 => "B", 3 => "C", 4 => "D", 5 => "E" } }
+
+    it "produces the same winners for the same election_seed" do
+      r1 = calculator.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-abc")
+      r2 = calculator.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-abc")
+      expect(r1.winners).to eq(r2.winners)
+    end
+
+    it "produces the same elimination order for the same election_seed" do
+      r1 = calculator.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-abc")
+      r2 = calculator.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-abc")
+      expect(r1.elimination_log.map { |e| e[:id] }).to eq(r2.elimination_log.map { |e| e[:id] })
+    end
+
+    it "produces the same result from a fresh calculator instance with the same seed" do
+      r1 = described_class.new.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-fresh")
+      r2 = described_class.new.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-fresh")
+      expect(r1.winners).to eq(r2.winners)
+    end
+
+    it "records the seed in the tie-break message when a random lot is used" do
+      result = calculator.calculate(tied_ballots, 2, 3, tied_candidates, election_seed: "seed-xyz")
+      elim_round = result.rounds.find do |r|
+        r[:action]&.dig(:type) == :elimination &&
+          r[:action][:tie_break_message]&.include?("random lot")
+      end
+      expect(elim_round).not_to be_nil
+      expect(elim_round[:action][:tie_break_message]).to match(/seed: \d+/)
+    end
+  end
 end

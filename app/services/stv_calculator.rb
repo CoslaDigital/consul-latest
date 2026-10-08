@@ -9,6 +9,7 @@
 #   - track exhausted vote value (not just exhausted ballot counts)
 #
 require "zlib"
+
 class StvCalculator
   Result = Struct.new(
     :winners,
@@ -81,10 +82,15 @@ class StvCalculator
         totals.each { |id, total| @history[id] << total }
         candidates_over_quota = totals.select { |_, total| total >= @current_quota }
 
+        # Snapshot the exhausted value at the START of this round.
+        # The round's data reflects the state BEFORE the action; the action
+        # itself carries its own delta (exhausted_value) for reporting.
+        exhausted_at_round_start = @exhausted_total
+
         if candidates_over_quota.any?
-          handle_election(candidates_over_quota, totals)
+          handle_election(candidates_over_quota, totals, exhausted_at_round_start)
         else
-          handle_elimination(totals)
+          handle_elimination(totals, exhausted_at_round_start)
         end
 
         break if @empty_seats <= 0
@@ -121,7 +127,7 @@ class StvCalculator
     # Election (surplus transfer)
     # ------------------------------------------------------------------
 
-    def handle_election(candidates_over_quota, totals)
+    def handle_election(candidates_over_quota, totals, exhausted_at_round_start)
       ordered = candidates_over_quota.sort_by { |id, total| [-total, id] }
       elected_id, elected_total = ordered.first
 
@@ -156,20 +162,25 @@ class StvCalculator
         transfer_fraction: transfer_fraction
       }
 
-      log_round(totals, action, transfers: {
-        type: :surplus,
-        candidate_id: elected_id,
-        amount: surplus,
-        fraction: transfer_fraction,
-        to: transfers_to
-      })
+      log_round(
+        totals,
+        action,
+        exhausted_at_round_start: exhausted_at_round_start,
+        transfers: {
+          type: :surplus,
+          candidate_id: elected_id,
+          amount: surplus,
+          fraction: transfer_fraction,
+          to: transfers_to
+        }
+      )
     end
 
     # ------------------------------------------------------------------
     # Elimination (no surplus; ballots keep their current value)
     # ------------------------------------------------------------------
 
-    def handle_elimination(totals)
+    def handle_elimination(totals, exhausted_at_round_start)
       min_votes = totals.values.min
       tied = totals.select { |_, v| v == min_votes }
 
@@ -214,12 +225,17 @@ class StvCalculator
       }
       action[:tie_break_message] = format_tie_break_message(tie_break_info) if tie_break_info
 
-      log_round(totals, action, transfers: {
-        type: :elimination,
-        candidate_id: eliminated_id,
-        amount: eliminated_votes,
-        to: transfers_to
-      })
+      log_round(
+        totals,
+        action,
+        exhausted_at_round_start: exhausted_at_round_start,
+        transfers: {
+          type: :elimination,
+          candidate_id: eliminated_id,
+          amount: eliminated_votes,
+          to: transfers_to
+        }
+      )
     end
 
     def advance_ballot(ballot)
@@ -261,7 +277,12 @@ class StvCalculator
           count: current_votes
         }
 
-        log_round(round_totals, action, transfers: {})
+        log_round(
+          round_totals,
+          action,
+          exhausted_at_round_start: @exhausted_total,
+          transfers: {}
+        )
       end
     end
 
@@ -297,6 +318,8 @@ class StvCalculator
         }
       end
 
+      # Deterministic tie-break via seeded pseudo-random draw.
+      # Same election + round + tied candidates => same winner.
       seed = Zlib.crc32([@election_seed, @iteration, at_min.sort].flatten.join("-"))
       rng = Random.new(seed)
       winner = at_min.sort.sample(random: rng)
@@ -306,7 +329,6 @@ class StvCalculator
         reason: :random_lot,
         details: { tied_candidates: at_min, seed: seed }
       }
-
     end
 
     def format_tie_break_message(info)
@@ -331,14 +353,14 @@ class StvCalculator
     # Round logging
     # ------------------------------------------------------------------
 
-    def log_round(totals, action, transfers:)
+    def log_round(totals, action, transfers:, exhausted_at_round_start:)
       @rounds_data << {
         iteration: @iteration,
         quota: @current_quota,
         standings: totals.sort_by { |id, total| [-total, id] }.to_h,
         action: action,
         transfers: transfers,
-        exhausted_total: @exhausted_total
+        exhausted_total: exhausted_at_round_start
       }
     end
 end
