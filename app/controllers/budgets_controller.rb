@@ -15,7 +15,14 @@ class BudgetsController < ApplicationController
   end
 
   def index
-    @finished_budgets = @budgets.finished.order(created_at: :desc)
+    # 1. Start with only published budgets (just to be safe)
+    published_budgets = @budgets.published
+
+    # 2. Extract the finished budgets for the bottom section
+    @finished_budgets = published_budgets.finished.order(created_at: :desc)
+
+    # 3. Redefine @budgets to be everything published EXCEPT the finished ones
+    @budgets = published_budgets.where.not(id: @finished_budgets.select(:id)).order(created_at: :desc)
   end
 
   def select
