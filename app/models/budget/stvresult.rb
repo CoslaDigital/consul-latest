@@ -51,9 +51,37 @@ class Budget
         dynamic_quota_enabled: dynamic_quota_enabled
       )
 
+      # -----------------------------------------------------------------------
+      # 2. CRITICAL TRANSLATOR FIX:
+      # The StvDetailReportComponent expects a simple flat structure.
+      # StvCalculator nests metadata under :details. This maps them perfectly!
+      # -----------------------------------------------------------------------
+      mapped_rounds = result.rounds.map do |round|
+        action = round[:action]
+        if action && action[:details]
+          if action[:type] == :election
+            # Safely handle multiple elected candidates in a single round
+            first_elected = action[:details].first || {}
+            action[:title] = action[:details].map { |d| d[:title] }.join(" & ")
+            action[:candidate_id] = first_elected[:id]
+            action[:count] = first_elected[:count]
+            action[:surplus] = first_elected[:surplus]
+          elsif action[:type] == :elimination
+            action[:title] = action[:details][:title]
+            action[:candidate_id] = action[:details][:id]
+            action[:count] = action[:details][:count]
+          end
+        end
+        # Ensure standings is formatted as a Hash for the Component
+        round[:standings] = round[:standings].to_h if round[:standings].is_a?(Array)
+        round
+      end
+
+      result.rounds = mapped_rounds
+
       write_to_output("✅ STV Calculation Completed. #{result.winners.size} winners found.")
 
-      # 2. Render Reports
+      # 3. Render Reports
       summary_html_report = ApplicationController.render(
         StvSummaryReportComponent.new(
           result: result,
@@ -112,10 +140,6 @@ class Budget
       update_custom_page(detailed_html_report, detail_title, detail_slug)
 
       result.winners
-
-    rescue StandardError => e
-      write_to_output("❌ CRASH ERROR: #{e.message}\n#{e.backtrace.join("\n")}")
-      raise e
     end
 
     private
