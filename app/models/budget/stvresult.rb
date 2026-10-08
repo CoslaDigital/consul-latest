@@ -37,22 +37,29 @@ class Budget
       initial_quota = droop_quota(votes_cast.to_f, seats)
       dynamic_quota_enabled = @budget.respond_to?(:stv_dynamic_quota?) && @budget.stv_dynamic_quota?
 
-      calculator = StvCalculator.new
-      result = calculator.calculate(
-        ballot_data,
-        seats,
-        initial_quota,
-        investment_titles,
+      result = StvCalculator.new.calculate(
+        ballot_data, seats, initial_quota, investment_titles,
         dynamic_quota_enabled: dynamic_quota_enabled
       )
 
       write_to_output("✅ STV Calculation Completed. #{result.winners.size} winners found.")
 
-      render_and_attach_reports(result, candidates, votes_cast, initial_quota, investment_titles,
-                                summary_title, summary_slug, detail_title, detail_slug,
-                                dynamic_quota_enabled)
-
+      # 1. Persist the authoritative result FIRST.
       update_winning_investments(result.winners)
+
+      # 2. THEN render and publish reports. Report bugs must not destroy results.
+      begin
+        render_and_attach_reports(
+          result, candidates, votes_cast, initial_quota, investment_titles,
+          summary_title, summary_slug, detail_title, detail_slug,
+          dynamic_quota_enabled
+        )
+      rescue => e
+        Rails.logger.error("STV report rendering failed for heading #{@heading.id}: #{e.message}")
+        Rails.logger.error(e.backtrace.first(10).join("\n"))
+        write_to_output("⚠️ Reports failed to render: #{e.message}")
+      end
+
       result.winners
     end
 
@@ -85,7 +92,6 @@ class Budget
             report_title: summary_title,
             detail_page_slug: detail_slug,
             dynamic_quota_enabled: dynamic_quota_enabled,
-            heading: @heading
           ),
           layout: false
         )
