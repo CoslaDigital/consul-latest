@@ -115,40 +115,59 @@ class StvCalculator
       totals
     end
 
+    # ------------------------------------------------------------------
+    # Election (surplus transfer)
+    # ------------------------------------------------------------------
+
     def handle_election(candidates_over_quota, totals)
+      # Sort deterministically: highest total first, tie-break by id ascending.
       ordered = candidates_over_quota.sort_by { |id, total| [-total, id] }
       elected_id, elected_total = ordered.first
 
-      # FIXED: Restored correct surplus calculation
       surplus = elected_total - @current_quota
       title = @investment_titles[elected_id]
 
-      @elected_investments << elected_id
+      # Guard against re-election of an already-elected candidate.
+      unless @elected_investments.include?(elected_id)
+        @elected_investments << elected_id
+        @empty_seats -= 1
+      end
       @active_candidates.delete(elected_id)
-      @empty_seats -= 1
+
+      transfer_fraction = (surplus > 0 && elected_total > 0) ? (surplus.to_f / elected_total) : nil
+      transfers_to = Hash.new(0.0)
+
+      if transfer_fraction && @empty_seats > 0
+        @ballots
+          .select { |b| !b.exhausted && b.current_candidate == elected_id }
+          .each do |ballot|
+          ballot.current_value *= transfer_fraction
+          advance_ballot(ballot)
+          transfers_to[ballot.current_candidate] += ballot.current_value if ballot.current_candidate
+        end
+      end
 
       action = {
         type: :election,
         title: title,
         candidate_id: elected_id,
         count: elected_total,
-        surplus: [surplus, 0].max
+        surplus: [surplus, 0.0].max,
+        transfer_fraction: transfer_fraction
       }
 
-      if surplus > 0 && @empty_seats > 0
-        transfer_fraction = surplus.to_f / elected_total
-        ballots_to_transfer = @ballots.select do |b|
-          !b.exhausted && b.current_candidate == elected_id
-        end
-
-        ballots_to_transfer.each do |ballot|
-          ballot.current_value *= transfer_fraction
-          advance_ballot(ballot)
-        end
-      end
-
-      log_round(totals, action, transfers: { type: :surplus, candidate_id: elected_id, amount: surplus })
+      log_round(totals, action, transfers: {
+        type: :surplus,
+        candidate_id: elected_id,
+        amount: surplus,
+        fraction: transfer_fraction,
+        to: transfers_to
+      })
     end
+
+    # ------------------------------------------------------------------
+    # Elimination (no surplus; ballots keep their current value)
+    # ------------------------------------------------------------------
 
     def handle_elimination(totals)
       min_votes = totals.values.min
@@ -171,30 +190,36 @@ class StvCalculator
         votes: eliminated_votes
       }
 
-      @eliminated_investments << eliminated_id
+      @eliminated_investments << eliminated_id unless @eliminated_investments.include?(eliminated_id)
       @active_candidates.delete(eliminated_id)
+
+      transfers_to = Hash.new(0.0)
+      before_exhausted = @exhausted_total
+
+      @ballots
+        .select { |b| !b.exhausted && b.current_candidate == eliminated_id }
+        .each do |b|
+        advance_ballot(b)
+        transfers_to[b.current_candidate] += b.current_value if b.current_candidate
+      end
+
+      exhausted_this_round = @exhausted_total - before_exhausted
 
       action = {
         type: :elimination,
         title: title,
         candidate_id: eliminated_id,
-        count: eliminated_votes
+        count: eliminated_votes,
+        exhausted_value: exhausted_this_round
       }
       action[:tie_break_message] = format_tie_break_message(tie_break_info) if tie_break_info
 
-      ballots_to_transfer = @ballots.select do |b|
-        !b.exhausted && b.current_candidate == eliminated_id
-      end
-
-      before_exhausted = @exhausted_total
-      ballots_to_transfer.each { |b| advance_ballot(b) }
-
-      # FIXED: Restored correct exhaustion tracking calculation
-      exhausted_this_round = @exhausted_total - before_exhausted
-
-      action[:exhausted_value] = exhausted_this_round
-
-      log_round(totals, action, transfers: { type: :elimination, candidate_id: eliminated_id, amount: eliminated_votes })
+      log_round(totals, action, transfers: {
+        type: :elimination,
+        candidate_id: eliminated_id,
+        amount: eliminated_votes,
+        to: transfers_to
+      })
     end
 
     def advance_ballot(ballot)
