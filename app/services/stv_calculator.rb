@@ -1,230 +1,337 @@
+# app/services/stv_calculator.rb
+#
+# Implements the Weighted Inclusive Gregory Method (WIGM) for STV.
+#
+# Ballots are "stateful": each one tracks its current transfer value and
+# current candidate. This lets us correctly:
+#   - transfer fractional surplus values
+#   - preserve fractional values across subsequent eliminations
+#   - track exhausted vote value (not just exhausted ballot counts)
+#
 class StvCalculator
-  # The Result struct now includes a log of all rounds for the detail component.
-  Result = Struct.new(:winners, :elimination_log, :unfilled_seats, :rounds, keyword_init: true)
+  Result = Struct.new(
+    :winners,
+    :elimination_log,
+    :unfilled_seats,
+    :rounds,
+    :exhausted_total,
+    keyword_init: true
+  )
 
-  # The calculator is stateless, so the initializer is empty.
+  # A stateful ballot:
+  #   rankings:          Array<Integer> investment ids, in preference order
+  #   current_value:     Float, current transfer value (starts at 1.0)
+  #   current_candidate: Integer|nil, currently assigned candidate id
+  #   exhausted:         Boolean
+  Ballot = Struct.new(:rankings, :current_value, :current_candidate, :exhausted, keyword_init: true)
+
   def initialize
-  end
-  
-  # The main public method that runs the STV algorithm.
-def calculate(ballot_data, seats, quota, investment_titles, dynamic_quota_enabled: false)
-  # --- 1. Setup Phase ---
-  initial_vote_counts = {}
-  investment_titles.keys.each { |id| initial_vote_counts[id] = 0 }
-
-  ballot_data.each do |vote|
-    next if vote[:rankings].empty?
-    investment_id = vote[:rankings].first
-    initial_vote_counts[investment_id] += 1 if initial_vote_counts.key?(investment_id)
+    # no state; safe to reuse
   end
 
-  @elected_investments = []
-  @eliminated_investments = []
-  @elimination_log = []
-  rounds_log = []
-  empty_seats = seats
-  iteration = 1
-  # Store a copy of the original votes for tie-breaking
-  first_preference_votes = initial_vote_counts.dup
+  # Public entry point.
+  #
+  # @param ballot_data [Array<Hash>] array of { rankings: [ids...] }
+  # @param seats [Integer] number of seats to fill
+  # @param initial_quota [Numeric] initial droop quota
+  # @param investment_titles [Hash{Integer=>String}] candidate id => title
+  # @param dynamic_quota_enabled [Boolean]
+  # @return [Result]
+  def calculate(ballot_data, seats, initial_quota, investment_titles, dynamic_quota_enabled: false)
+    reset_state
+    @investment_titles = investment_titles
+    @seats = seats
+    @dynamic_quota = dynamic_quota_enabled
 
-  # Initialize a hash to store vote history
-  vote_history = Hash.new { |h, k| h[k] = [] }
-
-
-  # --- 2. Calculation Loop ---
-  loop do
-    sorted_investments = initial_vote_counts.sort_by { |_, count| -count }
-    if sorted_investments.empty? || empty_seats <= 0
-      break
+    # Copy ballots so we never mutate the caller's data.
+    @ballots = ballot_data.map do |vote|
+      Ballot.new(
+        rankings: vote[:rankings].dup,
+        current_value: 1.0,
+        current_candidate: vote[:rankings].first,
+        exhausted: false
+      )
     end
-    # 1. Determine the quota and calculation details for this round first.
-  current_quota, quota_calc_details = if dynamic_quota_enabled && empty_seats > 0
-    remaining_votes = initial_vote_counts.values.sum
-    new_quota = (remaining_votes / (empty_seats + 1)).floor + 1
-    calculation_details = { votes: remaining_votes, seats: empty_seats }
-    [new_quota, calculation_details]
-  else
-    [quota, nil]
+
+    @first_preference_votes = Hash.new(0.0)
+    @ballots.each do |b|
+      @first_preference_votes[b.current_candidate] += 1.0 if b.current_candidate
+    end
+
+    @active_candidates = investment_titles.keys
+    @empty_seats = seats
+    @iteration = 1
+    @current_quota = initial_quota
+
+    run_loop
+
+    Result.new(
+      winners: @elected_investments,
+      elimination_log: @elimination_log,
+      unfilled_seats: @empty_seats,
+      rounds: @rounds_data,
+      exhausted_total: @exhausted_total
+    )
   end
 
-  # 2. Now, create the hash for the round's log with all the correct data.
-  current_round_data = {
-    iteration: iteration,
-    quota: current_quota,
-    quota_calculation: quota_calc_details,
-    standings: sorted_investments,
-    action: nil
-  }    
+  private
 
-    elected_in_round = sorted_investments.select { |_, count| count >= current_quota }
+    def reset_state
+      @elected_investments = []
+      @eliminated_investments = []
+      @elimination_log = []
+      @rounds_data = []
+      @exhausted_total = 0.0
+      @history = Hash.new { |h, k| h[k] = [] } # candidate_id => [totals per round]
+    end
 
-    if elected_in_round.present?
-      election_details = []
-      elected_in_round.each do |investment_id, count|
-        break if empty_seats <= 0
-        @elected_investments << investment_id
-        title = investment_titles[investment_id]
-        surplus = count - current_quota
+    def run_loop
+      loop do
+        update_dynamic_quota
 
-        reallocated_votes = transfer_surplus_votes(ballot_data, investment_id)
-        if surplus > 0 && reallocated_votes.any?
-          ratio = surplus.to_f / reallocated_votes.size
-          reallocated_votes.each do |id|
-            initial_vote_counts[id] += ratio if initial_vote_counts.key?(id)
+        totals = tally_candidates
+
+        # Record the current totals into history (for tie-breaking).
+        totals.each { |id, total| @history[id] << total }
+
+        candidates_over_quota = totals.select { |_, total| total >= @current_quota }
+
+        if candidates_over_quota.any?
+          handle_election(candidates_over_quota, totals)
+        else
+          handle_elimination(totals)
+        end
+
+        break if @empty_seats <= 0
+        break if @active_candidates.size <= @empty_seats
+        @iteration += 1
+      end
+
+      auto_elect_remaining if @empty_seats > 0 && @active_candidates.any?
+    end
+
+    # ------------------------------------------------------------------
+    # Quota / tallying
+    # ------------------------------------------------------------------
+
+    def update_dynamic_quota
+      return unless @dynamic_quota && @iteration > 1
+
+      total_active_value = @ballots.sum { |b| b.exhausted ? 0.0 : b.current_value }
+      @current_quota = droop_quota(total_active_value, @empty_seats)
+    end
+
+    def droop_quota(total_value, seats)
+      return 0 if seats <= 0
+      (total_value / (seats + 1)).floor + 1
+    end
+
+    def tally_candidates
+      totals = Hash.new(0.0)
+      @active_candidates.each { |id| totals[id] = 0.0 }
+      @ballots.each do |b|
+        next if b.exhausted
+        next unless @active_candidates.include?(b.current_candidate) # ← ADD THIS
+        totals[b.current_candidate] += b.current_value
+      end
+      totals
+    end
+
+    # ------------------------------------------------------------------
+    # Election (surplus transfer)
+    # ------------------------------------------------------------------
+
+    def handle_election(candidates_over_quota, totals)
+      # Sort deterministically: highest total first, tie-break by id ascending.
+      ordered = candidates_over_quota.sort_by { |id, total| [-total, id] }
+      elected_id, elected_total = ordered.first
+
+      surplus = elected_total - @current_quota
+      title = @investment_titles[elected_id]
+
+      @elected_investments << elected_id
+      @active_candidates.delete(elected_id)
+      @empty_seats -= 1
+
+      action = {
+        type: :election,
+        title: title,
+        candidate_id: elected_id,
+        count: elected_total,
+        surplus: [surplus, 0].max
+      }
+
+      if surplus > 0 && @empty_seats > 0
+        transfer_fraction = surplus.to_f / elected_total
+        ballots_to_transfer = @ballots.select do |b|
+          !b.exhausted && b.current_candidate == elected_id
+        end
+
+        ballots_to_transfer.each do |ballot|
+          ballot.current_value *= transfer_fraction
+          advance_ballot(ballot)
+        end
+      end
+
+      log_round(totals, action, transfers: { type: :surplus, candidate_id: elected_id, amount: surplus })
+    end
+
+    # ------------------------------------------------------------------
+    # Elimination (no surplus; ballots keep their current value)
+    # ------------------------------------------------------------------
+
+    def handle_elimination(totals)
+      min_votes = totals.values.min
+      tied = totals.select { |_, v| v == min_votes }
+
+      eliminated_id, tie_break_info = if tied.size > 1
+                                        result = resolve_scottish_tie(tied.keys)
+                                        [result[:id], result]
+                                      else
+                                        [tied.keys.first, nil]
+                                      end
+
+      eliminated_votes = totals[eliminated_id]
+      title = @investment_titles[eliminated_id] || "Unknown"
+
+      @elimination_log << {
+        round: @iteration,
+        title: title,
+        id: eliminated_id,
+        votes: eliminated_votes
+      }
+
+      @eliminated_investments << eliminated_id
+      @active_candidates.delete(eliminated_id)
+
+      action = {
+        type: :elimination,
+        title: title,
+        candidate_id: eliminated_id,
+        count: eliminated_votes
+      }
+      action[:tie_break_message] = format_tie_break_message(tie_break_info) if tie_break_info
+
+      ballots_to_transfer = @ballots.select do |b|
+        !b.exhausted && b.current_candidate == eliminated_id
+      end
+
+      before_exhausted = @exhausted_total
+      ballots_to_transfer.each { |b| advance_ballot(b) }
+      exhausted_this_round = @exhausted_total - before_exhausted
+
+      action[:exhausted_value] = exhausted_this_round
+
+      log_round(totals, action, transfers: { type: :elimination, candidate_id: eliminated_id, amount: eliminated_votes })
+    end
+
+    # ------------------------------------------------------------------
+    # Ballot advance / exhaustion
+    # ------------------------------------------------------------------
+
+    def advance_ballot(ballot)
+      skip = @elected_investments + @eliminated_investments
+      next_pref = ballot.rankings.find { |id| !skip.include?(id) }
+
+      if next_pref
+        ballot.current_candidate = next_pref
+      else
+        ballot.exhausted = true
+        ballot.current_candidate = nil
+        @exhausted_total += ballot.current_value
+      end
+    end
+
+    # ------------------------------------------------------------------
+    # Auto-election of remaining candidates
+    # ------------------------------------------------------------------
+
+    def auto_elect_remaining
+      @active_candidates.dup.each do |id|
+        break if @empty_seats <= 0
+        @elected_investments << id
+        @empty_seats -= 1
+
+        action = {
+          type: :auto_election,
+          title: @investment_titles[id],
+          candidate_id: id,
+          count: 0
+        }
+        log_round({ id => 0.0 }, action, transfers: {})
+      end
+    end
+
+    # ------------------------------------------------------------------
+    # Scottish STV tie-breaking
+    # ------------------------------------------------------------------
+
+    def resolve_scottish_tie(tied_ids)
+      # Rule 1: Compare previous rounds' totals (most recent first).
+      last_round = (@history[tied_ids.first] || []).size - 2 # exclude current round
+      if last_round >= 0
+        last_round.downto(0) do |idx|
+          comparison = tied_ids.each_with_object({}) { |id, h| h[id] = @history[id][idx] }
+          min = comparison.values.min
+          at_min = comparison.select { |_, v| v == min }.keys
+          if at_min.size == 1
+            return {
+              id: at_min.first,
+              reason: :previous_round,
+              details: { round: idx + 1, comparison: comparison }
+            }
           end
         end
-
-        election_details << { id: investment_id, title: title, count: count, surplus: surplus }
-        empty_seats -= 1
-        initial_vote_counts.delete(investment_id)
-      end
-      current_round_data[:action] = { type: :election, details: election_details }
-    else
-      # --- Elimination Logic ---
-      min_votes = sorted_investments.last[1]
-      tied_candidates = sorted_investments.select { |_, count| count == min_votes }
-      elimination_details = {}
-      
-      if tied_candidates.size > 1
-        # A tie has occurred, call the new tie-breaking method
-          tied_ids = tied_candidates.map { |id, _| id }
-          tie_break_result = resolve_scottish_tie(tied_ids, vote_history, first_preference_votes)
-          eliminated_id = tie_break_result[:id]
-          
-          # Log the reason for the report
-          elimination_details[:tie_break_message] = format_tie_break_message(tie_break_result, investment_titles)
-      else
-        # No tie
-        eliminated_id = tied_candidates.first[0]
       end
 
-      # FIX 1: Get the vote count from the main hash, not the old variable.
-      eliminated_votes = initial_vote_counts[eliminated_id]
-      eliminated_title = investment_titles[eliminated_id] || "Unknown Candidate"
-      
-      # Update state
-      @elimination_log << { round: iteration, title: eliminated_title, id: eliminated_id, votes: eliminated_votes }
-      @eliminated_investments << eliminated_id
-      initial_vote_counts.delete(eliminated_id)
-
-      # Transfer votes
-      transfer_result = transfer_eliminated_votes(ballot_data, eliminated_id)
-      reallocated_votes = transfer_result[:reallocated]
-      exhausted_count = transfer_result[:exhausted]
-
-      reallocated_votes.each do |id|
-        initial_vote_counts[id] += 1 if initial_vote_counts.key?(id)
+      # Rule 2: First-preference totals.
+      comparison = tied_ids.each_with_object({}) { |id, h| h[id] = @first_preference_votes[id] }
+      min = comparison.values.min
+      at_min = comparison.select { |_, v| v == min }.keys
+      if at_min.size == 1
+        return {
+          id: at_min.first,
+          reason: :first_preference,
+          details: { comparison: comparison }
+        }
       end
-      
-      # FIX 2: Removed a redundant `.merge!` call and simplified this assignment.
-      elimination_details.merge!({
-        id: eliminated_id,
-        title: eliminated_title,
-        count: eliminated_votes,
-        reallocated_count: reallocated_votes.size,
-        exhausted_count: exhausted_count
-      })
-      current_round_data[:action] = { type: :elimination, details: elimination_details }
+
+      # Rule 3: Random lot.
+      {
+        id: at_min.sample,
+        reason: :random_lot,
+        details: { tied_candidates: at_min }
+      }
     end
 
-    rounds_log << current_round_data
-    iteration += 1
-  end
+    def format_tie_break_message(info)
+      return nil unless info
 
-  # --- 3. Final Result ---
-  Result.new(
-    winners: @elected_investments,
-    elimination_log: @elimination_log,
-    unfilled_seats: seats - @elected_investments.size,
-    rounds: rounds_log
-  )
-end
-
-  
-  private
-  
-  def format_tie_break_message(tie_break_result, investment_titles)
-  details = tie_break_result[:details]
-  
-  case tie_break_result[:reason]
-  when :previous_round
-    comparison_text = details[:comparison].map do |id, count|
-      "#{investment_titles[id]}: #{count.round(2)}"
-    end.join(', ')
-    "Tie resolved by checking votes from Round #{details[:round]}. Counts were: #{comparison_text}."
-  when :first_preference
-    comparison_text = details[:comparison].map do |id, count|
-      "#{investment_titles[id]}: #{count.round(2)}"
-    end.join(', ')
-    "Tie resolved by checking original first preference votes. Counts were: #{comparison_text}."
-  when :random_lot
-    tied_names = details[:tied_candidates].map { |id| investment_titles[id] }.join(', ')
-    "Tie could not be resolved by vote counts. A random draw was used to select a candidate for elimination from: #{tied_names}."
-  end
-  end
-  
-  def resolve_scottish_tie(tied_ids, vote_history, first_preference_votes)
-  # Rule 1: Check previous rounds' votes.
-  last_round_index = (vote_history[tied_ids.first] || []).size - 1
-  if last_round_index >= 0
-    (last_round_index).downto(0) do |round_idx|
-      comparison = tied_ids.each_with_object({}) { |id, h| h[id] = vote_history[id][round_idx] }
-      min_past_vote = comparison.values.min
-      candidates_at_min = comparison.keys.filter { |id| comparison[id] == min_past_vote }
-      
-      if candidates_at_min.size == 1
-        return { id: candidates_at_min.first, reason: :previous_round, 
-                 details: { round: round_idx + 1, comparison: comparison } }
+      case info[:reason]
+      when :previous_round
+        counts = info[:details][:comparison].map { |id, v| "#{@investment_titles[id]}: #{v.round(2)}" }.join(", ")
+        "Tie resolved by votes at Round #{info[:details][:round]} (#{counts})."
+      when :first_preference
+        counts = info[:details][:comparison].map { |id, v| "#{@investment_titles[id]}: #{v.round(2)}" }.join(", ")
+        "Tie resolved by first-preference votes (#{counts})."
+      when :random_lot
+        names = info[:details][:tied_candidates].map { |id| @investment_titles[id] }.join(", ")
+        "Tie could not be resolved; random lot applied to: #{names}."
       end
     end
-  end
 
-  # Rule 2: Check first preference votes.
-  comparison = tied_ids.each_with_object({}) { |id, h| h[id] = first_preference_votes[id] }
-  min_first_pref = comparison.values.min
-  candidates_at_min_first_pref = comparison.keys.filter { |id| comparison[id] == min_first_pref }
-  
-  if candidates_at_min_first_pref.size == 1
-    return { id: candidates_at_min_first_pref.first, reason: :first_preference, 
-             details: { comparison: comparison } }
-  end
+    # ------------------------------------------------------------------
+    # Round logging
+    # ------------------------------------------------------------------
 
-  # Rule 3: Decide by lot.
-  { id: candidates_at_min_first_pref.sample, reason: :random_lot, 
-    details: { tied_candidates: candidates_at_min_first_pref } }
-  end
-   
-  def transfer_eliminated_votes(ballot_data, eliminated_investment_id)
-    reallocated_votes = []
-    exhausted_count = 0
-    ballot_data.each do |vote|
-      if vote[:rankings].first == eliminated_investment_id
-        vote[:rankings].shift
-        next_preference = vote[:rankings].find { |id| !elected_or_eliminated?(id) }
-        if next_preference
-          reallocated_votes << next_preference
-        else
-          exhausted_count += 1
-        end
-      end
+    def log_round(totals, action, transfers:)
+      @rounds_data << {
+        iteration: @iteration,
+        quota: @current_quota,
+        standings: totals.sort_by { |id, total| [-total, id] }.to_h,
+        action: action,
+        transfers: transfers,
+        exhausted_total: @exhausted_total
+      }
     end
-    # Return a hash with both sets of data
-    { reallocated: reallocated_votes, exhausted: exhausted_count }
-  end
-  
-  def transfer_surplus_votes(ballot_data, elected_investment_id)
-    surplus_contributing_ballots = []
-    ballot_data.each do |vote|
-      if vote[:rankings].first == elected_investment_id
-        vote[:rankings].shift
-        next_preference = vote[:rankings].find { |id| !elected_or_eliminated?(id) }
-        surplus_contributing_ballots << next_preference if next_preference
-      end
-    end
-    surplus_contributing_ballots
-  end
-
-  def elected_or_eliminated?(investment_id)
-    @elected_investments.include?(investment_id) || @eliminated_investments.include?(investment_id)
-  end
 end

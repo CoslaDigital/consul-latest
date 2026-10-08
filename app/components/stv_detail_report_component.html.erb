@@ -1,47 +1,52 @@
 <%# app/components/stv_detail_report_component.html.erb %>
+
 <h1>Detailed Election Log</h1>
 <hr>
 
 <% @rounds.each do |round| %>
-  <br><h2>Round <%= round[:iteration] || round[:number] %>:</h2>
+  <h2>Round <%= round[:iteration] %>:</h2>
   <p>Quota to be elected: <%= round[:quota] %></p>
+  <p><em>Total Exhausted Value: <%= round[:exhausted_total].round(3) %></em></p>
 
   <p><strong>Current Standings:</strong></p>
   <table>
     <thead><tr><th>Candidate</th><th>Votes</th></tr></thead>
     <tbody>
-    <% round[:standings].each do |id, count| %>
+    <% round[:standings].each do |id, total| %>
       <tr>
         <td><%= @investment_titles[id] || "Unknown" %> (<%= id %>)</td>
-        <td><%= count.to_f.round(2) %></td>
+        <td><%= total.round(3) %></td>
       </tr>
     <% end %>
     </tbody>
   </table>
-  <br>
 
-  <% if round[:action].is_a?(Hash) %>
-    <% if round[:action][:type] == :election %>
-      <strong>Action: Candidate Elected</strong>
-      <p style="margin-left: 20px;">
-        ✅ <strong>Elected: <%= round[:action][:title] %> (<%= round[:action][:candidate_id] %>)</strong>
-        with <%= round[:action][:count].to_f.round(2) %> votes.
+  <% action = round[:action] %>
+  <% if action.present? %>
+    <% case action[:type] %>
+<% when :election %>
+      <p><strong>Action:</strong> ✅
+        <%= action[:title] %> elected with <%= action[:count].round(3) %> votes
+        <% if action[:surplus].to_f > 0 %>
+          (surplus: <%= action[:surplus].round(3) %>)
+        <% end %>
       </p>
-    <% elsif round[:action][:type] == :elimination %>
-      <strong>Action: Candidate Eliminated</strong>
-      <p style="margin-left: 20px;">
-        ❌ <strong>Eliminated: <%= round[:action][:title] %> (<%= round[:action][:candidate_id] %>)</strong>
-        with <%= round[:action][:count].to_f.round(2) %> votes.
+    <% when :elimination %>
+      <p><strong>Action:</strong> ❌
+        <%= action[:title] %> eliminated with <%= action[:count].round(3) %> votes.
       </p>
-    <% elsif round[:action][:type] == :auto_election %>
-      <strong>Action: Candidate Auto-Elected</strong>
-      <p style="margin-left: 20px;">
-        ✅ <strong>Elected: <%= round[:action][:title] %> (<%= round[:action][:candidate_id] %>)</strong>
-        (Automatically elected to fill remaining seat)
+      <% if action[:tie_break_message] %>
+        <p style="color:#c00;"><em><%= action[:tie_break_message] %></em></p>
+      <% end %>
+      <% if action[:exhausted_value].to_f > 0 %>
+        <p><em><%= action[:exhausted_value].round(3) %> vote value became exhausted.</em></p>
+      <% end %>
+    <% when :auto_election %>
+      <p><strong>Action:</strong> ⚙️
+        <%= action[:title] %> auto-elected to fill remaining seat.
       </p>
     <% end %>
-  <% else %>
-    <p><strong><%= round[:action] %></strong></p>
   <% end %>
+
   <hr>
 <% end %>

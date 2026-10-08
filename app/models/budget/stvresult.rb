@@ -1,3 +1,5 @@
+# app/models/budget/stvresult.rb
+
 class Budget
   class Stvresult
     attr_accessor :budget, :heading, :user
@@ -8,13 +10,8 @@ class Budget
       @user = user
       @log_file_name = "stv_voting_#{budget.name}_#{heading.name}.log"
 
-      # Initialize/clear the log file
-      log_path = Rails.root.join('log', @log_file_name)
-      File.open(log_path, 'w') {}
-    end
-
-    def droop_quota(total_value, seats)
-      (total_value / (seats + 1)).floor + 1
+      log_path = Rails.root.join("log", @log_file_name)
+      File.open(log_path, "w") {}
     end
 
     def calculate_stv_winners
@@ -25,15 +22,14 @@ class Budget
       summary_title = "Election Results: #{@budget.name}"
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
-      seats = @heading.respond_to?(:effective_max_winners) ? @heading.effective_max_winners.to_i : @heading.max_winners.to_i
+      seats = heading_seats
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
       investment_titles = candidates.pluck(:id, :title).to_h
 
-      # Uses your proven extraction method
       ballot_data = get_votes_data
       votes_cast = ballot_data.size
 
-      if seats <= 0 || votes_cast == 0 || candidates.empty?
+      if seats <= 0 || votes_cast.zero? || candidates.empty?
         write_to_output("<h2>Election Aborted</h2><p>Missing seats, ballots, or candidates.</p>")
         return []
       end
@@ -41,7 +37,6 @@ class Budget
       initial_quota = droop_quota(votes_cast.to_f, seats)
       dynamic_quota_enabled = @budget.respond_to?(:stv_dynamic_quota?) && @budget.stv_dynamic_quota?
 
-      # 1. Wire directly into your external StvCalculator class
       calculator = StvCalculator.new
       result = calculator.calculate(
         ballot_data,
@@ -51,110 +46,101 @@ class Budget
         dynamic_quota_enabled: dynamic_quota_enabled
       )
 
-      # -----------------------------------------------------------------------
-      # 2. CRITICAL TRANSLATOR FIX:
-      # The StvDetailReportComponent expects a simple flat structure.
-      # StvCalculator nests metadata under :details. This maps them perfectly!
-      # -----------------------------------------------------------------------
-      mapped_rounds = result.rounds.map do |round|
-        action = round[:action]
-        if action && action[:details]
-          if action[:type] == :election
-            # Safely handle multiple elected candidates in a single round
-            first_elected = action[:details].first || {}
-            action[:title] = action[:details].map { |d| d[:title] }.join(" & ")
-            action[:candidate_id] = first_elected[:id]
-            action[:count] = first_elected[:count]
-            action[:surplus] = first_elected[:surplus]
-          elsif action[:type] == :elimination
-            action[:title] = action[:details][:title]
-            action[:candidate_id] = action[:details][:id]
-            action[:count] = action[:details][:count]
-          end
-        end
-        # Ensure standings is formatted as a Hash for the Component
-        round[:standings] = round[:standings].to_h if round[:standings].is_a?(Array)
-        round
-      end
-
-      result.rounds = mapped_rounds
-
       write_to_output("✅ STV Calculation Completed. #{result.winners.size} winners found.")
 
-      # 3. Render Reports
-      summary_html_report = ApplicationController.render(
-        StvSummaryReportComponent.new(
-          result: result,
-          budget: @budget,
-          heading: @heading,
-          candidates: candidates,
-          votes_cast: votes_cast,
-          quota: initial_quota,
-          report_title: summary_title,
-          detail_page_slug: detail_slug,
-          dynamic_quota_enabled: dynamic_quota_enabled
-        ),
-        layout: false
-      )
-
-      detailed_html_report = ApplicationController.render(
-        StvDetailReportComponent.new(
-          rounds: result.rounds,
-          investment_titles: investment_titles,
-          dynamic_quota_enabled: dynamic_quota_enabled
-        ),
-        layout: false
-      )
-
-      pdf_html_content = ApplicationController.render(
-        template: "budgets/results/stv_report_pdf",
-        layout: "pdf",
-        assigns: {
-          budget: @budget,
-          heading: @heading,
-          result: result,
-          candidates: candidates,
-          votes_cast: votes_cast,
-          quota: initial_quota,
-          investment_titles: investment_titles
-        }
-      )
-
-      pdf_file = WickedPdf.new.pdf_from_string(pdf_html_content)
-      document_title = "STV Full Report: #{@heading.name}"
-
-      @heading.documents.where(title: document_title).destroy_all
-
-      @heading.documents.create!(
-        title: document_title,
-        user: @user,
-        attachment: {
-          io: StringIO.new(pdf_file),
-          filename: "stv_report_#{@budget.slug}_#{@heading.slug}.pdf",
-          content_type: "application/pdf"
-        }
-      )
+      render_and_attach_reports(result, candidates, votes_cast, initial_quota, investment_titles,
+                                summary_title, summary_slug, detail_title, detail_slug,
+                                dynamic_quota_enabled)
 
       update_winning_investments(result.winners)
-      update_custom_page(summary_html_report, summary_title, summary_slug)
-      update_custom_page(detailed_html_report, detail_title, detail_slug)
-
       result.winners
     end
 
     private
 
+      def heading_seats
+        if @heading.respond_to?(:effective_max_winners)
+          @heading.effective_max_winners.to_i
+        else
+          @heading.max_winners.to_i
+        end
+      end
+
+      def droop_quota(total_value, seats)
+        return 0 if seats <= 0
+        (total_value / (seats + 1)).floor + 1
+      end
+
+      def render_and_attach_reports(result, candidates, votes_cast, quota, investment_titles,
+                                    summary_title, summary_slug, detail_title, detail_slug,
+                                    dynamic_quota_enabled)
+        summary_html = ApplicationController.render(
+          StvSummaryReportComponent.new(
+            result: result,
+            budget: @budget,
+            heading: @heading,
+            candidates: candidates,
+            votes_cast: votes_cast,
+            quota: quota,
+            report_title: summary_title,
+            detail_page_slug: detail_slug,
+            dynamic_quota_enabled: dynamic_quota_enabled
+          ),
+          layout: false
+        )
+
+        detail_html = ApplicationController.render(
+          StvDetailReportComponent.new(
+            rounds: result.rounds,
+            investment_titles: investment_titles,
+            dynamic_quota_enabled: dynamic_quota_enabled
+          ),
+          layout: false
+        )
+
+        pdf_html = ApplicationController.render(
+          template: "budgets/results/stv_report_pdf",
+          layout: "pdf",
+          assigns: {
+            budget: @budget,
+            heading: @heading,
+            result: result,
+            candidates: candidates,
+            votes_cast: votes_cast,
+            quota: quota,
+            investment_titles: investment_titles
+          }
+        )
+
+        pdf_file = WickedPdf.new.pdf_from_string(pdf_html)
+        document_title = "STV Full Report: #{@heading.name}"
+
+        @heading.documents.where(title: document_title).destroy_all
+        @heading.documents.create!(
+          title: document_title,
+          user: @user,
+          attachment: {
+            io: StringIO.new(pdf_file),
+            filename: "stv_report_#{@budget.slug}_#{@heading.slug}.pdf",
+            content_type: "application/pdf"
+          }
+        )
+
+        update_custom_page(summary_html, summary_title, summary_slug)
+        update_custom_page(detail_html, detail_title, detail_slug)
+      end
+
       def get_ballots
         @budget.ballots
       end
 
-      # Your proven database extraction method from Reference 2
       def get_votes_data(ballots = get_ballots)
         ballot_ids = ballots.pluck(:id)
 
-        all_lines = Budget::Ballot::Line.where(ballot_id: ballot_ids, heading_id: @heading.id)
-                                        .order(:position)
-                                        .select(:ballot_id, :investment_id)
+        all_lines = Budget::Ballot::Line
+                      .where(ballot_id: ballot_ids, heading_id: @heading.id)
+                      .order(:position)
+                      .select(:ballot_id, :investment_id)
 
         lines_by_ballot = all_lines.group_by(&:ballot_id)
 
@@ -170,8 +156,8 @@ class Budget
       def update_winning_investments(winning_investment_ids)
         ids = winning_investment_ids.to_a
         return if ids.empty?
-        investments = Budget::Investment.unscoped.where(id: ids)
-        investments.each do |investment|
+
+        Budget::Investment.unscoped.where(id: ids).each do |investment|
           investment.class.without_auditing { investment.update!(winner: true) }
           investment.reload
         end
@@ -179,7 +165,7 @@ class Budget
 
       def update_custom_page(html_content, page_title, page_slug)
         page = SiteCustomization::Page.find_or_initialize_by(slug: page_slug)
-        page.update(status: 'published', title: page_title, content: html_content)
+        page.update(status: "published", title: page_title, content: html_content)
       end
 
       def candidates
@@ -192,14 +178,14 @@ class Budget
 
       def reset_winners
         candidates.update_all(winner: false)
-        if Budget::Investment.column_names.include?('votes')
+        if Budget::Investment.column_names.include?("votes")
           candidates.update_all(votes: 0)
         end
       end
 
       def write_to_output(message)
-        log_path = Rails.root.join('log', @log_file_name)
-        File.open(log_path, 'a') { |file| file.puts(message) }
+        log_path = Rails.root.join("log", @log_file_name)
+        File.open(log_path, "a") { |file| file.puts(message) }
       end
   end
 end
