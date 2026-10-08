@@ -36,10 +36,17 @@ class StvDetailReportComponent < ViewComponent::Base
   end
 
   # Status label for a standings row.
+  # Status label for a standings row.
+  # Marks every candidate at quota, and every candidate tied for the lowest total.
   def status_for(round, candidate_id)
     total = round[:standings][candidate_id]
-    return "✓ At quota" if total && total >= round[:quota]
-    return "⚠ Lowest" if candidate_id == lowest_candidate_id(round)
+    return "" if total.nil?
+
+    return "✓ At quota" if total >= round[:quota]
+
+    min_votes = round[:standings].values.min
+    return "⚠ Lowest" if total == min_votes
+
     ""
   end
 

@@ -235,9 +235,25 @@ class StvCalculator
       end
     end
 
+    # ------------------------------------------------------------------
+    # Auto-election of remaining candidates
+    # ------------------------------------------------------------------
+
     def auto_elect_remaining
+      return if @active_candidates.empty?
+
       @active_candidates.dup.each do |id|
         break if @empty_seats <= 0
+        next if @elected_investments.include?(id)
+
+        # Build the real current tally so the round reflects the true state.
+        round_totals = tally_candidates
+        current_votes = round_totals[id] || 0.0
+
+        # Advance the round counter so this appears as a new round,
+        # not as a duplicate of the last elimination round.
+        @iteration += 1
+
         @elected_investments << id
         @empty_seats -= 1
 
@@ -245,9 +261,10 @@ class StvCalculator
           type: :auto_election,
           title: @investment_titles[id],
           candidate_id: id,
-          count: 0
+          count: current_votes
         }
-        log_round({ id => 0.0 }, action, transfers: {})
+
+        log_round(round_totals, action, transfers: {})
       end
     end
 
@@ -298,7 +315,8 @@ class StvCalculator
         "Tie resolved by first-preference votes (#{counts})."
       when :random_lot
         names = info[:details][:tied_candidates].map { |id| @investment_titles[id] }.join(", ")
-        "Tie could not be resolved; random lot applied to: #{names}."
+        "Tie could not be resolved by previous rounds or first-preference counts; " \
+          "random lot applied to: #{names}."
       end
     end
 
