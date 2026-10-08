@@ -366,15 +366,10 @@ RSpec.describe StvCalculator do
   end
 
   # ==================================================================
-  # Retained vote accounting (elected candidates)
+  # Retained vote accounting is a view concern, not a calculator concern
   # ==================================================================
-  describe "retained vote accounting" do
-    it "accounts for retained votes from elected candidates" do
-      # A=10, B=5, C=3, D=2, seats=2, quota = floor(20/3) + 1 = 7
-      # Round 1: A=10 >= 7 -> A elected with surplus 3, retained = 7, transferred = 3.
-      #          10 A-ballots go to B at 3/10 = 0.3 each. B gets 3.0 -> B = 8.
-      # Round 2: B=8 >= 7 -> B elected with surplus 1, retained = 7, transferred = 1.
-      # Both seats filled.
+  describe "retained vote accounting (calculator)" do
+    it "does not include retained_total in round data" do
       ballots = ballot_tally(
         [10, [1, 2]],
         [5, [2, 1]],
@@ -383,39 +378,8 @@ RSpec.describe StvCalculator do
       )
       result = calculator.calculate(ballots, 2, 7, { 1 => "A", 2 => "B", 3 => "C", 4 => "D" })
 
-      # Every round's retained_total should be present
       result.rounds.each do |round|
-        expect(round).to have_key(:retained_total)
-      end
-
-      # In round 1 (before A elected), retained = 0
-      round1 = result.rounds.find { |r| r[:iteration] == 1 }
-      expect(round1[:retained_total]).to eq(0.0)
-
-      # After A is elected, retained should equal quota
-      round2 = result.rounds.find { |r| r[:iteration] == 2 }
-      expect(round2[:retained_total]).to be_within(0.001).of(7.0)
-    end
-
-    it "vote accounting balances every round (active + retained + exhausted = total cast)" do
-      ballots = ballot_tally(
-        [8, [1, 2, 3]],
-        [5, [2, 3]],
-        [2, [3, 1]]
-      )
-      # 15 ballots, seats=2, quota = floor(15/3) + 1 = 6
-      result = calculator.calculate(ballots, 2, 6, { 1 => "A", 2 => "B", 3 => "C" })
-      total_cast = 15.0
-
-      result.rounds.each do |round|
-        active = round[:standings].values.sum
-        retained = round[:retained_total].to_f
-        exhausted = round[:exhausted_total].to_f
-
-        expect(active + retained + exhausted).to be_within(0.001).of(total_cast),
-                                                 "Round #{round[:iteration]} failed: " \
-                                                   "active=#{active}, retained=#{retained}, exhausted=#{exhausted}, " \
-                                                   "sum=#{active + retained + exhausted}, expected #{total_cast}"
+        expect(round).not_to have_key(:retained_total)
       end
     end
   end
@@ -428,7 +392,7 @@ RSpec.describe StvCalculator do
 
     it "each round has the expected keys" do
       result.rounds.each do |round|
-        expect(round).to include(:iteration, :quota, :standings, :action, :transfers, :exhausted_total, :retained_total)
+        expect(round).to include(:iteration, :quota, :standings, :action, :transfers, :exhausted_total)
         expect(round[:standings]).to be_a(Hash)
       end
     end

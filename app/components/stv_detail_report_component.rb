@@ -60,16 +60,33 @@ class StvDetailReportComponent < ViewComponent::Base
     round.dig(:transfers, :to) || {}
   end
 
-  # Vote value retained by already-elected candidates in this round.
-  # Elected candidates hold `quota` worth of votes; these are neither active
-  # (no longer part of the continuing count) nor exhausted.
-  def retained_total(round)
-    round[:retained_total] || 0.0
+  # Retained value for a given round: the quota-worth of votes held by each
+  # candidate elected in a *previous* round. These votes are no longer active
+  # (they've left the continuing count) but are not exhausted.
+  def retained_total_for(round, all_rounds)
+    round_index = all_rounds.index(round)
+    return 0.0 if round_index.nil? || round_index.zero?
+
+    previous_rounds = all_rounds[0...round_index]
+
+    previous_rounds.sum do |prev_round|
+      action = prev_round[:action]
+      next 0.0 unless action
+
+      case action[:type]
+      when :election
+        prev_round[:quota].to_f
+      when :auto_election
+        action[:count].to_f
+      else
+        0.0
+      end
+    end
   end
 
   # Active + retained + exhausted should always equal the total valid votes cast.
-  def grand_total(round)
-    active_total(round) + retained_total(round) + round[:exhausted_total].to_f
+  def grand_total(round, all_rounds)
+    active_total(round) + retained_total_for(round, all_rounds) + round[:exhausted_total].to_f
   end
 
 end
