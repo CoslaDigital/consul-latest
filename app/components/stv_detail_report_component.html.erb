@@ -127,7 +127,7 @@
           <em>
             Exhausted this round:
             <%= format_votes(action[:exhausted_value]) %>
-            (cumulative: <%= format_votes(round[:exhausted_total]) %>).
+            (cumulative: <%= format_votes(round[:exhausted_after_action]) %>).
           </em>
         </p>
       <% end %>

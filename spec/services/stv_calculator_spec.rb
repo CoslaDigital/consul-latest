@@ -454,5 +454,11 @@ RSpec.describe StvCalculator do
       expect(elim_round).not_to be_nil
       expect(elim_round[:action][:tie_break_message]).to match(/seed: \d+/)
     end
+    it "includes exhausted_after_action in each round" do
+      result = calculator.calculate(ballot_data, seats, quota, candidates)
+      result.rounds.each do |round|
+        expect(round).to have_key(:exhausted_after_action)
+      end
+    end
   end
 end

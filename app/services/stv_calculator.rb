@@ -360,7 +360,8 @@ class StvCalculator
         standings: totals.sort_by { |id, total| [-total, id] }.to_h,
         action: action,
         transfers: transfers,
-        exhausted_total: exhausted_at_round_start
+        exhausted_total: exhausted_at_round_start,
+        exhausted_after_action: @exhausted_total
       }
     end
 end
