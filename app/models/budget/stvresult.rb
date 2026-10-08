@@ -1,6 +1,6 @@
 class Budget
   class Stvresult
-    attr_accessor :budget, :heading, :current_investment
+    attr_accessor :budget, :heading, :user
 
     def initialize(budget, heading, user:)
       @budget = budget
@@ -13,6 +13,10 @@ class Budget
       File.open(log_path, 'w') {}
     end
 
+    def droop_quota(total_value, seats)
+      (total_value / (seats + 1)).floor + 1
+    end
+
     def calculate_stv_winners
       reset_winners
 
@@ -21,16 +25,11 @@ class Budget
       summary_title = "Election Results: #{@budget.name}"
       detail_title  = "Detailed Election Log: #{@budget.name}"
 
-      # Safely extract seats (guards against custom method names)
-      seats = if @heading.respond_to?(:effective_max_winners)
-                @heading.effective_max_winners.to_i
-              else
-                @heading.max_winners.to_i
-              end
-
+      seats = @heading.respond_to?(:effective_max_winners) ? @heading.effective_max_winners.to_i : @heading.max_winners.to_i
       candidates = @heading.investments.where(budget_id: @budget.id, selected: true)
       investment_titles = candidates.pluck(:id, :title).to_h
 
+      # Uses your proven extraction method
       ballot_data = get_votes_data
       votes_cast = ballot_data.size
 
@@ -39,10 +38,10 @@ class Budget
         return []
       end
 
-      # 1. Wire directly into the external StvCalculator class!
-      initial_quota = (votes_cast.to_f / (seats + 1)).floor + 1
+      initial_quota = droop_quota(votes_cast.to_f, seats)
       dynamic_quota_enabled = @budget.respond_to?(:stv_dynamic_quota?) && @budget.stv_dynamic_quota?
 
+      # 1. Wire directly into your external StvCalculator class
       calculator = StvCalculator.new
       result = calculator.calculate(
         ballot_data,
@@ -103,7 +102,7 @@ class Budget
         user: @user,
         attachment: {
           io: StringIO.new(pdf_file),
-          filename: "stv_report_#{@budget.id}_#{@heading.id}.pdf",
+          filename: "stv_report_#{@budget.slug}_#{@heading.slug}.pdf",
           content_type: "application/pdf"
         }
       )
@@ -115,33 +114,30 @@ class Budget
       result.winners
 
     rescue StandardError => e
-      # If it EVER crashes again, the log file will tell you exactly why instead of staying blank
       write_to_output("❌ CRASH ERROR: #{e.message}\n#{e.backtrace.join("\n")}")
       raise e
     end
 
     private
 
-      def get_votes_data
+      def get_ballots
+        @budget.ballots
+      end
+
+      # Your proven database extraction method from Reference 2
+      def get_votes_data(ballots = get_ballots)
+        ballot_ids = ballots.pluck(:id)
+
+        all_lines = Budget::Ballot::Line.where(ballot_id: ballot_ids, heading_id: @heading.id)
+                                        .order(:position)
+                                        .select(:ballot_id, :investment_id)
+
+        lines_by_ballot = all_lines.group_by(&:ballot_id)
+
         valid_ballots = []
-
-        # 3. Use ActiveRecord associations safely instead of hardcoded column names
-        @budget.ballots.includes(lines: :investment).find_each do |ballot|
-
-          # Filter lines by heading safely
-          heading_lines = ballot.lines.select do |line|
-            h_id = line.respond_to?(:budget_heading_id) ? line.budget_heading_id : line.heading_id
-            h_id == @heading.id
-          end
-
-          next if heading_lines.empty?
-
-          # Handle the 'position' column dynamically
-          heading_lines.sort_by! { |l| l.respond_to?(:position) ? l.position.to_i : l.preference.to_i }
-
-          # Pluck the IDs
-          rankings = heading_lines.map { |line| line.investment.id }
-          valid_ballots << { rankings: rankings }
+        ballot_ids.each do |id|
+          rankings = lines_by_ballot[id]&.map(&:investment_id) || []
+          valid_ballots << { rankings: rankings } if rankings.any?
         end
 
         valid_ballots
@@ -172,7 +168,6 @@ class Budget
 
       def reset_winners
         candidates.update_all(winner: false)
-        # Prevents crashing if the physical 'votes' column isn't present
         if Budget::Investment.column_names.include?('votes')
           candidates.update_all(votes: 0)
         end
