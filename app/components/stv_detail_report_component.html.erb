@@ -21,9 +21,9 @@
 
   <p><em>
     Active: <%= format_votes(active_total(round)) %> |
-    Retained (elected): <%= format_votes(retained_total(round)) %> |
+    Retained (elected): <%= format_votes(retained_total_for(round, @rounds)) %> |
     Exhausted: <%= format_votes(round[:exhausted_total]) %> |
-    <strong>Total: <%= format_votes(grand_total(round)) %></strong>
+    <strong>Total: <%= format_votes(grand_total(round, @rounds)) %></strong>
   </em></p>
 
   <p><strong>Current Standings (highest to lowest):</strong></p>

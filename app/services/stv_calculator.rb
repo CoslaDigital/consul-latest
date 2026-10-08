@@ -68,7 +68,6 @@ class StvCalculator
       @elimination_log = []
       @rounds_data = []
       @exhausted_total = 0.0
-      @retained_values = {}
       @history = Hash.new { |h, k| h[k] = [] }
     end
 
@@ -132,11 +131,6 @@ class StvCalculator
         @empty_seats -= 1
       end
       @active_candidates.delete(elected_id)
-
-      # Retain the elected candidate's ballot value for vote-accounting.
-      # Once elected, their ballots no longer count toward "active" but are
-      # not exhausted either — they are retained by the elected candidate.
-      @retained_values[elected_id] = elected_total
 
       transfer_fraction = (surplus > 0 && elected_total > 0) ? (surplus.to_f / elected_total) : nil
       transfers_to = Hash.new(0.0)
@@ -250,12 +244,9 @@ class StvCalculator
         break if @empty_seats <= 0
         next if @elected_investments.include?(id)
 
-        # Build the real current tally so the round reflects the true state.
         round_totals = tally_candidates
         current_votes = round_totals[id] || 0.0
 
-        # Advance the round counter so this appears as a new round,
-        # not as a duplicate of the last elimination round.
         @iteration += 1
 
         @elected_investments << id
@@ -271,6 +262,10 @@ class StvCalculator
         log_round(round_totals, action, transfers: {})
       end
     end
+
+    # ------------------------------------------------------------------
+    # Tie-breaking
+    # ------------------------------------------------------------------
 
     def resolve_scottish_tie(tied_ids)
       last_round = (@history[tied_ids.first] || []).size - 2
@@ -324,17 +319,18 @@ class StvCalculator
       end
     end
 
-    def log_round(totals, action, transfers:)
-      retained_sum = @retained_values.values.sum
+    # ------------------------------------------------------------------
+    # Round logging
+    # ------------------------------------------------------------------
 
+    def log_round(totals, action, transfers:)
       @rounds_data << {
         iteration: @iteration,
         quota: @current_quota,
         standings: totals.sort_by { |id, total| [-total, id] }.to_h,
         action: action,
         transfers: transfers,
-        exhausted_total: @exhausted_total,
-        retained_total: retained_sum
+        exhausted_total: @exhausted_total
       }
     end
 end
