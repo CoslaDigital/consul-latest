@@ -8,6 +8,7 @@
 #   - preserve fractional values across subsequent eliminations
 #   - track exhausted vote value (not just exhausted ballot counts)
 #
+require "zlib"
 class StvCalculator
   Result = Struct.new(
     :winners,
@@ -24,11 +25,12 @@ class StvCalculator
     # no state; safe to reuse
   end
 
-  def calculate(ballot_data, seats, initial_quota, investment_titles, dynamic_quota_enabled: false)
+  def calculate(ballot_data, seats, initial_quota, investment_titles, dynamic_quota_enabled: false, election_seed: nil)
     reset_state
     @investment_titles = investment_titles
     @seats = seats
     @dynamic_quota = dynamic_quota_enabled
+    @election_seed = election_seed || "default"
 
     @ballots = ballot_data.map do |vote|
       Ballot.new(
@@ -295,11 +297,16 @@ class StvCalculator
         }
       end
 
+      seed = Zlib.crc32([@election_seed, @iteration, at_min.sort].flatten.join("-"))
+      rng = Random.new(seed)
+      winner = at_min.sort.sample(random: rng)
+
       {
-        id: at_min.sample,
+        id: winner,
         reason: :random_lot,
-        details: { tied_candidates: at_min }
+        details: { tied_candidates: at_min, seed: seed }
       }
+
     end
 
     def format_tie_break_message(info)
@@ -314,8 +321,9 @@ class StvCalculator
         "Tie resolved by first-preference votes (#{counts})."
       when :random_lot
         names = info[:details][:tied_candidates].map { |id| @investment_titles[id] }.join(", ")
+        seed = info[:details][:seed]
         "Tie could not be resolved by previous rounds or first-preference counts; " \
-          "random lot applied to: #{names}."
+          "random lot applied to: #{names} (seed: #{seed})."
       end
     end
 

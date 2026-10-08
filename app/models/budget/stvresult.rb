@@ -38,8 +38,12 @@ class Budget
       dynamic_quota_enabled = @budget.respond_to?(:stv_dynamic_quota?) && @budget.stv_dynamic_quota?
 
       result = StvCalculator.new.calculate(
-        ballot_data, seats, initial_quota, investment_titles,
-        dynamic_quota_enabled: dynamic_quota_enabled
+        ballot_data,
+        seats,
+        initial_quota,
+        investment_titles,
+        dynamic_quota_enabled: dynamic_quota_enabled,
+        election_seed: "#{@budget.id}-#{@heading.id}"
       )
 
       write_to_output("✅ STV Calculation Completed. #{result.winners.size} winners found.")
