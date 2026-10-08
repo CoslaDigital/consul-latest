@@ -93,7 +93,8 @@ class Budget
           StvDetailReportComponent.new(
             rounds: result.rounds,
             investment_titles: investment_titles,
-            dynamic_quota_enabled: dynamic_quota_enabled
+            dynamic_quota_enabled: dynamic_quota_enabled,
+            heading: @heading
           ),
           layout: false
         )
