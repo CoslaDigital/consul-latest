@@ -152,11 +152,11 @@ RSpec.describe StvCalculator do
       # B = 1 + 15/7 = 22/7 ≈ 3.142857 (non-integer)
       # C = 1 + 6/7 = 13/7 ≈ 1.857 (non-integer)
       ballots = ballot_tally(
-        [5, [1, 2]], # A > B
-        [2, [1, 3]], # A > C
-        [1, [2, 1]], # B > A
-        [1, [3, 1]], # C > A
-        [1, [4, 3, 1]] # D > C > A
+        [5, [1, 2]],
+        [2, [1, 3]],
+        [1, [2, 1]],
+        [1, [3, 1]],
+        [1, [4, 3, 1]]
       )
       result = calculator.calculate(ballots, 2, 4, { 1 => "A", 2 => "B", 3 => "C", 4 => "D" })
 
@@ -164,7 +164,7 @@ RSpec.describe StvCalculator do
       non_integer = all_standings.select { |v| v > 0.0 && v != v.to_i }
       expect(non_integer).not_to be_empty
     end
-  end # ← MISSING END ADDED HERE
+  end
 
   # ==================================================================
   # Elimination transfer preserves value
@@ -195,9 +195,9 @@ RSpec.describe StvCalculator do
   describe "dynamic quota" do
     it "recalculates quota when ballots exhaust" do
       ballots = ballot_tally(
-        [5, [1]], # A only
-        [5, [2, 1]], # B > A
-        [3, [3, 2]] # C > B
+        [5, [1]],
+        [5, [2, 1]],
+        [3, [3, 2]]
       )
       result = calculator.calculate(
         ballots, 2, 4, { 1 => "A", 2 => "B", 3 => "C" },
@@ -343,6 +343,81 @@ RSpec.describe StvCalculator do
       auto_round = result.rounds.find { |r| r[:action]&.dig(:type) == :auto_election }
       expect(auto_round).not_to be_nil
     end
+
+    it "creates a distinct round for auto-election with the candidate's real tally" do
+      # A=2, B=1, seats=2, quota=2 -> A elected on first prefs, B auto-elected.
+      ballots = ballot_tally(
+        [2, [1, 2]],
+        [1, [2]]
+      )
+      result = calculator.calculate(ballots, 2, 2, { 1 => "A", 2 => "B" })
+
+      auto_round = result.rounds.find { |r| r[:action]&.dig(:type) == :auto_election }
+      expect(auto_round).not_to be_nil
+
+      # Auto-election should be its own round, distinct from any elimination.
+      elimination_rounds = result.rounds.select { |r| r[:action]&.dig(:type) == :elimination }
+      expect(auto_round[:iteration]).to be > elimination_rounds.map { |r| r[:iteration] }.max.to_i
+
+      # The round should show the candidate's real tally, not 0.
+      expect(auto_round[:standings][2]).to eq(1.0)
+      expect(auto_round[:action][:count]).to eq(1.0)
+    end
+  end
+
+  # ==================================================================
+  # Retained vote accounting (elected candidates)
+  # ==================================================================
+  describe "retained vote accounting" do
+    it "accounts for retained votes from elected candidates" do
+      # A=10, B=5, C=3, D=2, seats=2, quota = floor(20/3) + 1 = 7
+      # Round 1: A=10 >= 7 -> A elected with surplus 3, retained = 7, transferred = 3.
+      #          10 A-ballots go to B at 3/10 = 0.3 each. B gets 3.0 -> B = 8.
+      # Round 2: B=8 >= 7 -> B elected with surplus 1, retained = 7, transferred = 1.
+      # Both seats filled.
+      ballots = ballot_tally(
+        [10, [1, 2]],
+        [5, [2, 1]],
+        [3, [3, 1]],
+        [2, [4, 3]]
+      )
+      result = calculator.calculate(ballots, 2, 7, { 1 => "A", 2 => "B", 3 => "C", 4 => "D" })
+
+      # Every round's retained_total should be present
+      result.rounds.each do |round|
+        expect(round).to have_key(:retained_total)
+      end
+
+      # In round 1 (before A elected), retained = 0
+      round1 = result.rounds.find { |r| r[:iteration] == 1 }
+      expect(round1[:retained_total]).to eq(0.0)
+
+      # After A is elected, retained should equal quota
+      round2 = result.rounds.find { |r| r[:iteration] == 2 }
+      expect(round2[:retained_total]).to be_within(0.001).of(7.0)
+    end
+
+    it "vote accounting balances every round (active + retained + exhausted = total cast)" do
+      ballots = ballot_tally(
+        [8, [1, 2, 3]],
+        [5, [2, 3]],
+        [2, [3, 1]]
+      )
+      # 15 ballots, seats=2, quota = floor(15/3) + 1 = 6
+      result = calculator.calculate(ballots, 2, 6, { 1 => "A", 2 => "B", 3 => "C" })
+      total_cast = 15.0
+
+      result.rounds.each do |round|
+        active = round[:standings].values.sum
+        retained = round[:retained_total].to_f
+        exhausted = round[:exhausted_total].to_f
+
+        expect(active + retained + exhausted).to be_within(0.001).of(total_cast),
+                                                 "Round #{round[:iteration]} failed: " \
+                                                   "active=#{active}, retained=#{retained}, exhausted=#{exhausted}, " \
+                                                   "sum=#{active + retained + exhausted}, expected #{total_cast}"
+      end
+    end
   end
 
   # ==================================================================
@@ -353,7 +428,7 @@ RSpec.describe StvCalculator do
 
     it "each round has the expected keys" do
       result.rounds.each do |round|
-        expect(round).to include(:iteration, :quota, :standings, :action, :transfers, :exhausted_total)
+        expect(round).to include(:iteration, :quota, :standings, :action, :transfers, :exhausted_total, :retained_total)
         expect(round[:standings]).to be_a(Hash)
       end
     end
