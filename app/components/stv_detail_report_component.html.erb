@@ -1,21 +1,64 @@
 <%# app/components/stv_detail_report_component.html.erb %>
 
 <h1>Detailed Election Log</h1>
+<h2><%= @heading.name %></h2>
+<p><em>Single Transferable Vote count using the Weighted Inclusive Gregory Method</em></p>
 <hr>
 
-<% @rounds.each do |round| %>
-  <h2>Round <%= round[:iteration] %>:</h2>
-  <p>Quota to be elected: <%= round[:quota] %></p>
-  <p><em>Total Exhausted Value: <%= round[:exhausted_total].round(3) %></em></p>
+<% @rounds.each_with_index do |round, index| %>
+  <% prev = index > 0 ? @rounds[index - 1] : nil %>
 
-  <p><strong>Current Standings:</strong></p>
+  <h2>Round <%= round[:iteration] %></h2>
+  <p>
+    <strong>Quota:</strong> <%= format_votes(round[:quota]) %>
+    <% if @dynamic_quota_enabled && index > 0 %>
+      <em>(dynamically recalculated)</em>
+    <% end %>
+  </p>
+
+  <% active_total = round[:standings].values.sum %>
+  <p><em>
+    Active vote total: <%= format_votes(active_total) %> |
+    Cumulative exhausted: <%= format_votes(round[:exhausted_total]) %> |
+    Sum: <%= format_votes(active_total + round[:exhausted_total]) %>
+  </em></p>
+
+  <p><strong>Current Standings (highest to lowest):</strong></p>
   <table>
-    <thead><tr><th>Candidate</th><th>Votes</th></tr></thead>
+    <thead>
+    <tr>
+      <th>Candidate</th>
+      <th>Votes</th>
+      <th>Change</th>
+      <th>Status</th>
+    </tr>
+    </thead>
     <tbody>
     <% round[:standings].each do |id, total| %>
+      <% prev_total = prev&.dig(:standings, id) %>
+      <% delta = prev_total ? total - prev_total : nil %>
+      <% status = if total >= round[:quota]
+                    "✓ At quota"
+                  elsif id == round[:standings].to_a.last&.first
+                    "⚠ Lowest — candidate for elimination"
+                  else
+                    ""
+                  end %>
       <tr>
-        <td><%= @investment_titles[id] || "Unknown" %> (<%= id %>)</td>
-        <td><%= total.round(3) %></td>
+        <td><%= @investment_titles[id] || "Unknown" %></td>
+        <td><%= format_votes(total) %></td>
+        <td>
+          <% if delta.nil? %>
+            —
+          <% elsif delta > 0 %>
+            <span style="color: green;">+<%= format_votes(delta) %></span>
+          <% elsif delta < 0 %>
+            <span style="color: red;"><%= format_votes(delta) %></span>
+          <% else %>
+            0
+          <% end %>
+        </td>
+        <td><%= status %></td>
       </tr>
     <% end %>
     </tbody>
@@ -26,24 +69,54 @@
     <% case action[:type] %>
 <% when :election %>
       <p><strong>Action:</strong> ✅
-        <%= action[:title] %> elected with <%= action[:count].round(3) %> votes
+        <strong><%= action[:title] %></strong> elected with <%= format_votes(action[:count]) %> votes
         <% if action[:surplus].to_f > 0 %>
-          (surplus: <%= action[:surplus].round(3) %>)
+          (surplus: <%= format_votes(action[:surplus]) %>)
         <% end %>
       </p>
+      <% if action[:transfer_fraction] %>
+        <p><em>Transfer value: <%= format("%.6f", action[:transfer_fraction]) %> per ballot.</em></p>
+      <% end %>
+      <% if round[:transfers][:to].present? %>
+        <p><strong>Transferred to:</strong></p>
+        <ul>
+          <% round[:transfers][:to].each do |to_id, value| %>
+            <li>
+              <%= @investment_titles[to_id] || "Unknown" %>:
+              <strong>+<%= format_votes(value) %></strong>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
     <% when :elimination %>
       <p><strong>Action:</strong> ❌
-        <%= action[:title] %> eliminated with <%= action[:count].round(3) %> votes.
+        <strong><%= action[:title] %></strong> eliminated with <%= format_votes(action[:count]) %> votes.
       </p>
       <% if action[:tie_break_message] %>
-        <p style="color:#c00;"><em><%= action[:tie_break_message] %></em></p>
+        <p style="color:#c00; padding: 8px; border-left: 3px solid #c00;">
+          <em><%= action[:tie_break_message] %></em>
+        </p>
+      <% end %>
+      <% if round[:transfers][:to].present? %>
+        <p><strong>Transferred to:</strong></p>
+        <ul>
+          <% round[:transfers][:to].each do |to_id, value| %>
+            <li>
+              <%= @investment_titles[to_id] || "Unknown" %>:
+              <strong>+<%= format_votes(value) %></strong>
+            </li>
+          <% end %>
+        </ul>
       <% end %>
       <% if action[:exhausted_value].to_f > 0 %>
-        <p><em><%= action[:exhausted_value].round(3) %> vote value became exhausted.</em></p>
+        <p><em>Exhausted this round: <%= format_votes(action[:exhausted_value]) %>.</em></p>
       <% end %>
+
     <% when :auto_election %>
       <p><strong>Action:</strong> ⚙️
-        <%= action[:title] %> auto-elected to fill remaining seat.
+        <strong><%= action[:title] %></strong> deemed elected under Rule 53
+        — number of continuing candidates equals remaining vacancies.
       </p>
     <% end %>
   <% end %>

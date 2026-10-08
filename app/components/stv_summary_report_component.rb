@@ -42,17 +42,39 @@ class StvSummaryReportComponent < ViewComponent::Base
     end
   end
 
+  # The vote total for a candidate in the last round in which they appeared
+  # in the standings. Used to show votes for auto-elected candidates.
+  def final_standing_for(candidate_id)
+    @result.rounds
+           .reverse
+           .find { |r| r[:standings].key?(candidate_id) }
+      &.dig(:standings, candidate_id)
+  end
+
   # Human-readable description for a winner line.
   def winner_description(winner_id)
     round = election_round_for(winner_id)
     return "—" unless round
 
     action = round[:action]
+
     case action[:type]
     when :election
       "elected in round #{round[:iteration]} with #{format_votes(action[:count])} votes"
     when :auto_election
-      "auto-elected in round #{round[:iteration]} to fill a remaining seat"
+      votes = final_standing_for(winner_id)
+      vote_text = votes ? "with #{format_votes(votes)} votes" : ""
+      "deemed elected in round #{round[:iteration]} #{vote_text} " \
+        "(Rule 53 — continuing candidates equal remaining vacancies)".strip
+    else
+      "elected in round #{round[:iteration]}"
+    end
+  end
+
+  # True when the election finished with auto-election of one or more winners.
+  def any_auto_elected?
+    @result.winners.any? do |winner_id|
+      election_round_for(winner_id)&.dig(:action, :type) == :auto_election
     end
   end
 end

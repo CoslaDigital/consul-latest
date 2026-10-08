@@ -1,10 +1,9 @@
 <%# app/components/stv_summary_report_component.html.erb %>
 
 <%# ------------------------------------------------------------------
-    Title and heading
+    Heading (the CMS page title is rendered above this by the chrome)
     ------------------------------------------------------------------ %>
-<h1><%= @report_title %></h1>
-<h2><%= @heading.name %></h2>
+<h1><%= @heading.name %></h1>
 <hr>
 
 <%# ------------------------------------------------------------------
@@ -49,10 +48,8 @@
   This election uses the <strong>Droop Quota</strong>, as defined in Rule 47 of the
   Scottish Local Government Elections Order 2011:
 </p>
-<div style="background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace; line-height: 1.6;">
-  <div>Quota = ⌊Total Valid Votes ÷ (Seats + 1)⌋ + 1</div>
-  <div>Quota = ⌊<%= @votes_cast %> ÷ (<%= total_seats %> + 1)⌋ + 1 = <strong><%= @quota %></strong></div>
-</div>
+<pre style="background-color:#f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace; white-space: pre-wrap;">Quota = ⌊Total Valid Votes ÷ (Seats + 1)⌋ + 1
+Quota = ⌊<%= @votes_cast %> ÷ (<%= total_seats %> + 1)⌋ + 1 = <strong><%= @quota %></strong></pre>
 
 <%# ------------------------------------------------------------------
     Link to detailed report
@@ -108,6 +105,20 @@
     <% end %>
     </tbody>
   </table>
+<% end %>
+
+<%# ------------------------------------------------------------------
+    Rule 53 note (auto-election) — shown only when relevant
+    ------------------------------------------------------------------ %>
+<% if any_auto_elected? %>
+  <p>
+    <em>
+      <strong>Note:</strong> Following the eliminations above, the number of continuing
+      candidates equalled the number of remaining vacancies. Under Rule 53 of the
+      Scottish Local Government Elections Order 2011, those candidates are deemed
+      elected without the need for further transfers.
+    </em>
+  </p>
 <% end %>
 
 <%# ------------------------------------------------------------------
