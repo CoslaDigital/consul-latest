@@ -84,7 +84,8 @@ class Budget
             quota: quota,
             report_title: summary_title,
             detail_page_slug: detail_slug,
-            dynamic_quota_enabled: dynamic_quota_enabled
+            dynamic_quota_enabled: dynamic_quota_enabled,
+            heading: @heading
           ),
           layout: false
         )
