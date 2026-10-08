@@ -77,9 +77,7 @@ module Abilities
       can [:budget_headings, :select, :select_headings, :index, :read, :create, :update, :destroy], Budget
       can :publish, Budget, id: Budget.drafting.ids
       can :calculate_winners, Budget, &:reviewing_ballots?
-      can :read_results, Budget do |budget|
-        budget.balloting_finished? && budget.has_winning_investments?
-      end
+      can :read_results, Budget
       can :read_sensemaking, Budget
 
       can [:read, :create, :update, :destroy], Budget::Group
