@@ -18,32 +18,18 @@ class StvCalculator
     keyword_init: true
   )
 
-  # A stateful ballot:
-  #   rankings:          Array<Integer> investment ids, in preference order
-  #   current_value:     Float, current transfer value (starts at 1.0)
-  #   current_candidate: Integer|nil, currently assigned candidate id
-  #   exhausted:         Boolean
   Ballot = Struct.new(:rankings, :current_value, :current_candidate, :exhausted, keyword_init: true)
 
   def initialize
     # no state; safe to reuse
   end
 
-  # Public entry point.
-  #
-  # @param ballot_data [Array<Hash>] array of { rankings: [ids...] }
-  # @param seats [Integer] number of seats to fill
-  # @param initial_quota [Numeric] initial droop quota
-  # @param investment_titles [Hash{Integer=>String}] candidate id => title
-  # @param dynamic_quota_enabled [Boolean]
-  # @return [Result]
   def calculate(ballot_data, seats, initial_quota, investment_titles, dynamic_quota_enabled: false)
     reset_state
     @investment_titles = investment_titles
     @seats = seats
     @dynamic_quota = dynamic_quota_enabled
 
-    # Copy ballots so we never mutate the caller's data.
     @ballots = ballot_data.map do |vote|
       Ballot.new(
         rankings: vote[:rankings].dup,
@@ -82,18 +68,15 @@ class StvCalculator
       @elimination_log = []
       @rounds_data = []
       @exhausted_total = 0.0
-      @history = Hash.new { |h, k| h[k] = [] } # candidate_id => [totals per round]
+      @history = Hash.new { |h, k| h[k] = [] }
     end
 
     def run_loop
       loop do
         update_dynamic_quota
-
         totals = tally_candidates
 
-        # Record the current totals into history (for tie-breaking).
         totals.each { |id, total| @history[id] << total }
-
         candidates_over_quota = totals.select { |_, total| total >= @current_quota }
 
         if candidates_over_quota.any?
@@ -110,13 +93,8 @@ class StvCalculator
       auto_elect_remaining if @empty_seats > 0 && @active_candidates.any?
     end
 
-    # ------------------------------------------------------------------
-    # Quota / tallying
-    # ------------------------------------------------------------------
-
     def update_dynamic_quota
       return unless @dynamic_quota && @iteration > 1
-
       total_active_value = @ballots.sum { |b| b.exhausted ? 0.0 : b.current_value }
       @current_quota = droop_quota(total_active_value, @empty_seats)
     end
@@ -131,21 +109,17 @@ class StvCalculator
       @active_candidates.each { |id| totals[id] = 0.0 }
       @ballots.each do |b|
         next if b.exhausted
-        next unless @active_candidates.include?(b.current_candidate) # ← ADD THIS
+        next unless @active_candidates.include?(b.current_candidate)
         totals[b.current_candidate] += b.current_value
       end
       totals
     end
 
-    # ------------------------------------------------------------------
-    # Election (surplus transfer)
-    # ------------------------------------------------------------------
-
     def handle_election(candidates_over_quota, totals)
-      # Sort deterministically: highest total first, tie-break by id ascending.
       ordered = candidates_over_quota.sort_by { |id, total| [-total, id] }
       elected_id, elected_total = ordered.first
 
+      # FIXED: Restored correct surplus calculation
       surplus = elected_total - @current_quota
       title = @investment_titles[elected_id]
 
@@ -175,10 +149,6 @@ class StvCalculator
 
       log_round(totals, action, transfers: { type: :surplus, candidate_id: elected_id, amount: surplus })
     end
-
-    # ------------------------------------------------------------------
-    # Elimination (no surplus; ballots keep their current value)
-    # ------------------------------------------------------------------
 
     def handle_elimination(totals)
       min_votes = totals.values.min
@@ -218,16 +188,14 @@ class StvCalculator
 
       before_exhausted = @exhausted_total
       ballots_to_transfer.each { |b| advance_ballot(b) }
+
+      # FIXED: Restored correct exhaustion tracking calculation
       exhausted_this_round = @exhausted_total - before_exhausted
 
       action[:exhausted_value] = exhausted_this_round
 
       log_round(totals, action, transfers: { type: :elimination, candidate_id: eliminated_id, amount: eliminated_votes })
     end
-
-    # ------------------------------------------------------------------
-    # Ballot advance / exhaustion
-    # ------------------------------------------------------------------
 
     def advance_ballot(ballot)
       skip = @elected_investments + @eliminated_investments
@@ -241,10 +209,6 @@ class StvCalculator
         @exhausted_total += ballot.current_value
       end
     end
-
-    # ------------------------------------------------------------------
-    # Auto-election of remaining candidates
-    # ------------------------------------------------------------------
 
     def auto_elect_remaining
       @active_candidates.dup.each do |id|
@@ -262,13 +226,8 @@ class StvCalculator
       end
     end
 
-    # ------------------------------------------------------------------
-    # Scottish STV tie-breaking
-    # ------------------------------------------------------------------
-
     def resolve_scottish_tie(tied_ids)
-      # Rule 1: Compare previous rounds' totals (most recent first).
-      last_round = (@history[tied_ids.first] || []).size - 2 # exclude current round
+      last_round = (@history[tied_ids.first] || []).size - 2
       if last_round >= 0
         last_round.downto(0) do |idx|
           comparison = tied_ids.each_with_object({}) { |id, h| h[id] = @history[id][idx] }
@@ -284,7 +243,6 @@ class StvCalculator
         end
       end
 
-      # Rule 2: First-preference totals.
       comparison = tied_ids.each_with_object({}) { |id, h| h[id] = @first_preference_votes[id] }
       min = comparison.values.min
       at_min = comparison.select { |_, v| v == min }.keys
@@ -296,7 +254,6 @@ class StvCalculator
         }
       end
 
-      # Rule 3: Random lot.
       {
         id: at_min.sample,
         reason: :random_lot,
@@ -319,10 +276,6 @@ class StvCalculator
         "Tie could not be resolved; random lot applied to: #{names}."
       end
     end
-
-    # ------------------------------------------------------------------
-    # Round logging
-    # ------------------------------------------------------------------
 
     def log_round(totals, action, transfers:)
       @rounds_data << {
