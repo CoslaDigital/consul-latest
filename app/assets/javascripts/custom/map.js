@@ -326,8 +326,6 @@
 
       const baseLayers = {
         "Standard Map": defaultLayer,
-        "Clean Minimalist (Light)": cartoLight,
-        "High Contrast (Dark)": cartoDark,
         "Community & Infrastructure": osmHumanitarian,
         "Satellite View": satelliteLayer,
         "Terrain View": terrainLayer
