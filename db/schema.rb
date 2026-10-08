@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_08_073957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -269,6 +269,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
     t.string "title"
     t.text "description"
     t.datetime "hidden_at", precision: nil
+    t.text "summary"
     t.index ["budget_investment_id"], name: "index_budget_investment_translations_on_budget_investment_id"
     t.index ["hidden_at"], name: "index_budget_investment_translations_on_hidden_at"
     t.index ["locale"], name: "index_budget_investment_translations_on_locale"
