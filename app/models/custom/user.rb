@@ -427,10 +427,16 @@ class User < ApplicationRecord
       expected_geozone = "ys_#{council_name}"
       return false unless Geozone.exists?(name: expected_geozone)
 
-      # 3. Perform the standard YS digit structure checks
-      # The middle must be exactly 8 digits.
+      # 3. Perform the standard YS digit structure checks with temporary code support
+      # Fetch the 2-letter temporary code from env, defaulting to 'XX'
+      temp_code = ENV.fetch("YS_TEMP_CODE", "XX")
+
+      # The middle must be either 8 digits, OR the temp_code followed by 6 digits.
       # The suffix (issue number) must specifically be between 01 and 05.
-      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A0[1-5]\z/)
+      valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
+      valid_suffix = suffix.match?(/\A0[1-5]\z/)
+
+      return false unless valid_middle && valid_suffix
 
       true
     end
