@@ -1,4 +1,6 @@
 en:
   ys_login:
     form:
-      username_label: "16-Digit NEC Card Number"
+      username_label: "16-Digit NEC Card (Young Scot) Number"
+      header_label: "Sign in with you NEC Card Number (Young Scot)"
+      header_hint: "Please enter your 16-digit number to sign in or create an account"
