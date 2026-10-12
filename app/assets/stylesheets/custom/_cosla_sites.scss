@@ -1,17 +1,75 @@
 // 1. Move the import to the very top
 @import "cosla_shared";
 
-// ==========================================================================
-// SITE VARIABLE CONFIGURATIONS (Pure Data Data-Store)
-// ==========================================================================
-// Standardized Structure:
-// - Core Branding
-// - Header
-// - Navigation
-// - Footer
-// - Content & Callouts
-// - Interactive Elements
-// ==========================================================================
+/*
+================================================================================
+COSLA MULTI-TENANT STYLING GUIDE (Variable Data-Store)
+================================================================================
+
+ARCHITECTURE OVERVIEW:
+We use a "Holy Trinity" CSS architecture to keep site branding maintainable and
+prevent layout conflicts across the network:
+
+1. custom_sites.scss (THIS FILE): Acts purely as a "Variable Dictionary".
+   It assigns color variables to specific tenant classes (e.g., .site-glasgow).
+   Do NOT put structural CSS (margins, padding, layout) in this file unless
+   it is a highly specific, unavoidable tenant override.
+
+2. _cosla_shared.scss: Contains the `@mixin shared-styles`. This handles the
+   structural CSS for tables, badges, comments, and maps. It consumes the
+   variables defined in this file.
+
+3. custom.scss: The single source of truth for global overrides like the
+   hero header. It applies the variables defined here dynamically.
+
+================================================================================
+HOW TO ADD A NEW SITE:
+================================================================================
+
+STEP 1: Copy and paste the BLANK TEMPLATE below.
+STEP 2: Change `.site-name` to match the tenant's exact system identifier.
+STEP 3: Fill in the hex codes.
+        - Use https://webaim.org/resources/contrastchecker/ to ensure your
+          contrast colors (text over brand colors) are accessible.
+STEP 4: Scroll to the very bottom of this file to the "GLOBAL APPLICATION"
+        block, and add your new `.site-name` to the comma-separated list so
+        it inherits the shared layout mixin.
+
+================================================================================
+BLANK TEMPLATE:
+================================================================================
+
+.site-name {
+  // Core Branding
+  --brand: #;
+  --brand-secondary: #;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA; // Usually light grey, adjust if needed
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
+}
+
+*/
 
 .site-coslatest {
   // Core Branding
@@ -167,19 +225,6 @@
   --button-background-hover: var(--brand-secondary);
   --button-background-hover-contrast: #FFFFFF;
 
-  // Hero Header Overrides (Merged from inline style block)
-  .hero-header .hero-content .row {
-    background-color: color-mix(in srgb, var(--brand) 85%, transparent) !important;
-    padding: 2rem;
-    border-radius: 15px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .hero-header .hero-content {
-    color: var(--brand-contrast);
-    text-shadow: none;
-  }
 }
 
 .site-perthandkinross {
@@ -546,10 +591,10 @@
   --button-background-hover-contrast: #FFFFFF;
 
   // Custom structural override for Renfrewshire
-  .hero-header .row::before {
+  .hero-header .hero-content .row::before {
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%);
+    background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%) !important;
     opacity: 0.8;
     border-radius: inherit;
   }
@@ -644,19 +689,6 @@
   --button-background-hover: var(--brand-secondary);
   --button-background-hover-contrast: #FFFFFF;
 
-  // Hero Header Overrides (Merged from inline style block)
-  .hero-header .hero-content .row {
-    background-color: color-mix(in srgb, var(--brand) 85%, transparent) !important;
-    padding: 2rem;
-    border-radius: 15px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .hero-header .hero-content {
-    color: var(--brand-contrast);
-    text-shadow: none;
-  }
 }
 
 

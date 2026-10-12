@@ -18,16 +18,21 @@
 }
 
 /*
- * ===================================================================
- * Refactored Mobile-First Hero Styles
- *
- * This one block replaces all your other hero styles.
- * =================================_=================================
- */
+- ===================================================================
+
+- Refactored Mobile-First Hero Styles
+
+-
+- Architecture: Single source of truth. Layout is defined here,
+
+- colors are injected entirely via var(--brand) CSS variables.
+
+- ===================================================================
+
+*/
 
 .hero-header {
   // --- BASE STYLES ---
-  // These apply to the fallback hero (no image)
   @include full-width-background;
   @extend %budget-header;
   margin-top: -$line-height;
@@ -38,54 +43,30 @@
   padding: 4rem 2rem;
   background-color: var(--brand-secondary);
   text-align: center;
-  color: #fff;
+  color: var(--brand-contrast, #fff);
 
   // --- 1. STYLES FOR THE IMAGE HERO ---
-  // This applies to ".hero-header.with-background-image"
   &.with-background-image {
-    //
-    // --- MOBILE-FIRST STYLES (Default) ---
-    //
-    // A smaller min-height for phones. This is now the
-    // *only* rule controlling the height.
     min-height: 300px;
-
-    // --- Core Layout ---
-    position: relative; // CRITICAL: For positioning children
-    overflow: hidden;   // This is fine, it clips the background image
-    padding: 0;         // Padding will be on the content box
-
-    // These center the .hero-content box
+    position: relative;
+    overflow: hidden;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-
-    // !! REMOVED: aspect-ratio and max-height
-    // This allows the container to grow vertically
-    // based on its content.
-
-    // Responsive padding for the *container itself*
     padding-top: clamp(1rem, 5vh, 6rem);
     padding-bottom: clamp(1rem, 5vh, 6rem);
     padding-left: clamp(1rem, 5vw, 3rem);
     padding-right: clamp(1rem, 5vw, 3rem);
 
-    //
-    // --- DESKTOP OVERRIDES ---
-    //
     @media (min-width: 768px) {
-      // When the screen is 768px or wider, switch to a larger min-height
       min-height: 400px;
     }
   }
 
-  // --- NESTED CHILD STYLES ---
-  // These rules apply to children of ANY .hero-header
-
-  // The semi-transparent content box
+  // --- 2. HERO CONTENT & DYNAMIC BRAND GRADIENT ---
   .hero-content {
-
     .row {
       padding: clamp(1.0rem, 4vw, 1.5rem);
       display: flex;
@@ -109,40 +90,41 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to top, $brand-secondary 0%, $brand 100%);
-        opacity: 0.7;
+        background: linear-gradient(to top, var(--brand-secondary) 0%, var(--brand) 100%) !important;
+        opacity: 0.85;
         border-radius: inherit;
         z-index: -1;
       }
     }
 
-    // Move the text and link styles in here too so they target safely
     .homepage-title {
       display: block;
       font-size: clamp(1rem, 2.5vw, 1.5rem);
       font-weight: 600;
       margin-bottom: 0;
-      color: #ffffffcc;
+      color: var(--brand-contrast, #fff);
+      opacity: 0.9;
     }
 
     h1 {
       font-size: clamp(1rem, 5vw, 2.75rem);
       font-weight: bold;
-      color: #fff;
+      color: var(--brand-contrast, #fff);
       margin-top: 1.25rem;
     }
 
     .homepage-lead {
       font-size: clamp(1rem, 2vw, 1.25rem);
       margin-bottom: 2rem;
-      color: #ffffffcc;
+      color: var(--brand-contrast, #fff);
+      opacity: 0.9;
     }
 
     .homepage-link {
       display: inline-block;
       margin: 1.0rem 0;
       background-color: var(--brand-secondary);
-      color: white;
+      color: var(--brand-contrast, #fff);
       padding: 0.75rem 1.5rem;
       text-align: center;
       text-decoration: none;
@@ -154,19 +136,24 @@
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 
       &:hover {
-        background-color: #005fa3;
+        // FIXED: Replaced hardcoded #005fa3
+        background-color: var(--brand);
+        color: var(--brand-contrast, #fff);
       }
     }
   }
-} // --- End of .hero-header block ---
-
+}
 
 /*
- * ===================================================================
- * 2. STYLES FOR THE BACKGROUND IMAGE (Unchanged)
+- ===================================================================
+
+- 2. STYLES FOR THE BACKGROUND IMAGE (Unchanged)
+
  *
- * These rules are NOT nested and are still required.
- * ===================================================================
+- These rules are NOT nested and are still required.
+
+- ===================================================================
+
  */
 
 .hero-background-image {
@@ -185,11 +172,15 @@
 }
 
 /*
- * ===================================================================
- * 3. STYLES FOR THE CONTENT (Unchanged)
+- ===================================================================
+
+- 3. STYLES FOR THE CONTENT (Unchanged)
+
  *
- * This rule is NOT nested and is still required.
- * ===================================================================
+- This rule is NOT nested and is still required.
+
+- ===================================================================
+
  */
 
 .hero-content {
