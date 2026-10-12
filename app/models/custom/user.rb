@@ -45,22 +45,9 @@ class User < ApplicationRecord
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
-  # 1. Registration Restriction
-  validate :email_belongs_to_allowed_domain, if: -> { email.present? && email_changed? }
-
-  # 2. Login Restriction
-  def active_for_authentication?
-    super && allowed_email_domain?
-  end
-
-  # Provide a specific error message when login fails due to domain
-  def inactive_message
-    allowed_email_domain? ? super : :unauthorized_domain
-  end
 
   def masked_username
     return username if username.blank?
-
     # If the username is 4 characters or less, just mask the middle
     if username.length <= 4
       username.gsub(/(?<=.).(?=.)/, "*")
@@ -349,7 +336,7 @@ class User < ApplicationRecord
 
       # 3. Create brand new user if no base match was found
       prefix = document_number.to_s[0, 6]
-      council_name = NEC_PREFIX_MAPPING[prefix]
+      council_name = council_name_for_prefix(prefix)
       geozone_name = "ys_#{council_name}"
 
       user = User.new(
@@ -403,18 +390,21 @@ class User < ApplicationRecord
       middle = document_number.to_s[6, 8]
       suffix = document_number.to_s[14, 2]
 
-      # 1. Check if the prefix exists in our known mapping
-      council_name = NEC_PREFIX_MAPPING[prefix]
+      # Use the dynamic lookup method
+      council_name = council_name_for_prefix(prefix)
       return false unless council_name # Reject immediately if prefix is unknown
 
-      # 2. Check if the corresponding Geozone actually exists in the database
       expected_geozone = "ys_#{council_name}"
       return false unless Geozone.exists?(name: expected_geozone)
 
-      # 3. Perform the standard YS digit structure checks
-      # The middle must be exactly 8 digits.
-      # The suffix (issue number) must specifically be between 01 and 05.
-      return false unless middle.match?(/\A\d{8}\z/) && suffix.match?(/\A0[1-5]\z/)
+      # Fetch the 2-letter temporary code from env, defaulting to 'XX'
+      temp_code = ENV.fetch("YS_TEMP_CODE", "XX")
+
+      # Allow standard digits OR the temp_code. Allow suffix 00 through 05.
+      valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
+      valid_suffix = suffix.match?(/\A0[0-5]\z/)
+
+      return false unless valid_middle && valid_suffix
 
       true
     end
@@ -475,4 +465,22 @@ class User < ApplicationRecord
 
       self.save!
     end
+
+    def self.council_name_for_prefix(prefix)
+      # 1. Check the core hardcoded mapping first
+      core_council = NEC_PREFIX_MAPPING[prefix.to_s]
+      return core_council if core_council.present?
+
+      # 2. Fetch the flat array from secrets
+      secrets = Tenant.current_secrets || {}
+      temp_mappings = secrets[:temp_nec_mappings] || []
+
+      # 3. Convert the flat array ["prefix", "council"] into a Hash {"prefix" => "council"}
+      # (We map to string just to be 100% safe against YAML integers)
+      lookup_hash = temp_mappings.map(&:to_s).each_slice(2).to_h
+
+      # 4. Simply look up the prefix!
+      lookup_hash[prefix.to_s]
+    end
+
 end
