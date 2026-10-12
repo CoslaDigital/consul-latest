@@ -1,4 +1,4 @@
 en:
   ys_login:
     form:
-      username_label: "16-Digit YS Number"
+      username_label: "16-Digit NEC Card Number"
