@@ -84,7 +84,7 @@ module Abilities
       can :publish, Budget, id: Budget.drafting.ids
       can :calculate_winners, Budget, &:reviewing_ballots?
       can :read_results, Budget do |budget|
-        budget.balloting_finished? && budget.has_winning_investments?
+        budget.balloting_finished?
       end
       can :read_sensemaking, Budget
 
