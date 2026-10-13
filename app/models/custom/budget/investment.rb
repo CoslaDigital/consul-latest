@@ -14,9 +14,6 @@ class Budget
 
     validate :all_answers
 
-    # 1. ADD THIS CALLBACK
-    before_validation :normalize_youtube_shorts_url
-
     def all_answers
       errors.add(:answers, :missing_mandatory) unless has_all_answers?
     end
@@ -36,18 +33,5 @@ class Budget
       result
     end
 
-    private
-
-      # 2. ADD THIS METHOD
-      def normalize_youtube_shorts_url
-        return unless video_url.present?
-
-        # If it's a YouTube short, extract the ID and convert it to a standard watch URL
-        if video_url.include?("youtube.com/shorts/")
-          # Example: https://youtube.com/shorts/K20_AXNLbfU?si=IBU... -> K20_AXNLbfU
-          video_id = video_url.split("/shorts/").last.split("?").first
-          self.video_url = "https://www.youtube.com/watch?v=#{video_id}"
-        end
-      end
   end
 end
