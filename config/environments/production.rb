@@ -109,6 +109,11 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  #  Trust loopback requests originating from local Nginx
+  config.action_dispatch.trusted_proxies = ActionDispatch::RemoteIp::TRUSTED_PROXIES + [
+    IPAddr.new("127.0.0.1"),
+    IPAddr.new("::1")
+  ]
 end
 
 require Rails.root.join("config", "environments", "custom", "production")
