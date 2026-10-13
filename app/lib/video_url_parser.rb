@@ -2,7 +2,9 @@ class VideoUrlParser
   attr_reader :url
 
   VIMEO_REGEX = /vimeo.*(staffpicks\/|channels\/|videos\/|video\/|\/)([^#\&\?]*).*/
-  YOUTUBE_REGEX = /youtu.*(be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+
+  # UPDATED: Added 'shorts\/' to the capture group so it recognizes YouTube Shorts
+  YOUTUBE_REGEX = /youtu.*(be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/
 
   def initialize(url)
     @url = url
