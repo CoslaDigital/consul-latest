@@ -10,3 +10,8 @@ $("#my_ballot").html("<%= j render(
 <%= render "refresh_ballots",
             investment_ids: @investment_ids,
             ballot: @ballot %>
+
+// Re-init sortable on the freshly-rendered sidebar.
+if (typeof window.initializeSortable === "function") {
+  window.initializeSortable();
+}
