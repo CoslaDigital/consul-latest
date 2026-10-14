@@ -30,7 +30,8 @@ class Setting
           "feature.demographics": false,
           "feature.restrict_debate_creation": false,
           "feature.user_milestones": false,
-          "feature.enable_card_login": false
+          "feature.enable_card_login": false,
+          "feature.my_area_landing_page": false
         })
       end
     end
@@ -62,6 +63,10 @@ class Setting
     def enable_card_login?
 
       Setting["feature.enable_card_login"] == "active"
+    end
+
+    def my_area_enabled?
+      Setting["feature.my_area_landing_page"] == "active"
     end
 
   end

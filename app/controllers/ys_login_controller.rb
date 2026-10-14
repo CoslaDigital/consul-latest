@@ -36,12 +36,17 @@ class YsLoginController < Devise::SessionsController
 
   protected
 
-  def after_sign_in_path_for(resource)
-    # If the user is NOT unverified (i.e., they ARE verified)
-    return my_area_path unless resource.unverified?
+  protected
 
-    # If the user IS unverified, go to verification
-    verification_path
+  def after_sign_in_path_for(resource)
+    # 1. If the user IS unverified, always go to verification first
+    return verification_path if resource.unverified?
+
+    if Setting.my_area_enabled?
+      my_area_path
+    else
+      super
+    end
   end
 
   def ensure_card_login_enabled!

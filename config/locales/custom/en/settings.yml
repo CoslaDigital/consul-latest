@@ -148,7 +148,8 @@ en:
       user_milestones_description: "Authors of Proposals or Budget Investments may create new milestones or update existing milestones ofn processes they own"
       enable_card_login: "Enable Card login"
       enable_card_login_description: "Enable logging in with NEC card or other bespoke cards"
-
+      my_area_landing_page: "Enable My Area Landing page"
+      my_area_landing_page_description: "Users logging in with a NEC Card will be redirected to a landing page specifically for their geozone"
     remote_census:
       general:
         endpoint: "Endpoint"

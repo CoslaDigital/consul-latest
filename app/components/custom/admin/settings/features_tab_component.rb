@@ -11,6 +11,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.restrict_debate_creation
                           feature.user_milestones
                           feature.enable_card_login
+                          feature.my_area_landing_page
                         ]
     original_settings + custom_settings
   end
