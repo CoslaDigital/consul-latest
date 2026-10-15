@@ -6,14 +6,11 @@
   <p style="margin-bottom: 1rem;"><%= t("welcome.open_processes.help", default: "Participate in drafting and improving current legislation.") %></p>
 
   <div class="feed-content">
-    <%# Changed data-timer-delay from 4000 to 7000 (7 seconds) %>
     <div class="orbit" role="region" data-orbit data-use-m-u-i="false" data-timer-delay="7000">
 
       <div class="orbit-wrapper">
         <ul class="orbit-container no-bullet" tabindex="0">
           <% processes.each_with_index do |process, index| %>
-
-            <%# Removed the inline style="display: none;" so Foundation can animate smoothly %>
             <li class="orbit-slide <%= is_active_class(index) %>"
                 data-slide="<%= index %>"
                 aria-live="polite">
@@ -21,10 +18,9 @@
               <%= render Widget::Feeds::ProcessComponent.new(process) %>
 
             </li>
-
           <% end %>
         </ul>
-        <div class="truncate"></div>
+        <%# Intentionally removed the <div class="truncate"></div> to prevent dead whitespace %>
       </div>
 
       <div class="orbit-bullets">
@@ -42,5 +38,7 @@
     </div>
   </div>
 
-  <%= link_to t("welcome.feed.see_all.processes"), legislation_processes_path, class: "see-all" %>
+  <div class="text-right">
+    <%= link_to t("welcome.feed.see_all.processes"), legislation_processes_path, class: "see-all" %>
+  </div>
 </section>
