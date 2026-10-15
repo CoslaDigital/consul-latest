@@ -47,13 +47,13 @@ class Poll < ApplicationRecord
             },
             allow_blank: true,
             if: -> { ends_at }
-  validates :starts_at,
-            comparison: {
-              greater_than_or_equal_to: ->(*) { Time.current },
-              message: ->(*) { I18n.t("errors.messages.past_date") }
-            },
-            allow_blank: true,
-            on: :create
+  # validates :starts_at,
+  #       comparison: {
+  #            greater_than_or_equal_to: ->(*) { Time.current },
+  #        message: ->(*) { I18n.t("errors.messages.past_date") }
+  #       },
+  #       allow_blank: true,
+  #        on: :create
   validates :ends_at,
             comparison: {
               greater_than_or_equal_to: ->(*) { Time.current },
