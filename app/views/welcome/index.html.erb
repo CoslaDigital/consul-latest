@@ -13,57 +13,75 @@
 <%= render "shared/header", header: @header %>
 
 <%
-  # Extract feeds individually so we can place them in our smart grid
+  # Extract feeds individually
   processes_feed = @feeds.find { |f| f.kind == "processes" }
   upcoming_feed = @feeds.find { |f| f.kind == "upcoming" }
   proposals_feed = @feeds.find { |f| f.kind == "proposals" }
   debates_feed = @feeds.find { |f| f.kind == "debates" }
 %>
 
-<%# --- ROW 1: Citizen Voices (Proposals & Debates) --- %>
-<% if (proposals_feed && proposals_feed.items.any?) || (debates_feed && debates_feed.items.any?) %>
+<%# --- DYNAMIC GRID SYSTEM --- %>
+<%
+  active_widgets = []
+  active_widgets << { type: :proposals, feed: proposals_feed, size: :large } if proposals_feed&.items&.any?
+  active_widgets << { type: :processes, feed: processes_feed, size: :large } if processes_feed&.items&.any?
+  active_widgets << { type: :debates, feed: debates_feed, size: :small } if debates_feed&.items&.any?
+  active_widgets << { type: :upcoming, feed: upcoming_feed, size: :small } if upcoming_feed&.items&.any?
+
+  grid_rows = []
+
+  while active_widgets.any?
+    if active_widgets.size >= 2
+      first = active_widgets.shift
+
+      if first[:size] == :large
+        second_idx = active_widgets.index { |w| w[:size] == :small }
+        if second_idx
+          second = active_widgets.delete_at(second_idx)
+          grid_rows << [{ **first, cols: "large-8" }, { **second, cols: "large-4" }]
+        else
+          grid_rows << [{ **first, cols: "large-12" }]
+        end
+      else
+        second_idx = active_widgets.index { |w| w[:size] == :small }
+        if second_idx
+          second = active_widgets.delete_at(second_idx)
+          grid_rows << [{ **first, cols: "large-6" }, { **second, cols: "large-6" }]
+        else
+          second = active_widgets.shift
+          grid_rows << [{ **first, cols: "large-4" }, { **second, cols: "large-8" }]
+        end
+      end
+    else
+      # --- THE FIX IS HERE ---
+      # If only 1 widget is left:
+      # Large widgets get full width (12 cols)
+      # Small widgets get 8 cols, but we removed 'large-centered' so it left-aligns.
+      last = active_widgets.shift
+      cols = last[:size] == :large ? "large-12" : "large-8"
+      grid_rows << [{ **last, cols: cols }]
+    end
+  end
+%>
+
+<%# Render the dynamically packed rows %>
+<% grid_rows.each do |row| %>
   <div class="row">
-
-    <% if proposals_feed && proposals_feed.items.any? %>
-      <div class="small-12 <%= (debates_feed && debates_feed.items.any?) ? 'large-8' : 'large-12' %> column feeds-list">
-        <%= render Widget::Feeds::FeedComponent.new(proposals_feed) %>
+    <% row.each do |widget| %>
+      <div class="small-12 <%= widget[:cols] %> column feeds-list">
+        <% if widget[:type] == :processes %>
+          <%= render Legislation::OpenProcessesCarouselComponent.new(processes: widget[:feed].items) %>
+        <% else %>
+          <%= render Widget::Feeds::FeedComponent.new(widget[:feed]) %>
+        <% end %>
       </div>
     <% end %>
-
-    <% if debates_feed && debates_feed.items.any? %>
-      <%# Debates are mostly text, so if Proposals are missing, center them at 8 columns instead of stretching to 12 %>
-      <div class="small-12 <%= (proposals_feed && proposals_feed.items.any?) ? 'large-4' : 'large-8 large-centered' %> column feeds-list">
-        <%= render Widget::Feeds::FeedComponent.new(debates_feed) %>
-      </div>
-    <% end %>
-
   </div>
 <% end %>
-
-
-<%# --- ROW 2: Platform Initiatives (Processes & Upcoming Events) --- %>
-<% if (processes_feed && processes_feed.items.any?) || (upcoming_feed && upcoming_feed.items.any?) %>
-  <div class="row">
-
-    <% if processes_feed && processes_feed.items.any? %>
-      <div class="small-12 <%= (upcoming_feed && upcoming_feed.items.any?) ? 'large-8' : 'large-12' %> column feeds-list">
-        <%= render Legislation::OpenProcessesCarouselComponent.new(processes: processes_feed.items) %>
-      </div>
-    <% end %>
-
-    <% if upcoming_feed && upcoming_feed.items.any? %>
-      <%# Events are short text. If Processes are missing, center Events at 6 columns %>
-      <div class="small-12 <%= (processes_feed && processes_feed.items.any?) ? 'large-4' : 'large-6 large-centered' %> column feeds-list">
-        <%= render Widget::Feeds::FeedComponent.new(upcoming_feed) %>
-      </div>
-    <% end %>
-
-  </div>
-<% end %>
+<%# --- END DYNAMIC GRID SYSTEM --- %>
 
 
 <%# --- CATCH-ALL: Custom Feeds --- %>
-<%# Renders any other feeds safely in case Consul adds more or you create custom ones %>
 <% remaining_feeds = @feeds.reject { |f| %w[processes proposals upcoming debates].include?(f.kind) } %>
 <% if remaining_feeds.any? %>
   <div class="row">
@@ -75,12 +93,10 @@
   </div>
 <% end %>
 
-
 <%# --- ROW 3: Featured Content Cards --- %>
 <% if @cards.any? %>
   <div class="row">
     <div class="small-12 column">
-      <%# Keeping the widget-feed class here gives the title consistent spacing/styling %>
       <div class="widget-feed">
         <h2 class="title"><%= t("welcome.cards.title") %></h2>
         <%= render "shared/cards", cards: @cards %>
@@ -89,8 +105,7 @@
   </div>
 <% end %>
 
-
-<%# --- ROW 4: Recommendations (Commented out) --- %>
+<%# --- ROW 4: Recommendations --- %>
 <%# if feature?("user.recommendations") && (@recommended_debates.present? || @recommended_proposals.present?) %>
 <%#= render "recommended",
              recommended_debates: @recommended_debates,
