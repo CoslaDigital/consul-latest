@@ -21,16 +21,16 @@ en:
           knapsack: "Total budget <span>%{count}</span>"
           approval:
             one: "You can vote <span>1</span> project"
-            other: "You can vote up to <span>%{count}</span> candidates"
+            other: "You can vote up to <span>%{count}</span> budgets"
         no_balloted_group_yet: "You have not voted on this group yet, go vote!"
         remove: Remove vote
         remove_label: "Remove your vote for %{investment}"
         voted:
-          one: "You have voted for<span>one</span> candidate."
-          other: "You have voted for<span>%{count}</span> candidates."
+          one: "You have voted for<span>one</span> budget."
+          other: "You have voted for<span>%{count}</span> budgets."
         voted_info: "Your ballot is confirmed!"
         voted_info_2: "But you can change your vote at any time until this phase is closed."
-        zero: You have not voted for any candidate project.
+        zero: You have not voted for any project.
       reasons_for_not_balloting:
         invalid_geozone: "You cannot vote on this project because your location is not valid. Your geozone is %{user_geozone}, but this project requires one of the following: %{required_geozones}."
 
@@ -41,7 +41,7 @@ en:
       open_budgets: "Open Processes"
     investments:
       form:
-        title: "Submit a candidate Proposal"
+        title: "Submit a Proposal"
         heading_note: "Select the area this proposal applies to"
         subtitle: "%{heading} (%{price})"
         subtitle_note: "What is your project or application called?"
