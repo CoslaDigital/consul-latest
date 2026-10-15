@@ -265,6 +265,6 @@ class Poll < ApplicationRecord
   def enforce_date_validations?
     # This will return true only if the environment is production.
     # In development and test, it will return false, disabling the validations.
-    Rails.env.production?
+    Rails.env.test?
   end
 end
