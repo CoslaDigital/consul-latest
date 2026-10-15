@@ -12,6 +12,7 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.user_milestones
                           feature.enable_card_login
                           feature.my_area_landing_page
+                          feature.geofence_card_login
                         ]
     original_settings + custom_settings
   end
