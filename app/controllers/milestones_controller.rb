@@ -67,15 +67,16 @@ class MilestonesController < ApplicationController
     end
 
     def set_route_variables
-      # Hydrates @budget and @investment only if we are in a budget context
-      # This prevents UrlGenerationErrors in the views/forms
       if @milestoneable.is_a?(Budget::Investment)
         @investment = @milestoneable
         @budget = @investment.budget
 
-        # Verify the budget in the URL matches the investment's budget
-        if params[:budget_id].present? && params[:budget_id].to_i != @budget.id
-          raise ActiveRecord::RecordNotFound
+        # Fix: Check against BOTH the friendly slug and the ID
+        if params[:budget_id].present?
+          budget_param = params[:budget_id].to_s
+          unless budget_param == @budget.to_param || budget_param == @budget.id.to_s
+            raise ActiveRecord::RecordNotFound
+          end
         end
       end
     end
@@ -89,8 +90,9 @@ class MilestonesController < ApplicationController
         :status_id,
         :publication_date,
         translations_attributes: [:id, :locale, :title, :description],
-        image_attributes: [:id, :cached_attachment, :title, :user_id, :_destroy],
-        documents_attributes: [:id, :cached_attachment, :title, :user_id, :_destroy]
+        # Fix: Add :attachment to both so standard file uploads aren't rejected
+        image_attributes: [:id, :attachment, :cached_attachment, :title, :user_id, :_destroy],
+        documents_attributes: [:id, :attachment, :cached_attachment, :title, :user_id, :_destroy]
       )
     end
 end
