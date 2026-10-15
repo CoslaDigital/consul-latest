@@ -62,6 +62,8 @@ en:
     min_age_to_participate_description: "Users over this age can participate in all processes where a user verified account is needed"
     postal_codes: "Postal Codes"
     postal_codes_description: "A comma-separated list of valid postal codes; you can also introduce ranges separated with a colon. Example: 00001:00010,00024,AB3 45FG,00031:00035 will allow postal codes between 00001 and 00010, the postal code 00024, the postal code AB3 45FG, and postal codes between 00031 and 00035. If you leave it blank, all postal codes will be valid."
+    geofence_allowed_countries: "Allowed territories for card login"
+    geofence_allowed_countries_description: "Comma-separated two-letter ISO country codes allowed to log in (e.g. GB, IM, JE)"
     proposals:
       successful_proposal_id: Successful proposal
       successful_proposal_id_description: This proposal is used as a reference for a successful proposal in supports number and will be displayed in the dashboard graph.
@@ -148,7 +150,8 @@ en:
       user_milestones_description: "Authors of Proposals or Budget Investments may create new milestones or update existing milestones ofn processes they own"
       enable_card_login: "Enable Card login"
       enable_card_login_description: "Enable logging in with NEC card or other bespoke cards"
-
+      geofence_card_login: "Geofence card login"
+      geofence_card_login_description: "Restrict card login attempts to permitted geographic territories"
     remote_census:
       general:
         endpoint: "Endpoint"
