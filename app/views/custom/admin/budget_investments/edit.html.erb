@@ -43,16 +43,18 @@
       </div>
     </div>
 
-    <%# Custom / Dynamic Questions Section %>
+    <%# Dynamic Questions Section %>
     <% if @budget.questions.any? %>
       <div class="row expanded margin-top">
         <div class="small-12 column">
           <h2><%= t("budgets.investments.form.questions", default: "Custom Questions") %></h2>
         </div>
 
-        <%= f.fields_for :answers do |builder| %>
-          <% budget_question = builder.object.budget_question || @budget.questions.order(:id)[builder.index] %>
-          <% if budget_question %>
+        <% @budget.questions.order(:id).each do |budget_question| %>
+          <% next unless budget_question.enabled? %>
+          <% answer = @investment.answers.find { |a| a.budget_question_id == budget_question.id } || @investment.answers.build(budget_question: budget_question, budget_id: @budget.id) %>
+
+          <%= f.fields_for :answers, answer do |builder| %>
             <% label_text = budget_question.text %>
             <% label_text += " (#{t("budgets.investments.form.private", default: "Private")})" if budget_question.is_private? %>
 
@@ -62,12 +64,8 @@
                                     rows: 4,
                                     hint: budget_question.hint %>
 
-              <%= builder.hidden_field :budget_id, value: builder.object.budget_id || @budget.id %>
-              <%= builder.hidden_field :budget_question_id, value: builder.object.budget_question_id || budget_question.id %>
-
-              <% if @investment.errors[:answers].present? && params.dig(:budget_investment, :answers_attributes, builder.index.to_s, :text).blank? %>
-                <span class="form-error is-visible"><%= t("custom.errors.no_answer", default: "This question must be answered") %></span>
-              <% end %>
+              <%= builder.hidden_field :budget_id, value: @budget.id %>
+              <%= builder.hidden_field :budget_question_id, value: budget_question.id %>
             </div>
           <% end %>
         <% end %>
