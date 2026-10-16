@@ -28,24 +28,21 @@ class Setting
         consul_defaults
       else
         consul_defaults.merge({
-          # Overwrite default CONSUL DEMOCRACY settings or add new settings here
-          "feature.events": false,
-          "feature.hide_comments": false,
-          "feature.hide_votes": false,
-          "feature.hide_local_login": false,
-          "feature.demographics": false,
-          "feature.restrict_debate_creation": false,
-          "feature.user_milestones": false,
-          "feature.restrict_login_to_officials": false,
-          "feature.require_login_to_view_processes": false
-          "feature.user_milestones": false,
-          "feature.enable_card_login": false,
-          "feature.my_area_landing_page": false,
-          # Geofence settings
-          "feature.geofence_card_login": "active", # Defaulted to "active" so your current protection stays on
-          "geofence_allowed_countries": "GB"
-        })
-
+                                # Overwrite default CONSUL DEMOCRACY settings or add new settings here
+                                "feature.events": false,
+                                "feature.hide_comments": false,
+                                "feature.hide_votes": false,
+                                "feature.hide_local_login": false,
+                                "feature.demographics": false,
+                                "feature.restrict_debate_creation": false,
+                                "feature.user_milestones": false,
+                                "feature.restrict_login_to_officials": false,
+                                "feature.require_login_to_view_processes": false,
+                                "feature.enable_card_login": false,
+                                "feature.my_area_landing_page": false,
+                                "feature.geofence_card_login": true,
+                                "geofence_allowed_countries": "GB"
+                              })
       end
     end
 
@@ -84,7 +81,7 @@ class Setting
     # Returns true if geofencing is switched on in the admin dashboard
     def geofence_card_login_enabled?
       Rails.cache.fetch(GEOFENCE_ENABLED_KEY, expires_in: 2.minutes) do
-        # Checks for "active" (Consul standard) or boolean true
+        # Checks for "active" (saved in DB by Consul admin UI) or boolean true/string "true"
         Setting["feature.geofence_card_login"].to_s.in?(["active", "true"])
       end
     rescue StandardError => e
@@ -102,7 +99,7 @@ class Setting
           raw = Tenant.current_secrets&.dig(:geofence, :allowed_countries)
         end
 
-        raw ||= "GB"
+        raw = "GB" if raw.blank?
         raw.to_s.split(",").map(&:strip).map(&:upcase).reject(&:blank?)
       end
     rescue StandardError => e
