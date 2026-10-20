@@ -34,6 +34,13 @@
           </div>
         <% end %>
 
+        <div class="small-12 column">
+          <%= f.text_area :summary,
+                          rows: 3,
+                          maxlength: Budget::Investment.description_max_length,
+                          label: t("budgets.investments.form.summary", default: "Summary") %>
+        </div>
+
         <div class="small-12 medium-6 column">
           <%= f.select :heading_id, budget_heading_select_options(@budget), include_blank: t("admin.budget_investments.edit.select_heading") %>
         </div>
@@ -76,7 +83,7 @@
     <% end %>
 
     <%# -------------------------------------------------------------------- %>
-    <%# 3. TAGS & METADATA (All tags together)                               %>
+    <%# 3. TAGS & METADATA                                                  %>
     <%# -------------------------------------------------------------------- %>
     <fieldset class="fieldset margin-top">
       <legend><h2><%= t("admin.budget_investments.edit.tags", default: "Tags & Metadata") %></h2></legend>
@@ -103,7 +110,7 @@
     </fieldset>
 
     <%# -------------------------------------------------------------------- %>
-    <%# 4. STAFF & VALUATOR ASSIGNMENT (Formerly titled 'Classification')     %>
+    <%# 4. STAFF & VALUATION ASSIGNMENT                                     %>
     <%# -------------------------------------------------------------------- %>
     <fieldset class="fieldset margin-top">
       <legend><h2><%= t("admin.budget_investments.edit.assignment", default: "Staff & Valuation Assignment") %></h2>
