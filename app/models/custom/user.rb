@@ -45,6 +45,18 @@ class User < ApplicationRecord
   has_one :process_manager
   scope :process_managers, -> { joins(:process_manager) }
 
+  # 1. Registration Restriction
+  validate :email_belongs_to_allowed_domain, if: -> { email.present? && email_changed? }
+
+  # 2. Login Restriction
+  def active_for_authentication?
+    super && allowed_email_domain?
+  end
+
+  # Provide a specific error message when login fails due to domain
+  def inactive_message
+    allowed_email_domain? ? super : :unauthorized_domain
+  end
 
   def masked_username
     return username if username.blank?
@@ -390,6 +402,35 @@ class User < ApplicationRecord
       end
 
       nil
+    end
+
+    def self.ys_document_error_message(document_number)
+      return "Please enter your card number." if document_number.blank?
+
+      str_number = document_number.to_s
+
+      # If it's meant to be a YS card but isn't 16 digits
+      if str_number.length != 16
+        return "The number you entered is not valid. Please enter a valid 16-digit card number."
+      end
+
+      prefix = str_number[0, 6]
+      council_name = council_name_for_prefix(prefix)
+
+      # If the prefix isn't in your mapping at all
+      unless council_name
+        return "We do not recognize the prefix of this card number. Please check for typos."
+      end
+
+      # If the prefix is valid, but that council's Geozone hasn't been created in Consul
+      expected_geozone = "ys_#{council_name}"
+      unless Geozone.exists?(name: expected_geozone)
+        formatted_council = council_name.to_s.titleize.gsub("_", " ")
+        return "Your card is valid, but belongs to #{formatted_council}, which is not currently participating on this platform."
+      end
+
+      # If it passed prefix and geozone, it must have failed the middle/suffix regex
+      "The format of your card number is invalid. Please ensure there are no letters or special characters."
     end
 
     def self.validate_document_number(document_number)
