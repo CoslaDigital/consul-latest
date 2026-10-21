@@ -82,7 +82,14 @@
                     <strong><%= t(".cards.status_label") %></strong>
                     <%= t(".cards.finished") %>
                   </p>
-                  <%= link_to t(".cards.view_results"), budget_results_path(budget), class: "button expanded hollow secondary" %>
+
+                  <%# ONLY DISPLAY RESULTS LINK IF ENABLED %>
+                  <% if budget.results_enabled? %>
+                    <%= link_to t(".cards.view_results"), budget_results_path(budget), class: "button expanded hollow secondary" %>
+                  <% else %>
+                    <p class="text-center margin-top"><em>Results are currently being processed.</em></p>
+                  <% end %>
+
                 </div>
               </div>
             </div>
@@ -92,7 +99,7 @@
     </div>
   <% end %>
 
-  <<%# --- EMPTY STATE FALLBACK --- %>
+  <%# --- EMPTY STATE FALLBACK --- %>
   <% if @active_voting.empty? && @upcoming.empty? && @past_results.empty? %>
     <div class="row margin-top margin-bottom">
       <div class="small-12 column text-center">
