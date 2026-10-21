@@ -11,6 +11,7 @@
 require "zlib"
 
 class StvCalculator
+  VERSION = "1.0.0"
   Result = Struct.new(
     :winners,
     :elimination_log,

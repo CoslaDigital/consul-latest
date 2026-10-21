@@ -51,7 +51,27 @@ class Budget
       # 1. Persist the authoritative result FIRST.
       update_winning_investments(result.winners)
 
-      # 2. THEN render and publish reports. Report bugs must not destroy results.
+      # 2. Persist the full count record (audit trail).
+      begin
+        Budget::StvResult.record!(
+          budget: @budget,
+          heading: @heading,
+          result: result,
+          seats: seats,
+          quota: initial_quota,
+          votes_cast: votes_cast,
+          election_seed: "#{@budget.id}-#{@heading.id}",
+          dynamic_quota_enabled: dynamic_quota_enabled,
+          investment_titles: investment_titles,
+          calculated_by: @user
+        )
+      rescue => e
+        Rails.logger.error("STV result persistence failed for heading #{@heading.id}: #{e.message}")
+        Rails.logger.error(e.backtrace.first(10).join("\n"))
+        write_to_output("⚠️ Result persistence failed: #{e.message}")
+      end
+
+      # 3. THEN render and publish reports. Report bugs must not destroy results.
       begin
         render_and_attach_reports(
           result, candidates, votes_cast, initial_quota, investment_titles,
