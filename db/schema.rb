@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_21_110114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -269,6 +269,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
     t.string "title"
     t.text "description"
     t.datetime "hidden_at", precision: nil
+    t.text "summary"
     t.index ["budget_investment_id"], name: "index_budget_investment_translations_on_budget_investment_id"
     t.index ["hidden_at"], name: "index_budget_investment_translations_on_hidden_at"
     t.index ["locale"], name: "index_budget_investment_translations_on_locale"
@@ -388,6 +389,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
     t.string "reason"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+  end
+
+  create_table "budget_stv_results", force: :cascade do |t|
+    t.bigint "budget_id", null: false
+    t.bigint "heading_id", null: false
+    t.datetime "calculated_at", null: false
+    t.bigint "calculated_by_user_id"
+    t.string "calculator_version", null: false
+    t.string "election_seed", null: false
+    t.integer "seats", null: false
+    t.integer "quota", null: false
+    t.integer "votes_cast", null: false
+    t.boolean "dynamic_quota_enabled", default: false, null: false
+    t.jsonb "winners", default: [], null: false
+    t.jsonb "elimination_log", default: [], null: false
+    t.jsonb "rounds", default: [], null: false
+    t.jsonb "investment_titles", default: {}, null: false
+    t.decimal "exhausted_total", precision: 15, scale: 6, default: "0.0", null: false
+    t.integer "unfilled_seats", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_budget_stv_results_on_budget_id"
+    t.index ["heading_id", "calculated_at"], name: "index_budget_stv_results_on_heading_and_time", order: { calculated_at: :desc }
+    t.index ["heading_id"], name: "index_budget_stv_results_on_heading_id"
   end
 
   create_table "budget_translations", id: :serial, force: :cascade do |t|
@@ -2010,6 +2035,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_124914) do
   add_foreign_key "budget_investments", "communities"
   add_foreign_key "budget_owners", "budgets"
   add_foreign_key "budget_owners", "users"
+  add_foreign_key "budget_stv_results", "budget_headings", column: "heading_id"
+  add_foreign_key "budget_stv_results", "budgets"
+  add_foreign_key "budget_stv_results", "users", column: "calculated_by_user_id", on_delete: :nullify
   add_foreign_key "budget_valuators", "budgets"
   add_foreign_key "budget_valuators", "valuators"
   add_foreign_key "bulk_password_resets", "users", column: "admin_user_id"
