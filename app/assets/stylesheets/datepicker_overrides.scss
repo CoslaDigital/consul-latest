@@ -5,17 +5,42 @@
 // 1. The Container
 .ui-datepicker,
 .simple-calendar {
+  color: #333; // FIX: Set default text color to dark gray
+  font-family: inherit;
   padding: 0;
   z-index: 4 !important;
-  font-family: inherit;
 
-  // FIX: Set default text color for the grid to dark gray.
-  // This prevents dates from disappearing if they inherit 'white' from a parent container.
-  color: #333333;
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    color: inherit;
+    cursor: pointer;
+    font-family: "icons" !important;
+    font-size: rem-calc(24);
+    font-weight: normal;
+    height: rem-calc(30);
+    line-height: $line-height;
+    position: absolute;
+    top: 4px;
+    width: rem-calc(30);
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .ui-datepicker-prev::after {
+    content: "\62";
+  }
+
+  .ui-datepicker-next::after {
+    content: "\63";
+  }
 
   table {
     border: 1px solid $border;
+    border-collapse: collapse;
     border-top: 0;
+    table-layout: fixed; // Ensures event bars don't stretch the cells weirdly
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed; // Ensures event bars don't stretch the cells weirdly
@@ -33,7 +58,8 @@
     }
   }
 
-  td, th {
+  td,
+  th {
     border-right: 1px solid $border;
     padding: 0;
 
@@ -46,9 +72,11 @@
   td {
     vertical-align: top;
 
-    span, a, .day-number {
-      display: block;
+    span,
+    a,
+    .day-number {
       color: inherit;
+      display: block;
       line-height: $line-height;
       text-align: center;
       text-decoration: none;
@@ -69,19 +97,16 @@
 .ui-datepicker-header,
 .calendar-heading {
   background-color: $brand; // Uses your app's main color
-
+  color: #fff; // Force #fff text on the header so Month Name is visible against $brand
   font-weight: bold;
-  position: relative;
   padding: rem-calc(10) 0;
+  position: relative;
   text-align: center;
 
-  // Force white text on the header so Month Name is visible against $brand
-  color: white;
-
   .calendar-title {
-    font-size: rem-calc(16);
-    color: white;
+    color: #fff;
     display: inline-block; // Ensures it respects centering
+    font-size: rem-calc(16);
   }
 }
 
@@ -91,18 +116,18 @@
 
 // Define the shared structural styles for arrows
 %datepicker-nav-shared {
+  align-items: center;
   cursor: pointer;
+  display: flex;
   font-family: "icons" !important; // Your icon font
   font-size: rem-calc(24);
   font-weight: normal;
   height: rem-calc(30);
+  justify-content: center;
   line-height: $line-height;
   position: absolute;
   top: 4px;
   width: rem-calc(30);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
   &:hover {
     text-decoration: none;

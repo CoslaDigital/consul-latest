@@ -35,21 +35,12 @@
   <div id="proposals" class="proposals-list small-12 medium-9 column">
 
     <%= render Shared::BannerComponent.new("proposals") %>
-
     <%= render Proposals::FeaturedProposalsComponent.new(@featured_proposals) %>
 
     <% unless params[:selected].present? %>
       <div class="row">
         <div class="small-12 column">
-          <%
-            map_proposals = @proposals
-            if params[:project].present?
-              kind = ProposalKind.find_by(slug: params[:project])
-              map_proposals = map_proposals.where(proposal_kind_id: kind.id) if kind
-            end
-          %>
-          <%= render Proposals::MapComponent.new(map_proposals) %>
-          <%#= render Proposals::MapComponent.new(@proposals) %>
+          <%= render Proposals::MapComponent.new(@map_proposals) %>
           <%= render Shared::ViewModeComponent.new %>
         </div>
       </div>
@@ -117,6 +108,7 @@
 
       <%= render "retired" %>
       <%= render "proposals_lists" %>
+      <%= render Sensemaker::ReportLinkComponent.new(Proposal) %>
     </aside>
   </div>
 </div>

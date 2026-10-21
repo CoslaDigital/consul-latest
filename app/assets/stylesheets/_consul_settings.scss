@@ -48,7 +48,15 @@ $small-font-size: rem-calc(14) !default;
 $abbr-underline: none !default;
 
 $orbit-bullet-diameter: 0.8rem !default;
-$orbit-caption-background: #eee;
+
+// 1. Change the caption background to a transparent overlay
+// For a dark transparent background use rgba($black, 0.7)
+// For a light transparent background use rgba($white, 0.85)
+$orbit-caption-background: rgba($black, 0.7) !default;
+
+// 2. Reduce the whitespace around the bullets at the bottom of the slider
+$orbit-bullet-margin-top: 0.2rem !default; // reduced from 0.8rem
+$orbit-bullet-margin-bottom: 0.2rem !default; // reduced from 0.8rem
 
 $show-header-for-stacked: true !default;
 

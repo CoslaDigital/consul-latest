@@ -1,75 +1,17 @@
 // 1. Move the import to the very top
 @import "cosla_shared";
 
-/*
-================================================================================
-COSLA MULTI-TENANT STYLING GUIDE (Variable Data-Store)
-================================================================================
-
-ARCHITECTURE OVERVIEW:
-We use a "Holy Trinity" CSS architecture to keep site branding maintainable and
-prevent layout conflicts across the network:
-
-1. custom_sites.scss (THIS FILE): Acts purely as a "Variable Dictionary".
-   It assigns color variables to specific tenant classes (e.g., .site-glasgow).
-   Do NOT put structural CSS (margins, padding, layout) in this file unless
-   it is a highly specific, unavoidable tenant override.
-
-2. _cosla_shared.scss: Contains the `@mixin shared-styles`. This handles the
-   structural CSS for tables, badges, comments, and maps. It consumes the
-   variables defined in this file.
-
-3. custom.scss: The single source of truth for global overrides like the
-   hero header. It applies the variables defined here dynamically.
-
-================================================================================
-HOW TO ADD A NEW SITE:
-================================================================================
-
-STEP 1: Copy and paste the BLANK TEMPLATE below.
-STEP 2: Change `.site-name` to match the tenant's exact system identifier.
-STEP 3: Fill in the hex codes.
-        - Use https://webaim.org/resources/contrastchecker/ to ensure your
-          contrast colors (text over brand colors) are accessible.
-STEP 4: Scroll to the very bottom of this file to the "GLOBAL APPLICATION"
-        block, and add your new `.site-name` to the comma-separated list so
-        it inherits the shared layout mixin.
-
-================================================================================
-BLANK TEMPLATE:
-================================================================================
-
-.site-name {
-  // Core Branding
-  --brand: #;
-  --brand-secondary: #;
-  --brand-contrast: #FFFFFF;
-
-  // Header
-  --main-header: var(--brand);
-  --main-header-contrast: #FFFFFF;
-
-  // Navigation
-  --top-links: var(--brand-secondary);
-  --top-links-contrast: #FFFFFF;
-  --subnavigation: #EAEAEA; // Usually light grey, adjust if needed
-
-  // Footer
-  --footer: var(--brand-secondary);
-  --footer-contrast: #FFFFFF;
-
-  // Content & Callouts
-  --background-color: var(--brand-secondary);
-  --text-color: var(--brand-contrast);
-
-  // Interactive Elements
-  --anchor-color: var(--brand);
-  --anchor-color-hover: var(--brand-secondary);
-  --button-background-hover: var(--brand-secondary);
-  --button-background-hover-contrast: #FFFFFF;
-}
-
-*/
+// ==========================================================================
+// SITE VARIABLE CONFIGURATIONS (Pure Data Data-Store)
+// ==========================================================================
+// Standardized Structure:
+// - Core Branding
+// - Header
+// - Navigation
+// - Footer
+// - Content & Callouts
+// - Interactive Elements
+// ==========================================================================
 
 .site-coslatest {
   // Core Branding
@@ -224,7 +166,6 @@ BLANK TEMPLATE:
   --anchor-color-hover: var(--brand-secondary);
   --button-background-hover: var(--brand-secondary);
   --button-background-hover-contrast: #FFFFFF;
-
 }
 
 .site-perthandkinross {
@@ -591,7 +532,7 @@ BLANK TEMPLATE:
   --button-background-hover-contrast: #FFFFFF;
 
   // Custom structural override for Renfrewshire
-  .hero-header .hero-content .row::before {
+  .hero-header .row::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(to top, var(--brand-contrast2) 0%, var(--brand) 100%) !important;
@@ -631,52 +572,21 @@ BLANK TEMPLATE:
 }
 
 .site-elections {
-  // Core Branding
+  --main-header: #EC008B;
   --brand: #55366B;
   --brand-secondary: #EE7522;
   --brand-contrast: #FFFFFF;
-
-  // Header
-  --main-header: #EC008B;
-  --main-header-contrast: #FFFFFF;
-
-  // Navigation
-  --top-links: #a9c731;
-  --top-links-contrast: #FFFFFF;
-  --subnavigation: #EAEAEA; // Added missing variable
-
-  // Footer
   --footer: #eee6db;
-  --footer-contrast: #333333; // Added for dark text on light footer
-
-  // Content & Callouts
-  --background-color: var(--brand-secondary);
-  --text-color: var(--brand-contrast);
-
-  // Interactive Elements
-  --anchor-color: var(--brand);
-  --anchor-color-hover: var(--brand-secondary);
-  --button-background-hover: var(--brand-secondary);
-  --button-background-hover-contrast: #FFFFFF;
-}
-
-.site-syp {
-  // Core Branding
-  --brand: #0093D1;
-  --brand-secondary: #F78E1E;
-  --brand-contrast: #FFFFFF;
 
   // Header
   --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
-
-  // Navigation
-  --top-links: #F78E1E;
+  --top-links: #a9c731;
   --top-links-contrast: #FFFFFF;
-  --subnavigation: #FFFFFF;
+  --subnavigation: #EAEAEA;
 
   // Footer
-  --footer: #F78E1E;
+  --footer: #0069aa;
   --footer-contrast: #FFFFFF;
 
   // Content & Callouts

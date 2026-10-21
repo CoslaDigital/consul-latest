@@ -5,7 +5,6 @@
 <% end %>
 
 <%# --- SAFELY ROUTED PROJECT TYPE FILTERS --- %>
-<%# --- ADDED: HIGH-LEVEL PROJECT TRACK UTILITY PANEL --- %>
 <% if ProposalKind.count > 1 %>
   <div class="subnavigation structural-filter" style="margin-bottom: 1.5rem; background: #f4f4f4; padding: 1rem; border-radius: 4px; border: 1px solid #e1e1e1;">
     <strong style="margin-right: 1rem; color: #555;">Filter by Project Type:</strong>
@@ -23,34 +22,36 @@
     <% end %>
   </div>
 <% end %>
-<%# --- END PANEL --- %>
+
 <% if proposals.any? %>
-  <%= render Admin::SearchComponent.new(label: t("admin.shared.search.label.proposals")) %>
 
-  <div class="input-group">
-    <%# Now that your YAML is fixed, we can safely use the original translation key! %>
-    <%= text_field_tag :search, params[:search],
-                       class: "input-group-field",
-                       placeholder: t("admin.shared.search.label.proposals") %>
+  <%# --- BULLETPROOF SEARCH FORM --- %>
+  <div style="margin-bottom: 1.5rem; max-width: 600px;">
+    <%= form_tag admin_proposals_path, method: :get, enforce_utf8: false do %>
+      <% if params[:project].present? %>
+        <%= hidden_field_tag :project, params[:project] %>
+      <% end %>
 
-    <div class="input-group-button">
-      <%# name: nil guarantees the URL is never corrupted by a commit button again %>
-      <%= submit_tag "Search", class: "button", name: nil %>
-    </div>
+      <div class="input-group">
+        <%# Now that your YAML is fixed, we can safely use the original translation key! %>
+        <%= text_field_tag :search, params[:search],
+                           class: "input-group-field",
+                           placeholder: t("admin.shared.search.label.proposals") %>
+
+        <div class="input-group-button">
+          <%# name: nil guarantees the URL is never corrupted by a commit button again %>
+          <%= submit_tag "Search", class: "button", name: nil %>
+        </div>
+      </div>
+    <% end %>
   </div>
-<% end %>
-</div>
 
-  <%# The single button bar containing your two primary utilities %>
   <div class="page-actions" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
     <%= link_to t("admin.proposals.index.download_csv", default: "Download CSV"),
                 admin_proposals_path(search: params[:search], project: params[:project], format: :csv),
                 class: "button clear-margin-bottom" %>
 
-    <%# ONLY ONE: Replaced with a clean, secondary-styled management shortcut %>
-    <%= link_to "Manage Proposal Types",
-                admin_proposal_kinds_path,
-                class: "button hollow secondary clear-margin-bottom" %>
+    <%= proposal_kinds_link rescue nil %>
   </div>
 
   <h3><%= page_entries_info proposals %></h3>
@@ -61,7 +62,6 @@
       <th class="text-center"><%= t("admin.proposals.index.id") %></th>
       <th><%= Proposal.human_attribute_name(:title) %></th>
       <th><%= t("admin.proposals.index.author") %></th>
-      <th><%= t("admin.proposals.index.status") %></th>
       <th><%= t("admin.proposals.index.status", default: "Status") %></th>
       <th><%= t("admin.proposals.index.updated_at", default: "Updated at") %></th>
       <th><%= t("admin.proposals.index.milestones") %></th>
@@ -76,6 +76,7 @@
         <td><%= link_to proposal.title, admin_proposal_path(proposal) %></td>
         <td><%= proposal.author.username %></td>
         <td><%= proposal.published? ? t("admin.proposals.index.published") : t("admin.proposals.index.draft") %></td>
+        <td><%= proposal.updated_at.strftime('%Y-%m-%d %H:%M') %></td>
         <td><%= proposal.milestones.count %></td>
         <td><%= render Admin::Proposals::ToggleSelectionComponent.new(proposal) %></td>
       </tr>
