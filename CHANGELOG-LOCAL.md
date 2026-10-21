@@ -2,6 +2,46 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.6.0-syp.1](https://github.com/cosladigital/consul-latest/tree/2.6.0-syp.1) (2026-10-23)
+
+## What's Changed
+
+### Added
+
+* Feature: Add customsable language set for Elections
+* Feature: NEC Card- added strategy for custom numbers
+* Feature: My Area- added a landing page which displays processes for my geozone
+* NEC Card: added a dedicated login page for NEC cards
+* Feature: Budget owner- added budget owner role
+* Security: add rack attack geofencing and rate limiting
+* Feature: Geozones: hierarchical geozone routing and add ancestor traversal methods to the Geozone model
+* Feature: Add feature setting to restrict debate creation to Admin only
+* Feature: Give users ability to make documents private
+* Feature: Add user lock/unlock functionality to admin users index
+* Feature: add voter density auditing and spatial analysis for budget balloting
+* Feature: add election type to budgets
+* Feature: Settings - restrict login to the domain listed in the official email setting
+* Feature: Settings - create feature switch to control whether processes are displayed to guest users
+
+### Changed
+
+* Maps: added geozone and points as layers
+* Maps: added new background layers
+* Maps: snap dynamically to bounds
+* Budgets: amend index page to display all open budgets instead of most recent budget
+* Budgets: sort admin view alphabetically and add search to admin view
+* Budgets: clean style of budget phases view
+* Budgets: Update STV voting to deal with edge cases
+* Budgets: Improve STV reports
+
+### Fixed
+
+* cleaned up behaviour of obfuscation of local login
+* make invalid geozone error user friendly
+* Fix videourl parser to accept youtube shorts
+
+**Full Changelog**:
+
 ## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
 
 ## What's Changed
@@ -106,5 +146,3 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 ### Fixed
-
-
