@@ -28,6 +28,7 @@ module Abilities
         can [:read], Budget
         can [:read], Budget::Group
         can [:read, :print], Budget::Investment
+        can :read, Budget::Investment::Answer
         can :read_results, Budget, id: Budget.finished.results_enabled.ids
 
         can :read_stats, Budget, id: Budget.valuating_or_later.stats_enabled.ids
