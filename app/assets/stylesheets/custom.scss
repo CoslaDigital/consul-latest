@@ -30,7 +30,16 @@
   // These apply to the fallback hero (no image)
   @include full-width-background;
   @extend %budget-header;
-  margin-top: -$line-height;
+
+  margin-top: -$line-height; // <-- This is pulling it up over the banner
+
+  // ADD THIS FIX:
+  // If a .banner comes before the .hero-header, remove the negative margin
+  // so they stack normally without overlapping.
+  .banner ~ & {
+    margin-top: 0;
+  }
+
   width: 100vw;
   position: relative;
   left: 50%;
