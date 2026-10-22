@@ -339,8 +339,17 @@ class User < ApplicationRecord
   private
 
     def self.log_in_or_create_ys_user(document_number)
+      # Calculate the expected geozone upfront for all 3 scenarios
+      prefix = document_number.to_s[0, 6]
+      council_name = council_name_for_prefix(prefix)
+      expected_geozone = Geozone.find_by(name: "ys_#{council_name}")
+
       # 1. Exact match fallback (handles standard logins fast)
       if (existing_user = User.find_by(username: document_number))
+        if expected_geozone && existing_user.geozone_id != expected_geozone.id
+          existing_user.geozone_id = expected_geozone.id
+          existing_user.save(validate: false)
+        end
         return existing_user
       end
 
@@ -361,6 +370,11 @@ class User < ApplicationRecord
           legacy_user.email = "#{document_number}@consul.dev"
           legacy_user.password = document_number # Critical: Updates their password to the new card
 
+          # Update geozone if it has changed
+          if expected_geozone && legacy_user.geozone_id != expected_geozone.id
+            legacy_user.geozone_id = expected_geozone.id
+          end
+
           if legacy_user.save(validate: false)
             return legacy_user
           else
@@ -370,22 +384,20 @@ class User < ApplicationRecord
       end
 
       # 3. Create brand new user if no base match was found
-      prefix = document_number.to_s[0, 6]
-      council_name = council_name_for_prefix(prefix)
-      geozone_name = "ys_#{council_name}"
-
       user = User.new(
         username: document_number,
         email: "#{document_number}@consul.dev",
         password: document_number,
         document_number: document_number,
-        geozone_id: Geozone.find_by!(name: geozone_name).id,
+        geozone_id: expected_geozone&.id, # Uses the upfront calculation
         terms_of_service: "1",
         confirmed_at: Time.current,
         verified_at: Time.current,
         level_two_verified_at: Time.current,
         residence_verified_at: Time.current
       )
+
+      user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
 
       user.valid?
 
