@@ -1,15 +1,17 @@
 <% if question.question_options.any? %>
-  <% if process.debate_phase.open? && !answer.persisted? && can?(:create, Legislation::Answer) %>
+  <% if process.debate_phase.open? && can?(:create, Legislation::Answer) %>
 
-    <%= form_for answer, url: legislation_process_question_answers_path(process, question, answer), remote: true, html: { class: "controls-stacked" } do |f| %>
+    <%= form_for answer, url: legislation_process_question_answers_path(process, question), remote: true, html: { class: "controls-stacked" } do |f| %>
       <% question.question_options.each do |question_option| %>
-        <label class="control radio <%= "is-active" if @answer.legislation_question_option_id == question_option.id %>">
+        <label class="control radio <%= "is-active" if answer.legislation_question_option_id == question_option.id %>">
           <%= f.radio_button :legislation_question_option_id, question_option.id, label: false %>
           <span class="control-indicator"></span>
           <%= question_option.value %>
         </label>
       <% end %>
-      <%= f.submit t("legislation.questions.show.answer_question"), class: "button" %>
+
+      <%# Hidden directly so it doesn't flash when injected via AJAX %>
+      <%= f.submit t("legislation.questions.show.answer_question"), class: "button", style: "display: none;" %>
     <% end %>
 
   <% else %>
@@ -23,15 +25,6 @@
         </label>
       <% end %>
     </form>
-
-    <%# The completion banner: updated to use callout primary %>
-    <% if answer.persisted? && question.next_question_id.nil? %>
-      <div class="callout primary margin-top" style="margin-top: 2rem;">
-        <strong><%= t("legislation.questions.completion.title", default: "Thank you for participating!") %></strong>
-        <p><%= t("legislation.questions.completion.body", default: "You have reached the end of the consultation questions.") %></p>
-        <%= link_to t("legislation.questions.completion.return", default: "Return to consultation"), legislation_process_path(process), class: "button margin-top" %>
-      </div>
-    <% end %>
 
   <% end %>
 

@@ -1,26 +1,45 @@
 <% provide :title, @question.title %>
+<% previous_question = @process.questions.where("id < ?", @question.id).order(id: :desc).first %>
 
 <section class="debate-questions">
-  <div class="quiz-header row small-collapse">
-    <div class="quiz-title">
+  <%# Added flex to ensure all three blocks stretch to the exact same height %>
+  <div class="quiz-header row small-collapse" style="display: flex;">
+
+    <%# PREVIOUS QUESTION BLOCK (Reuses quiz-next class for the shaded background) %>
+    <div class="quiz-next" style="flex: 1; text-align: left; border-left: none; border-right: 1px solid #e3e3e3;">
+      <% if previous_question %>
+        <%= link_to legislation_process_question_path(@process, previous_question), class: "quiz-next-link", style: "justify-content: flex-start; padding-left: 1.5rem;" do %>
+          <span class="icon-angle-left" aria-hidden="true" style="margin-right: 0.5rem;"></span>
+          <%= t("legislation.questions.show.previous_question", default: "Previous question") %>
+        <% end %>
+      <% else %>
+        <%# Keeps the shaded block present but empty on the first question %>
+        <div class="quiz-next-link" style="visibility: hidden;">&nbsp;</div>
+      <% end %>
+    </div>
+
+    <%# TITLE BLOCK %>
+    <div class="quiz-title" style="flex: 2; border-left: none;">
       <p class="quiz-header-title"><%= t("legislation.questions.show.title") %></p>
       <strong><%= link_to @process.title, @process %></strong>
     </div>
-    <div class="quiz-next">
+
+    <%# NEXT QUESTION BLOCK %>
+    <div class="quiz-next" style="flex: 1;">
       <% if @question.next_question_id %>
         <%= link_to legislation_process_question_path(@process, @question.next_question_id), class: "quiz-next-link" do %>
           <%= t("legislation.questions.show.next_question") %>
           <span class="icon-angle-right" aria-hidden="true"></span>
         <% end %>
       <% else %>
-        <%# Replaced the infinite loop with an exit path %>
         <%= link_to legislation_process_path(@process), class: "quiz-next-link" do %>
-          <%= t("legislation.questions.show.return_to_process", default: "Submit Responses") %>
+          <%= t("legislation.questions.show.return_to_process", default: "Return to consultation") %>
           <span class="icon-angle-right" aria-hidden="true"></span>
         <% end %>
       <% end %>
     </div>
   </div>
+
   <div class="row">
     <div class="small-12 medium-9 column">
       <h1 class="quiz-question"><%= @question.title %></h1>
@@ -38,6 +57,7 @@
       <%= render "/shared/social_share", title: @question.title, url: legislation_process_question_url(@question.process, @question) %>
     </aside>
   </div>
+
   <%= render Shared::CommentsComponent.new(@question, @comment_tree) do %>
     <h2>
       <%= t("legislation.questions.comments.comments_title") %>

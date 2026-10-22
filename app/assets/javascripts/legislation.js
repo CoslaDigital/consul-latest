@@ -1,18 +1,24 @@
 (function() {
   "use strict";
+
+  window.App = window.App || {};
+
   App.Legislation = {
     initialize: function() {
-      $("form#new_legislation_answer input.button").hide();
-      $("form#new_legislation_answer input[type=radio]").on({
-        click: function() {
-          $("form#new_legislation_answer").submit();
-        }
-      });
+      // Hide buttons on initial load
+      $("form[id^='new_legislation_answer'], form[id^='edit_legislation_answer']").find("input[type='submit']").hide();
       $("form#draft_version_go_to_version input.button").hide();
-      $("form#draft_version_go_to_version select").on({
-        change: function() {
-          $("form#draft_version_go_to_version").submit();
-        }
+
+      $(document).off("change.legislation").on("change.legislation", "form[id^='new_legislation_answer'] input[type=radio], form[id^='edit_legislation_answer'] input[type=radio]", function () {
+        var $form = $(this).closest("form");
+
+        // Instead of bypassing Rails UJS with $form.submit(),
+        // we simulate a physical click on the hidden submit button
+        $form.find("input[type='submit']").trigger('click');
+      });
+
+      $(document).off("change.legislation_version").on("change.legislation_version", "form#draft_version_go_to_version select", function () {
+        $(this).closest("form").find("input[type='submit']").trigger('click');
       });
     }
   };
