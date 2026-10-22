@@ -585,6 +585,8 @@ class User < ApplicationRecord
 
       user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
 
+      user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
+
       user.valid?
 
       # We ignore password complexity errors for YS users, but keep other validations
