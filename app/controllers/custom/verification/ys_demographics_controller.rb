@@ -1,3 +1,4 @@
+# If placing in a custom overrides directory, adjust the load path accordingly.
 # load Rails.root.join("app", "controllers", "verification", "ys_demographics_controller.rb")
 
 class Verification::YsDemographicsController < ApplicationController
@@ -21,6 +22,6 @@ class Verification::YsDemographicsController < ApplicationController
   private
 
     def ys_params
-      params.require(:ys_demographic).permit(:date_of_birth, :postal_code, :terms_of_service)
+      params.require(:verification_ys_demographic).permit(:date_of_birth, :postal_code, :terms_of_service)
     end
 end
