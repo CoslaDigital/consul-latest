@@ -30,3 +30,4 @@ gem "rqrcode", "~> 2.0"
 gem "acts_as_list"
 gem 'rack-attack'
 gem 'maxmind-db', '>= 1.3.2'
+gem "notifications-ruby-client"
