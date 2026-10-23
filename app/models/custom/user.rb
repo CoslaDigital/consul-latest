@@ -422,37 +422,21 @@ class User < ApplicationRecord
     (ancestors + descendants).uniq
   end
 
-  # Builds an array of required steps dynamically based on current Admin Settings.
+  # --- DYNAMIC VERIFICATION PIPELINE ---
+
   def verification_pipeline
     steps = []
 
-    # 1. First Step: Demographics/Residence
-    # The global `require_residence` setting is the master switch.
-    # If it is OFF, NOBODY does this step.
-    if Setting["verification.require_residence"].present?
-
-      if User.valid_ys_document?(document_number)
-        # If it's a YS user, look at their specific toggle to see WHICH form they get
-        if Setting["verification.ys_requires_demographics"].present?
-          steps << :ys_demographics
-        end
-        # If ys_requires_demographics is OFF, we add NOTHING. They skip step 1.
-      else
-        # Standard users always get the standard form
-        steps << :residence
-      end
-
+    # YS User Pipeline
+    if User.valid_ys_document?(document_number)
+      steps << :ys_demographics if Setting["verification.ys_requires_demographics"]
+      return steps
     end
 
-    # 2. Second Step: SMS
-    if Setting["verification.require_sms"].present?
-      steps << :sms
-    end
-
-    # 3. Third Step: Letter
-    if Setting["verification.require_letter"].present?
-      steps << :letter
-    end
+    # Standard User Pipeline
+    steps << :residence if Setting["verification.require_residence"]
+    steps << :sms if Setting["verification.require_sms"]
+    steps << :letter if Setting["verification.require_letter"]
 
     steps
   end
@@ -460,10 +444,10 @@ class User < ApplicationRecord
   def pending_verification_steps
     verification_pipeline.reject do |step|
       case step
-      when :ys_demographics then residence_verified_at.present?
+      when :ys_demographics then verified_at.present?
       when :residence then residence_verified_at.present?
-      when :sms then confirmed_phone.present?
-      when :letter then verified_at.present?
+      when :sms then sms_verified?
+      when :letter then level_three_verified_at.present?
       else true
       end
     end
