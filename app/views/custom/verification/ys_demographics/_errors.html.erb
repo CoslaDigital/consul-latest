@@ -1,0 +1,14 @@
+<%# If we ever need to catch a specific YS error (like an invalid card status), we can intercept it here like the census does %>
+<% if @ys_demographic.errors[:base].present? %>
+  <div id="error_explanation" data-alert class="callout alert" data-closable>
+    <button class="close-button" aria-label="<%= t("application.close") %>" type="button" data-close>
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <%= @ys_demographic.errors[:base].first %>
+  </div>
+<% else %>
+  <%# Standard fallback for age, postcode, and terms of service validation errors %>
+  <%= render "shared/errors",
+             resource: @ys_demographic,
+             message: t("verification.residence.new.form_errors") %>
+<% end %>

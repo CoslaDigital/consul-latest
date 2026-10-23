@@ -391,11 +391,17 @@ class User < ApplicationRecord
         document_number: document_number,
         geozone_id: expected_geozone&.id, # Uses the upfront calculation
         terms_of_service: "1",
-        confirmed_at: Time.current,
-        verified_at: Time.current,
-        level_two_verified_at: Time.current,
-        residence_verified_at: Time.current
+        confirmed_at: Time.current # Always auto-confirm the dummy email
       )
+
+      # Determine if the user bypasses the demographic form
+      skip_ys_verification = !Setting["verification.ys_requires_demographics"] || Setting["feature.user.skip_verification"]
+
+      if skip_ys_verification
+        user.verified_at = Time.current
+        user.level_two_verified_at = Time.current
+        user.residence_verified_at = Time.current
+      end
 
       user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
 
@@ -557,6 +563,61 @@ class User < ApplicationRecord
 
       # 4. Simply look up the prefix!
       lookup_hash[prefix.to_s]
+    end
+
+    # --- DYNAMIC VERIFICATION PIPELINE ---
+
+    def verification_pipeline
+      steps = []
+
+      # YS User Pipeline
+      if User.valid_ys_document?(document_number)
+        steps << :ys_demographics if Setting["verification.ys_requires_demographics"]
+        return steps
+      end
+
+      # Standard User Pipeline
+      steps << :residence if Setting["verification.require_residence"]
+      steps << :sms if Setting["verification.require_sms"]
+      steps << :letter if Setting["verification.require_letter"]
+
+      steps
+    end
+
+    def pending_verification_steps
+      verification_pipeline.reject do |step|
+        case step
+        when :ys_demographics then verified_at.present?
+        when :residence then residence_verified_at.present?
+        when :sms then level_two_verified_at.present?
+        when :letter then level_three_verified_at.present?
+        else true
+        end
+      end
+    end
+
+    def pipeline_complete?
+      pending_verification_steps.empty?
+    end
+
+    def promote_to_fully_verified!
+      updates = {}
+      updates[:residence_verified_at] = Time.current unless residence_verified_at?
+      updates[:level_two_verified_at] = Time.current unless level_two_verified_at?
+      # You can add level_three_verified_at here too if your app considers an empty pipeline = Level 3
+
+      update_columns(updates) if updates.any?
+    end
+
+    # --- CONSUL OVERRIDES ---
+
+    # Override Consul's native verification checks to respect our dynamic pipeline
+    def level_two_verified?
+      super || pipeline_complete?
+    end
+
+    def residence_verified?
+      super || pipeline_complete?
     end
 
 end

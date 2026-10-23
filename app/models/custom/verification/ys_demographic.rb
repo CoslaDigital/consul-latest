@@ -17,9 +17,13 @@ class Verification::YsDemographic
     normalized_postcode = postal_code.to_s.strip.downcase
     new_geozone_id = Postcode.find_geozone_for_postcode(normalized_postcode) || user.geozone_id
 
-    # 2. Update the user with the Geozone and Timestamp ONLY.
-    # Do NOT save the raw date_of_birth or postal_code.
+    # 2. Update the user with the Geozone, Timestamp, AND Date of Birth.
+    # We still discard the raw postal_code as it's not a database column.
+
+    dob_to_save = date_of_birth.is_a?(String) ? Date.parse(date_of_birth) : date_of_birth
+
     user.update!(
+      date_of_birth: dob_to_save.in_time_zone.to_datetime,
       geozone_id: new_geozone_id,
       verified_at: Time.current
     )
@@ -30,7 +34,6 @@ class Verification::YsDemographic
     def allowed_age
       return if errors[:date_of_birth].any?
 
-      # We cast it to a Date object in memory for the age check
       dob_in_memory = date_of_birth.is_a?(String) ? Date.parse(date_of_birth) : date_of_birth
 
       if Age.in_years(dob_in_memory) < User.minimum_required_age

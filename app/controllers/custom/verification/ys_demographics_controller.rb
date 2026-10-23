@@ -22,6 +22,6 @@ class Verification::YsDemographicsController < ApplicationController
   private
 
     def ys_params
-      params.require(:verification_ys_demographic).permit(:date_of_birth, :postal_code, :terms_of_service)
+      params.require(:ys_demographic).permit(:date_of_birth, :postal_code, :terms_of_service)
     end
 end
