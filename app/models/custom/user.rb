@@ -336,6 +336,81 @@ class User < ApplicationRecord
     (ancestors + descendants).uniq
   end
 
+  # --- DYNAMIC VERIFICATION PIPELINE ---
+
+  def verification_pipeline
+    steps = []
+
+    # YS User Pipeline
+    if User.valid_ys_document?(document_number)
+      steps << :ys_demographics if Setting["verification.ys_requires_demographics"]
+      return steps
+    end
+
+    # Standard User Pipeline
+    steps << :residence if Setting["verification.require_residence"]
+    steps << :sms if Setting["verification.require_sms"]
+    steps << :letter if Setting["verification.require_letter"]
+
+    steps
+  end
+
+  def pending_verification_steps
+    verification_pipeline.reject do |step|
+      case step
+      when :ys_demographics then verified_at.present?
+      when :residence then residence_verified_at.present?
+      when :sms then sms_verified?
+      when :letter then level_three_verified_at.present?
+      else true
+      end
+    end
+  end
+
+  def pipeline_complete?
+    pending_verification_steps.empty?
+  end
+
+  def promote_to_fully_verified!
+    updates = {}
+    updates[:residence_verified_at] = Time.current unless residence_verified_at?
+    updates[:level_two_verified_at] = Time.current unless level_two_verified_at?
+
+    # NEW: Stamp the Level 3 verified_at column so Consul stops asking for Letter verification
+    updates[:verified_at] = Time.current unless verified_at?
+
+    update_columns(updates) if updates.any?
+  end
+
+  # --- CONSUL OVERRIDES ---
+  def level_two_verified?
+    super || pipeline_complete?
+  end
+
+  def residence_verified?
+    super || pipeline_complete?
+  end
+
+  # NEW: Automatically consider them Level 3 if the admin pipeline is empty
+  def level_three_verified?
+    super || pipeline_complete?
+  end
+
+  def unverify!
+    update!(
+      residence_verified_at: nil,
+      level_two_verified_at: nil,
+      verified_at: nil,
+      confirmed_phone: nil,
+      unconfirmed_phone: nil,
+      sms_confirmation_code: nil,
+      document_number: nil,
+      document_type: nil,
+      letter_requested_at: nil,
+      letter_verification_code: nil
+    )
+  end
+
   private
 
     def self.log_in_or_create_ys_user(document_number)
@@ -565,59 +640,5 @@ class User < ApplicationRecord
       lookup_hash[prefix.to_s]
     end
 
-    # --- DYNAMIC VERIFICATION PIPELINE ---
-
-    def verification_pipeline
-      steps = []
-
-      # YS User Pipeline
-      if User.valid_ys_document?(document_number)
-        steps << :ys_demographics if Setting["verification.ys_requires_demographics"]
-        return steps
-      end
-
-      # Standard User Pipeline
-      steps << :residence if Setting["verification.require_residence"]
-      steps << :sms if Setting["verification.require_sms"]
-      steps << :letter if Setting["verification.require_letter"]
-
-      steps
-    end
-
-    def pending_verification_steps
-      verification_pipeline.reject do |step|
-        case step
-        when :ys_demographics then verified_at.present?
-        when :residence then residence_verified_at.present?
-        when :sms then level_two_verified_at.present?
-        when :letter then level_three_verified_at.present?
-        else true
-        end
-      end
-    end
-
-    def pipeline_complete?
-      pending_verification_steps.empty?
-    end
-
-    def promote_to_fully_verified!
-      updates = {}
-      updates[:residence_verified_at] = Time.current unless residence_verified_at?
-      updates[:level_two_verified_at] = Time.current unless level_two_verified_at?
-      # You can add level_three_verified_at here too if your app considers an empty pipeline = Level 3
-
-      update_columns(updates) if updates.any?
-    end
-
-    # --- CONSUL OVERRIDES ---
-
-    # Override Consul's native verification checks to respect our dynamic pipeline
-    def level_two_verified?
-      super || pipeline_complete?
-    end
-
-    def residence_verified?
-      super || pipeline_complete?
-    end
 
 end
