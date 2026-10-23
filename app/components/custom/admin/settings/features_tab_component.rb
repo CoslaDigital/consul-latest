@@ -1,4 +1,4 @@
-load Rails.root.join("app","components","admin","settings","features_tab_component.rb")
+load Rails.root.join("app", "components", "admin", "settings", "features_tab_component.rb")
 
 class Admin::Settings::FeaturesTabComponent < ApplicationComponent
   alias_method :original_settings, :settings
@@ -14,6 +14,10 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.require_login_to_view_processes
                           feature.enable_card_login
                           feature.my_area_landing_page
+                          verification.ys_requires_demographics
+                          verification.require_residence
+                          verification.require_sms
+                          verification.require_letter
                           feature.geofence_card_login
                         ]
     original_settings + custom_settings

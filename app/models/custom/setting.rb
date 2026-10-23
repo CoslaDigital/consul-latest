@@ -41,7 +41,12 @@ class Setting
                                 "feature.enable_card_login": false,
                                 "feature.my_area_landing_page": false,
                                 "feature.geofence_card_login": true,
-                                "geofence_allowed_countries": "GB"
+                                "geofence_allowed_countries": "GB",
+                                # Dynamic Verification Pipeline Settings
+                                "verification.ys_requires_demographics": false,
+                                "verification.require_residence": true,
+                                "verification.require_sms": true,
+                                "verification.require_letter": false
                               })
       end
     end
@@ -71,7 +76,8 @@ class Setting
     end
 
     def enable_card_login?
-      Setting["feature.enable_card_login"] == "active"
+
+    Setting["feature.enable_card_login"] == "active"
     end
 
     def my_area_enabled?
