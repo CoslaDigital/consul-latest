@@ -23,6 +23,7 @@
 
     <%= form_for @residence, as: "residence", url: residence_path do |f| %>
       <%= render "errors" %>
+
       <% if @residence.errors.any? %>
         <div class="callout alert" style="background-color: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px;">
           <strong>Debug:</strong>
@@ -37,36 +38,36 @@
       <div class="row" style="display: none;">
         <div class="small-12 medium-8">
           <div class="small-12 medium-3 column">
-          <%= f.select :document_type, document_types, prompt: "" %>
+            <%= f.select :document_type, document_types, prompt: "" %>
           </div>
+
           <div class="small-12 medium-5 column end">
+            <div class="inline-block">
+              <%= f.label t("verification.residence.new.document_number") %>
+            </div>
 
-          <div class="inline-block">
-            <%= f.label t("verification.residence.new.document_number") %>
-          </div>
+            <button type="button" class="inline-block" data-toggle="info-document-number">
+              <span class="icon-help"></span>
+              <span class="show-for-sr"><%= t("verification.residence.new.document_number_help_title") %></span>
+            </button>
 
-          <button type="button" class="inline-block" data-toggle="info-document-number">
-            <span class="icon-help"></span>
-            <span class="show-for-sr"><%= t("verification.residence.new.document_number_help_title") %></span>
-          </button>
+            <div class="dropdown-pane" id="info-document-number" data-dropdown data-hover="true" data-hover-pane="true">
+              <%= sanitize(t("verification.residence.new.document_number_help_text")) %>
+            </div>
 
-          <div class="dropdown-pane" id="info-document-number" data-dropdown
-               data-hover="true" data-hover-pane="true">
-            <%= sanitize(t("verification.residence.new.document_number_help_text")) %>
-          </div>
-
-          <%= f.text_field :document_number, label: false %>
+            <%= f.text_field :document_number, label: false %>
           </div>
         </div>
       </div>
+
       <% if Verification::Residence.new.verify_dob %>
-      <div class="date-of-birth small-12 medium-6 clear" >
-        <%= render Shared::DateOfBirthFieldComponent.new(f) %>
+        <div class="date-of-birth small-12 medium-6 clear">
+          <%= render Shared::DateOfBirthFieldComponent.new(f) %>
+        </div>
       <% end %>
 
       <div class="small-12 medium-5 clear">
-        <%= f.text_field :postal_code,
-                         hint: t("verification.residence.new.postal_code_note") %>
+        <%= f.text_field :postal_code, hint: t("verification.residence.new.postal_code_note") %>
       </div>
 
       <div class="small-12">

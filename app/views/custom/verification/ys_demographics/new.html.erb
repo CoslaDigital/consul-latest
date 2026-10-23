@@ -21,7 +21,7 @@
       <%= render Account::PermissionsListComponent.new(User.new(level_two_verified_at: Time.current)) %>
     </div>
 
-    <%= form_for @ys_demographic, as: "verification_ys_demographic", url: verification_ys_demographic_path do |f| %>
+    <%= form_for @ys_demographic, as: "ys_demographic", url: ys_demographic_path do |f| %>
       <%= render "errors" %>
 
       <% if @ys_demographic.errors.any? %>
