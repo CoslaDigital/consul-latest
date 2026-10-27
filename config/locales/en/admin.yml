@@ -1648,7 +1648,7 @@ en:
       sdg:
         budget_investments:
           amount: "Approved amount"
-          winners: "Winning Candidates"
+          winners: "Winning Projects"
           sent: "Investment projects sent"
         debates: "Debates"
         polls: "Polls"

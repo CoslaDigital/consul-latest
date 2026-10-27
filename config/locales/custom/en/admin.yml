@@ -97,7 +97,7 @@ en:
           all: All
           open: Open
           finished: Finished
-        budget_investments: Budget Candidates
+        budget_investments: Projects
         table_budget_type: "Type"
         table_completed: Completed
         table_draft: "Draft"
@@ -159,7 +159,7 @@ en:
         stv_winners_help_text: "This is the total number of seats being elected in this election"
       destroy:
         success_notice: Budget deleted successfully
-        unable_notice: You cannot delete an that has associated candidates
+        unable_notice: You cannot delete an that has associated projects
         unable_notice_polls: You cannot delete a budget that has an associated poll
       new:
         title_multiple: New multiple headings budget
