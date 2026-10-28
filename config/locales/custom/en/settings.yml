@@ -252,6 +252,6 @@ en:
       require_residence: "Standard Users: Require Verification"
       require_residence_description: "When enabled, standard users must provide (Postal Code & Date of Birth) to be verified."
       require_sms: "Standard Users: Require SMS Verification (Level 2)"
-      require_sms_description: "When enabled, standard users must complete SMS phone verification."
+      require_sms_description: "When enabled, standard users must complete SMS phone verification. Your admin must configure an api key to be able to use this option"
       require_letter: "Standard Users: Require Letter Verification (Level 3)"
       require_letter_description: "When enabled, standard users must complete physical letter verification."

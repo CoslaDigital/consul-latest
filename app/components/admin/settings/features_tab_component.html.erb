@@ -2,6 +2,6 @@
 
 <%= render Admin::Settings::TableComponent.new(setting_name: "feature", table_class: "featured-settings-table") do %>
   <% settings.each do |key| %>
-    <%= render Admin::Settings::RowComponent.new(key, type: :feature, tab: "#tab-feature-flags") %>
+    <%= render Admin::Settings::RowComponent.new(key, type: :feature, tab: "#tab-feature-flags", disabled: setting_disabled?(key)) %>
   <% end %>
 <% end %>
