@@ -523,7 +523,7 @@ Rails.logger.info("oauth_user #{oauth_user}")
   end
 
   def send_devise_notification(notification, *)
-    devise_mailer.send(notification, self, *args).deliver_later
+    devise_mailer.send(notification, self, *).deliver_later
   end
 
   def add_subscriptions_token
