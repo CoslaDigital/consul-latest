@@ -84,10 +84,6 @@ class User < ApplicationRecord
     (unlock_in_value || 10).to_f.minutes
   end
 
-  def send_devise_notification(notification, *)
-    devise_mailer.send(notification, self, *).deliver_later
-  end
-
   def erase(erase_reason = nil)
     update!(
       erased_at: Time.current,
