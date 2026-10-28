@@ -22,4 +22,12 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                         ]
     original_settings + custom_settings
   end
+
+  def setting_disabled?(key)
+    if key == "verification.require_sms"
+      Tenant.current_secrets&.sms_api_key.blank?
+    else
+      false # All other settings remain enabled by default
+    end
+  end
 end
