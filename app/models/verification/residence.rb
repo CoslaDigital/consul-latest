@@ -75,8 +75,9 @@ class Verification::Residence
   end
 
   def local_postal_code
-    errors.add(:postal_code,
-               I18n.t("verification.residence.new.error_not_allowed_postal_code")) unless valid_postal_code?
+    unless VerificationHelper.postal_code_allowed_by_settings?(postal_code)
+      errors.add(:postal_code, I18n.t("verification.residence.new.error_not_allowed_postal_code"))
+    end
   end
 
   def local_residence
@@ -105,15 +106,4 @@ class Verification::Residence
       self.document_number = document_number.gsub(/[^a-z0-9]+/i, "").upcase if document_number.present?
     end
 
-    def valid_postal_code?
-      return true if Setting["postal_codes"].blank?
-
-      Setting["postal_codes"].split(",").any? do |code_or_range|
-        if code_or_range.include?(":")
-          Range.new(*code_or_range.split(":").map(&:strip)).include?(postal_code&.strip)
-        else
-          /\A#{code_or_range.strip}\Z/.match?(postal_code&.strip)
-        end
-      end
-    end
 end
