@@ -191,7 +191,7 @@ class User < ApplicationRecord
   # Get the existing user by email if the provider gives us a verified email.
   def self.first_or_initialize_for_oauth(auth)
     oauth_email = auth.info.email
-    oauth_verified = auth.info.verified || auth.info.verified_email || auth.info.email_verified || auth.extra.raw_info.email_verified
+    auth.info.verified || auth.info.verified_email || auth.info.email_verified || auth.extra.raw_info.email_verified
     oauth_email_confirmed = oauth_email.present? #&& oauth_verified
     oauth_user = User.find_by(email: oauth_email) if oauth_email_confirmed
 
@@ -422,21 +422,37 @@ class User < ApplicationRecord
     (ancestors + descendants).uniq
   end
 
-  # --- DYNAMIC VERIFICATION PIPELINE ---
-
+  # Builds an array of required steps dynamically based on current Admin Settings.
   def verification_pipeline
     steps = []
 
-    # YS User Pipeline
-    if User.valid_ys_document?(document_number)
-      steps << :ys_demographics if ["1", true, "true"].include?(Setting["verification.ys_requires_demographics"])
-      return steps
+    # 1. First Step: Demographics/Residence
+    # The global `require_residence` setting is the master switch.
+    # If it is OFF, NOBODY does this step.
+    if Setting["verification.require_residence"].present?
+
+      if User.valid_ys_document?(document_number)
+        # If it's a YS user, look at their specific toggle to see WHICH form they get
+        if Setting["verification.ys_requires_demographics"].present?
+          steps << :ys_demographics
+        end
+        # If ys_requires_demographics is OFF, we add NOTHING. They skip step 1.
+      else
+        # Standard users always get the standard form
+        steps << :residence
+      end
+
     end
 
-    # Standard User Pipeline
-    steps << :residence if ["1", true, "true"].include?(Setting["verification.require_residence"])
-    steps << :sms if ["1", true, "true"].include?(Setting["verification.require_sms"])
-    steps << :letter if ["1", true, "true"].include?(Setting["verification.require_letter"])
+    # 2. Second Step: SMS
+    if Setting["verification.require_sms"].present?
+      steps << :sms
+    end
+
+    # 3. Third Step: Letter
+    if Setting["verification.require_letter"].present?
+      steps << :letter
+    end
 
     steps
   end
@@ -444,7 +460,7 @@ class User < ApplicationRecord
   def pending_verification_steps
     verification_pipeline.reject do |step|
       case step
-      when :ys_demographics then verified_at.present?
+      when :ys_demographics then residence_verified_at.present?
       when :residence then residence_verified_at.present?
       when :sms then confirmed_phone.present?
       when :letter then verified_at.present?
@@ -500,8 +516,17 @@ class User < ApplicationRecord
   private
 
     def self.log_in_or_create_ys_user(document_number)
+      # Calculate the expected geozone upfront for all 3 scenarios
+      prefix = document_number.to_s[0, 6]
+      council_name = council_name_for_prefix(prefix)
+      expected_geozone = Geozone.find_by(name: "ys_#{council_name}")
+
       # 1. Exact match fallback (handles standard logins fast)
       if (existing_user = User.find_by(username: document_number))
+        if expected_geozone && existing_user.geozone_id != expected_geozone.id
+          existing_user.geozone_id = expected_geozone.id
+          existing_user.save(validate: false)
+        end
         return existing_user
       end
 
@@ -522,6 +547,11 @@ class User < ApplicationRecord
           legacy_user.email = "#{document_number}@consul.dev"
           legacy_user.password = document_number # Critical: Updates their password to the new card
 
+          # Update geozone if it has changed
+          if expected_geozone && legacy_user.geozone_id != expected_geozone.id
+            legacy_user.geozone_id = expected_geozone.id
+          end
+
           if legacy_user.save(validate: false)
             return legacy_user
           else
@@ -531,22 +561,29 @@ class User < ApplicationRecord
       end
 
       # 3. Create brand new user if no base match was found
-      prefix = document_number.to_s[0, 6]
-      council_name = council_name_for_prefix(prefix)
-      geozone_name = "ys_#{council_name}"
-
       user = User.new(
         username: document_number,
         email: "#{document_number}@consul.dev",
         password: document_number,
         document_number: document_number,
-        geozone_id: Geozone.find_by!(name: geozone_name).id,
+        geozone_id: expected_geozone&.id, # Uses the upfront calculation
         terms_of_service: "1",
-        confirmed_at: Time.current,
-        verified_at: Time.current,
-        level_two_verified_at: Time.current,
-        residence_verified_at: Time.current
+        confirmed_at: Time.current # Always auto-confirm the dummy email
       )
+
+      # --- THE FIX: Let the Pipeline handle verification status! ---
+      # If the global "Skip Verification" feature is enabled, fully verify them.
+      if Setting["feature.user.skip_verification"].present?
+        user.verified_at = Time.current
+        user.level_two_verified_at = Time.current
+        user.residence_verified_at = Time.current
+        # Otherwise, if the YS Demographics step is OFF, just mark residence as verified
+        # so the Traffic Cop drops them straight into the SMS step.
+      elsif !Setting["verification.ys_requires_demographics"].present?
+        user.residence_verified_at = Time.current
+      end
+
+      user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
 
       user.valid?
 
@@ -594,19 +631,19 @@ class User < ApplicationRecord
       "The format of your card number is invalid. Please ensure there are no letters or special characters."
     end
 
-  def self.validate_document_number(document_number)
-    return false if document_number.blank?
+    def self.validate_document_number(document_number)
+      return false if document_number.blank?
 
-    DOCUMENT_ID_STRATEGIES.any? do |strategy|
-      if strategy.is_a?(Regexp)
-        # Check against Regex
-        document_number.to_s.match?(strategy)
-      elsif strategy.is_a?(Symbol) && respond_to?(strategy)
-        # Call the custom method
-        send(strategy, document_number)
+      DOCUMENT_ID_STRATEGIES.any? do |strategy|
+        if strategy.is_a?(Regexp)
+          # Check against Regex
+          document_number.to_s.match?(strategy)
+        elsif strategy.is_a?(Symbol) && respond_to?(strategy)
+          # Call the custom method
+          send(strategy, document_number)
+        end
       end
     end
-  end
 
     def self.valid_ys_document?(document_number)
       return false unless document_number.to_s.length == 16
@@ -627,25 +664,23 @@ class User < ApplicationRecord
 
       # Allow standard digits OR the temp_code. Allow suffix 00 through 05.
       valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
-      valid_suffix = suffix.match?(/\A0[0-9]\z/)
+      valid_suffix = suffix.match?(/\A0[0-5]\z/)
 
       return false unless valid_middle && valid_suffix
 
       true
     end
 
-  def self.valid_na_document?(document_number)
-    # Define the allowed formats
-    allowed_formats = [
-      /\AON0\d{4,14}\z/, # NA digital
-      /\A[Pp]0\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
-    ]
+    def self.valid_na_document?(document_number)
+      # Define the allowed formats
+      allowed_formats = [
+        /\AON0\d{4,14}\z/, # NA digital
+        /\A[Pp]0\d{5,9}[a-zA-Z0-9]\z/ # NA Library cards
+      ]
 
-    # Check if the document number matches ANY of the formats
-    allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
-  end
-
-
+      # Check if the document number matches ANY of the formats
+      allowed_formats.any? { |regex| document_number.to_s.match?(regex) }
+    end
 
     def allowed_email_domain?
 
