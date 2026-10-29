@@ -1,4 +1,4 @@
-Rails.root.join("app", "controllers", "verification", "residence_controller.rb")
+load Rails.root.join("app", "controllers", "verification", "residence_controller.rb").to_s
 
 class Verification::ResidenceController < ApplicationController
   before_action :authenticate_user!
@@ -12,8 +12,10 @@ class Verification::ResidenceController < ApplicationController
 
   def create
     @residence = Verification::Residence.new(residence_params.merge(user: current_user))
+
     if @residence.save
-      redirect_to root_path, notice: t("verification.residence.create.flash.success")
+      # CRITICAL FIX: Send them back to the dynamic pipeline instead of root_path
+      redirect_to verification_path, notice: t("verification.residence.create.flash.success")
     else
       render :new
     end

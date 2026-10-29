@@ -339,14 +339,14 @@ class User < ApplicationRecord
 
     # YS User Pipeline
     if User.valid_ys_document?(document_number)
-      steps << :ys_demographics if Setting["verification.ys_requires_demographics"]
+      steps << :ys_demographics if ["1", true, "true"].include?(Setting["verification.ys_requires_demographics"])
       return steps
     end
 
     # Standard User Pipeline
-    steps << :residence if Setting["verification.require_residence"]
-    steps << :sms if Setting["verification.require_sms"]
-    steps << :letter if Setting["verification.require_letter"]
+    steps << :residence if ["1", true, "true"].include?(Setting["verification.require_residence"])
+    steps << :sms if ["1", true, "true"].include?(Setting["verification.require_sms"])
+    steps << :letter if ["1", true, "true"].include?(Setting["verification.require_letter"])
 
     steps
   end
@@ -356,8 +356,8 @@ class User < ApplicationRecord
       case step
       when :ys_demographics then verified_at.present?
       when :residence then residence_verified_at.present?
-      when :sms then sms_verified?
-      when :letter then level_three_verified_at.present?
+      when :sms then confirmed_phone.present?
+      when :letter then verified_at.present?
       else true
       end
     end

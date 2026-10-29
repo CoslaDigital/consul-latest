@@ -33,7 +33,6 @@ class Verification::Residence
       geozone_id: my_geozone,
       date_of_birth: date_of_birth.present? ? date_of_birth.in_time_zone.to_datetime : nil,
       residence_verified_at: Time.current,
-      verified_at: Time.current
     )
   end
 
