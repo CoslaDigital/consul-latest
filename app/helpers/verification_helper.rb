@@ -19,4 +19,24 @@ module VerificationHelper
 
     "#{data_to_display}#{"*" * data_to_mask.size}@#{email_provider}"
   end
+
+  def self.postal_code_allowed_by_settings?(postcode_to_check)
+    return true if Setting["postal_codes"].blank?
+
+    # Normalize the user's input right away (e.g. "FK10 2FB" -> "fk102fb")
+    normalized_input = postcode_to_check.to_s.strip.gsub(/\s+/, '').downcase
+
+    Setting["postal_codes"].split(",").any? do |code_or_range|
+      code_or_range = code_or_range.strip.gsub(/\s+/, '').downcase
+
+      if code_or_range.include?(":")
+        # It's a range (e.g. "ab101aa:ab129zz")
+        range_start, range_end = code_or_range.split(":")
+        (range_start..range_end).cover?(normalized_input)
+      else
+        # It's an exact or partial match (allows "fk10" to match "FK10 2FB")
+        normalized_input.start_with?(code_or_range)
+      end
+    end
+  end
 end
