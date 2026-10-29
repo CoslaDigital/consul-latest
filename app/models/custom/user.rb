@@ -418,21 +418,37 @@ class User < ApplicationRecord
     (ancestors + descendants).uniq
   end
 
-  # --- DYNAMIC VERIFICATION PIPELINE ---
-
+  # Builds an array of required steps dynamically based on current Admin Settings.
   def verification_pipeline
     steps = []
 
-    # YS User Pipeline
-    if User.valid_ys_document?(document_number)
-      steps << :ys_demographics if ["1", true, "true"].include?(Setting["verification.ys_requires_demographics"])
-      return steps
+    # 1. First Step: Demographics/Residence
+    # The global `require_residence` setting is the master switch.
+    # If it is OFF, NOBODY does this step.
+    if Setting["verification.require_residence"].present?
+
+      if User.valid_ys_document?(document_number)
+        # If it's a YS user, look at their specific toggle to see WHICH form they get
+        if Setting["verification.ys_requires_demographics"].present?
+          steps << :ys_demographics
+        end
+        # If ys_requires_demographics is OFF, we add NOTHING. They skip step 1.
+      else
+        # Standard users always get the standard form
+        steps << :residence
+      end
+
     end
 
-    # Standard User Pipeline
-    steps << :residence if ["1", true, "true"].include?(Setting["verification.require_residence"])
-    steps << :sms if ["1", true, "true"].include?(Setting["verification.require_sms"])
-    steps << :letter if ["1", true, "true"].include?(Setting["verification.require_letter"])
+    # 2. Second Step: SMS
+    if Setting["verification.require_sms"].present?
+      steps << :sms
+    end
+
+    # 3. Third Step: Letter
+    if Setting["verification.require_letter"].present?
+      steps << :letter
+    end
 
     steps
   end
@@ -440,7 +456,7 @@ class User < ApplicationRecord
   def pending_verification_steps
     verification_pipeline.reject do |step|
       case step
-      when :ys_demographics then verified_at.present?
+      when :ys_demographics then residence_verified_at.present?
       when :residence then residence_verified_at.present?
       when :sms then confirmed_phone.present?
       when :letter then verified_at.present?
@@ -551,12 +567,15 @@ class User < ApplicationRecord
         confirmed_at: Time.current # Always auto-confirm the dummy email
       )
 
-      # Determine if the user bypasses the demographic form
-      skip_ys_verification = !Setting["verification.ys_requires_demographics"] || Setting["feature.user.skip_verification"]
-
-      if skip_ys_verification
+      # --- THE FIX: Let the Pipeline handle verification status! ---
+      # If the global "Skip Verification" feature is enabled, fully verify them.
+      if Setting["feature.user.skip_verification"].present?
         user.verified_at = Time.current
         user.level_two_verified_at = Time.current
+        user.residence_verified_at = Time.current
+        # Otherwise, if the YS Demographics step is OFF, just mark residence as verified
+        # so the Traffic Cop drops them straight into the SMS step.
+      elsif !Setting["verification.ys_requires_demographics"].present?
         user.residence_verified_at = Time.current
       end
 

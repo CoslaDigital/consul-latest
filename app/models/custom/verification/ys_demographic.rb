@@ -25,7 +25,7 @@ class Verification::YsDemographic
     user.update!(
       date_of_birth: dob_to_save.in_time_zone.to_datetime,
       geozone_id: new_geozone_id,
-      verified_at: Time.current
+      residence_verified_at: Time.current
     )
   end
 
