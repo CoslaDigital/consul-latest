@@ -29,7 +29,8 @@ class VerificationController < ApplicationController
       when :residence
         { path: new_residence_path }
       when :sms
-        current_user.verification_sms_sent? ? { path: edit_sms_path } : { path: verified_user_path }
+        # FIX: The correct Consul route for the phone number form is new_sms_path
+        current_user.verification_sms_sent? ? { path: edit_sms_path } : { path: new_sms_path }
       when :letter
         current_user.verification_letter_sent? ? { path: edit_letter_path } : { path: new_letter_path }
       end
