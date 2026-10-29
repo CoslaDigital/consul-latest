@@ -338,17 +338,24 @@ class User < ApplicationRecord
   def verification_pipeline
     steps = []
 
-    # 1. First Step: Demographics OR Residence
     if User.valid_ys_document?(document_number)
-      steps << :ys_demographics if Setting["verification.ys_requires_demographics"].present?
+      # 1A. If the YS switch is OFF, YS users are fully trusted.
+      # We return the empty array immediately, granting them instant verified_at status!
+      return steps unless Setting["verification.ys_requires_demographics"].present?
+
+      # If it is ON, they must do their specific demographics form...
+      steps << :ys_demographics
+
+      # ...and then they fall through to inherit the global SMS/Letter settings below!
     else
+      # 1B. Standard users must do normal Residence if enabled
       steps << :residence if Setting["verification.require_residence"].present?
     end
 
-    # 2. Second Step: SMS (Applies to EVERYONE)
+    # 2. Second Step: SMS (Applies to standard users, AND to YS users who didn't exit early)
     steps << :sms if Setting["verification.require_sms"].present?
 
-    # 3. Third Step: Letter (Applies to EVERYONE)
+    # 3. Third Step: Letter
     steps << :letter if Setting["verification.require_letter"].present?
 
     steps

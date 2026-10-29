@@ -247,8 +247,8 @@ en:
         legislation: Related SDG in collaborative legislation
         legislation_description: Allow collaborative legislation to be linked to Sustainable Development Goals
     verification:
-      ys_requires_demographics: "NEC Card: Require Demographics (Postal Code & Date of Birth)"
-      ys_requires_demographics_description: "When enabled, users registering with a NEC(Young Scot) card must confirm their date of birth and postal code before participating."
+      ys_requires_demographics: "NEC Card: Require Verification"
+      ys_requires_demographics_description: "When enabled, users registering with a NEC(Young Scot) card must be verified before participating."
       require_residence: "Standard Users: Require Verification"
       require_residence_description: "When enabled, standard users must provide (Postal Code & Date of Birth) to be verified."
       require_sms: "Standard Users: Require SMS Verification (Level 2)"
