@@ -334,19 +334,22 @@ class User < ApplicationRecord
 
   # --- DYNAMIC VERIFICATION PIPELINE ---
 
+  # Builds an array of required steps dynamically based on current Admin Settings.
   def verification_pipeline
     steps = []
 
-    # YS User Pipeline
+    # 1. First Step: Demographics OR Residence
     if User.valid_ys_document?(document_number)
-      steps << :ys_demographics if ["1", true, "true"].include?(Setting["verification.ys_requires_demographics"])
-      return steps
+      steps << :ys_demographics if Setting["verification.ys_requires_demographics"].present?
+    else
+      steps << :residence if Setting["verification.require_residence"].present?
     end
 
-    # Standard User Pipeline
-    steps << :residence if ["1", true, "true"].include?(Setting["verification.require_residence"])
-    steps << :sms if ["1", true, "true"].include?(Setting["verification.require_sms"])
-    steps << :letter if ["1", true, "true"].include?(Setting["verification.require_letter"])
+    # 2. Second Step: SMS (Applies to EVERYONE)
+    steps << :sms if Setting["verification.require_sms"].present?
+
+    # 3. Third Step: Letter (Applies to EVERYONE)
+    steps << :letter if Setting["verification.require_letter"].present?
 
     steps
   end
