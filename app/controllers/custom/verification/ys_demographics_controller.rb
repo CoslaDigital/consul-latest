@@ -1,4 +1,3 @@
-# If placing in a custom overrides directory, adjust the load path accordingly.
 # load Rails.root.join("app", "controllers", "verification", "ys_demographics_controller.rb")
 
 class Verification::YsDemographicsController < ApplicationController
