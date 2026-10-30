@@ -364,7 +364,7 @@ class User < ApplicationRecord
   def pending_verification_steps
     verification_pipeline.reject do |step|
       case step
-      when :ys_demographics then verified_at.present?
+      when :ys_demographics then residence_verified_at.present?
       when :residence then residence_verified_at.present?
       when :sms then confirmed_phone.present?
       when :letter then verified_at.present?
