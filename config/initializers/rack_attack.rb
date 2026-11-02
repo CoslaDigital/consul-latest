@@ -2,6 +2,7 @@
 require "maxmind/db"
 
 class Rack::Attack
+  Rack::Attack.enabled = false
   Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new(size: 32.megabytes)
 
   GEOIP_PATH = Rails.root.join("db", "geoip", "GeoLite2-Country.mmdb")
