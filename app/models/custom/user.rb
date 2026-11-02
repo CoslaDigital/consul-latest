@@ -30,6 +30,7 @@ class User < ApplicationRecord
     "633678" => "midlothian",
     "633604" => "moray",
     "633680" => "north_ayrshire",
+    "633729" => "north_ayrshire",
     "633284" => "north_lanarkshire",
     "633605" => "orkney_islands",
     "633722" => "perth_and_kinross",
