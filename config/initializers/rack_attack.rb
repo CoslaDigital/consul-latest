@@ -1,4 +1,3 @@
-# config/initializers/rack_attack.rb
 require "maxmind/db"
 
 class Rack::Attack
@@ -7,6 +6,15 @@ class Rack::Attack
 
   GEOIP_PATH = Rails.root.join("db", "geoip", "GeoLite2-Country.mmdb")
   GEOIP_DB = File.exist?(GEOIP_PATH) ? MaxMind::DB.new(GEOIP_PATH.to_s, mode: MaxMind::DB::MODE_MEMORY) : nil
+
+  # Per-IP login ceiling. Kept as a method so specs can stub it per example without mutating ENV.
+  def self.login_ip_limit
+    ENV.fetch("RACK_ATTACK_IP_LIMIT", 400).to_i
+  end
+
+  def self.login_path?(req)
+    (req.path == "/ys_login" || req.path == "/ys_login/") && req.post?
+  end
 
   def self.client_ip(req)
     if Rails.env.development? || Rails.env.test?
@@ -24,10 +32,7 @@ class Rack::Attack
 
   # Geofence Rule
   blocklist("geofence-ys-login") do |req|
-    is_ys_login = (req.path == "/ys_login" || req.path == "/ys_login/") && req.post?
-
-    # Clean delegation to the Setting model
-    if is_ys_login && Setting.geofence_card_login_enabled? && GEOIP_DB
+    if login_path?(req) && Setting.geofence_card_login_enabled? && GEOIP_DB
       ip = client_ip(req)
       record = GEOIP_DB.get(ip)
       country_code = record&.dig("country", "iso_code")
@@ -38,15 +43,23 @@ class Rack::Attack
     end
   end
 
-  # Throttle: Max 10 login submissions per minute per IP
-  throttle("limit-ys-login-attempts", limit: 10, period: 1.minute) do |req|
-    if (req.path == "/ys_login" || req.path == "/ys_login/") && req.post?
-      client_ip(req)
+  # 1. Strict limit: Max 10 attempts per minute per email (stops account brute-forcing).
+  #    Identity-keyed, so it survives NAT — the whole school shares an IP but not an email.
+  throttle("login-per-email", limit: 10, period: 1.minute) do |req|
+    if login_path?(req)
+      email = req.params["email"].to_s.downcase.strip
+      email if email.present?
     end
   end
 
+  # 2. Generous limit: per-IP login ceiling, sized for shared networks.
+  #    Keep this the LOOSEST per-IP login rule; it's DoS protection, not brute-force protection.
+  throttle("login-per-ip", limit: proc { Rack::Attack.login_ip_limit }, period: 1.minute) do |req|
+    client_ip(req) if login_path?(req)
+  end
+
   # Blanket DoS Throttle
-  throttle("req/ip", limit: 300, period: 5.minutes) do |req|
+  throttle("req/ip", limit: 15000, period: 5.minutes) do |req|
     client_ip(req) unless req.path.start_with?("/assets", "/packs", "/vite")
   end
 
