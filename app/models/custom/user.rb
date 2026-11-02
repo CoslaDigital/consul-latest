@@ -7,41 +7,118 @@ class User < ApplicationRecord
   ].freeze
 
   NEC_PREFIX_MAPPING = {
+    # Aberdeen City
+    "633560" => "aberdeen_city", # CONFLICT WARNING: Was 'inverclyde' in original mapping
     "633718" => "aberdeen_city",
+
+    # Aberdeenshire
     "633727" => "aberdeenshire",
+
+    # Angus
     "633719" => "angus",
+
+    # Argyll and Bute
+    "633297" => "argyll_and_bute", # Added from new list
     "633644" => "argyll_and_bute",
+
+    # City of Edinburgh
     "633668" => "city_of_edinburgh",
+
+    # Clackmannanshire
     "633741" => "clackmannanshire",
-    "633624" => "western_isles", # Comhairle nan Eilean Siar
+
+    # Comhairle nan Eilean Siar (Western Isles)
+    "633624" => "western_isles",
+
+    # Dumfries and Galloway
     "633670" => "dumfries_and_galloway",
+
+    # Dundee City
     "633720" => "dundee_city",
+    "633725" => "dundee_city", # Added from new list
+
+    # East Ayrshire
+    "633687" => "east_ayrshire", # Added from new list
     "633728" => "east_ayrshire",
+
+    # East Dunbartonshire
+    "633564" => "east_dunbartonshire", # Added from new list
     "633590" => "east_dunbartonshire",
     "633597" => "east_dunbartonshire",
-    "633675" => "east_lothian",
+
+    # East Lothian
     "633546" => "east_lothian",
+    "633675" => "east_lothian",
+
+    # East Renfrewshire
     "633570" => "east_renfrewshire",
+
+    # Falkirk
     "633733" => "falkirk",
+
+    # Fife
     "633250" => "fife",
+
+    # Glasgow City
     "633740" => "glasgow_city",
+
+    # Highland
     "633603" => "highland",
-    "633560" => "inverclyde",
+
+    # Inverclyde
+    "633744" => "inverclyde", # Added from new list (Replaced 633560)
+
+    # Midlothian
     "633678" => "midlothian",
+
+    # Moray
     "633604" => "moray",
+    "633737" => "moray", # Added from new list
+
+    # North Ayrshire
+    "633279" => "north_ayrshire",
     "633680" => "north_ayrshire",
-    "633729" => "north_ayrshire",
+
+    # North Lanarkshire
     "633284" => "north_lanarkshire",
+
+    # Orkney Islands
     "633605" => "orkney_islands",
+    "633734" => "orkney_islands", # Added from new list
+
+    # Perth and Kinross
+    "633708" => "perth_and_kinross", # Added from new list
     "633722" => "perth_and_kinross",
+
+    # Renfrewshire
     "633289" => "renfrewshire",
+
+    # Scottish Borders
     "633743" => "scottish_borders",
+
+    # Shetland Islands
     "633606" => "shetland_islands",
+    "633679" => "shetland_islands", # Added from new list
+
+    # South Ayrshire
+    "633559" => "south_ayrshire", # Added from new list
     "633682" => "south_ayrshire",
+
+    # South Lanarkshire
     "633231" => "south_lanarkshire",
+
+    # Stirling
     "633739" => "stirling",
+
+    # West Dunbartonshire
+    "633511" => "west_dunbartonshire", # Added from new list
     "633580" => "west_dunbartonshire",
+
+    # West Lothian
+    "633285" => "west_lothian", # Added from new list
     "633676" => "west_lothian",
+
+    # Trumptonshire (Mock/Test)
     "999111" => "trumptonshire"
   }.freeze
 
