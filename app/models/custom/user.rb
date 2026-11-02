@@ -552,7 +552,7 @@ class User < ApplicationRecord
 
       # Allow standard digits OR the temp_code. Allow suffix 00 through 05.
       valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
-      valid_suffix = suffix.match?(/\A0[0-5]\z/)
+      valid_suffix = suffix.match?(/\A0[0-9]\z/)
 
       return false unless valid_middle && valid_suffix
 
