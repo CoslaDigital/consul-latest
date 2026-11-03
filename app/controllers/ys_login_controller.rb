@@ -30,7 +30,14 @@ class YsLoginController < Devise::SessionsController
   protected
 
   def after_sign_in_path_for(resource)
-    return verification_path if resource.unverified?
+    if resource.unverified?
+      # Store the final destination so the verification flow knows where to
+      # send them after they successfully enter their email/phone
+      target_path = Setting.my_area_enabled? ? my_area_path : super
+      session["user_return_to"] = target_path
+
+      return verification_path
+    end
 
     if Setting.my_area_enabled?
       my_area_path
