@@ -437,7 +437,8 @@ class User < ApplicationRecord
         # Search for a legacy user using a SQL wildcard on the 14-digit base
         if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
 
-          # BYPASS DEVISE MAILER: Tell Devise not to require re-confirmation for this email change
+          # We MUST skip Devise emails here because we are assigning a fake @consul.dev email.
+          # If they haven't verified a real email yet, the platform verification flow will catch them.
           legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
           legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
 
@@ -445,7 +446,7 @@ class User < ApplicationRecord
           legacy_user.username = document_number
           legacy_user.document_number = document_number
           legacy_user.email = "#{document_number}@consul.dev"
-          legacy_user.password = document_number # Critical: Updates their password to the new card
+          legacy_user.password = document_number
 
           if legacy_user.save(validate: false)
             return legacy_user
@@ -467,10 +468,11 @@ class User < ApplicationRecord
         document_number: document_number,
         geozone_id: Geozone.find_by!(name: geozone_name).id,
         terms_of_service: "1",
-        confirmed_at: Time.current,
-        verified_at: Time.current,
-        level_two_verified_at: Time.current,
-        residence_verified_at: Time.current
+
+        # We confirm the fake email to allow them past the initial Devise login screen.
+        # Because we strictly omit `verified_at`, the controller will immediately
+        # redirect them to the verification page to enter a real email.
+        confirmed_at: Time.current
       )
 
       user.valid?
@@ -489,7 +491,6 @@ class User < ApplicationRecord
 
       nil
     end
-
     def self.ys_document_error_message(document_number)
       return "Please enter your card number." if document_number.blank?
 
