@@ -3,6 +3,7 @@ require "maxmind/db"
 class Rack::Attack
   Rack::Attack.enabled = true
   Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new(size: 32.megabytes)
+  Rack::Attack.throttled_response_retry_after_header = true
 
   GEOIP_PATH = Rails.root.join("db", "geoip", "GeoLite2-Country.mmdb")
   GEOIP_DB = File.exist?(GEOIP_PATH) ? MaxMind::DB.new(GEOIP_PATH.to_s, mode: MaxMind::DB::MODE_MEMORY) : nil
@@ -64,7 +65,11 @@ class Rack::Attack
   end
 
   self.blocklisted_responder = lambda do |_request|
-    [302, { "Location" => "/users/sign_in?geoblocked=true" }, []]
+    [
+      403,
+      { "Content-Type" => "text/html; charset=utf-8" },
+      ["<h1>Access denied</h1><p>This login is not available from your location.</p>"]
+    ]
   end
 
   self.throttled_responder = lambda do |_request|
