@@ -6,22 +6,30 @@ class YsLoginController < Devise::SessionsController
 
   def create
     username = params.dig(:user, :username)
+    email = params.dig(:user, :email) # Capture the email
 
     if User.validate_document_number(username)
-      user = User.log_in_or_create_ys_user(username)
+      # Pass the email to the model
+      user = User.log_in_or_create_ys_user(username, email)
 
       if user&.persisted?
-        set_flash_message!(:notice, :signed_in)
-        sign_in(user, event: :authentication)
-        session["user_return_to"] = nil
-        redirect_to after_sign_in_path_for(user)
+        # NEW: Devise checks if the user has clicked the confirmation link
+        if user.active_for_authentication?
+          set_flash_message!(:notice, :signed_in)
+          sign_in(user, event: :authentication)
+          session["user_return_to"] = nil
+          redirect_to after_sign_in_path_for(user)
+        else
+          # User was just created and Devise sent the email
+          flash[:notice] = "A message with a confirmation link has been sent to your email address. Please follow the link to activate your account."
+          redirect_to root_path
+        end
       else
         error_message = user&.errors&.full_messages&.join(', ') || "Please try again."
         flash[:alert] = "Could not sign you in. #{error_message}"
         render :new, status: :unprocessable_entity
       end
     else
-      # --- NEW LOGIC: Fetch granular error message ---
       flash[:alert] = User.ys_document_error_message(username)
       render :new, status: :unprocessable_entity
     end

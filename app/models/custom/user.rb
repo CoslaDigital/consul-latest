@@ -424,60 +424,48 @@ class User < ApplicationRecord
 
   private
 
-    def self.log_in_or_create_ys_user(document_number)
-      # 1. Exact match fallback (handles standard logins fast)
+    # Update signature to accept email
+    def self.log_in_or_create_ys_user(document_number, email_address = nil)
       if (existing_user = User.find_by(username: document_number))
         return existing_user
       end
 
-      # 2. Base 14-digit match for YS cards (handles different issue numbers)
       if valid_ys_document?(document_number)
         base_number = document_number.to_s[0, 14]
-
-        # Search for a legacy user using a SQL wildcard on the 14-digit base
         if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
-
-          # We MUST skip Devise emails here because we are assigning a fake @consul.dev email.
-          # If they haven't verified a real email yet, the platform verification flow will catch them.
           legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
           legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
 
-          # Update their credentials to match the physical card they just used
           legacy_user.username = document_number
           legacy_user.document_number = document_number
-          legacy_user.email = "#{document_number}@consul.dev"
+          # If they provide an email and don't have one, you could update it here,
+          # but usually legacy users already have an email.
           legacy_user.password = document_number
 
           if legacy_user.save(validate: false)
             return legacy_user
-          else
-            Rails.logger.error("Failed to update YS user issue number for #{base_number}: #{legacy_user.errors.messages}")
           end
         end
       end
 
-      # 3. Create brand new user if no base match was found
       prefix = document_number.to_s[0, 6]
       council_name = council_name_for_prefix(prefix)
       geozone_name = "ys_#{council_name}"
 
       user = User.new(
         username: document_number,
-        email: "#{document_number}@consul.dev",
+        email: email_address, # NEW: Use the real email from the form
         password: document_number,
         document_number: document_number,
         geozone_id: Geozone.find_by!(name: geozone_name).id,
-        terms_of_service: "1",
+        terms_of_service: "1"
 
-        # We confirm the fake email to allow them past the initial Devise login screen.
-        # Because we strictly omit `verified_at`, the controller will immediately
-        # redirect them to the verification page to enter a real email.
-        confirmed_at: Time.current
+      # REMOVED: confirmed_at: Time.current
+      # By leaving this blank, Devise's Confirmable module will automatically
+      # generate a token and send the confirmation email when `user.save` is called.
       )
 
       user.valid?
-
-      # We ignore password complexity errors for YS users, but keep other validations
       other_errors = user.errors.messages.except(:password)
 
       if other_errors.empty?
