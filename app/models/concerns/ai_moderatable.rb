@@ -135,11 +135,24 @@ module AiModeratable
           triggers: triggered_categories.join(", "),
           reason: data["reasoning"]
         )
-      else
-        log_msg = I18n.t("moderation.ai.logs.clean", id: id, model: model_name)
-      end
+        Rails.logger.info log_msg
 
-      Rails.logger.info log_msg
+        # Send the admin notification
+        alert_title = is_hidden ? "AI Moderation: Item Hidden" : "AI Moderation: Item Flagged"
+        alert_body = "An item was automatically #{is_hidden ? 'hidden' : 'flagged'} for: #{triggered_categories.join(', ')}"
+        alert_link = is_hidden ? "/admin/hidden_comments" : "/moderation/comments"
+
+        notification = AdminNotification.new(
+          title: alert_title,
+          body: alert_body,
+          segment_recipient: "administrators",
+          link: alert_link
+        )
+        notification.save
+        notification.deliver
+      else
+        Rails.logger.info I18n.t("moderation.ai.logs.clean", id: id, model: model_name)
+      end
 
     rescue RubyLLM::Error => e
       err_msg = I18n.t("moderation.ai.errors.ruby_llm_crash", id: id, message: e.message)
