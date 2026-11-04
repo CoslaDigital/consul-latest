@@ -251,11 +251,13 @@ en:
         legislation: Related SDG in collaborative legislation
         legislation_description: Allow collaborative legislation to be linked to Sustainable Development Goals
     verification:
-      ys_requires_demographics: "NEC Card: Require Verification"
-      ys_requires_demographics_description: "When enabled, users registering with a NEC(Young Scot) card must be verified before participating."
-      require_residence: "Standard Users: Require Verification"
-      require_residence_description: "When enabled, standard users must provide (Postal Code & Date of Birth) to be verified."
+      require_email_confirmation: "NEC Card: Require Email Confirmation"
+      require_email_confirmation_description: "When enabled, newly created YS card users must click a confirmation link sent to their inbox before full access is granted. When disabled, accounts are auto-confirmed upon creation."
+      require_residence: "Master Residency Gate: Require Residence Verification"
+      require_residence_description: "MASTER GATEKEEPER: When enabled, activates residency checks platform-wide. NOTE: Disabling this turns off all geographic verification, including Young Scot demographics."
+      ys_requires_demographics: "NEC Cards: Require Demographics"
+      ys_requires_demographics_description: "Subjects YS cardholders to demographic collection. Requires 'Master Residency Gate (require_residence)' to be enabled above to function."
       require_sms: "Standard Users: Require SMS Verification (Level 2)"
-      require_sms_description: "When enabled, standard users must complete SMS phone verification. Your admin must configure an api key to be able to use this option"
+      require_sms_description: "When enabled, standard users must complete SMS phone verification. Requires a configured SMS API key in tenant secrets."
       require_letter: "Standard Users: Require Letter Verification (Level 3)"
       require_letter_description: "When enabled, standard users must complete physical letter verification."
