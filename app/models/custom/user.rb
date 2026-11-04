@@ -456,6 +456,11 @@ class User < ApplicationRecord
 
       # 1. Exact Match Fallback
       if (existing_user = User.find_by(username: document_number))
+        # BACKFILL: If this user exists but has no email, attach the new one
+        if existing_user.email.blank? && email_address.present?
+          existing_user.update_column(:email, email_address)
+        end
+
         if expected_geozone && existing_user.geozone_id != expected_geozone.id
           existing_user.geozone_id = expected_geozone.id
           existing_user.save(validate: false)
