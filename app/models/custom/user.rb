@@ -1,5 +1,4 @@
 load Rails.root.join("app", "models", "user.rb")
-
 class User < ApplicationRecord
   DOCUMENT_ID_STRATEGIES = [
     :valid_ys_document?, # original young scot logic
@@ -476,16 +475,23 @@ class User < ApplicationRecord
         end
       end
 
-      # 3. Create Brand New User (with Email Confirmation)
+      # 3. Create Brand New User
       user = User.new(
         username: document_number,
-        email: email_address, # Uses real email from registration form
         password: document_number,
         document_number: document_number,
         geozone_id: expected_geozone&.id,
         terms_of_service: "1"
-      # Notice: confirmed_at is NOT set, forcing Devise to send the confirmation email
       )
+
+      # Determine if email confirmation is required via Admin Settings
+      if Setting["verification.require_email_confirmation"].present?
+        user.email = email_address # Confirmed_at remains nil to trigger email flow
+      else
+        user.email = email_address if email_address.present?
+        user.confirmed_at = Time.current # Instantly bypass email confirmation
+        user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
+      end
 
       # 4. Pipeline Toggles (Bypass Demographics if disabled)
       if Setting["feature.user.skip_verification"].present?
@@ -495,8 +501,6 @@ class User < ApplicationRecord
       elsif !Setting["verification.ys_requires_demographics"].present?
         user.residence_verified_at = Time.current
       end
-
-      # IMPORTANT: We removed `user.skip_confirmation_notification!` here so the email actually sends!
 
       user.valid?
 
