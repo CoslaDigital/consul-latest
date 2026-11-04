@@ -456,9 +456,13 @@ class User < ApplicationRecord
 
       # 1. Exact Match Fallback
       if (existing_user = User.find_by(username: document_number))
-        # BACKFILL: If this user exists but has no email, attach the new one
         if existing_user.email.blank? && email_address.present?
-          existing_user.update_column(:email, email_address)
+          begin
+            existing_user.update_column(:email, email_address.strip.downcase)
+          rescue ActiveRecord::RecordNotUnique
+            existing_user.errors.add(:email, "is already registered to another account.")
+            return existing_user
+          end
         end
 
         if expected_geozone && existing_user.geozone_id != expected_geozone.id
@@ -479,14 +483,20 @@ class User < ApplicationRecord
           legacy_user.document_number = document_number
           legacy_user.password = document_number
 
-          # Update email if they provided one and don't already have one
-          legacy_user.email = email_address if legacy_user.email.blank? && email_address.present?
+          if legacy_user.email.blank? && email_address.present?
+            legacy_user.email = email_address.strip.downcase
+          end
 
           if expected_geozone && legacy_user.geozone_id != expected_geozone.id
             legacy_user.geozone_id = expected_geozone.id
           end
 
-          if legacy_user.save(validate: false)
+          begin
+            if legacy_user.save(validate: false)
+              return legacy_user
+            end
+          rescue ActiveRecord::RecordNotUnique
+            legacy_user.errors.add(:email, "is already registered to another account.")
             return legacy_user
           end
         end
@@ -503,14 +513,14 @@ class User < ApplicationRecord
 
       # Determine if email confirmation is required via Admin Settings
       if Setting["verification.require_email_confirmation"].present?
-        user.email = email_address # Confirmed_at remains nil to trigger email flow
+        user.email = email_address&.strip&.downcase
       else
-        user.email = email_address if email_address.present?
-        user.confirmed_at = Time.current # Instantly bypass email confirmation
+        user.email = email_address&.strip&.downcase if email_address.present?
+        user.confirmed_at = Time.current
         user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
       end
 
-      # 4. Pipeline Toggles (Bypass Demographics if disabled)
+      # 4. Pipeline Toggles
       if Setting["feature.user.skip_verification"].present?
         user.verified_at = Time.current
         user.level_two_verified_at = Time.current
@@ -520,24 +530,25 @@ class User < ApplicationRecord
       end
 
       user.valid?
-      # FIX: If the admin toggle is OFF, explicitly delete Devise's missing email complaints
-      # so the YS account can save successfully without an email address.
       unless Setting["verification.require_email_confirmation"].present?
         user.errors.delete(:email)
       end
 
-      # Check if there are any *other* errors preventing save (excluding password)
       other_errors = user.errors.messages.except(:password)
       if other_errors.empty?
-        if user.save(validate: false)
-          user.errors.clear
-          return user
+        begin
+          if user.save(validate: false)
+            user.errors.clear
+            return user
+          end
+        rescue ActiveRecord::RecordNotUnique
+          user.errors.add(:email, "is already registered to another account.")
         end
       else
         Rails.logger.error("Failed to create YS user #{document_number}: #{other_errors}")
       end
 
-      nil
+      user
     end
 
     def self.ys_document_error_message(document_number)
