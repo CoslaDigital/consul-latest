@@ -12,7 +12,7 @@ class Budget
     translates :summary, touch: true
 
     validates_translation :description, presence: false,
-                                        length: { maximum: Budget::Investment.description_max_length }
+                          length: { maximum: Budget::Investment.description_max_length }
 
     validate :all_answers
 
@@ -37,5 +37,6 @@ class Budget
 
       result
     end
+
   end
 end

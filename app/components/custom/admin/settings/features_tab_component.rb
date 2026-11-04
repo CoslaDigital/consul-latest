@@ -3,6 +3,16 @@ load Rails.root.join("app", "components", "admin", "settings", "features_tab_com
 class Admin::Settings::FeaturesTabComponent < ApplicationComponent
   alias_method :original_settings, :settings
 
+  def initialize
+    super # (If inheriting from a component that requires super)
+
+    # 1. Force SMS toggle OFF in the database if the API key is missing
+    # This prevents the toggle from being "stuck ON and greyed out"
+    if Tenant.current_secrets&.sms_api_key.blank? && Setting["verification.require_sms"].present?
+      Setting["verification.require_sms"] = nil
+    end
+  end
+
   def settings
     custom_settings = %w[ feature.offers
                           feature.demographics
@@ -14,11 +24,13 @@ class Admin::Settings::FeaturesTabComponent < ApplicationComponent
                           feature.restrict_login_to_officials
                           feature.require_login_to_view_processes
                           feature.enable_card_login
-                          feature.my_area_landing_page
                           verification.ys_requires_demographics
+                          verification.require_email_confirmation
                           verification.require_residence
                           verification.require_sms
                           verification.require_letter
+                          feature.my_area_landing_page
+                          feature.geofence_card_login
                         ]
     original_settings + custom_settings
   end

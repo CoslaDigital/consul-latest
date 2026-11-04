@@ -62,6 +62,8 @@ en:
     min_age_to_participate_description: "Users over this age can participate in all processes where a user verified account is needed"
     postal_codes: "Postal Codes"
     postal_codes_description: "A comma-separated list of valid postal codes; you can also introduce ranges separated with a colon. Example: 00001:00010,00024,AB3 45FG,00031:00035 will allow postal codes between 00001 and 00010, the postal code 00024, the postal code AB3 45FG, and postal codes between 00031 and 00035. If you leave it blank, all postal codes will be valid."
+    geofence_allowed_countries: "Allowed territories for card login"
+    geofence_allowed_countries_description: "Comma-separated two-letter ISO country codes allowed to log in (e.g. GB, IM, JE)"
     proposals:
       successful_proposal_id: Successful proposal
       successful_proposal_id_description: This proposal is used as a reference for a successful proposal in supports number and will be displayed in the dashboard graph.
@@ -150,6 +152,8 @@ en:
       enable_card_login_description: "Enable logging in with NEC card or other bespoke cards"
       my_area_landing_page: "Enable My Area Landing page"
       my_area_landing_page_description: "Users logging in with a NEC Card will be redirected to a landing page specifically for their geozone"
+      geofence_card_login: "Geofence card login"
+      geofence_card_login_description: "Restrict card login attempts to permitted geographic territories"
       restrict_login_to_officials: "Restrict login and registration to official domains"
       restrict_login_to_officials_description: "When active, only users with an email address matching the 'Email domain for officials' setting will be allowed to create an account or sign in. Administrators bypass this restriction."
       require_login_to_view_processes: "Require login to view processes"
@@ -247,11 +251,13 @@ en:
         legislation: Related SDG in collaborative legislation
         legislation_description: Allow collaborative legislation to be linked to Sustainable Development Goals
     verification:
-      ys_requires_demographics: "NEC Card: Require Verification"
-      ys_requires_demographics_description: "When enabled, users registering with a NEC(Young Scot) card must be verified before participating."
-      require_residence: "Standard Users: Require Verification"
-      require_residence_description: "When enabled, standard users must provide (Postal Code & Date of Birth) to be verified."
+      require_email_confirmation: "NEC Card: Require Email Confirmation"
+      require_email_confirmation_description: "When enabled, newly created YS card users must click a confirmation link sent to their inbox before full access is granted. When disabled, accounts are auto-confirmed upon creation."
+      require_residence: "Master Residency Gate: Require Residence Verification"
+      require_residence_description: "MASTER GATEKEEPER: When enabled, activates residency checks platform-wide. NOTE: Disabling this turns off all geographic verification, including Young Scot demographics."
+      ys_requires_demographics: "NEC Cards: Require Demographics"
+      ys_requires_demographics_description: "Subjects YS cardholders to demographic collection. Requires 'Master Residency Gate (require_residence)' to be enabled above to function."
       require_sms: "Standard Users: Require SMS Verification (Level 2)"
-      require_sms_description: "When enabled, standard users must complete SMS phone verification. Your admin must configure an api key to be able to use this option"
+      require_sms_description: "When enabled, standard users must complete SMS phone verification. Requires a configured SMS API key in tenant secrets."
       require_letter: "Standard Users: Require Letter Verification (Level 3)"
       require_letter_description: "When enabled, standard users must complete physical letter verification."

@@ -1,5 +1,5 @@
-var initializeSortable = function () {
-  $('ul[data-controller="reorder"]').each(function () {
+var initializeSortable = function() {
+  $('ul[data-controller="reorder"]').each(function() {
     var $list = $(this);
 
     // Always destroy and re-init — safe, cheap, and kills stale bindings.
@@ -19,8 +19,8 @@ var initializeSortable = function () {
       handle: '.ballot-item__handle, .drag-handle',
       items: 'li[data-reorder-target="item"]',
       placeholder: 'sortable-placeholder',
-      update: function (event, ui) {
-        var investment_ids = $list.sortable('toArray', {attribute: 'data-id'});
+      update: function(event, ui) {
+        var investment_ids = $list.sortable('toArray', { attribute: 'data-id' });
         $.ajax({
           url: reorderUrl,
           type: 'POST',
@@ -32,7 +32,7 @@ var initializeSortable = function () {
           success: function () {
             updatePreferenceNumbers($list);
           },
-          error: function () {
+          error: function() {
             alert("There was an error reordering. Please refresh the page.");
             $list.sortable('cancel');
           }
@@ -41,8 +41,8 @@ var initializeSortable = function () {
     });
   });
 
-  var updatePreferenceNumbers = function ($list) {
-    $list.find('li[data-reorder-target="item"]').each(function (index) {
+  var updatePreferenceNumbers = function($list) {
+    $list.find('li[data-reorder-target="item"]').each(function(index) {
       var $prefElement = $(this).find('.preference-order');
       if ($prefElement.length > 0) {
         var prefText = $prefElement.data('pref-text') || 'Preference';

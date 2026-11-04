@@ -15,7 +15,7 @@ bind "unix://#{rails_root}/tmp/sockets/puma.sock"
 
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
-workers 2
+workers ENV.fetch("WEB_CONCURRENCY", 4)
 preload_app!
 
 plugin :tmp_restart
