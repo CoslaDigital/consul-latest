@@ -456,12 +456,19 @@ class User < ApplicationRecord
 
       # 1. Exact Match Fallback
       if (existing_user = User.find_by(username: document_number))
-        if existing_user.email.blank? && email_address.present?
-          begin
-            existing_user.update_column(:email, email_address.strip.downcase)
-          rescue ActiveRecord::RecordNotUnique
-            existing_user.errors.add(:email, "is already registered to another account.")
+        if existing_user.email.present? && !existing_user.email.end_with?("@consul.dev")
+          if email_address.present? && existing_user.email != email_address.strip.downcase
+            existing_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
             return existing_user
+          end
+        elsif existing_user.email.blank? || existing_user.email.end_with?("@consul.dev")
+          if email_address.present?
+            begin
+              existing_user.update(email: email_address.strip.downcase)
+            rescue ActiveRecord::RecordNotUnique
+              existing_user.errors.add(:email, "is already registered to another account.")
+              return existing_user
+            end
           end
         end
 
@@ -476,15 +483,31 @@ class User < ApplicationRecord
       if valid_ys_document?(document_number)
         base_number = document_number.to_s[0, 14]
         if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
-          legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
-          legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
+
+          # Security Lock: Check if they have a real email that mismatches
+          if legacy_user.email.present? && !legacy_user.email.end_with?("@consul.dev")
+            if email_address.present? && legacy_user.email != email_address.strip.downcase
+              legacy_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
+              return legacy_user
+            end
+          end
 
           legacy_user.username = document_number
           legacy_user.document_number = document_number
           legacy_user.password = document_number
 
-          if legacy_user.email.blank? && email_address.present?
+          is_upgrading_stub_email = false
+
+          # Upgrade the stub email if provided
+          if (legacy_user.email.blank? || legacy_user.email.end_with?("@consul.dev")) && email_address.present?
             legacy_user.email = email_address.strip.downcase
+            is_upgrading_stub_email = true
+          end
+
+          # ONLY skip confirmations if we are not actively upgrading their email
+          unless is_upgrading_stub_email
+            legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
+            legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
           end
 
           if expected_geozone && legacy_user.geozone_id != expected_geozone.id
