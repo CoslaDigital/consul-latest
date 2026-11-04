@@ -46,8 +46,18 @@
                        label: t('ys_login.form.username_label', default: 'Young Scot Number') %>
     </div>
 
+    <!-- NEW: Email field for account creation -->
+    <div class="small-12 column">
+      <%= f.email_field :email,
+                        required: true,
+                        label: "Email Address",
+                        placeholder: "Required for new accounts" %>
+    </div>
+
     <div class="small-12 medium-6 column">
-      <%= f.submit "Sign In", class: "button expanded" %>
+      <%= f.submit "Sign In / Register", class: "button expanded" %>
     </div>
   </div>
 <% end %>
+
+<%= render "devise/shared/links" %>

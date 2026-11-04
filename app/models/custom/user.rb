@@ -435,11 +435,12 @@ class User < ApplicationRecord
   # ==========================================
   private
 
-    def self.log_in_or_create_ys_user(document_number)
+    def self.log_in_or_create_ys_user(document_number, email_address = nil)
       prefix = document_number.to_s[0, 6]
       council_name = council_name_for_prefix(prefix)
       expected_geozone = Geozone.find_by(name: "ys_#{council_name}")
 
+      # 1. Exact Match Fallback
       if (existing_user = User.find_by(username: document_number))
         if expected_geozone && existing_user.geozone_id != expected_geozone.id
           existing_user.geozone_id = expected_geozone.id
@@ -448,6 +449,7 @@ class User < ApplicationRecord
         return existing_user
       end
 
+      # 2. Legacy User Match
       if valid_ys_document?(document_number)
         base_number = document_number.to_s[0, 14]
         if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
@@ -456,8 +458,10 @@ class User < ApplicationRecord
 
           legacy_user.username = document_number
           legacy_user.document_number = document_number
-          legacy_user.email = "#{document_number}@consul.dev"
           legacy_user.password = document_number
+
+          # Update email if they provided one and don't already have one
+          legacy_user.email = email_address if legacy_user.email.blank? && email_address.present?
 
           if expected_geozone && legacy_user.geozone_id != expected_geozone.id
             legacy_user.geozone_id = expected_geozone.id
@@ -469,16 +473,18 @@ class User < ApplicationRecord
         end
       end
 
+      # 3. Create Brand New User (with Email Confirmation)
       user = User.new(
         username: document_number,
-        email: "#{document_number}@consul.dev",
+        email: email_address, # Uses real email from registration form
         password: document_number,
         document_number: document_number,
         geozone_id: expected_geozone&.id,
-        terms_of_service: "1",
-        confirmed_at: Time.current
+        terms_of_service: "1"
+      # Notice: confirmed_at is NOT set, forcing Devise to send the confirmation email
       )
 
+      # 4. Pipeline Toggles (Bypass Demographics if disabled)
       if Setting["feature.user.skip_verification"].present?
         user.verified_at = Time.current
         user.level_two_verified_at = Time.current
@@ -487,7 +493,8 @@ class User < ApplicationRecord
         user.residence_verified_at = Time.current
       end
 
-      user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
+      # IMPORTANT: We removed `user.skip_confirmation_notification!` here so the email actually sends!
+
       user.valid?
 
       other_errors = user.errors.messages.except(:password)
@@ -496,6 +503,8 @@ class User < ApplicationRecord
           user.errors.clear
           return user
         end
+      else
+        Rails.logger.error("Failed to create YS user #{document_number}: #{other_errors}")
       end
 
       nil
