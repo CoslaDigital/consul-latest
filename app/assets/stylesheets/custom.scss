@@ -18,16 +18,21 @@
 }
 
 /*
- * ===================================================================
- * Refactored Mobile-First Hero Styles
- *
- * This one block replaces all your other hero styles.
- * =================================_=================================
- */
+- ===================================================================
+
+- Refactored Mobile-First Hero Styles
+
+-
+- Architecture: Single source of truth. Layout is defined here,
+
+- colors are injected entirely via var(--brand) CSS variables.
+
+- ===================================================================
+
+*/
 
 .hero-header {
   // --- BASE STYLES ---
-  // These apply to the fallback hero (no image)
   @include full-width-background;
   @extend %budget-header;
 
@@ -163,7 +168,7 @@
       }
     }
   }
-}
+
 
 /*
 - ===================================================================
