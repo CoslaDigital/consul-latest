@@ -366,7 +366,7 @@ class User < ApplicationRecord
       end
     end
 
-    if Setting["verification.require_sms"].present?
+    if Setting["verification.require_sms"].present? && Tenant.current_secrets&.sms_api_key.present?
       steps << :sms
     end
 
@@ -378,6 +378,9 @@ class User < ApplicationRecord
   end
 
   def pending_verification_steps
+
+    return [] if Setting["feature.user.skip_verification"].present?
+
     verification_pipeline.reject do |step|
       case step
       when :ys_demographics then residence_verified_at.present?

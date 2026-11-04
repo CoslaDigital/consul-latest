@@ -10,7 +10,7 @@ RSpec.describe User, type: :model do
     let(:user) { create(:user) }
 
     before do
-      # Allow normal DB lookups for all other settings (like locales, etc.)
+      # Allow normal DB lookups for all other settings (like locales, feature.restrict_login_to_officials, etc.)
       allow(Setting).to receive(:[]).and_call_original
 
       # Start with a clean slate for our verification settings
@@ -87,6 +87,9 @@ RSpec.describe User, type: :model do
     before do
       # Ensure the geozone exists to avoid Geozone.find_by! raising an error during YS creation
       Geozone.find_or_create_by!(name: "ys_trumptonshire")
+
+      # IMPORTANT FIX: Tell RSpec to allow standard DB lookups for any un-stubbed settings
+      allow(Setting).to receive(:[]).and_call_original
     end
 
     context "when Demographics is ON, SMS is OFF, Letter is OFF" do
