@@ -44,6 +44,7 @@ class Setting
                                 "geofence_allowed_countries": "GB",
                                 # Dynamic Verification Pipeline Settings
                                 "verification.ys_requires_demographics": false,
+                                "verification.require_email_confirmation": true,
                                 "verification.require_residence": true,
                                 "verification.require_sms": true,
                                 "verification.require_letter": false

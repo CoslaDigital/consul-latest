@@ -47,12 +47,14 @@
     </div>
 
     <!-- NEW: Email field for account creation -->
-    <div class="small-12 column">
-      <%= f.email_field :email,
-                        required: true,
-                        label: "Email Address",
-                        placeholder: "Required for new accounts" %>
-    </div>
+    <% if Setting["verification.require_email_confirmation"].present? %>
+      <div class="small-12 column">
+        <%= f.email_field :email,
+                          required: true,
+                          label: "Email Address",
+                          placeholder: "Required for new accounts" %>
+      </div>
+    <% end %>
 
     <div class="small-12 medium-6 column">
       <%= f.submit "Sign In / Register", class: "button expanded" %>
