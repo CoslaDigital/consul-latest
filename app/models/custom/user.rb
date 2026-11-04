@@ -84,10 +84,6 @@ class User < ApplicationRecord
     (unlock_in_value || 10).to_f.minutes
   end
 
-  def send_devise_notification(notification, *)
-    devise_mailer.send(notification, self, *).deliver_later
-  end
-
   def erase(erase_reason = nil)
     update!(
       erased_at: Time.current,
@@ -336,6 +332,97 @@ class User < ApplicationRecord
     (ancestors + descendants).uniq
   end
 
+  # Builds an array of required steps dynamically based on current Admin Settings.
+  def verification_pipeline
+    steps = []
+
+    # 1. First Step: Demographics/Residence
+    # The global `require_residence` setting is the master switch.
+    # If it is OFF, NOBODY does this step.
+    if Setting["verification.require_residence"].present?
+
+      if User.valid_ys_document?(document_number)
+        # If it's a YS user, look at their specific toggle to see WHICH form they get
+        if Setting["verification.ys_requires_demographics"].present?
+          steps << :ys_demographics
+        end
+        # If ys_requires_demographics is OFF, we add NOTHING. They skip step 1.
+      else
+        # Standard users always get the standard form
+        steps << :residence
+      end
+
+    end
+
+    # 2. Second Step: SMS
+    if Setting["verification.require_sms"].present?
+      steps << :sms
+    end
+
+    # 3. Third Step: Letter
+    if Setting["verification.require_letter"].present?
+      steps << :letter
+    end
+
+    steps
+  end
+
+  def pending_verification_steps
+    verification_pipeline.reject do |step|
+      case step
+      when :ys_demographics then residence_verified_at.present?
+      when :residence then residence_verified_at.present?
+      when :sms then confirmed_phone.present?
+      when :letter then verified_at.present?
+      else true
+      end
+    end
+  end
+
+  def pipeline_complete?
+    pending_verification_steps.empty?
+  end
+
+  def promote_to_fully_verified!
+    updates = {}
+    updates[:residence_verified_at] = Time.current unless residence_verified_at?
+    updates[:level_two_verified_at] = Time.current unless level_two_verified_at?
+
+    # NEW: Stamp the Level 3 verified_at column so Consul stops asking for Letter verification
+    updates[:verified_at] = Time.current unless verified_at?
+
+    update_columns(updates) if updates.any?
+  end
+
+  # --- CONSUL OVERRIDES ---
+  def level_two_verified?
+    super || pipeline_complete?
+  end
+
+  def residence_verified?
+    super || pipeline_complete?
+  end
+
+  # NEW: Automatically consider them Level 3 if the admin pipeline is empty
+  def level_three_verified?
+    super || pipeline_complete?
+  end
+
+  def unverify!
+    update!(
+      residence_verified_at: nil,
+      level_two_verified_at: nil,
+      verified_at: nil,
+      confirmed_phone: nil,
+      unconfirmed_phone: nil,
+      sms_confirmation_code: nil,
+      document_number: nil,
+      document_type: nil,
+      letter_requested_at: nil,
+      letter_verification_code: nil
+    )
+  end
+
   private
 
     def self.log_in_or_create_ys_user(document_number)
@@ -391,11 +478,20 @@ class User < ApplicationRecord
         document_number: document_number,
         geozone_id: expected_geozone&.id, # Uses the upfront calculation
         terms_of_service: "1",
-        confirmed_at: Time.current,
-        verified_at: Time.current,
-        level_two_verified_at: Time.current,
-        residence_verified_at: Time.current
+        confirmed_at: Time.current # Always auto-confirm the dummy email
       )
+
+      # --- THE FIX: Let the Pipeline handle verification status! ---
+      # If the global "Skip Verification" feature is enabled, fully verify them.
+      if Setting["feature.user.skip_verification"].present?
+        user.verified_at = Time.current
+        user.level_two_verified_at = Time.current
+        user.residence_verified_at = Time.current
+        # Otherwise, if the YS Demographics step is OFF, just mark residence as verified
+        # so the Traffic Cop drops them straight into the SMS step.
+      elsif !Setting["verification.ys_requires_demographics"].present?
+        user.residence_verified_at = Time.current
+      end
 
       user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
 
@@ -558,5 +654,6 @@ class User < ApplicationRecord
       # 4. Simply look up the prefix!
       lookup_hash[prefix.to_s]
     end
+
 
 end
