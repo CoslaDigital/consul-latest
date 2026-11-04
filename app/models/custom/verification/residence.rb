@@ -78,21 +78,7 @@ class Verification::Residence
     Setting["min_age_to_participate"].present?
   end
 
-  def local_postal_code
-    errors.add(:postal_code, I18n.t("verification.residence.new.error_not_allowed_postal_code")) unless valid_postal_code?
-  end
-
   private
 
-    def valid_postal_code?
-      return true if Setting["postal_codes"].blank?
 
-      Setting["postal_codes"].split(",").any? do |code_or_range|
-        if code_or_range.include?(":")
-          Range.new(*code_or_range.split(":").map(&:strip)).include?(postal_code&.strip)
-        else
-          /\A#{code_or_range.strip}\Z/.match?(postal_code&.strip)
-        end
-      end
-    end
 end
