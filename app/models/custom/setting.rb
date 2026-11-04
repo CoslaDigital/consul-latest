@@ -26,7 +26,7 @@ class Setting
                                 # Dynamic Verification Pipeline Settings
                                 "verification.ys_requires_demographics": false,
                                 "verification.require_residence": true,
-                                "verification.require_sms": true,
+                                "verification.require_sms": false,
                                 "verification.require_letter": false
                               })
       end
