@@ -1,4 +1,5 @@
 load Rails.root.join("app", "models", "user.rb")
+
 class User < ApplicationRecord
   DOCUMENT_ID_STRATEGIES = [
     :valid_ys_document?, # original young scot logic
@@ -325,6 +326,9 @@ class User < ApplicationRecord
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
 
+    # Extract the email address from the Devise login form payload
+    form_email = conditions.delete(:email)
+
     if validate_document_number(login) && !Setting.enable_card_login?
       return nil
     end
@@ -334,8 +338,16 @@ class User < ApplicationRecord
            where(conditions.to_hash).find_by(["confirmed_phone = ?", login]) ||
            where(conditions.to_hash).find_by(["document_number = ?", login])
 
+    # BACKFILL CAPTURE: If a legacy user logs in without an email, but typed one into the form, save it.
+    if user.present? && user.email.blank? && form_email.present?
+      user.update_column(:email, form_email)
+    end
+
     if user.nil? && validate_document_number(login) && Setting.enable_card_login?
-      user = log_in_or_create_ys_user(login)
+      # Pass the captured email into the creation logic
+      user = log_in_or_create_ys_user(login, form_email)
+      # Prevent Devise from attempting to authenticate an unpersisted user object
+      user = nil unless user&.persisted?
     end
 
     user
@@ -503,7 +515,13 @@ class User < ApplicationRecord
       end
 
       user.valid?
+      # FIX: If the admin toggle is OFF, explicitly delete Devise's missing email complaints
+      # so the YS account can save successfully without an email address.
+      unless Setting["verification.require_email_confirmation"].present?
+        user.errors.delete(:email)
+      end
 
+      # Check if there are any *other* errors preventing save (excluding password)
       other_errors = user.errors.messages.except(:password)
       if other_errors.empty?
         if user.save(validate: false)

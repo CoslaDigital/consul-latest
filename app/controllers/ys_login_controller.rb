@@ -6,31 +6,36 @@ class YsLoginController < Devise::SessionsController
 
   def create
     username = params.dig(:user, :username)
-    email = params.dig(:user, :email) # Capture the email from the dual-field form
+    email = params.dig(:user, :email)
 
     if User.validate_document_number(username)
-      # Pass BOTH parameters to our newly merged model method
+      # Check if this legacy user's email already belongs to someone else
+      if email.present? && User.exists?(email: email) && !User.exists?(username: username, email: email)
+        flash[:alert] = "The email address #{email} is already registered to another account."
+        render :new, status: :unprocessable_entity
+        return
+      end
+
       user = User.log_in_or_create_ys_user(username, email)
 
       if user&.persisted?
-        # CRITICAL: Devise checks if they have clicked the email confirmation link yet
-        if user.active_for_authentication?
-          set_flash_message!(:notice, :signed_in)
-          sign_in(user, event: :authentication)
-          session["user_return_to"] = nil
-          redirect_to after_sign_in_path_for(user)
+        sign_in(user, event: :authentication)
+        session["user_return_to"] = nil
+
+        # CUSTOM FLASH MESSAGING: Check if they are locked behind the email confirmation barrier
+        if Setting["verification.require_email_confirmation"].present? && user.confirmed_at.blank?
+          flash[:notice] = "Account created successfully! Please check your inbox (#{user.email}) to click the confirmation link before you can fully participate."
         else
-          # User was just created and Devise dispatched the email. Deny immediate login.
-          flash[:notice] = "A message with a confirmation link has been sent to your email address. Please follow the link to activate your account."
-          redirect_to root_path
+          set_flash_message!(:notice, :signed_in)
         end
+
+        redirect_to after_sign_in_path_for(user)
       else
         error_message = user&.errors&.full_messages&.join(', ') || "Please try again."
         flash[:alert] = "Could not sign you in. #{error_message}"
         render :new, status: :unprocessable_entity
       end
     else
-      # Uses the granular error message for bad card formats
       flash[:alert] = User.ys_document_error_message(username)
       render :new, status: :unprocessable_entity
     end
