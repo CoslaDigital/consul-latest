@@ -18,7 +18,7 @@ class YsLoginController < Devise::SessionsController
 
       user = User.log_in_or_create_ys_user(username, email)
 
-      if user&.persisted?
+      if user&.persisted? && user.errors.empty?
         sign_in(user, event: :authentication)
         session["user_return_to"] = nil
 

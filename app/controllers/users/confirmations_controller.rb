@@ -58,6 +58,10 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
       params.require(resource_name).permit(allowed_params)
     end
 
+  def after_confirmation_path_for(resource_name, resource)
+    new_ys_login_path
+  end
+
     def allowed_params
       [:password, :password_confirmation, :email]
     end
