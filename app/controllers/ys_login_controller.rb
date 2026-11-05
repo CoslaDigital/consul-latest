@@ -19,15 +19,18 @@ class YsLoginController < Devise::SessionsController
       user = User.log_in_or_create_ys_user(username, email)
 
       if user&.persisted? && user.errors.empty?
-        sign_in(user, event: :authentication)
-        session["user_return_to"] = nil
 
-        # CUSTOM FLASH MESSAGING: Check if they are locked behind the email confirmation barrier
+        # 1. Catch unconfirmed users BEFORE trying to log them in
         if Setting["verification.require_email_confirmation"].present? && user.confirmed_at.blank?
           flash[:notice] = "Account created successfully! Please check your inbox (#{user.email}) to click the confirmation link before you can fully participate."
-        else
-          set_flash_message!(:notice, :signed_in)
+          redirect_to new_ys_login_path
+          return # Stop execution so we don't accidentally sign them in
         end
+
+        # 2. HAPPY PATH: User is confirmed, log them in and route them to the app
+        sign_in(user, event: :authentication)
+        session["user_return_to"] = nil
+        set_flash_message!(:notice, :signed_in)
 
         redirect_to after_sign_in_path_for(user)
       else
