@@ -14,7 +14,11 @@ class Admin::SystemEmailsController < Admin::BaseController
       direct_message_for_sender: %w[view edit_info],
       email_verification: %w[view edit_info],
       user_invite: %w[view edit_info],
-      evaluation_comment: %w[view edit_info]
+      evaluation_comment: %w[view edit_info],
+      proposal_match_created: %w[view edit_info],
+      proposal_match_accepted: %w[view edit_info],
+      collaboration_introduction: %w[view edit_info],
+      proposal_match_confirmed: %w[view edit_info]
     }
   end
 
@@ -36,6 +40,9 @@ class Admin::SystemEmailsController < Admin::BaseController
       @subject = t("mailers.user_invite.subject", org_name: Setting["org_name"])
     when "evaluation_comment"
       load_sample_valuation_comment
+      # Add this block for Mutual Aid:
+    when "proposal_match_created", "proposal_match_accepted", "collaboration_introduction", "proposal_match_confirmed"
+      load_sample_proposal_match
     end
   end
 
@@ -131,5 +138,35 @@ class Admin::SystemEmailsController < Admin::BaseController
     def unsent_proposal_notifications_ids
       Notification.where(notifiable_type: "ProposalNotification", emailed_at: nil)
                   .group(:notifiable_id).count.keys
+    end
+
+    def load_sample_proposal_match
+      @match = ProposalMatch.last
+
+      if @match
+        @proposal = @match.proposal
+        @offer = @match.offer
+
+        # Set default generic fallback variables for the views
+        @recipient = @proposal.author
+        @actor = @offer.author
+        @other_party = @offer.author
+        @initiated_by_proposal = false
+
+        # Set specific subjects/recipients based on which email is being previewed
+        case @system_email
+        when "proposal_match_created"
+          @subject = t("mailers.proposal_match_created.offered_subject", provider: @actor.name, proposal_title: @proposal.title)
+        when "proposal_match_accepted"
+          @subject = t("mailers.proposal_match_accepted.subject")
+        when "collaboration_introduction"
+          @subject = t("mailers.collaboration_introduction.subject", title: @proposal.title, default: "Collaboration Connected!")
+        when "proposal_match_confirmed"
+          @recipient = @offer.author # The Completion email is addressed to the Provider
+          @subject = t("mailers.proposal_match_confirmed.subject")
+        end
+      else
+        redirect_to admin_system_emails_path, alert: "No Mutual Aid collaborations exist to generate a preview."
+      end
     end
 end

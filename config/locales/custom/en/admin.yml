@@ -1044,6 +1044,18 @@ en:
         no_comments: "There aren't any comments created. Some example data is needed in order to preview the email."
         no_replies: "There aren't any replies created. Some example data is needed in order to preview the email."
         no_evaluation_comments: "There aren't any evaluation comments created. Some example data is needed in order to preview the email."
+      proposal_match_created:
+        title: "Mutual Aid: Collaboration Requested"
+        description: "Sent to the project lead or the resource provider when a new request is made."
+      proposal_match_accepted:
+        title: "Mutual Aid: Collaboration Accepted"
+        description: "Sent to the project lead when a resource provider accepts their request."
+      collaboration_introduction:
+        title: "Mutual Aid: Mutual Introduction (Handshake)"
+        description: "Sent to both parties exchanging their contact details once the match is confirmed."
+      proposal_match_confirmed:
+        title: "Mutual Aid: Collaboration Completed"
+        description: "Sent to both parties when the project lead marks the collaboration as successfully fulfilled."
     emails_download:
       index:
         title: Emails download
