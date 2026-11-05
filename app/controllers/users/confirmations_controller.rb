@@ -62,8 +62,11 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
     # Automatically sign the user in after successful confirmation
     sign_in(resource_name, resource)
 
-    # Redirect them straight into the app (e.g., root path or user profile)
-    root_path
+    if respond_to?(:my_area_path) && Setting.my_area_enabled?
+      my_area_path
+    else
+      root_path
+    end
   end
 
     def allowed_params
