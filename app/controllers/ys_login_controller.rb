@@ -22,7 +22,11 @@ class YsLoginController < Devise::SessionsController
 
         # 1. Catch unconfirmed users BEFORE trying to log them in
         if Setting["verification.require_email_confirmation"].present? && user.confirmed_at.blank?
-          flash[:notice] = "Account created successfully! Please check your inbox (#{user.email}) to click the confirmation link before you can fully participate."
+
+          # Grab the new email from the parking lot if they are a legacy user, otherwise use their main email
+          target_email = user.unconfirmed_email.presence || user.email
+
+          flash[:notice] = "Account created successfully! Please check your inbox (#{target_email}) to click the confirmation link before you can fully participate."
           redirect_to new_ys_login_path
           return # Stop execution so we don't accidentally sign them in
         end
