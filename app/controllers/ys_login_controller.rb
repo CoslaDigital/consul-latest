@@ -5,7 +5,12 @@ class YsLoginController < Devise::SessionsController
   end
 
   def create
-    username = params.dig(:user, :username).to_s.delete(' ')
+
+    if params[:user].present? && params[:user][:username].present?
+      params[:user][:username] = params[:user][:username].to_s.delete(' ')
+    end
+
+    username = params.dig(:user, :username)
     email = params.dig(:user, :email)
 
     if User.validate_document_number(username)
