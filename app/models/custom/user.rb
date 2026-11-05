@@ -622,7 +622,7 @@ class User < ApplicationRecord
 
       temp_code = ENV.fetch("YS_TEMP_CODE", "XX")
       valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
-      valid_suffix = suffix.match?(/\A0[0-5]\z/)
+      valid_suffix = suffix.match?(/\A(0[0-9]|1[0-5])\z/)
 
       valid_middle && valid_suffix
     end
