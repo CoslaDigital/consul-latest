@@ -59,7 +59,11 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
     end
 
   def after_confirmation_path_for(resource_name, resource)
-    new_ys_login_path
+    # Automatically sign the user in after successful confirmation
+    sign_in(resource_name, resource)
+
+    # Redirect them straight into the app (e.g., root path or user profile)
+    root_path
   end
 
     def allowed_params
