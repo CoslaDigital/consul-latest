@@ -58,7 +58,18 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
       params.require(resource_name).permit(allowed_params)
     end
 
-    def allowed_params
+  def after_confirmation_path_for(resource_name, resource)
+    # Automatically sign the user in after successful confirmation
+    sign_in(resource_name, resource)
+
+    if respond_to?(:my_area_path) && Setting.my_area_enabled?
+      my_area_path
+    else
+      root_path
+    end
+  end
+
+  def allowed_params
       [:password, :password_confirmation, :email]
     end
 
