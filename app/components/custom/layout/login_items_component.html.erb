@@ -26,9 +26,11 @@
     <%= link_to t("devise_views.menu.login_items.login"),
                 new_user_session_path, rel: "nofollow" %>
   </li>
-  <li>
-    <%= link_to t("devise_views.menu.login_items.ys_login"),
-                new_ys_login_path, rel: "nofollow" %>
-  </li>
+  <% if Setting.enable_card_login? %>
+    <li>
+      <%= link_to t("devise_views.menu.login_items.ys_login"),
+                  new_ys_login_path, rel: "nofollow" %>
+    </li>
+  <% end %>
 
 <% end %>
