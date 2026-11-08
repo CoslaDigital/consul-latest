@@ -620,17 +620,26 @@ class User < ApplicationRecord
       expected_geozone = "ys_#{council_name}"
       return false unless Geozone.exists?(name: expected_geozone)
 
-      temp_code = ENV.fetch("YS_TEMP_CODE", "XX")
-      valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
+      # Allow both the legacy XX and the new secure ZZ temporary codes
+      valid_middle = middle.match?(/\A(\d{2}|XX|ZZ)\d{6}\z/i)
       valid_suffix = suffix.match?(/\A(0[0-9]|1[0-5])\z/)
 
       return false unless valid_middle && valid_suffix
 
-      base_14 = document_number.to_s[0, 14]
+      base_14 = document_number.to_s[0, 14].upcase
 
-      # If the card is a temporary stub with 'XX', it bypasses the math check.
-      # Otherwise, it must pass the Luhn check.
-      base_14.match?(/\A\d{14}\z/) ? luhn_valid?(base_14) : true
+      # Strategy routing:
+      if base_14.include?("XX")
+        # 1. Legacy XX cards: bypass math entirely until retired
+        return true
+      elsif base_14.include?("ZZ")
+        # 2. New ZZ cards: substitute ZZ with 00 to perform mathematical Luhn check
+        numeric_base_14 = base_14.gsub("ZZ", "00")
+        return luhn_valid?(numeric_base_14)
+      else
+        # 3. Standard cards: perform mathematical Luhn check
+        return luhn_valid?(base_14)
+      end
     end
 
     def self.luhn_valid?(number_string)
@@ -721,6 +730,51 @@ class User < ApplicationRecord
 
       return results
     end
+
+    require 'csv'
+
+    def self.generate_unique_zz_cards_to_file(prefix, count = 10, start_sequence = 1, filename = "tmp/new_zz_cards.csv")
+      puts "Generating #{count} unique ZZ cards for prefix #{prefix}..."
+      puts "Output will be saved to: #{filename}"
+
+      cards = []
+      current_sequence = start_sequence
+
+      # Open the file in write mode
+      CSV.open(filename, "w") do |csv|
+        # Add a header row
+        csv << ["Document Number", "Prefix", "Sequence", "Check Digit"]
+
+        while cards.length < count
+          sequence = current_sequence.to_s.rjust(5, '0')
+          math_basis = "#{prefix}00#{sequence}"
+
+          check_digit = (0..9).find do |d|
+            User.luhn_valid?("#{math_basis}#{d}")
+          end
+
+          final_card = "#{prefix}ZZ#{sequence}#{check_digit}01"
+
+          unless User.exists?(username: final_card) || User.exists?(document_number: final_card)
+            cards << final_card
+            # Write the breakdown to the CSV
+            csv << [final_card, prefix, sequence, check_digit]
+            puts "✅ Saved #{final_card}"
+          else
+            puts "⚠️  Skipped #{final_card} (Already exists in database)"
+          end
+
+          current_sequence += 1
+        end
+      end
+
+      puts "\nFinished generating #{cards.count} unique cards."
+      puts "File ready at: #{filename}"
+      cards
+    end
+
+    # Example usage: Generate 20 cards for Clackmannanshire and save to a custom file
+    # generate_unique_zz_cards_to_file("633741", 20, 1, "tmp/clacks_test_cards.csv")
 
     def self.valid_na_document?(document_number)
       allowed_formats = [
