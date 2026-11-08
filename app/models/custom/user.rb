@@ -601,7 +601,102 @@ class User < ApplicationRecord
       valid_middle = middle.match?(/\A(\d{2}|#{Regexp.escape(temp_code)})\d{6}\z/i)
       valid_suffix = suffix.match?(/\A0[0-5]\z/)
 
-      valid_middle && valid_suffix
+      return false unless valid_middle && valid_suffix
+
+      base_14 = document_number.to_s[0, 14]
+
+      # If the card is a temporary stub with 'XX', it bypasses the math check.
+      # Otherwise, it must pass the Luhn check.
+      base_14.match?(/\A\d{14}\z/) ? luhn_valid?(base_14) : true
+    end
+
+    def self.luhn_valid?(number_string)
+      # 1. Strict input validation (rejects nil, letters, spaces, empty strings)
+      return false unless number_string.is_a?(String) && number_string.match?(/\A\d+\z/)
+
+      sum = 0
+
+      # 2. Memory-efficient reverse iteration
+      number_string.each_char.reverse_each.with_index do |char, index|
+        digit = char.to_i
+
+        if index.odd? # Every second digit from the right
+          digit *= 2
+          digit -= 9 if digit > 9
+        end
+
+        sum += digit
+      end
+
+      (sum % 10).zero?
+    end
+
+    def self.audit_ys_cards(geozone_id: nil)
+      # 1. Gather all known prefixes (Core + Tenant Secrets)
+      base_prefixes = NEC_PREFIX_MAPPING.keys
+      secrets = Tenant.current_secrets || {}
+      temp_mappings = secrets[:temp_nec_mappings] || []
+      temp_prefixes = temp_mappings.map(&:to_s).each_slice(2).to_h.keys
+      all_prefixes = (base_prefixes + temp_prefixes).uniq
+
+      # 2. Construct safe SQL LIKE conditions
+      sql_conditions = all_prefixes.map { "username LIKE ?" }.join(" OR ")
+      sql_values = all_prefixes.map { |prefix| "#{prefix}%" }
+
+      # 3. Apply scopes: Filter by geozone (if given) AND strictly match card prefixes
+      scope = geozone_id ? where(geozone_id: geozone_id) : all
+      scope = scope.where(sql_conditions, *sql_values)
+
+      results = {
+        standard_pass: [],
+        standard_fail: [],
+        stub_pass: [],
+        stub_fail: [],
+        invalid_length: []
+      }
+
+      # 4. Process strictly filtered users in batches
+      scope.find_each do |user|
+        card = user.username.to_s
+
+        if card.length != 16
+          results[:invalid_length] << user.id
+          next
+        end
+
+        is_stub = card.upcase.include?("XX")
+        is_valid = valid_ys_document?(card)
+
+        if is_stub
+          is_valid ? results[:stub_pass] << card : results[:stub_fail] << card
+        else
+          is_valid ? results[:standard_pass] << card : results[:standard_fail] << card
+        end
+      end
+
+      puts "\n--- YS Card Validation Audit ---"
+      puts "Scope: #{geozone_id ? "Geozone #{geozone_id}" : 'All Users'}"
+      puts "Valid Prefixes Found: #{all_prefixes.count}"
+      puts "Total Card Users Checked: #{scope.count}"
+      puts "----------------------------------------"
+      puts "✅ Standard Cards Passed: #{results[:standard_pass].count}"
+      puts "❌ Standard Cards Failed: #{results[:standard_fail].count}"
+      puts "✅ Stub (XX) Cards Passed: #{results[:stub_pass].count}"
+      puts "❌ Stub (XX) Cards Failed: #{results[:stub_fail].count}"
+      puts "⚠️  Invalid Length (Ignored): #{results[:invalid_length].count}"
+      puts "----------------------------------------"
+
+      if results[:standard_fail].any?
+        puts "\n🔍 Sample Standard Failures (First 5):"
+        results[:standard_fail].first(5).each { |card| puts " - #{card}" }
+      end
+
+      if results[:stub_fail].any?
+        puts "\n🔍 Sample Stub Failures (First 5):"
+        results[:stub_fail].first(5).each { |card| puts " - #{card}" }
+      end
+
+      return results
     end
 
     def self.valid_na_document?(document_number)
