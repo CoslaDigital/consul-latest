@@ -458,8 +458,22 @@ class User < ApplicationRecord
       if (existing_user = User.find_by(username: document_number))
         if existing_user.email.present? && !existing_user.email.end_with?("@consul.dev")
           if email_address.present? && existing_user.email != email_address.strip.downcase
-            existing_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
-            return existing_user
+
+            # FIX: Allow unconfirmed users to correct a typo'd email
+            if !existing_user.confirmed?
+              begin
+                # Devise automatically sends a new confirmation email on update
+                existing_user.update(email: email_address.strip.downcase)
+              rescue ActiveRecord::RecordNotUnique
+                existing_user.errors.add(:email, "is already registered to another account.")
+                return existing_user
+              end
+            else
+              # Hard lock for confirmed users to prevent account hijacks
+              existing_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
+              return existing_user
+            end
+
           end
         elsif existing_user.email.blank? || existing_user.email.end_with?("@consul.dev")
           if email_address.present?
@@ -484,11 +498,21 @@ class User < ApplicationRecord
         base_number = document_number.to_s[0, 14]
         if (legacy_user = User.where("document_number LIKE ?", "#{base_number}%").first)
 
+          is_upgrading_stub_email = false
+
           # Security Lock: Check if they have a real email that mismatches
           if legacy_user.email.present? && !legacy_user.email.end_with?("@consul.dev")
             if email_address.present? && legacy_user.email != email_address.strip.downcase
-              legacy_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
-              return legacy_user
+
+              # FIX: Allow unconfirmed users to correct a typo'd email
+              if !legacy_user.confirmed?
+                legacy_user.email = email_address.strip.downcase
+                is_upgrading_stub_email = true # Ensures Devise sends the new email on save
+              else
+                legacy_user.errors.add(:email, "does not match the address on file for this card. Please use your original email.")
+                return legacy_user
+              end
+
             end
           end
 
@@ -496,15 +520,13 @@ class User < ApplicationRecord
           legacy_user.document_number = document_number
           legacy_user.password = document_number
 
-          is_upgrading_stub_email = false
-
           # Upgrade the stub email if provided
           if (legacy_user.email.blank? || legacy_user.email.end_with?("@consul.dev")) && email_address.present?
             legacy_user.email = email_address.strip.downcase
             is_upgrading_stub_email = true
           end
 
-          # ONLY skip confirmations if we are not actively upgrading their email
+          # ONLY skip confirmations if we are not actively upgrading or fixing their email
           unless is_upgrading_stub_email
             legacy_user.skip_reconfirmation! if legacy_user.respond_to?(:skip_reconfirmation!)
             legacy_user.skip_confirmation_notification! if legacy_user.respond_to?(:skip_confirmation_notification!)
@@ -541,6 +563,7 @@ class User < ApplicationRecord
         if email_address.present?
           user.email = email_address.strip.downcase
         else
+          # RESTORED: Generate a unique dummy email to prevent DB collisions on ""
           user.email = "#{document_number}@consul.dev"
         end
         user.confirmed_at = Time.current
