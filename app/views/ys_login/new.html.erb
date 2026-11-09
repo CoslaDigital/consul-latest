@@ -65,6 +65,8 @@
   </div>
 <% end %>
 
+<% if Setting["verification.require_email_confirmation"].present? %>
 <div class="text-center" style="margin-top: 20px;">
   <%= link_to "Didn't receive confirmation instructions?", new_user_confirmation_path %>
 </div>
+<% end %>
