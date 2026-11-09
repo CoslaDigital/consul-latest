@@ -44,18 +44,8 @@ class Verification::YsDemographic
     end
 
     def local_postal_code
-      return if Setting["postal_codes"].blank?
+      return if VerificationHelper.postal_code_allowed_by_settings?(postal_code)
 
-      is_valid = Setting["postal_codes"].split(",").any? do |code_or_range|
-        if code_or_range.include?(":")
-          Range.new(*code_or_range.split(":").map(&:strip)).include?(postal_code&.strip)
-        else
-          /\A#{code_or_range.strip}\Z/.match?(postal_code&.strip)
-        end
-      end
-
-      unless is_valid
-        errors.add(:postal_code, I18n.t("verification.residence.new.error_not_allowed_postal_code"))
-      end
+      errors.add(:postal_code, I18n.t("verification.residence.new.error_not_allowed_postal_code"))
     end
 end
