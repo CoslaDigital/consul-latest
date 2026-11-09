@@ -538,7 +538,11 @@ class User < ApplicationRecord
       if Setting["verification.require_email_confirmation"].present?
         user.email = email_address&.strip&.downcase
       else
-        user.email = email_address&.strip&.downcase if email_address.present?
+        if email_address.present?
+          user.email = email_address.strip.downcase
+        else
+          user.email = "#{document_number}@consul.dev"
+        end
         user.confirmed_at = Time.current
         user.skip_confirmation_notification! if user.respond_to?(:skip_confirmation_notification!)
       end
