@@ -20,6 +20,8 @@ class Offer < ApplicationRecord
   belongs_to :author, -> { with_hidden }, class_name: "User", inverse_of: :offers
   belongs_to :geozone, optional: true
 
+  audited on: [:create, :update, :destroy]
+
   # The dating app connection
   has_many :proposal_matches, dependent: :destroy
   has_many :proposals, through: :proposal_matches

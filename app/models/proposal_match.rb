@@ -4,6 +4,8 @@ class ProposalMatch < ApplicationRecord
   belongs_to :proposal
   belongs_to :offer
 
+  audited on: [:create, :update, :destroy]
+
   # Status Lifecycle
   enum :status, { pending: 0, accepted: 10, confirmed: 20, fulfilled: 30, rejected: 40 }
 
