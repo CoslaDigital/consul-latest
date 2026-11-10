@@ -17,8 +17,20 @@
       <tbody>
       <% matches.each do |match| %>
         <tr id="<%= dom_id(match) %>">
-          <td><%= link_to match.proposal.title, proposal_path(match.proposal) %></td>
-          <td><%= link_to match.offer.title, offer_path(match.offer) %></td>
+          <td>
+            <% if match.proposal.present? %>
+              <%= link_to match.proposal.title, proposal_path(match.proposal) %>
+            <% else %>
+              <span class="text-muted" style="color: #999;"><i><%= t("admin.collaborations.index.deleted_proposal", default: "[Deleted Proposal]") %></i></span>
+            <% end %>
+          </td>
+          <td>
+            <% if match.offer.present? %>
+              <%= link_to match.offer.title, offer_path(match.offer) %>
+            <% else %>
+              <span class="text-muted" style="color: #999;"><i><%= t("admin.collaborations.index.deleted_offer", default: "[Deleted Offer]") %></i></span>
+            <% end %>
+          </td>
           <td>
               <span class="label <%= status_label_class(match.status) %>">
                 <%= t("collaborations.status.#{match.status}") %>
@@ -55,7 +67,13 @@
       <tbody>
       <% offers.each do |offer| %>
         <tr id="<%= dom_id(offer) %>">
-          <td><%= offer.author.name %></td>
+          <td>
+            <% if offer.author.present? %>
+              <%= offer.author.name %>
+            <% else %>
+              <span class="text-muted" style="color: #999;"><i><%= t("admin.collaborations.index.deleted_user", default: "[Deleted User]") %></i></span>
+            <% end %>
+          </td>
           <td><%= link_to offer.title, offer_path(offer) %></td>
           <td><%= l offer.created_at.to_date %></td>
           <td class="text-center">
