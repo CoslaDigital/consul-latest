@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe Admin::Collaborations::IndexComponent, type: :component do
-  # 1. Use let! (with a bang) to force database creation BEFORE any tests or stubs run
+  # Use let! to force database creation BEFORE any tests or stubs run
   let!(:author) { create(:user, username: "MutualAidUser") }
   let!(:proposal) { create(:proposal, title: "Community Garden Project") }
 
@@ -24,12 +24,30 @@ describe Admin::Collaborations::IndexComponent, type: :component do
   subject(:render_component) { render_inline(described_class.new(matches: matches, offers: offers)) }
 
   context "when all records exist and are healthy" do
-    it "renders the proposal, offer, and author names correctly" do
+    it "renders the proposal, offer, author names, and correct match stages" do
       render_component
 
+      # Verify basic text renders
       expect(page).to have_text("Community Garden Project")
       expect(page).to have_text("Free Garden Tools")
       expect(page).to have_text("MutualAidUser")
+
+      # Verify our new Match Stage and Status columns render properly
+      # Since the offer has an active match, it should say "Active" and "Pending"
+      expect(page).to have_css(".label.success", text: "Active")
+      expect(page).to have_css(".label.warning", text: "Pending")
+    end
+  end
+
+  context "when an offer has no matches" do
+    before do
+      # Destroy the match to test the empty state
+      match.destroy
+    end
+
+    it "renders the 'Unmatched' fallback stage" do
+      render_component
+      expect(page).to have_css(".label.secondary", text: "Unmatched")
     end
   end
 

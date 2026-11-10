@@ -11,6 +11,7 @@
         <th><%= t("admin.collaborations.index.proposal") %></th>
         <th><%= t("admin.collaborations.index.offer") %></th>
         <th><%= t("admin.collaborations.index.status") %></th>
+        <th><%= t("admin.collaborations.index.last_action", default: "Last Action") %></th>
         <th class="text-center"><%= t("admin.collaborations.index.actions") %></th>
       </tr>
       </thead>
@@ -36,6 +37,9 @@
                 <%= t("collaborations.status.#{match.status}") %>
               </span>
           </td>
+          <td class="text-muted">
+            <%= l match.updated_at.to_date %>
+          </td>
           <td class="text-center">
             <% if can_force_fulfill?(match) %>
               <%= link_to t("admin.collaborations.index.force_fulfill"),
@@ -60,7 +64,9 @@
       <tr>
         <th><%= t("admin.collaborations.index.author") %></th>
         <th><%= t("admin.collaborations.index.title") %></th>
-        <th><%= t("admin.collaborations.index.created_at") %></th>
+        <th><%= t("admin.collaborations.index.status", default: "Status") %></th>
+        <th><%= t("admin.collaborations.index.match_stage", default: "Match Stage") %></th>
+        <th><%= t("admin.collaborations.index.created_at", default: "Created At") %></th>
         <th class="text-center"><%= t("admin.collaborations.index.actions") %></th>
       </tr>
       </thead>
@@ -75,7 +81,21 @@
             <% end %>
           </td>
           <td><%= link_to offer.title, offer_path(offer) %></td>
-          <td><%= l offer.created_at.to_date %></td>
+          <td>
+            <% if offer.hidden? %>
+              <span class="label alert"><%= t("admin.collaborations.index.hidden", default: "Hidden") %></span>
+            <% else %>
+              <span class="label success"><%= t("admin.collaborations.index.active", default: "Active") %></span>
+            <% end %>
+          </td>
+          <td>
+            <% offer_match_statuses(offer).each do |status| %>
+              <span class="label <%= status_label_class(status) %>">
+                <%= t("collaborations.status.#{status}", default: status.titleize) %>
+              </span>
+            <% end %>
+          </td>
+          <td class="text-muted"><%= l offer.created_at.to_date %></td>
           <td class="text-center">
             <% if can_hide_offer?(offer) %>
               <%= link_to t("admin.collaborations.index.hide"),
