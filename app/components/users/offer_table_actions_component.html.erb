@@ -1,0 +1,9 @@
+<div class="user-offer-table-actions">
+  <% if can? :update, offer %>
+    <%= edit_link %>
+  <% end %>
+
+  <% if can? :destroy, offer %>
+    <%= destroy_button %>
+  <% end %>
+</div>

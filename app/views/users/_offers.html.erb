@@ -1,7 +1,16 @@
-<div id="offers-list">
+<table id="offers_list" class="margin-top">
+  <thead>
+  <tr>
+    <th scope="col"><%= t("users.show.offers", default: "Offers") %></th>
+    <th scope="col"><%= t("offers.status_label", default: "Status") %></th>
+    <th scope="col"><%= t("users.show.actions") %></th>
+  </tr>
+  </thead>
+  <tbody>
   <% offers.each do |offer| %>
-    <%= render "offers/offer", offer: offer %>
+    <%= render "users/offer", offer: offer %>
   <% end %>
+  </tbody>
+</table>
 
-  <%= paginate offers %>
-</div>
+<%= paginate offers %>

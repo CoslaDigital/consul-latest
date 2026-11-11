@@ -121,7 +121,12 @@ module Abilities
         # 1. Offers CRUD
         can [:read, :mine], Offer
         can :create, Offer
-        can [:update, :destroy], Offer, author_id: user.id, hidden_at: nil
+        can :update, Offer, author_id: user.id, hidden_at: nil
+
+        # User can only destroy their offer if it is not hidden AND has no matches
+        can :destroy, Offer do |offer|
+          offer.author_id == user.id && offer.hidden_at.nil? && offer.proposal_matches.none?
+        end
 
         # 2. Matchmaking (The Handshake Lifecycle)
 

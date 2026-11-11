@@ -1,9 +1,9 @@
 <div class="user-budget-investment-table-actions">
-  <% if can? :update, investment %>
+  <% if can? :update, offer %>
     <%= edit_link %>
   <% end %>
 
-  <% if can? :destroy, investment %>
+  <% if can? :destroy, offer %>
     <%= destroy_button %>
   <% end %>
 </div>

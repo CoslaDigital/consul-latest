@@ -60,6 +60,7 @@ class Offer < ApplicationRecord
   scope :last_week, -> { where(created_at: 7.days.ago..) }
 
   after_create :notify_admin_new_offer
+  before_destroy :ensure_no_matches
 
   def self.search(terms)
     pg_search(terms)
@@ -90,5 +91,12 @@ class Offer < ApplicationRecord
 
     def notify_admin_new_offer
       Mailer.new_offer_admin_notification(self).deliver_later
+    end
+
+    def ensure_no_matches
+      if proposal_matches.any?
+        errors.add(:base, "Cannot delete an offer that has been matched. Please withdraw it instead.")
+        throw :abort
+      end
     end
 end
