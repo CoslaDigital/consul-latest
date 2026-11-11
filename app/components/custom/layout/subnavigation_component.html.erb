@@ -19,6 +19,14 @@
                                 accesskey: "2" %>
       </li>
     <% end %>
+    <% if feature?(:offers) %>
+      <li>
+        <%= layout_menu_link_to t("layouts.header.offers", default: "Offers"),
+                                offers_path,
+                                controller_name == "offers",
+                                accesskey: "8" %>
+      </li>
+    <% end %>
     <% if feature?(:polls) %>
       <li>
         <%= layout_menu_link_to t("layouts.header.poll_questions"),
