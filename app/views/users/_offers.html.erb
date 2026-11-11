@@ -1,0 +1,7 @@
+<div id="offers-list">
+  <% offers.each do |offer| %>
+    <%= render "offers/offer", offer: offer %>
+  <% end %>
+
+  <%= paginate offers %>
+</div>
