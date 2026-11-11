@@ -82,6 +82,7 @@ en:
       select_proposal: "Select one of your proposals to request a collaboration"
       no_proposals: "You need to have an active proposal or project to request a collaboration"
       request_button: "Request this resource"
+    feature_disabled: "Offers are not available at the moment"
   flash:
     actions:
       errors:

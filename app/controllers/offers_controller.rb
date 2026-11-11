@@ -1,5 +1,6 @@
 class OffersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
+  before_action :ensure_offers_feature_enabled
 
   load_and_authorize_resource except: [:mine]
 
@@ -100,6 +101,12 @@ class OffersController < ApplicationController
   end
 
   private
+
+    def ensure_offers_feature_enabled
+      unless Setting['feature.offers'].present?
+        redirect_to root_path, alert: t("offers.feature_disabled", default: "The offers feature is currently disabled.")
+      end
+    end
 
     def offer_params
       params.require(:offer).permit(
