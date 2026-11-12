@@ -103,7 +103,7 @@
       <% if params[:retired].blank? %>
         <%= render Proposals::KindsComponent.new(project: params[:project], search: params[:search]) %>
 
-        <%= render "categories" %>
+        <%= render Proposals::CategoriesComponent.new(project: params[:project], search: params[:search]) %>
         <%= render "shared/tag_cloud", taggable: "Proposal" %>
         <%= render Proposals::GeozonesComponent.new %>
       <% end %>
