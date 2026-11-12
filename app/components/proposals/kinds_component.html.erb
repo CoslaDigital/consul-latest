@@ -3,19 +3,18 @@
 <br>
 
 <ul id="proposal-kinds" class="no-bullet categories">
-
-  <%# "All Types" Clear Button %>
   <li class="inline-block">
+    <%# Wipes the search param to ensure categories reset %>
     <%= link_to t("proposals.index.all_types", default: "All Types"),
-                proposals_path(search: current_search, project: nil),
+                proposals_path(project: nil),
                 class: ("is-active" if all_types_active?) %>
   </li>
 
-  <%# Dynamic Project Type Buttons %>
   <% kinds.each do |kind| %>
     <li class="inline-block">
+      <%# Wipes the search param to ensure categories reset %>
       <%= link_to kind.name,
-                  proposals_path(search: current_search, project: kind.slug),
+                  proposals_path(project: kind.slug),
                   class: ("is-active" if active?(kind)) %>
     </li>
   <% end %>
