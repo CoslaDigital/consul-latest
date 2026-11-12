@@ -56,8 +56,9 @@ class ProposalMatchesController < ApplicationController
     if @proposal_match.fulfill!
       Notification.add(@proposal_match.offer.author, @proposal_match)
 
-      # COMPLETED: Notify the Provider that the work has been marked fulfilled
-      Mailer.proposal_match_fulfilled(@proposal_match).deliver_later
+      # COMPLETED: Notify BOTH parties that the work has been fulfilled
+      Mailer.proposal_match_fulfilled(@proposal_match.id, @proposal_match.proposal.author).deliver_later
+      Mailer.proposal_match_fulfilled(@proposal_match.id, @proposal_match.offer.author).deliver_later
 
       redirect_back fallback_location: root_path, notice: t("proposal_matches.fulfill.success")
     end
