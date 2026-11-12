@@ -6,6 +6,19 @@ describe Proposals::CategoriesComponent do
     ActsAsTaggableOn::Tag.destroy_all
   end
 
+  # Helper method to properly create a category and immediately bind it to a proposal
+  # so that the Shared component's strict SQL JOIN recognizes it.
+  def create_category_tag(name, proposal = nil)
+    tag = create(:tag, name: name)
+    tag.update_column(:kind, "category")
+
+    if proposal
+      ActsAsTaggableOn::Tagging.create!(tag: tag, taggable: proposal, context: "tags")
+    end
+
+    tag
+  end
+
   describe "#render?" do
     it "does not render if there are no categories to show" do
       render_inline Proposals::CategoriesComponent.new(project: nil, search: nil)
@@ -13,13 +26,10 @@ describe Proposals::CategoriesComponent do
       expect(page).not_to have_css(".categories")
     end
 
-    it "renders if categories exist" do
-      # 1. Create tags and FORCE the kind column to "category" bypassing protections
-      env_tag = create(:tag, name: "Environment")
-      env_tag.update_column(:kind, "category")
-
-      health_tag = create(:tag, name: "Health")
-      health_tag.update_column(:kind, "category")
+    it "renders if categories exist and are actually used by proposals" do
+      proposal = create(:proposal)
+      create_category_tag("Environment", proposal)
+      create_category_tag("Health", proposal)
 
       render_inline Proposals::CategoriesComponent.new(project: nil, search: nil)
 
@@ -33,20 +43,11 @@ describe Proposals::CategoriesComponent do
     let!(:kind_b) { create(:proposal_kind, name: "City Works", slug: "city-works") }
 
     before do
-      # 1. Create tags and FORCE the kind column to "category"
-      tag_a = create(:tag, name: "Environment")
-      tag_a.update_column(:kind, "category")
-
-      tag_b = create(:tag, name: "Health")
-      tag_b.update_column(:kind, "category")
-
-      # 2. Create the proposals and explicitly link them via Taggings
-      # using Consul's native "tags" context.
       proposal_a = create(:proposal, proposal_kind_id: kind_a.id)
-      ActsAsTaggableOn::Tagging.create!(tag: tag_a, taggable: proposal_a, context: "tags")
-
       proposal_b = create(:proposal, proposal_kind_id: kind_b.id)
-      ActsAsTaggableOn::Tagging.create!(tag: tag_b, taggable: proposal_b, context: "tags")
+
+      create_category_tag("Environment", proposal_a)
+      create_category_tag("Health", proposal_b)
     end
 
     it "shows all categories when no project is selected" do
@@ -66,8 +67,8 @@ describe Proposals::CategoriesComponent do
 
   describe "active states and toggling" do
     before do
-      tag = create(:tag, name: "Environment")
-      tag.update_column(:kind, "category")
+      proposal = create(:proposal)
+      create_category_tag("Environment", proposal)
     end
 
     it "highlights 'All Categories' when no search is active" do
@@ -81,10 +82,9 @@ describe Proposals::CategoriesComponent do
 
       expect(page).to have_css("a.is-active", text: "Environment")
 
-      # Grab the rendered link and verify its parameter structure directly
       link = page.find_link("Environment")
       expect(link[:href]).to include("project=mutual-aid")
-      expect(link[:href]).not_to include("search=") # Confirms the search param is dropped to toggle it off
+      expect(link[:href]).not_to include("search=") # Confirms the parameter drops to toggle OFF
     end
   end
 end
