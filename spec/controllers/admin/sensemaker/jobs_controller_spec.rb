@@ -80,10 +80,11 @@ describe Admin::Sensemaker::JobsController do
   describe "GET #download" do
     let(:job) { sensemaker_job }
     let(:data_folder) { Sensemaker::Paths.sensemaker_data_folder.to_s }
+    let(:job_dir) { File.join(data_folder, "job-#{job.id}") }
 
     context "when artefact param is provided and valid" do
-      let(:basename) { "artefact-#{SecureRandom.hex}.json" }
-      let(:tmp_file) { File.join(data_folder, basename) }
+      let(:relative_artefact) { "job-#{job.id}/artefact-#{SecureRandom.hex}.json" }
+      let(:tmp_file) { File.join(data_folder, relative_artefact) }
 
       before do
         FileUtils.mkdir_p(File.dirname(tmp_file))
@@ -91,7 +92,7 @@ describe Admin::Sensemaker::JobsController do
         allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_output_artefact_paths)
           .and_return([tmp_file])
         allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_input_artefact_paths)
-                                                             .and_return([])
+          .and_return([])
       end
 
       after do
@@ -99,20 +100,20 @@ describe Admin::Sensemaker::JobsController do
       end
 
       it "sends the requested artefact file" do
-        get :download, params: { id: job.id, artefact: basename }
+        get :download, params: { id: job.id, artefact: relative_artefact }
 
         expect(response).to have_http_status(:ok)
-        expect(response.header["Content-Disposition"]).to include(basename)
+        expect(response.header["Content-Disposition"]).to include(File.basename(tmp_file))
       end
     end
 
     context "when input artefact param is provided and valid" do
-      let(:basename) { "input-#{SecureRandom.hex}.csv" }
-      let(:tmp_file) { File.join(data_folder, basename) }
+      let(:relative_artefact) { "job-#{job.id}/input.csv" }
+      let(:tmp_file) { File.join(data_folder, relative_artefact) }
 
       before do
         FileUtils.mkdir_p(File.dirname(tmp_file))
-        File.write(tmp_file, "comment-id,comment_text\n1,test")
+        File.write(tmp_file, "participant_id,survey_text\n1,test")
         job.update!(input_file: tmp_file)
       end
 
@@ -121,21 +122,35 @@ describe Admin::Sensemaker::JobsController do
       end
 
       it "sends the requested input artefact file" do
-        get :download, params: { id: job.id, artefact: basename }
+        get :download, params: { id: job.id, artefact: relative_artefact }
 
         expect(response).to have_http_status(:ok)
-        expect(response.header["Content-Disposition"]).to include(basename)
+        expect(response.header["Content-Disposition"]).to include("input.csv")
+      end
+    end
+
+    context "when artefact param attempts path traversal" do
+      it "redirects to show with alert" do
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_output_artefact_paths)
+          .and_return([])
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_input_artefact_paths)
+          .and_return([])
+
+        get :download, params: { id: job.id, artefact: "../secrets.yml" }
+
+        expect(response).to redirect_to(admin_sensemaker_job_path(job))
+        expect(flash[:alert]).to be_present
       end
     end
 
     context "when artefact param is invalid" do
       it "redirects to show with alert" do
         allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_output_artefact_paths)
-                                                             .and_return([])
+          .and_return([])
         allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:existing_input_artefact_paths)
           .and_return([])
 
-        get :download, params: { id: job.id, artefact: "nonexistent.json" }
+        get :download, params: { id: job.id, artefact: "job-#{job.id}/nonexistent.json" }
 
         expect(response).to redirect_to(admin_sensemaker_job_path(job))
         expect(flash[:alert]).to be_present
@@ -248,7 +263,7 @@ describe Admin::Sensemaker::JobsController do
     end
 
     context "with quick_action" do
-      it "creates job with runner.ts when quick_action is summary" do
+      it "creates job with the script named by quick_action" do
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
@@ -259,14 +274,14 @@ describe Admin::Sensemaker::JobsController do
             analysable_id: debate.id,
             additional_context: "Test"
           },
-          quick_action: "summary"
+          quick_action: "runner.ts"
         }
 
         job = Sensemaker::Job.last
         expect(job.script).to eq("runner.ts")
       end
 
-      it "creates job with sensemaking-report-ui when quick_action is report" do
+      it "creates job with sensemaking-report-ui when quick_action is the report script" do
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
         allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
@@ -277,11 +292,57 @@ describe Admin::Sensemaker::JobsController do
             analysable_id: debate.id,
             additional_context: "Test"
           },
-          quick_action: "report"
+          quick_action: "sensemaking-report-ui"
         }
 
         job = Sensemaker::Job.last
         expect(job.script).to eq("sensemaking-report-ui")
+      end
+
+      it "persists submitted report config in run_options" do
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:check_dependencies?).and_return(false)
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:prepare_input_data)
+        allow_any_instance_of(Sensemaker::JobRunner).to receive(:execute_script).and_return("")
+
+        post :create, params: {
+          sensemaker_job: {
+            analysable_type: "Debate",
+            analysable_id: debate.id,
+            additional_context: "Test",
+            run_options: {
+              config: {
+                title: " Custom Report ",
+                logo: "",
+                excluded_topics: ["Other", ""]
+              }
+            }
+          },
+          quick_action: "sensemaking-report-ui"
+        }
+
+        job = Sensemaker::Job.last
+        expect(job.run_options).to eq(
+          "config" => {
+            "title" => " Custom Report ",
+            "logo" => "",
+            "excluded_topics" => ["Other", ""]
+          }
+        )
+      end
+
+      it "redirects with script_required alert when quick_action is not a known script" do
+        post :create, params: {
+          sensemaker_job: {
+            analysable_type: "Debate",
+            analysable_id: debate.id,
+            additional_context: "Test"
+          },
+          quick_action: "not-a-script"
+        }
+
+        expect(response).to redirect_to(new_admin_sensemaker_job_path(target_type: "Debate",
+                                                                      target_id: debate.id))
+        expect(flash[:alert]).to eq(I18n.t("admin.sensemaker.notice.script_required"))
       end
     end
 
@@ -319,7 +380,7 @@ describe Admin::Sensemaker::JobsController do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Additional context")
       expect(response.body).to include("Input CSV")
-      expect(response.body).to include("comment-id,comment_text")
+      expect(response.body).to include("participant_id,survey_text")
     end
 
     it "handles missing analysable" do

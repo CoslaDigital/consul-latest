@@ -29,6 +29,8 @@
 }
 
 .admin .sensemaker {
+  margin-bottom: 6rem;
+
   .additional-context {
     border: 1px solid $border;
     height: fit-content;
@@ -51,6 +53,72 @@
       cursor: not-allowed;
       opacity: 0.7;
       pointer-events: none;
+    }
+  }
+
+  .sensemaker-report-config-dialog {
+    border: 1px solid $border;
+    border-radius: $button-radius;
+    max-width: 36rem;
+    padding: $line-height;
+    width: calc(100% - 2rem);
+
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .sensemaker-report-config-field {
+      margin-bottom: $line-height;
+    }
+
+    .sensemaker-string-list-row {
+      align-items: center;
+      display: flex;
+      gap: $line-height * 0.5;
+      margin-bottom: $line-height * 0.5;
+
+      input,
+      .button {
+        margin-bottom: 0;
+      }
+    }
+
+    .sensemaker-report-config-actions {
+      margin-top: $line-height;
+    }
+  }
+
+  .quick-action {
+    .quick-action-toggle {
+      @include has-fa-icon(chevron-down, solid, after);
+
+      &::after {
+        margin-left: 0.5rem;
+        max-height: 0.9rem;
+        position: relative;
+        top: 1px;
+      }
+    }
+
+    .dropdown-pane {
+      border: 0;
+      border-radius: $button-radius;
+      box-shadow: 1px 1px 3px rgb(188, 188, 188);
+      margin-top: 2px;
+      padding: 0.1rem;
+      width: auto;
+
+      .button {
+        display: block;
+        margin: 0;
+        text-align: left;
+        white-space: nowrap;
+        width: 100%;
+
+        + .button {
+          border-top: 1px solid rgba($white, 0.3);
+        }
+      }
     }
   }
 
@@ -570,6 +638,11 @@
       &.badge-default {
         background-color: $medium-gray;
         color: $white;
+      }
+
+      &.badge-unpublished {
+        background-color: #ffae00;
+        color: $black;
       }
     }
 

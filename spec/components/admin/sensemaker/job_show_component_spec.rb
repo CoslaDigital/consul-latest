@@ -10,8 +10,9 @@ describe Admin::Sensemaker::JobShowComponent do
   let(:component) { Admin::Sensemaker::JobShowComponent.new(sensemaker_job, child_jobs) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
+    stub_secrets(llm: { openai_api_key: "1234" })
+    Setting["llm.sensemaker_provider"] = "OpenAI"
+    Setting["llm.sensemaker_model"] = "gpt-4o"
     Setting["llm.use_sensemaker"] = true
   end
 
@@ -39,12 +40,18 @@ describe Admin::Sensemaker::JobShowComponent do
       expect(page).to have_content("Sensemaker Job ##{sensemaker_job.id}")
     end
 
+    it "does not render the public reports link when the job is not publishable" do
+      render_inline(component)
+
+      expect(page).not_to have_link(I18n.t("admin.sensemaker.job_show.public_reports_link"))
+    end
+
     context "when job can be downloaded" do
       let(:input_path) do
-        File.join(Sensemaker::Paths.sensemaker_data_folder, "input-#{sensemaker_job.id}.csv")
+        File.join(Sensemaker::Paths.job_directory(sensemaker_job), "input.csv")
       end
       let(:artefact_path) do
-        File.join(Sensemaker::Paths.sensemaker_data_folder, sensemaker_job.artefacts.output_file_name)
+        sensemaker_job.artefacts.default_output_path
       end
       before do
         sensemaker_job.update!(
@@ -53,9 +60,9 @@ describe Admin::Sensemaker::JobShowComponent do
           input_file: input_path
         )
 
-        data_folder = Sensemaker::Paths.sensemaker_data_folder
-        FileUtils.mkdir_p(data_folder)
-        File.write(input_path, "comment-id,comment_text\n1,test")
+        FileUtils.mkdir_p(File.dirname(input_path))
+        FileUtils.mkdir_p(File.dirname(artefact_path))
+        File.write(input_path, "participant_id,survey_text\n1,test")
         File.write(artefact_path, "test")
       end
 
@@ -67,6 +74,29 @@ describe Admin::Sensemaker::JobShowComponent do
         expect(page).to have_content("Output files")
         expect(page).to have_link(File.basename(input_path))
         expect(page).to have_link(File.basename(artefact_path))
+        expect(page.find_link(File.basename(input_path))[:href])
+          .to include("artefact=#{CGI.escape("job-#{sensemaker_job.id}/input.csv")}")
+        expect(page.find_link(File.basename(artefact_path))[:href])
+          .to include(
+            "artefact=#{CGI.escape("job-#{sensemaker_job.id}/#{File.basename(artefact_path)}")}"
+          )
+      end
+    end
+
+    context "when job is publishable but unpublished" do
+      let(:sensemaker_job) do
+        create(:sensemaker_job, :publishable, user: user, analysable_type: "Debate",
+                                              analysable_id: debate.id, published: false)
+      end
+
+      before do
+        allow_any_instance_of(Sensemaker::JobArtefacts).to receive(:complete?).and_return(true)
+      end
+
+      it "renders the public reports link" do
+        render_inline(component)
+
+        expect(page).to have_link(I18n.t("admin.sensemaker.job_show.public_reports_link"))
       end
     end
 
@@ -110,6 +140,7 @@ describe Admin::Sensemaker::JobShowComponent do
       expect(component).to respond_to(:status_text)
       expect(component).to respond_to(:parent_job?)
       expect(component).to respond_to(:parent_job)
+      expect(component).to respond_to(:show_public_reports_link?)
     end
   end
 end

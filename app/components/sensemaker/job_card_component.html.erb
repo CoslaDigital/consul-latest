@@ -5,6 +5,9 @@
         <span class="analysis-type-badge <%= analysis_type_badge_class(job) %>">
           <%= script_type_tag(job) %>
         </span>
+        <% if unpublished? %>
+          <span class="analysis-type-badge badge-unpublished"><%= unpublished_badge_text %></span>
+        <% end %>
         <h4>
           <% if job.artefacts.complete? %>
             <%= link_to view_job_text(job), job_artefact_path(job), class: "report-link", target: "_blank", rel: "noopener" %>

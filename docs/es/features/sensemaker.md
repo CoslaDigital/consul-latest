@@ -70,7 +70,7 @@ production:
   <<: *sensemaker
 ```
 
-La ruta es relativa a la raíz de la aplicación Rails. Los trabajos de Sensemaker leen y escriben artefactos CSV, JSON y HTML en este directorio.
+La ruta es relativa a la raíz de la aplicación Rails. Los trabajos de Sensemaker leen y escriben artefactos CSV, JSON y HTML en subdirectorios por trabajo dentro de esta carpeta (`job-{id}/`), por ejemplo `vendor/sensemaking-tools/data/job-42/report.html`.
 
 ### Paso 3: Preparar el directorio de datos
 
@@ -182,7 +182,7 @@ Los **presupuestos participativos** también requieren que los administradores h
 2. **Cola**: El trabajo se encola en la cola Delayed Job `sensemaker` (`Sensemaker::JobRunner`).
 3. **Procesamiento**: El runner invoca `npx ts-node` para scripts del pipeline o `npx sensemaking-report-ui` para informes HTML. El proveedor LLM, el modelo y las credenciales se pasan desde la configuración LLM del admin mediante `Sensemaker::RuntimeConfig`.
 4. **Salida**: Los archivos de resultado se escriben en la carpeta de datos y se registran en el registro `Sensemaker::Job`.
-5. **Publicación**: Un administrador publica el trabajo; `Sensemaker::ReportLinkComponent` muestra entonces el enlace público cuando existe un trabajo publicado para el recurso.
+5. **Publicación**: Un administrador publica el trabajo. Los ciudadanos ven entonces el enlace público cuando existe un trabajo publicado para el recurso. Los administradores también ven el enlace (y el índice de trabajos) para trabajos no publicados que están listos para publicar, de modo que puedan previsualizar los informes antes de hacerlos públicos.
 
 ## Recursos Soportados
 
@@ -205,6 +205,8 @@ El enlace se muestra actualmente en:
 - Cabeceras de votaciones
 - Páginas de procesos legislativos, preguntas y propuestas
 - Páginas de proyectos de gasto de presupuestos participativos (cuando el sensemaking del presupuesto está habilitado y existen trabajos publicados)
+
+Los administradores también ven el enlace cuando un trabajo no publicado está listo para publicar, de modo que puedan previsualizar las páginas públicas del informe antes de la publicación.
 
 ## Solución de Problemas
 

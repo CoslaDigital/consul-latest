@@ -15,17 +15,12 @@ module Sensemaker
       "Budget::Group"
     ].freeze
 
-    PUBLISHABLE_SCRIPTS = [
-      "sensemaking-report-ui",
-      "runner.ts"
-    ].freeze
-
     validates :analysable_type, inclusion: { in: ANALYSABLE_TYPES }
 
     belongs_to :user, optional: false
     belongs_to :parent_job, class_name: "Sensemaker::Job", optional: true
     has_many :children, class_name: "Sensemaker::Job", foreign_key: :parent_job_id, inverse_of: :parent_job,
-                        dependent: :nullify
+                        dependent: :destroy
 
     validates :analysable_type, presence: true
     validates :analysable_id, presence: true, unless: -> { analysable_type == "Proposal" }
@@ -33,11 +28,19 @@ module Sensemaker
 
     belongs_to :analysable, polymorphic: true, optional: true
 
+    attribute :cli_flags, :json, default: -> { {} }
+    attribute :run_options, :json, default: -> { {} }
+
     before_save :set_persisted_output_if_successful
     after_destroy :cleanup_associated_files
 
     scope :published, -> { where(published: true) }
     scope :unpublished, -> { where(published: false) }
+    scope :publishable_candidates, lambda {
+      where(script: Sensemaker::ScriptRegistry.publishable)
+        .where.not(finished_at: nil)
+        .where(error: nil)
+    }
 
     def artefacts
       @artefacts ||= Sensemaker::JobArtefacts.new(self)
@@ -82,7 +85,7 @@ module Sensemaker
     end
 
     def publishable?
-      PUBLISHABLE_SCRIPTS.include?(script) && finished? && !errored? && artefacts.complete?
+      Sensemaker::ScriptRegistry.publishable.include?(script) && finished? && !errored? && artefacts.complete?
     end
 
     def self.unstarted
@@ -103,6 +106,11 @@ module Sensemaker
 
     def cancel!
       update!(finished_at: Time.current, error: "Cancelled")
+    end
+
+    def record_error!(message)
+      update!(finished_at: Time.current, error: message)
+      Rails.logger.error(message)
     end
 
     def self.budget_related
@@ -139,7 +147,8 @@ module Sensemaker
                                   .where(legislation_question_id: questions_subquery)
                                   .select(:id)
 
-      where(analysable_type: "Legislation::Proposal", analysable_id: proposals_subquery)
+      where(analysable_type: "Legislation::Process", analysable_id: process.id)
+        .or(where(analysable_type: "Legislation::Proposal", analysable_id: proposals_subquery))
         .or(where(analysable_type: "Legislation::Question", analysable_id: questions_subquery))
         .or(where(analysable_type: "Legislation::QuestionOption",
                   analysable_id: question_options_subquery))

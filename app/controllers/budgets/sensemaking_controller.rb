@@ -6,10 +6,17 @@ module Budgets
 
     def show
       authorize! :read_sensemaking, @budget
-      @sensemaker_jobs = Sensemaker::Job.published.for_budget(@budget).order(finished_at: :desc)
+      @sensemaker_jobs = Sensemaker::Job
+                         .for_analysable(@budget, published_only: !admin_preview?)
+                         .publishable_candidates
+                         .order(finished_at: :desc)
     end
 
     private
+
+      def admin_preview?
+        current_user&.administrator?
+      end
 
       def load_budget
         @budget = Budget.find_by_slug_or_id(params[:budget_id]) || Budget.first

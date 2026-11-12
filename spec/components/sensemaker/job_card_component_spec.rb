@@ -14,8 +14,9 @@ describe Sensemaker::JobCardComponent do
   let(:component) { Sensemaker::JobCardComponent.new(job) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
+    stub_secrets(llm: { openai_api_key: "1234" })
+    Setting["llm.sensemaker_provider"] = "OpenAI"
+    Setting["llm.sensemaker_model"] = "gpt-4o"
     Setting["llm.use_sensemaker"] = true
   end
 
@@ -35,6 +36,32 @@ describe Sensemaker::JobCardComponent do
 
       expect(page).not_to have_link(href: serve_report_sensemaker_job_path(job))
       expect(page).to have_content(I18n.t("sensemaker.job_index.view_report"))
+    end
+
+    context "when job is unpublished" do
+      before do
+        job.update!(published: false)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
+      end
+
+      it "renders an unpublished badge" do
+        render_inline component
+
+        expect(page).to have_css("span.badge-unpublished", text: I18n.t("sensemaker.job_index.unpublished"))
+      end
+    end
+
+    context "when job is published" do
+      before do
+        job.update_column(:published, true)
+        allow(job.artefacts).to receive(:complete?).and_return(true)
+      end
+
+      it "does not render an unpublished badge" do
+        render_inline component
+
+        expect(page).not_to have_css("span.badge-unpublished")
+      end
     end
 
     context "when comments_analysed is present" do

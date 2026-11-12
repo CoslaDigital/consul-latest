@@ -152,4 +152,12 @@ describe Admin::Sensemaker::JobComponentHelpers do
       end
     end
   end
+
+  describe "#artefact_download_param" do
+    it "returns a path relative to the sensemaker data folder" do
+      absolute = File.join(Sensemaker::Paths.job_directory(sensemaker_job), "report.html")
+      expect(component.artefact_download_param(absolute))
+        .to eq("job-#{sensemaker_job.id}/report.html")
+    end
+  end
 end

@@ -12,10 +12,10 @@
     <h3><%= t("admin.sensemaker.help.title_4") %></h3>
     <p><%= t("admin.sensemaker.help.description_4") %></p>
     <ul class="script-list">
-      <% Sensemaker::JobRunner::SCRIPTS.each do |script| %>
+      <% scripts.each do |script| %>
         <li>
-          <strong><%= t("admin.sensemaker.scripts.#{script.parameterize.underscore}.title") %></strong> -
-          <%= t("admin.sensemaker.scripts.#{script.parameterize.underscore}.description") %>
+          <strong><%= script_title(script) %></strong> -
+          <%= script_description(script) %>
         </li>
       <% end %>
     </ul>

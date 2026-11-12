@@ -1,0 +1,58 @@
+<dialog id="<%= dialog_id %>" class="sensemaker-report-config-dialog">
+  <h4><%= t("admin.sensemaker.new.report_config_title") %></h4>
+  <p class="help-text small"><%= t("admin.sensemaker.new.report_config_hint") %></p>
+
+  <% properties.each do |key, definition| %>
+    <% next unless string_field?(definition) || string_array_field?(definition) %>
+
+    <div class="sensemaker-report-config-field">
+      <% if string_field?(definition) %>
+        <label for="sensemaker_job_run_options_config_<%= dialog_id %>_<%= key %>">
+          <%= field_label(key, definition) %>
+        </label>
+        <% if field_description(key, definition).present? %>
+          <p class="help-text"><%= field_description(key, definition) %></p>
+        <% end %>
+        <%= text_field_tag "sensemaker_job[run_options][config][#{key}]",
+                           field_value(key),
+                           id: "sensemaker_job_run_options_config_#{dialog_id}_#{key}" %>
+
+      <% else %>
+        <fieldset data-sensemaker-string-list>
+          <legend><%= field_label(key, definition) %></legend>
+          <% if field_description(key, definition).present? %>
+            <p class="help-text"><%= field_description(key, definition) %></p>
+          <% end %>
+          <div data-sensemaker-string-list-items>
+            <div class="sensemaker-string-list-row" data-sensemaker-string-list-row>
+              <%= text_field_tag "sensemaker_job[run_options][config][#{key}][]" %>
+              <button type="button"
+                      class="button hollow"
+                      data-sensemaker-string-list-remove
+                      aria-label="<%= t("admin.sensemaker.new.report_config_remove") %>">
+                <%= t("admin.sensemaker.new.report_config_remove") %>
+              </button>
+            </div>
+          </div>
+          <button type="button"
+                  class="button hollow"
+                  data-sensemaker-string-list-add>
+            <%= t("admin.sensemaker.new.report_config_add") %>
+          </button>
+        </fieldset>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="sensemaker-report-config-actions flex-between">
+    <button class="button" type="button" commandfor="<%= dialog_id %>" command="close">
+      <%= t("admin.shared.close_modal") %>
+    </button>
+    <%= button_tag t("admin.sensemaker.new.generate_report"),
+                   type: "submit",
+                   name: "quick_action",
+                   value: script,
+                   class: "button success",
+                   data: { temp_disable: true } %>
+  </div>
+</dialog>

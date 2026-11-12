@@ -11,28 +11,19 @@ class Sensemaker::ReportLinkComponent < ApplicationComponent
     Sensemaker.enabled? && report_available?
   end
 
-  def report_available?
-    if analysable_resource == Proposal
-      return Sensemaker::Job.published
-                            .where(analysable_type: "Proposal", analysable_id: nil)
-                            .exists?
-    end
+  def before_render
+    @admin_preview = helpers.current_user&.administrator?
+  end
 
-    case analysable_resource
-    when Budget
-      Sensemaker::Job.for_budget(analysable_resource).exists?
-    when Legislation::Process
-      Sensemaker::Job.for_process(analysable_resource).exists?
-    when Poll
-      Sensemaker::Job.for_poll(analysable_resource).exists?
-    when Budget::Group
-      Sensemaker::Job.for_budget(analysable_resource.budget).exists?
-    else
-      Sensemaker::Job.published
-                     .where(analysable_type: analysable_resource.class.name,
-                            analysable_id: analysable_resource.id)
-                     .exists?
-    end
+  def admin_preview?
+    @admin_preview == true
+  end
+
+  def report_available?
+    Sensemaker::Job
+      .for_analysable(analysable_for_report, published_only: !admin_preview?)
+      .publishable_candidates
+      .exists?
   end
 
   def analysis_title
@@ -56,4 +47,10 @@ class Sensemaker::ReportLinkComponent < ApplicationComponent
     link_to view_report_text, jobs_index_path_for(analysable_resource), class: "button hollow expanded",
                                                                         target: "_blank"
   end
+
+  private
+
+    def analysable_for_report
+      analysable_resource.is_a?(Budget::Group) ? analysable_resource.budget : analysable_resource
+    end
 end

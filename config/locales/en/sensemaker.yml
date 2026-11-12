@@ -68,6 +68,7 @@ en:
       view_report: "View Report"
       view_summary: "View Summary"
       completed_at: "Completed"
+      unpublished: "Unpublished"
 
     report_view:
       title: "Sensemaker Report"

@@ -1,9 +1,6 @@
 module Sensemaker::ReportComponentHelpers
   extend ActiveSupport::Concern
 
-  SCRIPT_REPORT = "sensemaking-report-ui".freeze
-  SCRIPT_SUMMARY = "runner.ts".freeze
-
   def display_title_for(record)
     return nil unless record
 
@@ -253,14 +250,7 @@ module Sensemaker::ReportComponentHelpers
   private
 
     def job_script_kind(job)
-      case job.script
-      when SCRIPT_REPORT
-        :report
-      when SCRIPT_SUMMARY
-        :summary
-      else
-        :other
-      end
+      Sensemaker::ScriptRegistry.logical_name(job.script) || :other
     end
 
     def resource_type_for_route(model_class)

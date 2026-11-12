@@ -1377,6 +1377,8 @@ es:
       remote_census_general_name: Datos Generales
       remote_census_request_name: Datos Petición
       remote_census_response_name: Datos Respuesta
+      llm_content_features_name: Funcionalidades de contenido
+      llm_sensemaker_features_name: Funcionalidades de Sensemaker
       setting: Funcionalidad
       setting_name: Configuración
       setting_value: Valor
@@ -1871,7 +1873,12 @@ es:
         additional_context_label: "Contexto adicional"
         additional_context_hint: "Texto opcional que ayuda a orientar el análisis. Por ejemplo, describe brevemente de qué trata la conversación para que la IA tenga contexto. El título y la descripción del objetivo ya se incluyen."
         generate_summary: "Generar resumen"
+        prepare_report: "Preparar informe"
         generate_report: "Generar informe"
+        report_config_title: "Configuración del informe"
+        report_config_hint: "Todos los campos son opcionales. Déjalos en blanco para usar los valores predeterminados."
+        report_config_add: "Añadir"
+        report_config_remove: "Eliminar"
         advanced_options: "Opciones avanzadas"
         expert_options_hint: "Para usuarios expertos. Ejecuta cualquier script de Sensemaker eligiendo en el desplegable."
         groups: "Grupos"
@@ -1885,6 +1892,15 @@ es:
         run: "Ejecutar"
         cancel: "← Cancelar"
         download_input_csv: "Descargar CSV de entrada"
+      report_config:
+        fields:
+          title:
+            label: "Título del informe"
+          logo:
+            label: "Nombre del archivo del logo"
+          excluded_topics:
+            label: "Temas excluidos"
+            hint: "Nombres de temas a omitir (coincidencia exacta)"
       job_row:
         job_id_link: "Trabajo #%{id}"
         unpublish: "Despublicar"
@@ -1903,6 +1919,7 @@ es:
         target_type: "Tipo de objetivo"
         target_title: "Título del objetivo"
         additional_context: "Contexto adicional"
+        run_options: "Opciones de ejecución"
         error_report: "Informe de error"
         error_log: "Registro de errores"
         prerequisite_jobs: "Trabajos prerrequisito"
@@ -1914,7 +1931,7 @@ es:
         none_available: "Ninguno disponible"
         select_file_download: "Selecciona un archivo para descargar."
         back_to_jobs: "Volver a trabajos"
-        published_reports_link: "Informe(s) publicado(s)"
+        public_reports_link: "Ver informe(s)"
         analysable_all_proposals: "Todas las propuestas"
         analysable_deleted: "(eliminado)"
         status_completed_at: "Completado el %{time}"

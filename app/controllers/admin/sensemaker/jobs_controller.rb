@@ -179,8 +179,10 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
   def create
     valid_params = sensemaker_job_params.to_h
 
-    if params[:quick_action].in?(%w[summary report])
-      valid_params[:script] = params[:quick_action] == "summary" ? "runner.ts" : "sensemaking-report-ui"
+    quick_action = params[:quick_action].to_s
+
+    if Sensemaker::ScriptRegistry.known?(quick_action)
+      valid_params[:script] = quick_action
     elsif valid_params[:script].blank?
       return redirect_to(
         new_admin_sensemaker_job_path(
@@ -254,8 +256,9 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
     artefacts = job_artefacts.existing_input_artefact_paths + job_artefacts.existing_output_artefact_paths
 
     if params[:artefact].present?
-      requested = File.join(Sensemaker::Paths.sensemaker_data_folder, params[:artefact])
-      if artefacts.include?(requested)
+      requested = resolve_download_artefact_path(params[:artefact])
+      allowed = artefacts.map { |path| File.expand_path(path.to_s) }
+      if requested.present? && allowed.include?(requested)
         return send_file requested, filename: File.basename(requested)
       else
         return redirect_to admin_sensemaker_job_path(@sensemaker_job),
@@ -305,12 +308,27 @@ class Admin::Sensemaker::JobsController < Admin::BaseController
 
   private
 
+    def resolve_download_artefact_path(artefact_param)
+      data_folder = File.expand_path(Sensemaker::Paths.sensemaker_data_folder.to_s)
+      candidate = File.expand_path(File.join(data_folder, artefact_param.to_s))
+      return nil unless candidate == data_folder || candidate.start_with?("#{data_folder}/")
+
+      candidate
+    end
+
     def normalized_filter_params
       [params[:resource_type].presence, params[:resource_id].presence]
     end
 
     def sensemaker_job_params
-      params.require(:sensemaker_job).permit(:analysable_type, :analysable_id, :script, :additional_context)
+      permitted = params.require(:sensemaker_job).permit(
+        :analysable_type, :analysable_id, :script, :additional_context
+      )
+      config = params.dig(:sensemaker_job, :run_options, :config)
+      if config.is_a?(ActionController::Parameters)
+        permitted[:run_options] = { config: config.permit!.to_h }
+      end
+      permitted
     end
 
     def result_title_for(obj)
