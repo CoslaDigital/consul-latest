@@ -25,5 +25,5 @@
 <%= render Budgets::Investments::ContentBlocksComponent.new(@heading) %>
 <%= render Budgets::Investments::MapComponent.new(@investments_in_map, heading: @heading) %>
 <%= render "shared/tag_cloud", taggable: "Budget::Investment" %>
-<%= render "budgets/investments/categories" %>
+<%= render Budgets::Investments::CategoriesComponent.new(budget: @budget, heading: @heading, search: params[:search]) %>
 <%#= render Budgets::Investments::FiltersComponent.new %>
