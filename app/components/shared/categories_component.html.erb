@@ -1,0 +1,21 @@
+<div class="sidebar-divider"></div>
+<h2 class="sidebar-title"><%= t("shared.tags_cloud.categories") %></h2>
+<br>
+
+<ul id="categories" class="no-bullet categories">
+  <li class="inline-block">
+    <%= link_to t("shared.tags_cloud.all_categories", default: "All Categories"),
+                category_url(nil),
+                class: ("is-active" if current_search.blank?) %>
+  </li>
+
+  <% categories.each do |category| %>
+    <li class="inline-block">
+      <% if active?(category) %>
+        <%= link_to category.name, category_url(nil), class: "is-active" %>
+      <% else %>
+        <%= link_to category.name, category_url(category.name) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
