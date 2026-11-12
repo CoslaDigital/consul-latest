@@ -191,5 +191,7 @@ en:
       community_steps_text: "1. Withdraw your proposal by selecting \"Done\" to confirm that the collaboration has been completed.\n\n2. At the bottom of the proposal page complete the project Milestones by editing the final milestone. Showcase the success of your project by adding supporting evidence, such as photos, videos, testimonials, outcomes and achievements."
       business_steps_title: "Final Step for the business"
       business_steps_text: "After a successful collaboration, please update the Offers Dashboard by marking the offer as ‘Claimed’ if the resource is no longer available, or 'Keep Available' if it can continue to be offered to other proposals."
+    proposal_match_fulfilled:
+      subject: "Mutual Aid: Collaboration Completed"
     new_offer_admin_notification:
       subject: "MUTUAL AID: New Resource Offer Published"

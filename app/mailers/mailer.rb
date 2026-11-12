@@ -218,14 +218,14 @@ class Mailer < ApplicationMailer
     end
   end
 
-  def proposal_match_confirmed(match)
-    @match = match
+  def proposal_match_fulfilled(match_or_id)
+    @match = match_or_id.is_a?(ActiveRecord::Base) ? match_or_id : ProposalMatch.find(match_or_id)
     @recipient = @match.offer.author # The business provider
     @email_to = @recipient.email
     @cc_to = @match.proposal.author.email # The community project lead
 
     with_user(@recipient) do
-      mail(to: @email_to, cc: @cc_to, subject: t("mailers.proposal_match_confirmed.subject"))
+      mail(to: @email_to, cc: @cc_to, subject: t("mailers.proposal_match_fulfilled.subject"))
     end
   end
   def proposal_match_admin_notification(match, action_type)

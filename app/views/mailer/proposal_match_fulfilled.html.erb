@@ -1,0 +1,25 @@
+<td style="<%= css_for_mailer_content %>">
+  <h1 style="<%= css_for_mailer_heading %>">
+    <%= t("mailers.proposal_match_fulfilled.title", default: "Collaboration Completed!") %>
+  </h1>
+
+  <p style="<%= css_for_mailer_text %>">
+    Hi <%= @recipient.name %>,
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= sanitize(t("mailers.proposal_match_fulfilled.text",
+                   proposal: "<strong>#{@match.proposal.title}</strong>",
+                   offer: "<strong>#{@match.offer.title}</strong>",
+                   default: "The mutual aid collaboration between %{proposal} and the offer for %{offer} has been successfully completed!"
+                 )) %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= t("mailers.proposal_match_fulfilled.thank_you", default: "Thank you for contributing your time and resources to make our community better. We couldn't do this without you.") %>
+  </p>
+
+  <p style="<%= css_for_mailer_text %>">
+    <%= link_to t("mailers.proposal_match_fulfilled.view_dashboard", default: "View your dashboard"), mine_offers_url, style: css_for_mailer_link %>
+  </p>
+</td>
