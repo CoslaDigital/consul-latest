@@ -105,7 +105,10 @@ module Sensemaker
             return false unless file_exists?(artefact_path, description: "Report input artefact")
           end
         else
-          return false unless file_exists?(artefacts.input_path, description: "Input file")
+          # Add the 'if requires_input?' guard here:
+          if requires_input?
+            return false unless file_exists?(artefacts.input_path, description: "Input file")
+          end
         end
 
         return false unless file_exists?(script_path, description: "Script file")
