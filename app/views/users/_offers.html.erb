@@ -1,16 +1,18 @@
-<table id="offers_list" class="margin-top">
-  <thead>
-  <tr>
-    <th scope="col"><%= t("users.show.offers", default: "Offers") %></th>
-    <th scope="col"><%= t("offers.status_label", default: "Status") %></th>
-    <th scope="col"><%= t("users.show.actions") %></th>
-  </tr>
-  </thead>
-  <tbody>
-  <% offers.each do |offer| %>
-    <%= render "users/offer", offer: offer %>
-  <% end %>
-  </tbody>
-</table>
+<div class="admin">
+  <table id="offers_list" class="margin-top">
+    <thead>
+    <tr>
+      <th scope="col"><%= t("offers.index.offers") %></th>
+      <th scope="col"><%= t("offers.index.status") %></th>
+      <th scope="col"><%= t("shared.actions.actions") %></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% offers.each do |offer| %>
+      <%= render "users/offer", offer: offer %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
 
 <%= paginate offers %>

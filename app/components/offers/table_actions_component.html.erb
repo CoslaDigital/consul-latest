@@ -2,7 +2,7 @@
   <%# 1. Render custom buttons passed into the component block %>
   <%= content %>
 
-  <%# 2. Render standard Edit action if specified in the 'actions' array %>
+  <%# 2. Render standard Edit action natively %>
   <% if actions.include?(:edit) %>
     <%= action(:edit,
                **edit_options,
@@ -10,7 +10,7 @@
                path: edit_path) %>
   <% end %>
 
-  <%# 3. Render standard Destroy action if specified %>
+  <%# 3. Render standard Destroy action natively %>
   <% if actions.include?(:destroy) %>
     <%= action(:destroy,
                **destroy_options,

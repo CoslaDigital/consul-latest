@@ -1,5 +1,6 @@
 class Offers::TableActionsComponent < Admin::TableActionsComponent
-  # We can add custom actions specifically for Mutual Aid
+
+  # Custom actions for Mutual Aid
   def confirm_button
     return unless record.is_a?(ProposalMatch) && record.accepted?
 
@@ -20,4 +21,17 @@ class Offers::TableActionsComponent < Admin::TableActionsComponent
            data: { confirm: helpers.t("proposals.show.confirm_fulfillment_check") }
     )
   end
+
+  private
+
+    # ONLY override the paths to fix the UsersController routing crash.
+    # Do not touch the options or text, so Admin::ActionComponent
+    # renders its built-in SVGs!
+    def edit_path
+      options[:edit_path] || helpers.edit_offer_path(record)
+    end
+
+    def destroy_path
+      options[:destroy_path] || helpers.offer_path(record)
+    end
 end
