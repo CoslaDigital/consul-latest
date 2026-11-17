@@ -1,0 +1,60 @@
+<div class="comment-info">
+  <% if comment.as_administrator? %>
+    <span class="user-name">
+      <%= t("comments.comment.admin") %>
+      <% if valuation %>
+        <%= Administrator.find(comment.administrator_id).description_or_name %>
+      <% else %>
+        #<%= comment.administrator_id %>
+      <% end %>
+    </span>
+  <% elsif comment.as_moderator? %>
+    <span class="user-name"><%= t("comments.comment.moderator") %> #<%= comment.moderator_id %></span>
+  <% else %>
+
+    <% if comment.user.hidden? || comment.user.erased? %>
+      <span class="user-name"><%= t("comments.comment.user_deleted") %></span>
+    <% else %>
+  <span class="user-name">
+    <% is_official_account = comment.user.administrator? ||
+                             comment.user.moderator? ||
+                             comment.user.official_level.to_i > 0 %>
+
+    <%# Use the user_viewer passed to the component, falling back to current_user just in case %>
+    <% viewer = user_viewer || current_user %>
+    <% can_view_real_name = viewer&.administrator? || (viewer&.id == comment.user_id) %>
+
+    <% if is_official_account || can_view_real_name %>
+      <%= link_to comment.user.name, user_path(comment.user) %>
+    <% else %>
+      <%= comment.user.masked_username %>
+    <% end %>
+  </span>
+
+      <% if comment.user.display_official_position_badge? %>
+    <span class="label round level-<%= comment.user.official_level %>">
+      <%= comment.user.official_position %>
+    </span>
+      <% end %>
+    <% end %>
+
+    <% if comment.user.verified_organization? %>
+      <span class="label round is-association">
+        <%= t("shared.collective") %>
+      </span>
+    <% end %>
+
+    <% if comment.user_id == comment.commentable.author_id %>
+      <span class="label round is-author">
+        <%= t("comments.comment.author") %>
+      </span>
+    <% end %>
+
+  <% end %>
+
+  <span>
+    <%= link_to comment_path(comment) do %>
+      <%= l comment.created_at.to_datetime, format: :datetime %>
+    <% end %>
+  </span>
+</div>
