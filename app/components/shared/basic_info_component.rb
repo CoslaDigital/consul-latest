@@ -1,9 +1,11 @@
 class Shared::BasicInfoComponent < ApplicationComponent
-  attr_reader :record
   delegate :namespace, to: :helpers
+  attr_reader :record, :user_viewer
 
-  def initialize(record)
+  # Add user_viewer: nil to the arguments
+  def initialize(record, user_viewer: nil)
     @record = record
+    @user_viewer = user_viewer
   end
 
   private
