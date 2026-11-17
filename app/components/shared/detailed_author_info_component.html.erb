@@ -5,8 +5,13 @@
   </span>
 <% else %>
   <%= render Shared::AvatarComponent.new(author, size: 32, class: "author-photo") %>
+
   <span class="author">
-    <%= link_to author.name, user_path(author) %>
+    <% if show_real_name? %>
+      <%= link_to author.name, user_path(author) %>
+    <% else %>
+      <%= author.masked_username %>
+    <% end %>
   </span>
 
   <% if author.display_official_position_badge? %>

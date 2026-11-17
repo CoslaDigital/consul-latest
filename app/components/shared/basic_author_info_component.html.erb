@@ -4,8 +4,13 @@
   </span>
 <% else %>
   <span class="author">
-    <%= author.name %>
+    <% if show_real_name? %>
+      <%= author.name %>
+    <% else %>
+      <%= author.masked_username %>
+    <% end %>
   </span>
+
   <% if author.display_official_position_badge? %>
     <span class="label round level-<%= author.official_level %>">
       <%= author.official_position %>

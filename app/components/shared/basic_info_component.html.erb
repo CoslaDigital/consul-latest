@@ -2,7 +2,7 @@
   <%= date %>
 
   <%= render Shared::CommentsCountComponent.new(record.comments_count, url: comments_path) %>
-  <%= render Shared::BasicAuthorInfoComponent.new(record.author) %>
+  <%= render Shared::BasicAuthorInfoComponent.new(record.author, user_viewer: current_user) %>
 
   <%= content %>
 </p>
