@@ -1,32 +1,31 @@
 <td style="<%= css_for_mailer_content %>">
   <h1 style="<%= css_for_mailer_heading %>">
-    <%= @initiated_by_proposal ? t("mailers.collaboration_request.title_requested") : t("mailers.collaboration_request.title_offered") %>
+    <%= @initiated_by_proposal ? t("mailers.proposal_match_created.title_requested") : t("mailers.proposal_match_created.title_offered") %>
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= t("mailers.collaboration_request.hi", name: @recipient.name) %>
+    <%= t("mailers.proposal_match_created.hi", name: @recipient.name) %>
   </p>
 
   <p style="<%= css_for_mailer_text %>">
     <% if @initiated_by_proposal %>
-      <%= sanitize(t("mailers.collaboration_request.main_text", requester_name: "<strong>#{@actor.name}</strong>", proposal_title: "<strong>#{@proposal.title}</strong>")) %>
+      <%= sanitize(t("mailers.proposal_match_created.requested_text", requester_name: "<strong>#{@actor.name}</strong>", proposal_title: "<strong>#{@proposal.title}</strong>")) %>
     <% else %>
-      <strong><%= @actor.name %></strong> has offered their resource "<em><%= @offer.title %></em>" to support your
-      proposal: <strong><%= @proposal.title %></strong>.
+      <%= sanitize(t("mailers.proposal_match_created.offered_text", provider_name: @actor.name, offer_title: @offer.title, proposal_title: @proposal.title)) %>
     <% end %>
   </p>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= @initiated_by_proposal ? t("mailers.collaboration_request.accept_help_text") : t("mailers.collaboration_request.review_offer_text") %>
+    <%= @initiated_by_proposal ? t("mailers.proposal_match_created.accept_help_text") : t("mailers.proposal_match_created.review_offer_text") %>
   </p>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= link_to (@initiated_by_proposal ? t("mailers.collaboration_request.respond_button") : t("mailers.collaboration_request.view_offer_button")),
+    <%= link_to (@initiated_by_proposal ? t("mailers.proposal_match_created.respond_button") : t("mailers.proposal_match_created.view_offer_button")),
                 mine_offers_url(filter: (@initiated_by_proposal ? nil : 'help_received')),
                 style: css_for_mailer_link %>
   </p>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= t("mailers.collaboration_request.dashboard_help_text") %>
+    <%= t("mailers.proposal_match_created.dashboard_help_text") %>
   </p>
 </td>

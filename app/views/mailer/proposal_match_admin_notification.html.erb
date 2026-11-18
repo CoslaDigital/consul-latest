@@ -1,17 +1,20 @@
 <td style="<%= css_for_mailer_content %>">
 
   <h1 style="<%= css_for_mailer_heading %>">
-    Mutual Aid Activity Detected
+    <%= t("mailers.proposal_match_admin_notification.title") %>
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    A collaboration between <strong><%= @match.offer.author.name %></strong> and
-    <strong><%= @match.proposal.author.name %></strong> has been <strong><%= @action_type %></strong>.
+    <%= sanitize(t("mailers.proposal_match_admin_notification.text",
+                   provider: @match.offer.author.name,
+                   requester: @match.proposal.author.name,
+                   action_type: @action_type)) %>
   </p>
 
   <p style="<%= css_for_mailer_text %>">
-    <strong>Proposal:</strong> <%= @match.proposal.title %><br>
-    <strong>Offer:</strong> <%= @match.offer.title %>
+    <strong><%= t("mailers.proposal_match_admin_notification.proposal_label") %></strong> <%= @match.proposal.title %>
+    <br>
+    <strong><%= t("mailers.proposal_match_admin_notification.offer_label") %></strong> <%= @match.offer.title %>
   </p>
 
   <table style="width: 100%;">
@@ -19,7 +22,7 @@
     <tr>
       <td style="padding-bottom: 12px; text-align: center;">
         <%= link_to admin_collaborations_url, style: css_for_mailer_button do %>
-          Manage Collaborations
+          <%= t("mailers.proposal_match_admin_notification.button") %>
         <% end %>
       </td>
     </tr>

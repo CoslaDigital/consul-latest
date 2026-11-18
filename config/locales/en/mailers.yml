@@ -106,6 +106,34 @@ en:
       subject: "Machine Learning - Content has been generated successfully"
       text: "Content has been generated successfully."
       title: "Machine Learning script"
+
+    # 1. THE "CREATED" EMAIL
+    proposal_match_created:
+      subject: "New Mutual Aid Request"
+      requested_subject: "%{requester} requested your offer: %{offer_title}"
+      offered_subject: "%{provider} offered support for your proposal: %{proposal_title}"
+      title_requested: "New Collaboration Request"
+      title_offered: "New Support Offered for Your Proposal"
+      hi: "Hi %{name},"
+      requested_text: "%{requester_name} has requested your help for their project '%{proposal_title}'."
+      offered_text: "<strong>%{provider_name}</strong> has offered their resource \"<em>%{offer_title}</em>\" to support your proposal: <strong>%{proposal_title}</strong>."
+      accept_help_text: "You can accept this request in your dashboard to start the coordination process."
+      review_offer_text: "Log in to your dashboard to review this offer. You can choose to Confirm or Decline the collaboration."
+      respond_button: "View Request & Respond"
+      view_offer_button: "Log In to Review & Respond"
+      dashboard_help_text: "Once confirmed, you will both receive contact details to begin collaborating."
+
+    # 2. THE "ACCEPTED" EMAIL
+    proposal_match_accepted:
+      subject: "Collaboration Accepted: Time to start!"
+      title: "Your request has been accepted!"
+      hi: "Hi %{name},"
+      text: "%{provider} has accepted your request to help '%{proposal}' with: %{offer}."
+      instruction: "Please confirm the collaboration on your dashboard to exchange contact details."
+      go_to_dashboard: "Confirm & Start"
+      sincerely: "The Community Team"
+
+    # 3. THE "CONFIRMED" (INTRODUCTION) EMAIL
     collaboration_introduction:
       subject: "Introduction: Collaboration for %{title}"
       title: "It's a Match!"
@@ -113,30 +141,29 @@ en:
       contact_details: "You can now coordinate directly via email:"
       summary_title: "Collaboration Summary"
       next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
-
-    # --- COLLABORATION REQUESTS & OFFERS ---
-    collaboration_request:
-      subject: "Someone wants to collaborate on %{requester_name}'s project"
+      community_steps_title: "Final steps for the community groups"
+      community_steps_text: "1. Once you have received the resource, please confirm completion of the collaboration by selecting “Complete” in your My Offers Dashboard (and withdraw your proposal by selecting \"Done\").<br><br>2. At the bottom of the proposal page complete the project Milestones by editing the final milestone. Showcase the success of your project by adding supporting evidence, such as photos, videos, testimonials, outcomes and achievements."
+      business_steps_title: "Final Step for the business"
+      business_steps_text: "After a successful collaboration, please update the Offers Dashboard by marking the offer as ‘Claimed’ if the resource is no longer available, or 'Keep Available' if it can continue to be offered to other proposals."
+    # 4. THE "FULFILLED" EMAIL
+    proposal_match_fulfilled:
+      subject: "Mutual Aid: Collaboration Completed"
+      title: "Collaboration Completed!"
       hi: "Hi %{name},"
-      main_text: "%{requester_name} has requested your help for their project '%{proposal_title}'"
-      action_text: "You can review this request and accept or decline it from your dashboard."
-      button: "Go to my dashboard"
-      footer_text: "Thank you for participating in the Mutual Aid network!"
-      title_requested: "New Collaboration Request"
-      title_offered: "New Support Offered for Your Proposal"
-      respond_button: "View Request & Respond"
+      text: "The mutual aid collaboration between %{proposal} and the offer for %{offer} has been successfully completed!"
+      thank_you: "Thank you for contributing your time and resources to make our community better. We couldn't do this without you."
+      view_dashboard: "View your dashboard"
 
-      # Polished keys for when a Business volunteers an offer
-      view_offer_button: "Log In to Review & Respond"
-      accept_help_text: "You can accept this request in your dashboard to start the coordination process."
-      review_offer_text: "Log in to your dashboard to review this offer. You can choose to Confirm or Decline the collaboration."
-      dashboard_help_text: "Once confirmed, you will both receive contact details to begin collaborating."
+    # 5. THE ADMIN NOTIFICATION
+    proposal_match_admin_notification:
+      subject: "MUTUAL Aid: Collaboration %{action_type}"
+      title: "Mutual Aid Activity Detected"
+      text: "A collaboration between <strong>%{provider}</strong> and <strong>%{requester}</strong> has been <strong>%{action_type}</strong>."
+      proposal_label: "Proposal:"
+      offer_label: "Offer:"
+      button: "Manage Collaborations"
 
-    collaboration_offer:
-      title: "New Support Offered for Your Proposal"
-      action_button: "Log In to Review & Respond"
-      instructions: "Log in to your dashboard to review this offer. You can choose to Confirm or Decline the collaboration."
-
+    # 6. STANDARD SYSTEM NOTIFICATIONS
     new_actions_notification_on_create:
       subject: "Your draft citizen proposal is created"
       hi: "Hi %{name}!"
@@ -168,30 +195,5 @@ en:
       text_9: "You will also find this new recommended dissemination action..."
       text_10: "You sure have more resources to use!"
       dashboard_button: "Go ahead, discover them!"
-    proposal_match_accepted:
-      subject: "Collaboration Accepted: Time to start!"
-      title: "Your request has been accepted!"
-      hi: "Hi %{name},"
-      text: "%{provider} has accepted your request to help '%{proposal}' with: %{offer}."
-      instruction: "Please confirm the collaboration on your dashboard to exchange contact details."
-      go_to_dashboard: "Confirm & Start"
-      sincerely: "The Community Team"
-    proposal_match_created:
-      subject: "New Mutual Aid Request"
-      requested_subject: "%{requester} requested your offer: %{offer_title}"
-      offered_subject: "%{provider} offered support for your proposal: %{proposal_title}"
-    proposal_match_confirmed:
-      subject: "Collaboration Confirmed: Time to start!"
-      title: "Handshake Complete!"
-      hi: "Hi %{name},"
-      text: "The lead for '%{proposal}' has confirmed your offer of %{offer}. You are now officially collaborating!"
-      next_steps: "Check your dashboard to coordinate the final steps."
-      view_dashboard: "View My Dashboard"
-      community_steps_title: "Final steps for the community groups"
-      community_steps_text: "1. Withdraw your proposal by selecting \"Done\" to confirm that the collaboration has been completed.\n\n2. At the bottom of the proposal page complete the project Milestones by editing the final milestone. Showcase the success of your project by adding supporting evidence, such as photos, videos, testimonials, outcomes and achievements."
-      business_steps_title: "Final Step for the business"
-      business_steps_text: "After a successful collaboration, please update the Offers Dashboard by marking the offer as ‘Claimed’ if the resource is no longer available, or 'Keep Available' if it can continue to be offered to other proposals."
-    proposal_match_fulfilled:
-      subject: "Mutual Aid: Collaboration Completed"
     new_offer_admin_notification:
       subject: "MUTUAL AID: New Resource Offer Published"
