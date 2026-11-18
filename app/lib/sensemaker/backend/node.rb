@@ -157,10 +157,20 @@ module Sensemaker
             "topics" => "#{base}-topic-stats.json",
             "summary" => "#{base}-summary.json",
             "comments" => "#{base}-comments-with-scores.json",
+            "metadata" => write_report_metadata,
             "config" => write_report_config,
             "outputDir" => artefacts.job_directory.to_s,
             "outputFile" => output_file_name
           }
+        end
+
+        def write_report_metadata
+          metadata = {
+            "title" => job.conversation.target_label(format: :full)
+          }
+          path = File.join(artefacts.job_directory.to_s, "metadata.json")
+          File.write(path, JSON.pretty_generate(metadata))
+          path
         end
 
         def write_report_config
