@@ -18,6 +18,7 @@ class Poll
       end
     end
 
+    # app/models/poll/booth.rb
     def self.available
       polls = Poll.where(ends_at: Time.current..).or(Poll.recounting)
       joins(:polls).where(polls: { id: polls }).distinct
