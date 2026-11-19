@@ -140,18 +140,20 @@ en:
       intro: "Great news! You are now connected with %{other_name} regarding the proposal '%{proposal_title}'."
       contact_details: "You can now coordinate directly via email:"
       summary_title: "Collaboration Summary"
-      next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided."
-      community_steps_title: "Final steps for the community groups"
-      community_steps_text: "1. Once you have received the resource, please confirm completion of the collaboration by selecting “Complete” in your My Offers Dashboard (and withdraw your proposal by selecting \"Done\").<br><br>2. At the bottom of the proposal page complete the project Milestones by editing the final milestone. Showcase the success of your project by adding supporting evidence, such as photos, videos, testimonials, outcomes and achievements."
-      business_steps_title: "Final Step for the business"
-      business_steps_text: "After a successful collaboration, please update the Offers Dashboard by marking the offer as ‘Claimed’ if the resource is no longer available, or 'Keep Available' if it can continue to be offered to other proposals."
+      next_steps: "We recommend reaching out to introduce yourself and discuss how to move forward with the resource provided. For communities: Once you have received the resource, please confirm completion of the collaboration by selecting “Complete” in your My Offers Dashboard."
+      view_dashboard: "View your dashboard"
+
     # 4. THE "FULFILLED" EMAIL
     proposal_match_fulfilled:
       subject: "Mutual Aid: Collaboration Completed"
       title: "Collaboration Completed!"
       hi: "Hi %{name},"
-      text: "The mutual aid collaboration between %{proposal} and the offer for %{offer} has been successfully completed!"
+      text: "Congratulations! The collaboration between %{proposal} and the offer for %{offer} has been successfully completed!"
       thank_you: "Thank you for contributing your time and resources to make our community better. We couldn't do this without you."
+      community_steps_title: "Final steps for the community groups"
+      community_steps_text: "1. Withdraw your proposal by selecting \"Done\" to confirm that the collaboration has been completed.<br><br>2. At the bottom of the proposal page complete the project Milestones by editing the final milestone. Showcase the success of your project by adding supporting evidence, such as photos, videos, testimonials, outcomes and achievements."
+      business_steps_title: "Final Step for the business"
+      business_steps_text: "After a successful collaboration, please update the Offers Dashboard by marking the offer as ‘Claimed’ if the resource is no longer available, or 'Keep Available' if it can continue to be offered to other proposals."
       view_dashboard: "View your dashboard"
 
     # 5. THE ADMIN NOTIFICATION

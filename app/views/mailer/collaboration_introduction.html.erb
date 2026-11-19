@@ -4,10 +4,12 @@
   </h1>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= sanitize(t("mailers.collaboration_introduction.intro", other_name: "<strong>#{@other_party.name}</strong>", proposal_title: "<strong>#{@proposal.title}</strong>")) %>
+    <%= sanitize(t("mailers.collaboration_introduction.intro",
+                   other_name: "<strong>#{@other_party.name}</strong>",
+                   proposal_title: "<strong>#{@proposal.title}</strong>")) %>
   </p>
 
-  <div style="<%= css_for_mailer_text + css_for_mailer_quote %>">
+  <div style="<%= css_for_mailer_quote %>">
     <p style="<%= css_for_mailer_text %>">
       <strong><%= t("mailers.collaboration_introduction.contact_details") %></strong>
     </p>
@@ -24,27 +26,11 @@
     <li style="<%= css_for_mailer_text %>"><strong>Proposal:</strong> <%= @proposal.title %></li>
   </ul>
 
-  <%# --- MERGED INSTRUCTION BLOCKS --- %>
-  <div style="<%= css_for_mailer_text %>">
-    <p style="margin-bottom: 5px;">
-      <strong><%= t("mailers.proposal_match_confirmed.community_steps_title", default: "Final steps for the community groups") %></strong>
-    </p>
-    <div style="margin-top: 0; margin-bottom: 15px;">
-      <%= simple_format(t("mailers.proposal_match_confirmed.community_steps_text")) %>
-    </div>
-  </div>
-
-  <div style="<%= css_for_mailer_text %>">
-    <p style="margin-bottom: 5px;">
-      <strong><%= t("mailers.proposal_match_confirmed.business_steps_title", default: "Final Step for the business") %></strong>
-    </p>
-    <div style="margin-top: 0; margin-bottom: 15px;">
-      <%= simple_format(t("mailers.proposal_match_confirmed.business_steps_text")) %>
-    </div>
-  </div>
-  <%# --------------------------------- %>
+  <p style="<%= css_for_mailer_text %>">
+    <%= sanitize(t("mailers.collaboration_introduction.next_steps")) %>
+  </p>
 
   <p style="<%= css_for_mailer_text %>">
-    <%= t("mailers.collaboration_introduction.next_steps") %>
+    <%= link_to t("mailers.collaboration_introduction.view_dashboard"), mine_offers_url, style: css_for_mailer_link %>
   </p>
 </td>
