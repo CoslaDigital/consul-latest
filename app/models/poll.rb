@@ -15,7 +15,7 @@ class Poll < ApplicationRecord
   translates :description, touch: true
   include Globalizable
 
-  RECOUNT_DURATION = 3.week
+  RECOUNT_DURATION = 3.weeks
 
   has_many :booth_assignments, class_name: "Poll::BoothAssignment"
   has_many :booths, through: :booth_assignments
