@@ -15,7 +15,7 @@ class Poll < ApplicationRecord
   translates :description, touch: true
   include Globalizable
 
-  RECOUNT_DURATION = 1.week
+  RECOUNT_DURATION = 3.weeks
 
   has_many :booth_assignments, class_name: "Poll::BoothAssignment"
   has_many :booths, through: :booth_assignments
@@ -77,6 +77,7 @@ class Poll < ApplicationRecord
   scope :public_for_api, -> { all }
   scope :not_budget, -> { where(budget_id: nil) }
   scope :created_by_admin, -> { where(related_type: nil) }
+  scope :open_for_assignments, -> { where(ends_at: Time.current..).or(recounting) }
 
   def self.sort_for_list(user = nil)
     all.sort do |poll, another_poll|
