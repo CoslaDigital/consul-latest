@@ -10,17 +10,21 @@ class Admin::Poll::Shifts::FormComponent < ApplicationComponent
   private
 
     def voting_polls
-      booth.polls.current
+      booth.polls.where(ends_at: Time.current..)
     end
 
     def recount_polls
-      booth.polls.current_or_recounting
+      booth.polls.open_for_assignments
     end
 
     def shift_vote_collection_dates
       return [] if voting_polls.blank?
 
-      date_options(voting_start_date..voting_end_date, Poll::Shift.tasks[:vote_collection])
+      dates = voting_polls.order(:starts_at).flat_map do |poll|
+        initial_date = [poll.starts_at.to_date, Date.current].max
+        (initial_date..poll.ends_at.to_date).to_a
+      end
+      date_options(dates.uniq.sort, Poll::Shift.tasks[:vote_collection])
     end
 
     def shift_recount_scrutiny_dates
