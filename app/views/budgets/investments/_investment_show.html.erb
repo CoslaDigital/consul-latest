@@ -83,11 +83,9 @@
         </div>
       <% end %>
 
-       
-
       <% if investment.should_show_price? %>
         <div class="sidebar-divider"></div>
-          
+
            <% if investment.formatted_price.nil? %>
                 <h2><%= t("budgets.investments.show.estimated_price") %></h2>
                <div class="supports text-center">
@@ -104,8 +102,8 @@
              </p>
              </div>
            <% end %>
-          
-        
+
+
         <% if investment.should_show_price_explanation? %>
           <div class="text-center" data-magellan>
             <%= link_to t("budgets.investments.show.see_price_explanation"),
