@@ -77,6 +77,7 @@ class Poll < ApplicationRecord
   scope :public_for_api, -> { all }
   scope :not_budget, -> { where(budget_id: nil) }
   scope :created_by_admin, -> { where(related_type: nil) }
+  scope :open_for_assignments, -> { where(ends_at: Time.current..).or(recounting) }
 
   def self.sort_for_list(user = nil)
     all.sort do |poll, another_poll|

@@ -20,8 +20,7 @@ class Poll
 
     # app/models/poll/booth.rb
     def self.available
-      polls = Poll.where(ends_at: Time.current..).or(Poll.recounting)
-      joins(:polls).where(polls: { id: polls }).distinct
+      joins(:polls).where(polls: { id: Poll.open_for_assignments }).distinct
     end
 
     def assignment_on_poll(poll)
