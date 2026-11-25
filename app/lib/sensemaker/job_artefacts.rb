@@ -2,46 +2,23 @@ module Sensemaker
   class JobArtefacts
     attr_reader :job
 
-    SCRIPT_CONFIG = {
-      "health_check_runner.ts" => {
-        output_basename: ->(job) { "health-check-#{job.id}.txt" },
-        output_suffixes: [],
-        default_input_path: nil,
-        input_suffixes: []
-      },
-      "categorization_runner.ts" => {
-        output_basename: ->(job) { "categorization-output-#{job.id}.csv" },
-        output_suffixes: [],
-        default_input_path: ->(job) { "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{job.id}.csv" },
-        input_suffixes: []
-      },
-      "advanced_runner.ts" => {
-        output_basename: ->(job) { "output-#{job.id}" },
-        output_suffixes: %w[-summary.json -topic-stats.json -comments-with-scores.json],
-        default_input_path: ->(job) {
-          "#{Sensemaker::Paths.sensemaker_data_folder}/categorization-output-#{job.id}.csv"
-        },
-        input_suffixes: []
-      },
-      "runner.ts" => {
-        output_basename: ->(job) { "output-#{job.id}" },
-        output_suffixes: %w[-summary.json -summary.html -summary.md -summaryAndSource.csv],
-        default_input_path: ->(job) { "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{job.id}.csv" },
-        input_suffixes: []
-      },
-      "sensemaking-report-ui" => {
-        output_basename: ->(job) { "report-#{job.id}.html" },
-        output_suffixes: [],
-        default_input_path: ->(_job) { "#{Sensemaker::Paths.sensemaker_data_folder}/advanced-output" },
-        input_suffixes: %w[-topic-stats.json -summary.json -comments-with-scores.json -metadata.json]
-      }
-    }.freeze
-
-    DEFAULT_OUTPUT_BASENAME = ->(job) { "output-#{job.id}.csv" }
-    DEFAULT_INPUT_PATH = ->(job) { "#{Sensemaker::Paths.sensemaker_data_folder}/input-#{job.id}.csv" }
+    DEFAULT_OUTPUT_BASENAME = ->(_job) { "output.csv" }
+    DEFAULT_INPUT_PATH = ->(job) { File.join(Sensemaker::Paths.job_directory(job), "input.csv") }
 
     def initialize(job)
       @job = job
+    end
+
+    def job_directory
+      Sensemaker::Paths.job_directory(job)
+    end
+
+    def relative_job_directory
+      Sensemaker::Paths.relative_job_directory(job)
+    end
+
+    def ensure_directory!
+      FileUtils.mkdir_p(job_directory)
     end
 
     def output_file_name
@@ -53,11 +30,11 @@ module Sensemaker
     end
 
     def default_output_path
-      File.join(Sensemaker::Paths.sensemaker_data_folder, output_file_name)
+      File.join(job_directory, output_file_name)
     end
 
     def relative_output_path
-      File.join(Sensemaker::Paths.sensemaker_relative_data_folder, output_file_name)
+      File.join(relative_job_directory, output_file_name)
     end
 
     def persisted_output_path
@@ -98,25 +75,71 @@ module Sensemaker
       input_suffixes.empty? ? [base_path] : input_suffixes.map { |suffix| "#{base_path}#{suffix}" }
     end
 
-    def existing_input_artefact_paths
-      input_artefact_paths.select { |path| File.exist?(path) }
+    def additional_input_artefact_paths
+      Array(config[:additional_input_scripts]).flat_map do |script|
+        preparation_outputs_for(script)
+      end
     end
 
-    def metadata_path
-      path = input_path
-      return nil if path.blank?
+    def existing_input_artefact_paths
+      existing_direct_input_artefact_paths = input_artefact_paths.select { |path| File.exist?(path) }
+      (existing_direct_input_artefact_paths + additional_input_artefact_paths).uniq
+    end
 
-      "#{path}-metadata.json"
+    def existing_preparation_output_artefact_paths
+      preparation_output_paths_by_script.values.flatten
+    end
+
+    def report_config_path
+      File.join(job_directory, "config.json")
+    end
+
+    def write_report_config(config)
+      ensure_directory!
+      File.write(report_config_path, JSON.pretty_generate(config))
+      report_config_path
     end
 
     def complete?
       output_artefact_paths.all? { |path| File.exist?(path) }
     end
 
+    def preparation_jobs
+      jobs = []
+      queue = job.children.order(:id).to_a
+      while (child = queue.shift)
+        jobs << child
+        queue.concat(child.children.order(:id).to_a)
+      end
+      jobs
+    end
+
+    # When multiple prep jobs share a script, prefer the latest by id that has
+    # at least one existing output file.
+    def preparation_output_paths_by_script
+      result = {}
+      preparation_jobs.group_by(&:script).each do |script, jobs|
+        preferred = jobs.sort_by(&:id).reverse.find do |prep_job|
+          prep_job.artefacts.existing_output_artefact_paths.any?
+        end
+        next if preferred.nil?
+
+        result[script] = preferred.artefacts.existing_output_artefact_paths
+      end
+      result
+    end
+
+    def preparation_outputs_for(script)
+      preparation_output_paths_by_script[script.to_s] || []
+    end
+
+    def preparation_output_for(script)
+      preparation_outputs_for(script).first
+    end
+
     def cleanup
       result = []
-      result.concat(cleanup_input_files)
-      result.concat(cleanup_output_files)
+      result.concat(cleanup_job_directory)
       result.concat(cleanup_persisted_output)
       result.flatten!
       result.compact!
@@ -128,35 +151,32 @@ module Sensemaker
     private
 
       def config
-        SCRIPT_CONFIG.fetch(job.script) do
-          {
-            output_basename: DEFAULT_OUTPUT_BASENAME,
-            output_suffixes: [],
-            default_input_path: DEFAULT_INPUT_PATH,
-            input_suffixes: []
-          }
-        end
+        Sensemaker::ScriptRegistry.artefact_config(job.script) || default_config
       end
 
-      def cleanup_input_files
-        result = input_artefact_paths.map { |path| FileUtils.rm_f(path) }
-
-        default_csv = config[:default_input_path]&.call(job)
-        if default_csv.present?
-          result << FileUtils.rm_f(default_csv)
-          result << FileUtils.rm_f("#{default_csv}.unfiltered")
-        end
-
-        result
+      def default_config
+        {
+          output_basename: DEFAULT_OUTPUT_BASENAME,
+          output_suffixes: [],
+          default_input_path: DEFAULT_INPUT_PATH,
+          input_suffixes: [],
+          additional_input_scripts: []
+        }
       end
 
-      def cleanup_output_files
-        output_artefact_paths.map { |path| FileUtils.rm_f(path) }
+      def cleanup_job_directory
+        return [] unless Dir.exist?(job_directory)
+
+        [FileUtils.rm_rf(job_directory)]
       end
 
       def cleanup_persisted_output
         path = persisted_output_path
         return [] unless path.present? && File.exist?(path)
+
+        job_dir = File.expand_path(job_directory)
+        persisted = File.expand_path(path.to_s)
+        return [] if persisted == job_dir || persisted.start_with?("#{job_dir}/")
 
         [FileUtils.rm_f(path)]
       end

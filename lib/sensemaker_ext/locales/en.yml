@@ -1,0 +1,33 @@
+en:
+  admin:
+    sensemaker:
+      report_config:
+        fields:
+          excluded_opinions:
+            label: "Excluded opinions"
+            hint: "Opinion names to omit (exact match)"
+      scripts:
+        health_check:
+          title: "(Sensemaker v2) Health check"
+          description: "Verify Sensemaker is working"
+        categorize:
+          title: "(Sensemaker v2) Categorise"
+          description: "Categorise comments into topics and subtopics"
+        bridge_scores:
+          title: "(Sensemaker v2) Bridge scores"
+          description: "Compute bridging scores between opinion groups"
+        report_text:
+          title: "(Sensemaker v2) Summarise opinions & topics"
+          description: "Summarise opinions and topics from categorised comments"
+        report_ui:
+          title: "(Sensemaker v2) Report"
+          description: "Analyse and generate a report in HTML format"
+        propositions:
+          title: "(Sensemaker v2) Generate propositions"
+          description: "Generate candidate propositions from categorised comments (requires categorise first, or runs it automatically)"
+        refine_propositions:
+          title: "(Sensemaker v2) Refine propositions (simulated jury)"
+          description: "Rank and refine propositions with a simulated jury (long-running; requires proposition generation first)"
+        ranked_propositions:
+          title: "(Sensemaker v2) Export ranked propositions (CSV)"
+          description: "Full pipeline: categorise, generate propositions, jury refinement, then export ranked propositions by topic. Very long-running and LLM-intensive."

@@ -42,8 +42,8 @@ describe Sensemaker::CsvExporter do
   describe ".provide_defaults_for_zero_vote_comments" do
     let(:csv_file_path) { "/tmp/test-categorization-output.csv" }
     let(:temp_csv_file) { Tempfile.new(["test-categorization-output", ".csv"]) }
-    let(:csv_header) { "comment-id,comment_text,agrees,disagrees,passes,author-id,topics\n" }
-    let(:expected_headers) { %w[comment-id comment_text agrees disagrees passes author-id topics] }
+    let(:csv_header) { "participant_id,survey_text,agrees,disagrees,passes,author-id,topics\n" }
+    let(:expected_headers) { %w[participant_id survey_text agrees disagrees passes author-id topics] }
 
     def with_temp_csv(*lines)
       temp = Tempfile.new(["test-csv", ".csv"])
@@ -106,12 +106,12 @@ describe Sensemaker::CsvExporter do
         expect(data.length).to eq(3)
         expect(comments_count).to eq(3)
 
-        zero_row = data.find { |row| row["comment-id"] == "comment_zero" }
+        zero_row = data.find { |row| row["participant_id"] == "comment_zero" }
         expect(zero_row["passes"]).to eq("1")
         expect(zero_row["agrees"]).to eq("0")
         expect(zero_row["disagrees"]).to eq("0")
 
-        pass_row = data.find { |row| row["comment-id"] == "comment_pass" }
+        pass_row = data.find { |row| row["participant_id"] == "comment_pass" }
         expect(pass_row["passes"]).to eq("1")
       end
     end
@@ -145,7 +145,7 @@ describe Sensemaker::CsvExporter do
 
       data = read_csv
       expect(data.length).to eq(6)
-      zero_vote_passes = data.select { |row| %w[comment_2 comment_6].include?(row["comment-id"]) }
+      zero_vote_passes = data.select { |row| %w[comment_2 comment_6].include?(row["participant_id"]) }
                              .map { |row| row["passes"] }
       expect(zero_vote_passes).to all(eq("1"))
     end
@@ -165,7 +165,7 @@ describe Sensemaker::CsvExporter do
 
     it "handles missing vote columns by defaulting passes to 1" do
       with_temp_csv(
-        "comment-id,comment_text,author-id,topics\n",
+        "participant_id,survey_text,author-id,topics\n",
         "comment_1,First comment,user_1,Transportation:PublicTransit\n",
         "comment_2,Second comment,user_2,Transportation:Parking\n"
       ) do

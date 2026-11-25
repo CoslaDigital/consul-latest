@@ -8,22 +8,26 @@ module Sensemaker
     end
 
     def provider
-      setting["llm.provider"].to_s.downcase.strip
+      setting["llm.sensemaker_provider"].to_s.downcase.strip
     end
 
     def model
-      setting["llm.model"].to_s.presence
+      setting["llm.sensemaker_model"].to_s.presence
+    end
+
+    def model_for(role)
+      case role.to_sym
+      when :primary
+        model
+      when :fast
+        setting["llm.sensemaker_fast_model"].to_s.presence || model
+      else
+        raise ArgumentError, "Unknown Sensemaker model role: #{role}"
+      end
     end
 
     def adapter
-      case provider
-      when /vertex/
-        "vertex"
-      when /ollama/
-        "ollama"
-      when /openai/, /openrouter/, /mistral/
-        "openai-compatible"
-      end
+      Llm::Config.sensemaker_adapter_for(provider)
     end
 
     def compat_provider
@@ -38,13 +42,20 @@ module Sensemaker
     end
 
     def api_key
-      provider_name = compat_provider
-      return nil if provider_name.blank?
+      case adapter
+      when "gemini"
+        return llm_config.gemini_api_key.to_s.presence if llm_config.respond_to?(:gemini_api_key)
 
-      key_method = "#{provider_name}_api_key"
-      return nil unless llm_config.respond_to?(key_method)
+        nil
+      when "openai-compatible"
+        provider_name = compat_provider
+        return nil if provider_name.blank?
 
-      llm_config.public_send(key_method).to_s.presence
+        key_method = "#{provider_name}_api_key"
+        return nil unless llm_config.respond_to?(key_method)
+
+        llm_config.public_send(key_method).to_s.presence
+      end
     end
 
     def base_url
@@ -75,6 +86,34 @@ module Sensemaker
 
     def supported?
       adapter.present?
+    end
+
+    def validation_error
+      if adapter.blank?
+        return "Sensemaker LLM provider is not supported. Current provider: " \
+               "#{provider.presence || "(not set)"}."
+      end
+
+      if adapter == "vertex" && vertex_project_id.blank?
+        return "Vertex AI is not configured. Set tenant secrets llm.vertexai_project_id " \
+               "(and optionally vertexai_location)."
+      end
+
+      if model.blank?
+        return "Sensemaker requires an LLM model to be selected. " \
+               "Set Sensemaker provider and model in Admin → Settings → LLM."
+      end
+
+      if adapter == "openai-compatible" && api_key.blank?
+        return "Sensemaker requires an API key for provider '#{compat_provider}'. " \
+               "Set tenant secret llm.#{compat_provider}_api_key."
+      end
+
+      if adapter == "gemini" && api_key.blank?
+        return "Sensemaker requires a Gemini API key. Set tenant secret llm.gemini_api_key."
+      end
+
+      nil
     end
 
     private

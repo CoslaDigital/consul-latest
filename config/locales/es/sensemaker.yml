@@ -68,6 +68,7 @@ es:
       view_report: "Ver Informe"
       view_summary: "Ver Resumen"
       completed_at: "Completado"
+      unpublished: "No publicado"
 
     report_view:
       title: "Informe Sensemaker"

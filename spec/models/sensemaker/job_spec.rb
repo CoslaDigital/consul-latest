@@ -13,8 +13,38 @@ describe Sensemaker::Job do
            additional_context: "Test context")
   end
 
+  describe "cli_flags" do
+    it "defaults to an empty hash" do
+      expect(job.cli_flags).to eq({})
+    end
+
+    it "persists a JSON object" do
+      job.update!(cli_flags: { "adapter" => "vertex", "modelName" => "gemini-2.5-flash-lite" })
+
+      expect(job.reload.cli_flags).to eq(
+        "adapter" => "vertex",
+        "modelName" => "gemini-2.5-flash-lite"
+      )
+    end
+  end
+
+  describe "run_options" do
+    it "defaults to an empty hash" do
+      expect(job.run_options).to eq({})
+    end
+
+    it "persists a JSON object" do
+      job.update!(run_options: { "config" => { "title" => "Custom Jury Report" }})
+
+      expect(job.reload.run_options).to eq(
+        "config" => { "title" => "Custom Jury Report" }
+      )
+    end
+  end
+
   shared_context "sensemaker paths stubbed" do
     let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
+    let(:job_dir) { "#{data_folder}/job-#{job.id}" }
 
     before do
       allow(Sensemaker::Paths).to receive(:sensemaker_data_folder).and_return(data_folder)
@@ -44,6 +74,7 @@ describe Sensemaker::Job do
 
     describe "#publishing_is_allowed" do
       let(:data_folder) { "/tmp/sensemaker_test_folder/data" }
+      let(:job_dir) { "#{data_folder}/job-#{job.id}" }
 
       before do
         allow(Sensemaker::Paths).to receive(:sensemaker_data_folder).and_return(data_folder)
@@ -56,7 +87,7 @@ describe Sensemaker::Job do
           job.script = "sensemaking-report-ui"
           job.finished_at = Time.current
           job.error = nil
-          output_path = "#{data_folder}/report-#{job.id}.html"
+          output_path = "#{job_dir}/report.html"
           allow(File).to receive(:exist?).with(output_path).and_return(true)
         end
 
@@ -106,6 +137,14 @@ describe Sensemaker::Job do
   describe "associations" do
     it "belongs to a user" do
       expect(job.user).to eq(user)
+    end
+
+    it "destroys children when the parent job is destroyed" do
+      child = create(:sensemaker_job, parent_job: job, user: user)
+
+      job.destroy!
+
+      expect(Sensemaker::Job.exists?(child.id)).to be false
     end
   end
 
@@ -303,7 +342,7 @@ describe Sensemaker::Job do
       end
 
       it "returns true for a finished successful job with complete outputs" do
-        output_path = "#{data_folder}/report-#{job.id}.html"
+        output_path = "#{job_dir}/report.html"
         allow(File).to receive(:exist?).with(output_path).and_return(true)
 
         expect(job.publishable?).to be true
@@ -361,27 +400,29 @@ describe Sensemaker::Job do
           context "when all output files exist" do
             it_behaves_like "sets persisted_output when all output files exist",
                             "categorization_runner.ts",
-                            ->(j, df) { ["#{df}/categorization-output-#{j.id}.csv"] }
+                            ->(j, df) { ["#{df}/job-#{j.id}/categorization-output.csv"] }
 
             it_behaves_like "sets persisted_output when all output files exist",
                             "advanced_runner.ts",
                             ->(j, df) {
-                              ["#{df}/output-#{j.id}-summary.json", "#{df}/output-#{j.id}-topic-stats.json",
-                               "#{df}/output-#{j.id}-comments-with-scores.json"]
+                              jd = "#{df}/job-#{j.id}"
+                              ["#{jd}/output-summary.json", "#{jd}/output-topic-stats.json",
+                               "#{jd}/output-comments-with-scores.json"]
                             }
 
             it_behaves_like "sets persisted_output when all output files exist",
                             "runner.ts",
                             ->(j, df) {
-                              ["#{df}/output-#{j.id}-summary.json", "#{df}/output-#{j.id}-summary.html",
-                               "#{df}/output-#{j.id}-summary.md", "#{df}/output-#{j.id}-summaryAndSource.csv"]
+                              jd = "#{df}/job-#{j.id}"
+                              ["#{jd}/output-summary.json", "#{jd}/output-summary.html",
+                               "#{jd}/output-summary.md", "#{jd}/output-summaryAndSource.csv"]
                             }
           end
 
           context "when not all output files exist" do
             it "does not set persisted_output" do
               job.script = "advanced_runner.ts"
-              base_path = "#{data_folder}/output-#{job.id}"
+              base_path = "#{job_dir}/output"
               allow(File).to receive(:exist?).with("#{base_path}-summary.json").and_return(true)
               allow(File).to receive(:exist?).with("#{base_path}-topic-stats.json").and_return(true)
               allow(File).to receive(:exist?).with("#{base_path}-comments-with-scores.json").and_return(false)
@@ -397,7 +438,7 @@ describe Sensemaker::Job do
 
         context "when persisted_output is already set" do
           it "does not overwrite existing persisted_output" do
-            existing_path = "vendor/sensemaking-tools/data/output-#{job.id}"
+            existing_path = "vendor/sensemaking-tools/data/job-#{job.id}/output"
             job.persisted_output = existing_path
 
             job.finished_at = Time.current

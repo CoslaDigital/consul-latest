@@ -7,8 +7,9 @@ describe Sensemaker::ReportLinkComponent do
   let(:component) { Sensemaker::ReportLinkComponent.new(debate) }
 
   before do
-    Setting["llm.provider"] = "OpenAI"
-    Setting["llm.model"] = "gpt-4o"
+    stub_secrets(llm: { openai_api_key: "1234" })
+    Setting["llm.sensemaker_provider"] = "OpenAI"
+    Setting["llm.sensemaker_model"] = "gpt-4o"
     Setting["llm.use_sensemaker"] = true
   end
 
@@ -41,11 +42,28 @@ describe Sensemaker::ReportLinkComponent do
 
     context "when sensemaker is enabled and but job is unpublished" do
       before do
-        create(:sensemaker_job, :unpublished, analysable_type: "Debate", analysable_id: debate.id)
+        create(:sensemaker_job, :publishable, published: false,
+                                              analysable_type: "Debate", analysable_id: debate.id)
       end
 
       it "returns false" do
         expect(component.render?).to be false
+      end
+    end
+
+    context "when admin and job is unpublished but publishable" do
+      before do
+        sign_in(create(:administrator).user)
+        create(:sensemaker_job, :publishable, published: false,
+                                              analysable_type: "Debate", analysable_id: debate.id)
+      end
+
+      it "renders the view report link" do
+        render_inline component
+
+        expect(page).to have_link("View analysis",
+                                  href: sensemaker_resource_jobs_path(resource_type: "debates",
+                                                                      resource_id: debate.id))
       end
     end
 
