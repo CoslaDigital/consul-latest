@@ -2,13 +2,45 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.6.0-local.1](https://github.com/cosladigital/consul-latest/tree/2.6.0-local.1) (2026-11-25)
+
+## What's Changed
+
+### Added
+
+* Feature: Add My Offers to the My Content page
+* Offers: Add audit logging to Offers and Proposal Matches
+* Offers: enhance admin collaborations view with status and date columns
+* User Verification: Add ability to customise verification pipeline using Email, Residence, SMS
+* Geozones:  Add parent and child to Geozones to enable nesting of geozones in future
+* Security: Add rackattack geofencing and login rate limiting
+* Add feature switch for NEC card login
+
+### Changed
+
+* Polling Booths: allow booths to be created at any time
+* Polling Booths: extend recount window to 3 weeks to give more flexibility in assigning shifts for ballot uploads
+* Proposal Kinds: create a proposal kinds component for sidebar
+* Refactor: extract and improve global postal code validation
+* Ai Moderation: enhancements to UX to let user know comment has been moderated and add notification to Admin
+* My Area: Make My Area Landing Page optional controlled by feature switch
+* Budgets: refine budget selection to only display unfished budgets on the budgets list
+
+### Fixed
+
+* mask usernames for NEC card users in budgets, proposals and comments
+* mask usernames in comments
+* Fix videourl parser to accept youtube shorts
+
+**Full Changelog**:
+
 ## [2.6.0-syp.1](https://github.com/cosladigital/consul-latest/tree/2.6.0-syp.1) (2026-10-23)
 
 ## What's Changed
 
 ### Added
 
-* Feature: Add customsable language set for Elections
+* Feature: Add customisable language set for Elections
 * Feature: NEC Card- added strategy for custom numbers
 * Feature: My Area- added a landing page which displays processes for my geozone
 * NEC Card: added a dedicated login page for NEC cards
@@ -41,10 +73,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 * Fix videourl parser to accept youtube shorts
 
 **Full Changelog**:
-
-## [2.4.1-local.4](https://github.com/cosladigital/consul-latest/tree/2.4.1-local.4) (2026-5-5)
-
-## What's Changed
 
 ## [2.5.1-local.1](https://github.com/cosladigital/consul-latest/tree/2.5.1-local.1) (2026-7-15)
 
