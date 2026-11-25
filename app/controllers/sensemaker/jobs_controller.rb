@@ -23,27 +23,14 @@ class Sensemaker::JobsController < ApplicationController
     raise ActiveRecord::RecordNotFound, "Resource not found" unless @resource
 
     @parent_resource = load_parent_resource_for(@resource)
-    @sensemaker_jobs = case @resource
-                       when Poll
-                         Sensemaker::Job.for_poll(@resource).order(finished_at: :desc)
-                       when Legislation::Question
-                         Sensemaker::Job.for_legislation_question(@resource).order(finished_at: :desc)
-                       when Legislation::Process
-                         Sensemaker::Job.for_process(@resource).order(finished_at: :desc)
-                       else
-                         Sensemaker::Job.published
-                           .where(analysable: @resource)
-                                        .order(finished_at: :desc)
-                       end
+    @sensemaker_jobs = jobs_for_analysable(@resource)
   rescue ActiveRecord::RecordNotFound, ArgumentError
     head :not_found
   end
 
   def all_proposals_index
     @parent_resource = nil
-    @sensemaker_jobs = Sensemaker::Job.published
-                                      .where(analysable_type: "Proposal", analysable_id: nil)
-                                      .order(finished_at: :desc)
+    @sensemaker_jobs = jobs_for_analysable(Proposal)
     render :index
   end
 
@@ -66,6 +53,17 @@ class Sensemaker::JobsController < ApplicationController
   end
 
   private
+
+    def jobs_for_analysable(record)
+      Sensemaker::Job
+        .for_analysable(record, published_only: !admin_preview?)
+        .publishable_candidates
+        .order(finished_at: :desc)
+    end
+
+    def admin_preview?
+      current_user&.administrator?
+    end
 
     def load_parent_resource_for(resource)
       case resource

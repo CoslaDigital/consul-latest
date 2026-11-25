@@ -2,7 +2,7 @@ require "csv"
 
 module Sensemaker
   class CsvExporter
-    EXPORT_HEADERS = %w[comment-id comment_text agrees disagrees passes author-id].freeze
+    EXPORT_HEADERS = %w[participant_id survey_text agrees disagrees passes author-id].freeze
 
     attr_reader :conversation, :include_votes
 
@@ -36,9 +36,6 @@ module Sensemaker
       end
     end
 
-    # Ensures every comment row has at least one vote signal for advanced_runner.
-    # Rows with zero agrees, disagrees, and passes get a default passes value of 1
-    # so they are not dropped by vote-dependent processing.
     def self.provide_defaults_for_zero_vote_comments(csv_file_path)
       return unless File.exist?(csv_file_path)
 
@@ -91,7 +88,6 @@ module Sensemaker
         items = @conversation.comments
 
         items.map do |item|
-          # Works with both Comment AR objects and CommentLikeItem Data objects
           [
             item_id(item),
             item.body,

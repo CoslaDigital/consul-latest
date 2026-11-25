@@ -367,11 +367,13 @@ describe "Admin settings", :admin do
         end
         expect(page).to have_content "Value updated"
 
-        within "tr", text: "Model" do
-          expect(page).to have_select selected: "None"
-          select "GPT-4.1 mini"
-          click_button "Update"
-          expect(page).to have_select selected: "GPT-4.1 mini"
+        within "table", text: "Content features" do
+          within "tr", text: "Model" do
+            expect(page).to have_select selected: "None"
+            select "GPT-4.1 mini"
+            click_button "Update"
+            expect(page).to have_select selected: "GPT-4.1 mini"
+          end
         end
         expect(page).to have_content "Value updated"
 

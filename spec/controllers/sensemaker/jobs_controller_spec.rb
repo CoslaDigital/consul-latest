@@ -226,6 +226,16 @@ describe Sensemaker::JobsController do
         expect(jobs).to be_empty
         expect(jobs).not_to include(unpublished_job)
       end
+
+      context "when the current user is an administrator", :admin do
+        it "returns unpublished publishable jobs" do
+          get :index, params: { resource_type: "debates", resource_id: debate.id }
+
+          expect(response).to have_http_status(:ok)
+          jobs = controller.instance_variable_get(:@sensemaker_jobs)
+          expect(jobs).to include(unpublished_job)
+        end
+      end
     end
   end
 
@@ -246,6 +256,33 @@ describe Sensemaker::JobsController do
       expect(jobs).not_to include(specific_proposal_job)
       expect(controller.instance_variable_get(:@parent_resource)).to be(nil)
     end
+
+    context "when an unpublished all-proposals job exists" do
+      let!(:unpublished_all_proposals_job) do
+        job = create(:sensemaker_job, :publishable, analysable_type: "Proposal", analysable_id: nil,
+                                                    published: false)
+        output_path = job.artefacts.default_output_path
+        FileUtils.mkdir_p(File.dirname(output_path))
+        File.write(output_path, "<html><body>Test Report</body></html>")
+        job
+      end
+
+      it "does not include unpublished jobs for guests" do
+        get :all_proposals_index
+
+        jobs = controller.instance_variable_get(:@sensemaker_jobs)
+        expect(jobs).not_to include(unpublished_all_proposals_job)
+      end
+
+      context "when the current user is an administrator", :admin do
+        it "includes unpublished publishable jobs" do
+          get :all_proposals_index
+
+          jobs = controller.instance_variable_get(:@sensemaker_jobs)
+          expect(jobs).to include(unpublished_all_proposals_job)
+        end
+      end
+    end
   end
 
   describe "GET #index with legislation_processes resource type" do
@@ -253,6 +290,12 @@ describe Sensemaker::JobsController do
     let(:question) { create(:legislation_question, process: legislation_process) }
     let(:first_proposal) { create(:legislation_proposal, process: legislation_process) }
     let(:option) { create(:legislation_question_option, question: question) }
+    let!(:process_job) do
+      create_publishable_job_with_output(
+        analysable_type: "Legislation::Process",
+        analysable_id: legislation_process.id
+      )
+    end
     let!(:question_job) do
       create_publishable_job_with_output(
         analysable_type: "Legislation::Question",
@@ -274,8 +317,8 @@ describe Sensemaker::JobsController do
     let!(:other_process_job) do
       other_process = create(:legislation_process)
       create_publishable_job_with_output(
-        analysable_type: "Legislation::Question",
-        analysable_id: create(:legislation_question, process: other_process).id
+        analysable_type: "Legislation::Process",
+        analysable_id: other_process.id
       )
     end
 
@@ -284,6 +327,7 @@ describe Sensemaker::JobsController do
 
       expect(response).to have_http_status(:ok)
       jobs = controller.instance_variable_get(:@sensemaker_jobs)
+      expect(jobs).to include(process_job)
       expect(jobs).to include(question_job)
       expect(jobs).to include(proposal_job)
       expect(jobs).to include(option_job)
@@ -320,7 +364,7 @@ describe Sensemaker::JobsController do
       end
 
       it "serves file using resolved path when persisted_output is relative" do
-        relative_path = "tmp/sensemaker_test_folder/data/report-#{job.id}.html"
+        relative_path = "tmp/sensemaker_test_folder/data/job-#{job.id}/report.html"
         resolved = Rails.root.join(relative_path)
         FileUtils.mkdir_p(File.dirname(resolved))
         File.write(resolved, "<html><body>Resolved report</body></html>")

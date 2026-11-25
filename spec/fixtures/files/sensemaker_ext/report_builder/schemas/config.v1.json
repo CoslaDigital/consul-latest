@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "config_schema_version": 1,
+  "title": "PythonReportConfig",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Report Title Override"
+    },
+    "logo": {
+      "type": "string",
+      "title": "Logo Image Filename"
+    },
+    "excluded_topics": {
+      "type": "array",
+      "title": "Excluded Topics",
+      "description": "Topic names to omit (exact match)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excluded_opinions": {
+      "type": "array",
+      "title": "Excluded Opinions",
+      "description": "Opinion names to omit (exact match)",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

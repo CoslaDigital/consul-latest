@@ -70,7 +70,7 @@ production:
   <<: *sensemaker
 ```
 
-The path is relative to the Rails application root. Sensemaker jobs read and write CSV, JSON, and HTML artefacts in this directory.
+The path is relative to the Rails application root. Sensemaker jobs read and write CSV, JSON, and HTML artefacts under per-job subdirectories of this folder (`job-{id}/`), for example `vendor/sensemaking-tools/data/job-42/report.html`.
 
 ### Step 3: Prepare the data directory
 
@@ -182,7 +182,7 @@ The **all proposals** route is separate from the per-proposal URL. Its index lis
 2. **Queue**: The job is enqueued on the `sensemaker` Delayed Job queue (`Sensemaker::JobRunner`).
 3. **Processing**: The runner invokes `npx ts-node` for pipeline scripts or `npx sensemaking-report-ui` for HTML reports. LLM provider, model, and credentials are passed from admin LLM settings via `Sensemaker::RuntimeConfig`.
 4. **Output**: Result files are written to the data folder and recorded on the `Sensemaker::Job` record.
-5. **Publish**: An administrator publishes the job; `Sensemaker::ReportLinkComponent` then shows the public link when a published job exists for the resource.
+5. **Publish**: An administrator publishes the job. Citizens then see the public link when a published job exists for the resource. Administrators also see the link (and the jobs index) for unpublished jobs that are ready to publish, so they can preview reports before making them public.
 
 ## Supported Resources
 
@@ -205,6 +205,8 @@ The link is currently shown on:
 - Poll headers
 - Legislation process, question, and proposal pages
 - Participatory budget investment pages (when budget sensemaking is enabled and published jobs exist)
+
+Administrators also see the link when an unpublished job is ready to publish, so they can preview the public report pages before publication.
 
 ## Troubleshooting
 

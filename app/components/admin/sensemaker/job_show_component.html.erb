@@ -11,7 +11,7 @@
         <h3><%= t("admin.sensemaker.job_show.details") %></h3>
         <div>
           <%= link_to t("admin.sensemaker.job_show.back_to_jobs"), admin_sensemaker_jobs_path, class: "margin-right" %>
-          <%= link_to t("admin.sensemaker.job_show.published_reports_link"), jobs_index_path_for(sensemaker_job.analysable), class: "margin-right" if is_published? %>
+          <%= link_to t("admin.sensemaker.job_show.public_reports_link"), jobs_index_path_for(sensemaker_job.analysable), class: "margin-right" if show_public_reports_link? %>
           <% if can_publish? %>
             <% if is_published? %>
               <%= button_to t("admin.sensemaker.job_row.unpublish"), unpublish_admin_sensemaker_job_path(sensemaker_job), form_class: "inline", class: "button", method: :patch %>
@@ -85,6 +85,11 @@
         <div class="small-12 medium-6 column additional-context">
           <h5><%= t("admin.sensemaker.job_show.additional_context") %></h5>
           <pre class="small"><%= sensemaker_job.additional_context %></pre>
+          <br />
+          <% if sensemaker_job.run_options.present? %>
+            <h5><%= t("admin.sensemaker.job_show.run_options") %></h5>
+            <pre class="small"><%= JSON.pretty_generate(sensemaker_job.run_options) %></pre>
+          <% end %>
         </div>
       </div>
     </section>
@@ -135,7 +140,11 @@
           <% if input_paths.any? %>
             <% input_paths.each do |path| %>
               <li>
-                <%= link_to ::File.basename(path), download_admin_sensemaker_job_path(sensemaker_job, artefact: ::File.basename(path)) %>
+                <%= link_to ::File.basename(path),
+                            download_admin_sensemaker_job_path(
+                              sensemaker_job,
+                              artefact: artefact_download_param(path)
+                            ) %>
               </li>
             <% end %>
           <% else %>
@@ -149,7 +158,11 @@
           <% if output_paths.any? %>
             <% output_paths.each do |path| %>
               <li>
-                <%= link_to ::File.basename(path), download_admin_sensemaker_job_path(sensemaker_job, artefact: ::File.basename(path)) %>
+                <%= link_to ::File.basename(path),
+                            download_admin_sensemaker_job_path(
+                              sensemaker_job,
+                              artefact: artefact_download_param(path)
+                            ) %>
               </li>
             <% end %>
           <% else %>

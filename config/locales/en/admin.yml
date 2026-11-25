@@ -1454,6 +1454,8 @@ en:
       remote_census_general_name: General Information
       remote_census_request_name: Request Data
       remote_census_response_name: Response Data
+      llm_content_features_name: Content features
+      llm_sensemaker_features_name: Sensemaker features
       setting: Feature
       setting_name: Setting
       setting_value: Value
@@ -1915,7 +1917,12 @@ en:
         additional_context_label: "Additional context"
         additional_context_hint: "Optional text that helps guide the analysis. For example, briefly describe what the conversation is about so the AI has useful background. The target's title and description are already included."
         generate_summary: "Generate summary"
+        prepare_report: "Prepare report"
         generate_report: "Generate report"
+        report_config_title: "Report configuration"
+        report_config_hint: "All fields are optional. Leave them blank to use defaults."
+        report_config_add: "Add"
+        report_config_remove: "Remove"
         advanced_options: "Advanced options"
         expert_options_hint: "For expert users. Run any Sensemaker script by choosing from the input."
         groups: "Groups"
@@ -1929,6 +1936,15 @@ en:
         run: "Run"
         cancel: "← Cancel"
         download_input_csv: "Download input CSV"
+      report_config:
+        fields:
+          title:
+            label: "Report title"
+          logo:
+            label: "Logo image filename"
+          excluded_topics:
+            label: "Excluded topics"
+            hint: "Topic names to omit (exact match)"
       job_row:
         job_id_link: "Job #%{id}"
         unpublish: "Unpublish"
@@ -1947,6 +1963,7 @@ en:
         target_type: "Target Type"
         target_title: "Target Title"
         additional_context: "Additional context"
+        run_options: "Run options"
         error_report: "Error report"
         error_log: "Error Log"
         prerequisite_jobs: "Prerequisite Jobs"
@@ -1958,7 +1975,7 @@ en:
         none_available: "None available"
         select_file_download: "Select a file to download."
         back_to_jobs: "Back to Jobs"
-        published_reports_link: "Published report(s)"
+        public_reports_link: "View report(s)"
         analysable_all_proposals: "All Proposals"
         analysable_deleted: "(deleted)"
         status_completed_at: "Completed at %{time}"

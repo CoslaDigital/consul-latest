@@ -32,6 +32,10 @@ module Admin::Sensemaker::JobComponentHelpers
     job.published?
   end
 
+  def show_public_reports_link?
+    can_publish?
+  end
+
   def status_text
     time_format = "%Y-%m-%d %H:%M"
     case job.status
@@ -54,5 +58,23 @@ module Admin::Sensemaker::JobComponentHelpers
 
   def parent_job
     @parent_job ||= job.parent_job if job.parent_job_id.present?
+  end
+
+  def script_title(script = job.script)
+    key = Sensemaker::ScriptRegistry.i18n_key(script)
+    I18n.t("admin.sensemaker.scripts.#{key}.title")
+  end
+
+  def script_description(script = job.script)
+    key = Sensemaker::ScriptRegistry.i18n_key(script)
+    I18n.t("admin.sensemaker.scripts.#{key}.description")
+  end
+
+  def artefact_download_param(absolute_path)
+    Pathname.new(File.expand_path(absolute_path.to_s)).relative_path_from(
+      Pathname.new(File.expand_path(Sensemaker::Paths.sensemaker_data_folder.to_s))
+    ).to_s
+  rescue ArgumentError
+    File.basename(absolute_path.to_s)
   end
 end
