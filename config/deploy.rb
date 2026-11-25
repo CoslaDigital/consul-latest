@@ -74,6 +74,7 @@ namespace :deploy do
 
   after :updating, "install_node"
   after :updating, "install_ruby"
+  after :updating, "install_sensemaking_tools"
 
   after "deploy:migrate", "add_new_settings"
 
@@ -188,6 +189,24 @@ task :setup_delayed_job_environment do
   on roles(fetch(:delayed_job_roles)) do
     fnm_setup = fetch(:fnm_setup_command)
     SSHKit.config.command_map.prefix[:bundle].unshift(-> { "#{fnm_setup} && EXECJS_RUNTIME='' " })
+  end
+end
+
+desc "Create shared Python venv and install cosla-sensemaking-tools if missing"
+task :install_sensemaking_tools do
+  on roles(:app, :background) do
+    venv_path = "#{shared_path}/vendor/sensemaking-tools/venv"
+    health_check_bin = "#{venv_path}/bin/sensemaking-health-check"
+
+    if test("[ -x #{health_check_bin} ]")
+      info "Sensemaking tools already installed at #{venv_path}"
+    else
+      info "Setting up Sensemaking tools venv at #{venv_path}..."
+      execute :mkdir, "-p", "#{shared_path}/vendor/sensemaking-tools"
+      execute :python3, "-m", "venv", venv_path
+      execute "#{venv_path}/bin/pip", "install", "--upgrade", "pip"
+      execute "#{venv_path}/bin/pip", "install", "cosla-sensemaking-tools"
+    end
   end
 end
 
