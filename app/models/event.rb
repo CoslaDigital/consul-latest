@@ -20,7 +20,6 @@ class Event < ApplicationRecord
             allow_blank: true,
             if: -> { ends_at }
 
-
   def self.all_in_range(start_date, end_date)
     # Use full day range to capture events happening late in the day
     range = start_date.beginning_of_day..end_date.end_of_day
@@ -47,7 +46,6 @@ class Event < ApplicationRecord
 
     (events + budgets + budget_phases + processes + polls).sort_by(&:calendar_start)
   end
-
 
   def kind
     "generic_event"
