@@ -14,25 +14,20 @@
 
 
       <h1 class="h2"><%= @event.name %></h1>
-      <span class="label secondary">Manual Event</span>
+      <span class="label secondary"><%= @event.human_type %></span>
     </header>
 
     <div class="callout">
-
       <div class="grid-x grid-margin-x margin-bottom">
         <div class="cell medium-6">
           <strong class="text-muted">Starts:</strong>
-          <div>
-            <%= l(@event.starts_at, format: :long) %>
-          </div>
+          <div><%= l(@event.starts_at, format: :long) %></div>
         </div>
 
         <% if @event.ends_at.present? %>
           <div class="cell medium-6">
             <strong class="text-muted">Ends:</strong>
-            <div>
-              <%= l(@event.ends_at, format: :long) %>
-            </div>
+            <div><%= l(@event.ends_at, format: :long) %></div>
           </div>
         <% end %>
       </div>
@@ -43,17 +38,39 @@
         <strong class="text-muted">Description:</strong>
         <%= simple_format @event.description %>
       </div>
-      <%# Show Type Label %>
-      <span class="label secondary"><%= @event.human_type %></span>
 
-      <%# Show Location %>
-      <% if @event.location.present? %>
-        <span class="label success"><%= @event.location %></span>
+      <% show_map = feature?(:map) && @event.map_location&.available? %>
+
+      <% if @event.location.present? || show_map %>
+        <hr>
+        <div class="event-location margin-top">
+          <strong class="text-muted"><%= t("events.show.location") %>:</strong>
+
+          <% if @event.location.present? %>
+            <p class="margin-bottom-small"><%= @event.location %></p>
+          <% end %>
+
+          <% if @event.directions_url.present? %>
+            <p>
+              <%= link_to "Get Directions", @event.directions_url, target: "_blank", rel: "noopener", class: "button tiny hollow" %>
+            </p>
+          <% end %>
+
+          <% if show_map %>
+            <div class="margin-top">
+              <%= render Shared::MapLocationComponent.new(
+                @event.map_location,
+                investments_coordinates: @event.map_marker_data
+              ) %>
+            </div>
+          <% end %>
+        </div>
       <% end %>
-    <hr>
-    <% if feature?(:allow_attached_documents) %>
-      <%= render Documents::DocumentsComponent.new(@event.documents) %>
-    <% end %>
+
+      <% if feature?(:allow_attached_documents) && @event.documents.any? %>
+        <hr>
+        <%= render Documents::DocumentsComponent.new(@event.documents) %>
+      <% end %>
     </div>
 
   </div>

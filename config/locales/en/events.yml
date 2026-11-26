@@ -16,3 +16,5 @@ en:
     edit:
       title: "Edit Event"
       submit_button: "Update Event"
+    show:
+      location: "Location"

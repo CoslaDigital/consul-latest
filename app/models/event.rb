@@ -2,6 +2,9 @@ class Event < ApplicationRecord
   include CalendarItem
   include Imageable
   include Documentable
+  include Mappable
+
+  alias_attribute :title, :name
 
   TYPES = %w[public_meeting workshop consultation training community_event].freeze
 
@@ -55,5 +58,26 @@ class Event < ApplicationRecord
   # We define this clearly so the Calendar knows exactly what to use
   def calendar_start
     starts_at
+  end
+
+  def directions_url
+    if map_location&.available?
+      "https://www.google.com/maps/search/?api=1&query=#{map_location.latitude},#{map_location.longitude}"
+    elsif location.present?
+      "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(location)}"
+    end
+  end
+
+  def map_marker_data
+    return [] unless map_location&.available?
+
+    [
+      {
+        title: location.presence || name,
+        link: directions_url,
+        lat: map_location.latitude,
+        long: map_location.longitude
+      }
+    ]
   end
 end
