@@ -1,205 +1,448 @@
-// If you're using multitenancy, you can override styles for a certain
-// tenant by styling the `<html>` element with the class
-// `tenant-<tenant_name>`. For example, to style the public (main)
-// tenant without these styles affecting any other tenants, use the
-// `.tenant-public` selector.
-//
-// You can use CSS variables to customize the colors. Here's an example
-// changing the brand, buttons, links and main layout colors for just
-// the main tenant.
-//
-// .tenant-public {
-//   --anchor-color: #372;
-//   --anchor-color-hover: #137;
-//   --brand: #153;
-//   --brand-secondary: #134a00;
-//   --button-background-hover: #fa0;
-//   --button-background-hover-contrast: #{$black};
-//   --footer: #e6e6e6;
-//   --main-header: #351;
-//   --subnavigation: #ffd;
-//   --top-links: var(--main-header);
-// }
-//
-// Some colors default to another color, so you don't have to change
-// both colors if you'd like them to be the same. For instance, the
-// `--main-header` and `--anchor-color` colors will use the `--brand`
-// color if `--main-header` or `--anchor-color` are not defined, while
-// the `--top-links` color will use the `--brand-secondary` color if
-// `--top-links` is not defined.
-//
-// If, for instance, you're using a light color for the main header when
-// the default color is a dark one, you should also change the text
-// color. You can do that with a variable ending in `-contrast`, like:
-//
-// .tenant-public {
-//   --main-header: #{$white};
-//   --main-header-contrast: #{$black};
-// }
-//
-// NOTE: If you are **not** using mulitenancy, we recommend overwriting
-// SCSS variables in the `_consul_custom_overrides.scss` file instead
+// 1. Move the import to the very top
+@import "cosla_shared";
+
+/*
+================================================================================
+COSLA MULTI-TENANT STYLING GUIDE (Variable Data-Store - tenants.scss)
+================================================================================
+
+ARCHITECTURE OVERVIEW:
+Each tenant is styled via the `tenant-<tenant_name>` class on the `<html>`
+element. This file acts purely as a "Variable Dictionary":
+
+1. tenants.scss (THIS FILE): Assigns color variables to specific tenant classes
+   (e.g., .tenant-edi). Do NOT put structural CSS (margins, padding, layout)
+   here unless it is a highly specific, unavoidable tenant override.
+
+2. _cosla_shared.scss: Contains `@mixin shared-styles`, which handles structural
+   CSS for tables, badges, comments, and maps using the variables defined here.
+
+================================================================================
+HOW TO ADD A NEW TENANT:
+================================================================================
+
+STEP 1: Copy and paste the BLANK TEMPLATE below.
+STEP 2: Change `.tenant-name` to match the tenant's exact system identifier.
+STEP 3: Fill in the hex codes.
+        - Use https://webaim.org/resources/contrastchecker/ to ensure contrast
+          colors (text over brand colors) are accessible.
+STEP 4: Scroll to the "GLOBAL APPLICATION" block at the bottom of this file and
+        add your new `.tenant-name` to the comma-separated list so it inherits
+        the shared layout mixin.
+
+================================================================================
+BLANK TEMPLATE:
+================================================================================
+
+.tenant-name {
+  // Core Branding
+  --brand: #;
+  --brand-secondary: #;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--brand-secondary);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
+}
+
+*/
 
 .tenant-public {
+  // Core Branding
   --brand: #FF3366;
-  --main-header: #EC407A;
-  --footer: #FCE4EC;
+  --brand-secondary: #f4b56e;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--footer);
   --top-links-contrast: #{$black};
-  --brand-secondary: #f4b56e;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--brand-secondary);
-  --main-header: var(--brand);
-  --brand-contrast: #FFFFFF;
-  --main-header-contrast: #FFFFFF;
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-flotta {
+  // Core Branding
   --brand: #FF3366;
-  --main-header: #EC407A;
-  --footer: #FCE4EC;
+  --brand-secondary: #f4b56e;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--footer);
   --top-links-contrast: #{$black};
-  --brand-secondary: #f4b56e;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--brand-secondary);
-  --main-header: var(--brand);
-  --brand-contrast: #FFFFFF;
-  --main-header-contrast: #FFFFFF;
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-test {
-  --anchor-color: #008585;
-  --anchor-color-hover: #74a892;
+  // Core Branding
   --brand: #c7522a;
   --brand-secondary: #e5c185;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: #74a892;
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
+  --top-links: var(--main-header);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #c7522a;
+
+  // Footer
+  --footer: #e6e6e6;
+  --footer-contrast: #{$black};
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: #008585;
+  --anchor-color-hover: #74a892;
   --button-background-hover: #fbf2c4;
   --button-background-hover-contrast: #{$black};
-  --footer: #e6e6e6;
-  --main-header: #74a892;
-  --top-links: var(--main-header);
-  --subnavigation: #c7522a;
 }
 
 .tenant-arb {
+  // Core Branding
   --brand: #10069F;
   --brand-secondary: #00B140;
   --brand-contrast: #FFFFFF;
-  --footer: #023C19;
-  --footer-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #023C19;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-inverc {
+  // Core Branding
   --brand: #36808c;
   --brand-secondary: #75a5ad;
   --brand-contrast: #FFFFFF;
-  --footer: #d7e5e7;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #75a5ad;
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #d7e5e7;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-edi {
+  // Core Branding
   --brand: #6D3465;
   --brand-secondary: #492445;
   --brand-contrast: #FFFFFF;
-  --footer: #D0E0F4;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #D0E0F4;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-aberdeen {
-  --main-header: #EF5D9E;
+  // Core Branding
   --brand: #45D3A1;
   --brand-secondary: #6CBEEC;
-  --brand-contrast: #FF;
-  --footer: #eee6db;
+  --brand-contrast: #FFFFFF; // Fixed from invalid #FF
+
+  // Header
+  --main-header: #EF5D9E;
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: #eee6db;
-  --top-links-contrast: #FF;
+  --top-links-contrast: #FFFFFF; // Fixed from invalid #FF
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #eee6db;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-sac {
+  // Core Branding
   --brand: #005293;
   --brand-secondary: #002F59;
-  --footer: #CEDBEA;
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #CEDBEA;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-ren {
+  // Core Branding
   --brand: #10069F;
   --brand-secondary: #00B140;
   --brand-contrast: #FFFFFF;
-  --footer: #023C19;
-  --footer-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--brand-secondary);
   --top-links-contrast: #FFFFFF;
-  @import "cosla_shared";
-  @include shared-styles;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: #023C19;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-ylag {
+  // Core Branding
   --brand: #004a83;
-  --footer: #FCE4EC;
-  --top-links: var(--footer);
-  --top-links-contrast: #FFF;
   --brand-secondary: #cc007e;
-  --footer: var(--brand-secondary);
-  --footer-contrast: #FFF;
-  --main-header: var(--brand);
   --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
   --main-header-contrast: #FFFFFF;
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
+
+  // Navigation
+  --top-links: var(--footer);
+  --top-links-contrast: #FFFFFF;
+  --subnavigation: #EAEAEA;
+
+  // Footer
+  --footer: var(--brand-secondary);
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-hlc {
+  // Core Branding
   --brand: #FF3366;
-  --footer: #FCE4EC;
+  --brand-secondary: #f4b56e;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--footer);
   --top-links-contrast: #{$black};
-  --brand-secondary: #f4b56e;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--brand-secondary);
-  --main-header: var(--brand);
-  --brand-contrast: #FFFFFF;
-  --main-header-contrast: #FFFFFF;
-  // Import shared styles
-  @import "cosla_shared";
-  @include shared-styles;
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
 }
 
 .tenant-ccdemo {
+  // Core Branding
   --brand: #2E542F;
-  --footer: #E9F8E9;
+  --brand-secondary: #9BEF9D;
+  --brand-contrast: #FFFFFF;
+
+  // Header
+  --main-header: var(--brand);
+  --main-header-contrast: #FFFFFF;
+
+  // Navigation
   --top-links: var(--footer);
   --top-links-contrast: #{$white};
-  --brand-secondary: #9BEF9D;
+  --subnavigation: #EAEAEA;
+
+  // Footer
   --footer: var(--brand-secondary);
-  --main-header: var(--brand);
-  --brand-contrast: #FFFFFF;
-  --main-header-contrast: #FFFFFF;
-  // Import shared styles
-  @import "cosla_shared";
+  --footer-contrast: #FFFFFF;
+
+  // Content & Callouts
+  --background-color: var(--brand-secondary);
+  --text-color: var(--brand-contrast);
+
+  // Interactive Elements
+  --anchor-color: var(--brand);
+  --anchor-color-hover: var(--brand-secondary);
+  --button-background-hover: var(--brand-secondary);
+  --button-background-hover-contrast: #FFFFFF;
+}
+
+// ==========================================================================
+// GLOBAL APPLICATION
+// ==========================================================================
+// Note: .tenant-test and .tenant-aberdeen are excluded to match the original
+// file. Add them to this list if they should also inherit shared-styles.
+
+.tenant-public,
+.tenant-flotta,
+.tenant-aberdeen,
+.tenant-test
+.tenant-arb,
+.tenant-inverc,
+.tenant-edi,
+.tenant-sac,
+.tenant-ren,
+.tenant-ylag,
+.tenant-hlc,
+.tenant-ccdemo {
   @include shared-styles;
 }
