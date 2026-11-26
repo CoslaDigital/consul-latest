@@ -597,6 +597,7 @@ en:
         new_event: "New event"
         title: "Manage Events"
         view_calendar: "View Calendar"
+        view_list: "View List"
     collaborations:
       index:
         title: "Mutual Aid Management"
