@@ -1,5 +1,10 @@
 class Admin::EventsController < Admin::BaseController
+  include ImageAttributes
+  include DocumentAttributes
+  include MapLocationAttributes
+
   before_action :set_event, only: [:edit, :update, :destroy]
+  before_action :destroy_map_location_association, only: :update
 
   # GET /admin/events
   # Shows a list (table) of manual events for easy management
@@ -43,16 +48,28 @@ class Admin::EventsController < Admin::BaseController
   end
 
   def event_params
-    params.require(:event).permit(
+    params.require(:event).permit(allowed_params)
+  end
+
+  def allowed_params
+    [
       :name,
       :description,
-      :image,
       :starts_at,
       :ends_at,
-      :location,
       :event_type,
-      documents_attributes: [:id, :title, :user_id, :cached_attachment, :attachment, :_destroy]
-    )
+      :location,
+      image_attributes: image_attributes,
+      documents_attributes: document_attributes,
+      map_location_attributes: map_location_attributes
+    ]
+  end
+
+  def destroy_map_location_association
+    map_location_params = event_params[:map_location_attributes]
+
+    if map_location_params.blank? || map_location_params.values.all?(&:blank?)
+      @event.map_location = nil
+    end
   end
 end
-
