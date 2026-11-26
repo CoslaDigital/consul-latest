@@ -188,3 +188,18 @@
   @import "cosla_shared";
   @include shared-styles;
 }
+
+.tenant-ccdemo {
+  --brand: #2E542F;
+  --footer: #E9F8E9;
+  --top-links: var(--footer);
+  --top-links-contrast: #{$white};
+  --brand-secondary: #9BEF9D;
+  --footer: var(--brand-secondary);
+  --main-header: var(--brand);
+  --brand-contrast: #FFFFFF;
+  --main-header-contrast: #FFFFFF;
+  // Import shared styles
+  @import "cosla_shared";
+  @include shared-styles;
+}
