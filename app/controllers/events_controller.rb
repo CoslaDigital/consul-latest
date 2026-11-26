@@ -4,16 +4,48 @@ class EventsController < ApplicationController
   skip_authorization_check
 
   def index
-    @start_date = resolve_start_date(params[:start_date])
+    respond_to do |format|
+      format.html do
+        @start_date = resolve_start_date(params[:start_date])
+        @calendar_items = Event.all_in_range(
+          @start_date.beginning_of_month,
+          @start_date.end_of_month
+        )
+      end
 
-    @calendar_items = Event.all_in_range(
-      @start_date.beginning_of_month,
-      @start_date.end_of_month
-    )
+      format.ics do
+        feed_items = Event.all_in_range(1.month.ago, 12.months.from_now)
+        ics = Events::IcalendarBuilder.new(
+          feed_items,
+          view_context: view_context,
+          calendar_name: Setting["org_name"].presence || "Events Calendar"
+        ).to_ics
+
+        send_data ics,
+                  type: "text/calendar; charset=utf-8",
+                  disposition: "inline",
+                  filename: "events.ics"
+      end
+    end
   end
 
   def show
     @event = Event.find(params[:id])
+
+    respond_to do |format|
+      format.html
+      format.ics do
+        ics = Events::IcalendarBuilder.new(
+          @event,
+          view_context: view_context
+        ).to_ics
+
+        send_data ics,
+                  type: "text/calendar; charset=utf-8",
+                  disposition: "attachment",
+                  filename: "#{@event.name.parameterize}.ics"
+      end
+    end
   end
 
   private

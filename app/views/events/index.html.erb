@@ -2,22 +2,44 @@
   <%= t("events.calendar.title", default: "Events Calendar") %>
 <% end %>
 
+<%
+  webcal_url = events_url(format: :ics, protocol: "webcal")
+  google_url = "https://calendar.google.com/calendar/r?cid=#{ERB::Util.url_encode(webcal_url)}"
+  ics_url = events_url(format: :ics)
+%>
+
 <div class="calendar-container">
-  <div class="clearfix mb-4">
+  <div class="mb-4">
     <% if current_user&.administrator? %>
-      <div class="float-right">
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: 0.75rem;">
         <%= link_to t("admin.events.index.view_list", default: "View List"),
                     admin_events_path,
                     class: "button secondary hollow",
-                    style: "margin-right: 0.5rem;" %>
+                    style: "margin-bottom: 0;" %>
 
         <%= link_to t("admin.events.index.new_event"),
                     new_admin_event_path,
-                    class: "button success" %>
+                    class: "button success",
+                    style: "margin-bottom: 0;" %>
       </div>
     <% end %>
 
-    <h2 class="h3"><%= t("events.calendar.title", default: "Events Calendar") %></h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <h2 class="h3" style="margin-bottom: 0;">
+        <%= t("events.calendar.title", default: "Events Calendar") %>
+      </h2>
+
+      <%= select_tag :calendar_subscribe,
+                     options_for_select([
+                                          ["Subscribe to Calendar", ""],
+                                          ["Google Calendar", google_url, { "data-external" => "true" }],
+                                          ["Apple / Outlook (Desktop)", webcal_url],
+                                          ["Download .ics file", ics_url]
+                                        ]),
+                     aria: { label: "Subscribe to Calendar" },
+                     style: "margin-bottom: 0; width: auto;",
+                     onchange: "if (!this.value) return; const opt = this.options[this.selectedIndex]; opt.dataset.external ? window.open(this.value, '_blank', 'noopener') : window.location.href = this.value; this.selectedIndex = 0;" %>
+    </div>
   </div>
 
   <%= month_calendar(events: @calendar_items, attribute: :calendar_start, end_attribute: :calendar_end, start_date: @start_date) do |date, items| %>
