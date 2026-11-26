@@ -39,7 +39,7 @@
       <% if @event.location.present? || show_map %>
         <hr>
         <div class="event-location margin-top">
-          <strong class="text-muted">Location:</strong>
+          <strong class="text-muted"><%= t("events.show.location") %>:</strong>
 
           <% if @event.location.present? %>
             <p class="margin-bottom-small"><%= @event.location %></p>
