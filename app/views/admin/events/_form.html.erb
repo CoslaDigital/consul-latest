@@ -36,6 +36,22 @@
       <%= f.text_field :location %>
     </div>
   </div>
+  <% if feature?(:map) %>
+    <div class="small-12 column margin-top">
+      <%= f.fields_for :map_location, (@event.map_location || @event.build_map_location) do |map_form| %>
+        <label><%= t("proposals.form.map_location", default: "Map location") %></label>
+        <p class="help-text">
+          <%= t("proposals.form.map_location_instructions", default: "Navigate the map to the location and place the marker.") %>
+        </p>
+
+        <%= render Shared::MapLocationComponent.new(map_form.object, form: map_form) %>
+
+        <%= map_form.hidden_field :latitude %>
+        <%= map_form.hidden_field :longitude %>
+        <%= map_form.hidden_field :zoom %>
+      <% end %>
+    </div>
+  <% end %>
 
   <% if feature?(:allow_attached_documents) %>
     <%= render Documents::NestedComponent.new(f) %>
