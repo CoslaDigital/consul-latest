@@ -1,6 +1,7 @@
 class MapLocation < ApplicationRecord
   belongs_to :proposal, class_name: "Proposal", touch: true
   belongs_to :investment, class_name: "Budget::Investment", touch: true
+  belongs_to :event, class_name: "Event", touch: true
 
   validates :longitude, :latitude, :zoom, presence: true, numericality: true
 
@@ -9,7 +10,7 @@ class MapLocation < ApplicationRecord
   end
 
   def mappable
-    proposal || investment
+    proposal || investment || event
   end
 
   def title
@@ -23,7 +24,7 @@ class MapLocation < ApplicationRecord
       longitude: heading.longitude.presence&.to_f
     )
   end
-  
+
   def self.from_settings
     latitude_setting = Setting.find_by(key: "map.latitude")
     longitude_setting = Setting.find_by(key: "map.longitude")
@@ -34,7 +35,7 @@ class MapLocation < ApplicationRecord
       longitude: (longitude_setting.value.to_f if longitude_setting&.value.present?)
     )
   end
-  
+
   def self.investments_json_data(investments)
     return [] if investments.none?
 
@@ -60,13 +61,13 @@ class MapLocation < ApplicationRecord
     Rails.logger.info "Inside proposals_json_data #{proposals.inspect}"
 
     data = proposals.joins(:map_location)
-                    .with_fallback_translation 
-                    .pluck(:id, :title, :latitude, :longitude) 
-        
+             .with_fallback_translation
+             .pluck(:id, :title, :latitude, :longitude)
+
     data.map do |values|
       {
         title: values[1],
-        link: "/proposals/#{values[0]}", 
+        link: "/proposals/#{values[0]}",
         lat: values[2],
         long: values[3]
       }
